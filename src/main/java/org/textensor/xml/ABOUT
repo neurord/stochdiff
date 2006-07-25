@@ -1,0 +1,22 @@
+
+
+This contains a minimal XML parser. Its nothing to do with the stochastid diffusion calculation,
+ but is needed to turn XML input files into java objects in the stochdiff.model package.
+ 
+ It works by recursion and reflection: pulling xml tokens from the input file and trying to 
+ instantiate the corresponding java objects.  We're not particularly fussy about the 
+ arcane details of the XML specification. IT just cares about normal XML elements such 
+ as 
+ <Thing x="1" y="2">
+    <z>4</z>
+     <subthing> 
+            <subx>5</subx>
+     </subthing>
+ </Thing>   
+ 
+ This will get turned into  a java object of clas Thing with felds x, y, z, and subthing where the 
+ field subthing is of some object type that has a field called subx. Note that the specification
+ of simple field values (strings, numbers etc) can be via attributes 'x="1"' or by elements
+ <x>1</x>.  This allows you to write the XML files in whichever form is more readable. 
+ 
+ 

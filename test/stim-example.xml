@@ -1,0 +1,29 @@
+<StimulationSet>
+
+    <!-- the injectionSite must match a regionLabel deefined in the morphology -->
+    <InjectionStim specieID="a" injectionSite="pointA">
+	<onset>5.0</onset>
+	<duration>1.0</duration>
+	<rate>200</rate>
+    </InjectionStim>
+    <!-- onset and duration are times measured in milliseconds. The rate is in numbers of particles 
+	 per millisecond -->
+
+
+
+    <!-- if you set a period, the stimulus is repeated at the corresponding frequency -->
+    <!-- if you set "end", the periodic event stops then -->
+
+    <InjectionStim specieID="c" injectionSite="unused">
+	<onset>1.0</onset>
+	<duration>0.2</duration>
+	<rate>50</rate>
+	<period>10</period>
+	<end>2000</end>
+	    
+    </InjectionStim>
+
+
+
+
+</StimulationSet>

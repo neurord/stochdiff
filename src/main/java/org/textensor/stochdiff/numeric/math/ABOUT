@@ -1,0 +1,10 @@
+
+
+Just some linear algebra.
+
+The matrix class includes standard LU decomposition and backsubstitution for solving 
+linear equations. 
+
+It also has an exp(M) method to compute a matrix exponential which uses the same algorithm
+as the standard c library for a simple exponential.
+ 

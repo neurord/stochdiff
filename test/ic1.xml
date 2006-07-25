@@ -1,0 +1,19 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+	<NanoMolarity specieID="a" value="0"/>
+	<NanoMolarity specieID="b" value="0"/>
+	<NumberDensity specieID="c" number="100"/>
+    </ConcentrationSet>
+
+
+    <!-- number densities are in particles per cubic micron. You 
+	 get about one particles per cubic micron in a 1.6 nM solution -->
+
+    
+    <!-- should aslo be able to set 'region="abc"' to have a concentration
+	set apply only to a certain region (not implemented yet) -->
+
+</InitialConditions>
+

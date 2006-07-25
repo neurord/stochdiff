@@ -1,0 +1,44 @@
+<ReactionScheme>
+    
+    <Specie name="Specie A" id="a" mobility="0.025"/>
+    <Specie name="Specie B" id="b" mobility="0.125"/>
+    <Specie name="Specie C" id="c" kdiff="0.2"/>
+    <Specie name="Specie D" id="d" mobility="0.5"/>
+    <Specie name="Specie E" id="e" kdiff="0.02"/>
+    <Specie name="Specie F" id="f" kdiff="0.01"/>
+
+
+
+    <Reaction name = "Reaction 1" id="r1">
+	<Reactant specieID="a"/>
+	<Reactant specieID="b"/>
+	<Product specieID="c"/>
+
+	<forwardRate>0.02</forwardRate>
+	<reverseRate>0.01</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+    <!-- as a short cut, you can put reactant and product ids in a list  -->
+    <Reaction name = "Reaction 2" 
+	      id="r2" 
+	      reactants="b c"
+	      products="d"
+	      forwardRate = "0.1"
+	      reverseRate = "0.05"
+	      Q10 = "0.2">
+    </Reaction>
+
+
+
+    <!-- enzyme reactions etc where you only have the Michaelis constant -->
+    <CatalyzedReaction michaelisConstant="0.01">
+	<Reactant specieID="e"/>
+	<Reactant specieID="e"/>
+	<Catalyst specieID="c"/>
+	<Product specieID="f"/>
+    </CatalyzedReaction>
+
+	
+
+</ReactionScheme>
