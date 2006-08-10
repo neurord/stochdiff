@@ -186,7 +186,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         sb.append("gridConcentrations " + nel + " " + nspec + " " + time + "\n");
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < nspec; j++) {
-                sb.append(" " + (CONC_OF_N * wkB[i][j] / volumes[i]));
+                sb.append(stringd((CONC_OF_N * wkB[i][j] / volumes[i])));
             }
             sb.append("\n");
         }
@@ -194,12 +194,51 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     }
 
 
+    @SuppressWarnings("boxing")
+    private String getGridConcsPlainText(double time) {
+        StringBuffer sb = new StringBuffer();
+        // TODO tag specific to integer quantities;
+        sb.append(stringd(time));
+        for (int i = 0; i < nel; i++) {
+            for (int j = 0; j < nspec; j++) {
+                sb.append(stringd((CONC_OF_N * wkB[i][j] / volumes[i])));
+            }
+        }
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
+
+    private String stringd(double d) {
+        if (d == 0.0) {
+            return "0.0 ";
+        } else {
+            return String.format("%.5g ", d);
+        }
+    }
+
+
+    private String getGridConcsHeadings() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("time ");
+        for (int i = 0; i < nel; i++) {
+            for (int j = 0; j < nspec; j++) {
+                sb.append(" Vol_" + i + "_Spc_" + j + " ");
+            }
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
 
     public final void run() {
         init();
 
         if (resultWriter != null) {
             resultWriter.writeString(vgrid.getAsText());
+            resultWriter.writeToSiblingFile(vgrid.getAsTableText(), "-mesh.txt");
+            resultWriter.writeToSiblingFile(getGridConcsHeadings(), "-conc.txt");
         }
 
         double time = 0.;
@@ -216,6 +255,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             if (iwr % 5 == 0) {
                 if (resultWriter != null) {
                     resultWriter.writeString(getGridConcsText(time));
+                    resultWriter.writeToSiblingFile(getGridConcsPlainText(time), "-conc.txt");
                 }
             }
 

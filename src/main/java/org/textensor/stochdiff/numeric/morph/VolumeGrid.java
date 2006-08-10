@@ -202,6 +202,19 @@ public class VolumeGrid {
     }
 
 
+    public String getAsTableText() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("element_index " + elements.get(0).getHeadings());
+        sb.append("\n");
+        for (int i = 0; i < nelement; i++) {
+            sb.append("" + i + " " + elements.get(i).getAsPlainText());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+
+
     public String getLabel(int i) {
         return eltLabels[i];
     }

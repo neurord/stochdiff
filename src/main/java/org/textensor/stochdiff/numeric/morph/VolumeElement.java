@@ -138,6 +138,39 @@ public class VolumeElement {
         return sb.toString();
     }
 
+    @SuppressWarnings("boxing")
+    public String getAsPlainText() {
+        StringBuffer sb = new StringBuffer();
+        // export boundary if have it, ow just the center point;
+        if (boundary != null) {
+            for (Position p : boundary) {
+                sb.append(String.format(" %.5g %.5g %.5g ", p.getX(), p.getY(), p.getZ()));
+            }
+        } else {
+            sb.append(String.format(" %.5g %.5g %.5g  ", cx, cy, cz));
+
+        }
+        return sb.toString();
+    }
+
+
+    @SuppressWarnings("boxing")
+    public String getHeadings() {
+        StringBuffer sb = new StringBuffer();
+        // export boundary if have it, ow just the center point;
+        if (boundary != null) {
+            for (int i = 0; i < boundary.length; i++) {
+                sb.append(" x" + i + " y" + i + " z" + i);
+
+            }
+        } else {
+            sb.append(" cx cy cz");
+
+        }
+        return sb.toString();
+    }
+
+
 
     public void setAlongArea(double d) {
         alongArea = d;
