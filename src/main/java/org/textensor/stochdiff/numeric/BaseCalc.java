@@ -21,9 +21,13 @@ public abstract class BaseCalc {
     StimulationTable stimulationTable;
 
 
-    double[] initialConcentrations;
+    double[] baseConcentrations;
+    double[][] regionConcentrations;
 
     protected ResultWriter resultWriter;
+
+    String[] speciesList;
+
 
 
     public BaseCalc(SDRun sdr) {
@@ -40,9 +44,9 @@ public abstract class BaseCalc {
         stimulationTable = stim.makeStimulationTable(reactionTable);
 
         InitialConditions icons = sdRun.getInitialConditions();
-        String[] spl = reactionTable.getSpeciesIDs();
-        double vol = sdRun.poolVolume;
-        initialConcentrations = icons.getDefaultNanoMolarConcentrations(spl);
+        speciesList = reactionTable.getSpeciesIDs();
+        // double vol = sdRun.poolVolume;
+        baseConcentrations = icons.getDefaultNanoMolarConcentrations(speciesList);
     }
 
 
@@ -77,13 +81,46 @@ public abstract class BaseCalc {
         spineloc.addSpinesTo(volumeGrid);
 
         volumeGrid.fix();
+
+        makeRegionConcentrations(volumeGrid.getRegionLabels());
+
     }
 
 
 
     public double[] getNanoMolarConcentrations() {
-        return initialConcentrations;
+        return baseConcentrations;
     }
+
+    public double[][] getRegionConcentrations() {
+        if (regionConcentrations == null) {
+            extractGrid();
+        }
+        return regionConcentrations;
+    }
+
+
+
+
+    private void makeRegionConcentrations(String[] sra) {
+        InitialConditions icons = sdRun.getInitialConditions();
+        int nc = baseConcentrations.length;
+        double[][] ret = new double[sra.length][];
+        for (int i = 0; i < sra.length; i++) {
+            if (icons.hasConcentrationsFor(sra[i])) {
+                ret[i] = icons.getRegionConcentrations(sra[i], speciesList);
+            } else {
+                // could also leave at zero?
+                ret[i] = new double[baseConcentrations.length];
+                for (int j = 0; j < nc; j++) {
+                    ret[i][j] = baseConcentrations[j];
+                }
+            }
+        }
+        regionConcentrations = ret;
+    }
+
+
 
 
     public ReactionTable getReactionTable() {

@@ -64,7 +64,7 @@ public class StimulationTable {
 
             if (f > 0.) {
                 for (int j = 0; j < nspec; j++) {
-                    ret[i][j] = f * rates[i][j];
+                    ret[i][j] = f * rates[i][j] * dt;
                 }
             }
         }

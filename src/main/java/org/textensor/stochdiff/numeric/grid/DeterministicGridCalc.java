@@ -36,14 +36,18 @@ public class DeterministicGridCalc extends BaseCalc {
 
     int nel;
     int nspec;
+    String[] specieIDs;
     double[] volumes;
     double[] fdiff;
 
     int[][] neighbors;
     double[][] couplingConstants;
 
-    int[] stimtargets;
+    int[][] stimtargets;
     int[] eltstims;
+    double[] eltstimshare;
+
+    int[] eltregions;
 
     double[][] wkA;
     double[][] wkB;
@@ -68,6 +72,8 @@ public class DeterministicGridCalc extends BaseCalc {
 
         nel = vgrid.getNElements();
         nspec = rtab.getNSpecies();
+        specieIDs = rtab.getSpecieIDs();
+
         volumes = vgrid.getElementVolumes();
 
         fdiff = rtab.getDiffusionConstants();
@@ -77,31 +83,44 @@ public class DeterministicGridCalc extends BaseCalc {
 
 
         stimTab = getStimulationTable();
-        stimtargets = vgrid.getElementIndexes(stimTab.getTargetIDs());
+        stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
         eltstims = new int[nel];
+        eltstimshare = new double[nel];
         for (int i = 0; i < eltstims.length; i++) {
             eltstims[i] = -1;
         }
         for (int i = 0; i < stimtargets.length; i++) {
-            eltstims[stimtargets[i]] = i;
+            int[] asti = stimtargets[i];
+            double vtot = 0.;
+            for (int k = 0; k < asti.length; k++) {
+                vtot += volumes[asti[k]];
+            }
+
+            for (int k = 0; k < asti.length; k++) {
+                eltstims[asti[k]] = i;
+                eltstimshare[asti[k]] = volumes[i] / vtot;
+            }
         }
 
+        eltregions = vgrid.getRegionIndexes();
 
         wkA = new double[nel][nspec];
         wkB = new double[nel][nspec];
         wkC = new double[nel][nspec];
 
-
-        double[] c0 = getNanoMolarConcentrations();
         dt = sdRun.fixedStepDt;
 
+        double[][] regcon = getRegionConcentrations();
+
+
         for (int i = 0; i < nel; i++) {
+            double[] rcs = regcon[eltregions[i]];
             for (int j = 0; j < nspec; j++) {
-                wkA[i][j] = c0[j];
-                wkB[i][j] = c0[j];
-                wkC[i][j] = c0[j];
+                wkA[i][j] = rcs[j];
+                wkB[i][j] = rcs[j];
+                wkC[i][j] = rcs[j];
             }
         }
     }
@@ -195,8 +214,9 @@ public class DeterministicGridCalc extends BaseCalc {
                 double[] pinj = stims[eltstims[iel]];
                 double[] concinc = new double[pinj.length];
                 double fconc = NM_PER_PARTICLE_PUV / volumes[iel];
+
                 for (int i = 0; i < pinj.length; i++) {
-                    concinc[i] = pinj[i] * fconc;
+                    concinc[i] = pinj[i] * fconc * eltstimshare[iel];
                     if (concinc[i] < 0) {
                         E.error("negative concentration? " + concinc[i]);
                     }
@@ -229,21 +249,23 @@ public class DeterministicGridCalc extends BaseCalc {
         Column cp = rtab.getProductionColumn(col);
         Column cpdt = cp.times(deltat);
 
+        /*
         if (nlog < 5) {
-            E.info("concs " + concs[0] + " " + concs[1] + " " + concs[2]);
-
-            nlog++;
-            m.dump();
+           E.info("concs " + concs[0] + " " + concs[1] + " " + concs[2]);
+           nlog++;
+           m.dump();
         }
+        */
 
         m.multiplyBy(dt);
         m.subtractIdentity();
         m.negate();
 
+        /*
         if (nlog < 5) {
-            m.dump();
-
+           m.dump();
         }
+        */
 
         if (concinc != null) {
             cpdt.incrementBy(concinc);
@@ -256,11 +278,15 @@ public class DeterministicGridCalc extends BaseCalc {
 
 
 
-
     @SuppressWarnings("boxing")
     private String getGridConcsText(double time) {
         StringBuffer sb = new StringBuffer();
-        sb.append("gridConcentrations " + nel + " " + nspec + " " + time + "\n");
+        sb.append("gridConcentrations " + nel + " " + nspec + " " + time + " ");
+        for (int i = 0; i < nspec; i++) {
+            sb.append(specieIDs[i] + " ");
+        }
+        sb.append("\n");
+
         for (int i = 0; i < nel; i++) {
             // sb.append("");
             for (int j = 0; j < nspec; j++) {

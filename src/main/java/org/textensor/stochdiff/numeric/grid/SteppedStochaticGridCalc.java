@@ -54,10 +54,12 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     int nel;
     int nspec;
+    String[] specieIDs;
     double[] volumes;
     double[] lnvolumes;
     double[] fdiff;
     double[] lnfdiff;
+
 
     int[][] neighbors;
     double[][] couplingConstants;
@@ -78,10 +80,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     int[][] reactantIndices;
     int[][] productIndices;
 
+    int[][] reactantStochiometry;
+    int[][] productStochiometry;
+
+
     double[] rates;
     double[] lnrates;
 
-    int[] stimtargets;
+    int[][] stimtargets;
 
 
     double[] intlogs;
@@ -110,29 +116,32 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
         nreaction = rtab.getNReaction();
         rates = rtab.getRates();
-        lnrates = ArrayUtil.log(rates);
+        lnrates = ArrayUtil.log(rates, -999.);
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
 
-
+        reactantStochiometry = rtab.getReactantStochiometry();
+        productStochiometry = rtab.getProductStochiometry();
 
         vgrid = getVolumeGrid();
 
         nel = vgrid.getNElements();
         nspec = rtab.getNSpecies();
+        specieIDs = rtab.getSpecieIDs();
         volumes = vgrid.getElementVolumes();
-        lnvolumes = ArrayUtil.log(volumes);
+        lnvolumes = ArrayUtil.log(volumes, -999.);
 
         fdiff = rtab.getDiffusionConstants();
-        lnfdiff = ArrayUtil.log(fdiff);
+        lnfdiff = ArrayUtil.log(fdiff, -999.);
 
         neighbors = vgrid.getPerElementNeighbors();
         couplingConstants = vgrid.getPerElementCouplingConstants();
-        lnCC = ArrayUtil.log(couplingConstants);
+        lnCC = ArrayUtil.log(couplingConstants, -999.);
+
 
         stimTab = getStimulationTable();
-        stimtargets = vgrid.getElementIndexes(stimTab.getTargetIDs());
+        stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
 
 
         // workspace for the calculation
@@ -141,12 +150,18 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         wkReac = new int[nreaction];
 
 
+        int[] eltregions = vgrid.getRegionIndexes();
+        double[][] regcon = getRegionConcentrations();
+
+
+
         // apply initial conditions over the grid
-        double[] c0 = getNanoMolarConcentrations();
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
+            double[] rcs = regcon[eltregions[i]];
+
             for (int j = 0; j < nspec; j++) {
-                double rnp = v * c0[j] * PARTICLES_PUVC;
+                double rnp = v * rcs[j] * PARTICLES_PUVC;
                 int irnp = (int)rnp;
                 double drnp = rnp - irnp;
 
@@ -158,9 +173,13 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 wkA[i][j] = irnp;
                 wkB[i][j] = irnp;
             }
+
+            /*
+            if (i % 20 == 0) {
+               E.info("elt " + i + " region " + eltregions[i] + " n0 " + wkA[i][0]);
+            }
+            */
         }
-
-
         dt = sdRun.fixedStepDt;
         lndt = Math.log(dt);
 
@@ -183,7 +202,13 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     private String getGridConcsText(double time) {
         StringBuffer sb = new StringBuffer();
         // TODO tag specific to integer quantities;
-        sb.append("gridConcentrations " + nel + " " + nspec + " " + time + "\n");
+
+        sb.append("gridConcentrations " + nel + " " + nspec + " " + time + " ");
+        for (int i = 0; i < nspec; i++) {
+            sb.append(specieIDs[i] + " ");
+        }
+        sb.append("\n");
+
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < nspec; j++) {
                 sb.append(stringd((CONC_OF_N * wkB[i][j] / volumes[i])));
@@ -214,7 +239,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         if (d == 0.0) {
             return "0.0 ";
         } else {
-            return String.format("%.5g ", d);
+            return String.format("%.5g ", new Double(d));
         }
     }
 
@@ -247,17 +272,20 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         double tlog = 5.;
 
 
-        int iwr = 0;
+        // int iwr = 0;
+        double writeTime = -1.e-9;
         while (time < runtime) {
-            time += advance(time);
 
-            iwr += 1;
-            if (iwr % 5 == 0) {
+            if (time > writeTime) {
                 if (resultWriter != null) {
                     resultWriter.writeString(getGridConcsText(time));
                     resultWriter.writeToSiblingFile(getGridConcsPlainText(time), "-conc.txt");
                 }
+                writeTime += sdRun.outputInterval;
             }
+
+
+            time += advance(time);
 
             if (time > tlog) {
                 E.info("time " + time + " dt=" + dt);
@@ -286,12 +314,23 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             double[] astim = stims[i];
             for (int j = 0; j < astim.length; j++) {
                 if (astim[j] > 0.) {
-                    /*
-                     E.info("non zero stim for elt " + j + " " +
-                           stimtargets[i] + " " + astim[j] + " at time " + tnow);
-                     */
+                    // the stimulus could be spread over a number of elements
+                    // as yet, assume equal probability of entering any of these
+                    // elements (TODO)
+                    // the random < asr ensures we get the right number of
+                    // particles even the average entry per volume is less than one
+                    // TODO - allow stim type (deterministic or poisson etc) in config;
 
-                    wkA[stimtargets[i]][j] += (int)(astim[j] + 0.5);
+                    int nk = stimtargets[i].length;
+                    if (nk > 0) {
+                        double as = astim[j] / nk;
+                        double ias = (int)as;
+                        double asr = as - ((int)as);
+
+                        for (int k = 0; k < nk; k++) {
+                            wkA[stimtargets[i][k]][j] += (ias + (random.random() < asr ? 1 : 0));
+                        }
+                    }
                 }
             }
         }
@@ -314,53 +353,56 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             int nnbr = inbr.length;
 
             for (int k = 0; k < nspec; k++) {
-                int np0 = wkA[iel][k];
+                if (lnfdiff[k] > -90) {
 
-                if (np0 > 0) {
-                    for (int j = 0; j < nnbr; j++) {
-                        // use logs here so the operations are all additions
-                        // and the compiler should be able to be clever
+                    int np0 = wkA[iel][k];
 
-                        double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
-                        // probability is  dt * K_diff * contact_area /
-                        //    (center_to_center_distance * source_volume)
-                        // gnbr contains the gometry:  contact_area / distance
+                    if (np0 > 0) {
+                        for (int j = 0; j < nnbr; j++) {
+                            // use logs here so the operations are all additions
+                            // and the compiler should be able to be clever
 
-                        if (lnpgo > -1.) {
-                            if (nwarn < 5) {
-                                E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j] +
-                                          " - capping " + Math.exp(lnpgo) +
-                                          " coupling is " + lngnbr[j]);
-                                nwarn++;
+                            double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
+                            // probability is  dt * K_diff * contact_area /
+                            //    (center_to_center_distance * source_volume)
+                            // gnbr contains the gometry:  contact_area / distance
+
+                            if (lnpgo > -1.) {
+                                if (nwarn < 5) {
+                                    E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j] +
+                                              " - capping " + Math.exp(lnpgo) +
+                                              " coupling is " + lngnbr[j]);
+                                    nwarn++;
+                                }
+                                lnpgo = -1.;
                             }
-                            lnpgo = -1.;
+
+
+                            int ngo = 0;
+                            if (np0 == 1) {
+                                // TODO - use table anyway - avoid exp!
+                                ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
+
+                            } else {
+                                ngo = interpSG.nGo(np0, lnpgo, random.random());
+
+                            }
+
+
+                            if (ngo > wkB[iel][k]) {
+                                ngo = wkB[iel][k];
+                                // TODO probably worth flagging if this ever happens
+                                // it means your steps could be too large
+                                // MATH if it does happen, there is a consistent
+                                // bias in that the last exit is the one that
+                                // is curtailed. We should actually restart
+                                // this set of jumps and get new fluxes to all
+                                // neighbours
+                            }
+
+                            wkB[iel][k] -= ngo;
+                            wkB[inbr[j]][k] += ngo;
                         }
-
-
-                        int ngo = 0;
-                        if (np0 == 1) {
-                            // TODO - use table anyway - avoid exp!
-                            ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
-
-                        } else {
-                            ngo = interpSG.nGo(np0, lnpgo, random.random());
-
-                        }
-
-
-                        if (ngo > wkB[iel][k]) {
-                            ngo = wkB[iel][k];
-                            // TODO probably worth flagging if this ever happens
-                            // it means your steps could be too large
-                            // MATH if it does happen, there is a consistent
-                            // bias in that the last exit is the one that
-                            // is curtailed. We should actually restart
-                            // this set of jumps and get new fluxes to all
-                            // neighbours
-                        }
-
-                        wkB[iel][k] -= ngo;
-                        wkB[inbr[j]][k] += ngo;
                     }
                 }
             }
@@ -396,6 +438,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 int[] ri = reactantIndices[ireac];
                 int[] pi = productIndices[ireac];
 
+                int[] rs = reactantStochiometry[ireac];
+                int[] ps = productStochiometry[ireac];
+
                 double lnp = lnrates[ireac] + lndt;
 
 
@@ -408,6 +453,17 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     if (nk < n) {
                         n = nk;
                     }
+                }
+
+
+                if (lnp > -1.) {
+                    if (nwarn < 5) {
+                        E.warning("p too large at element " + iel + " reaction " +
+                                  ireac + " capping from " + Math.exp(lnp) + " to " +
+                                  " exp(-1.)");
+                        nwarn++;
+                    }
+                    lnp = -1.;
                 }
 
 
@@ -424,9 +480,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     }
 
                     // update the new quantities in npn;
-                    int navail = nend[ri[0]];
-                    if (ri[1] >= 0 && navail < nend[ri[1]]) {
-                        navail = nend[ri[1]];
+                    int ri0 = ri[0];
+                    int ri1 = ri[1];
+                    int rs0 = rs[0];
+                    int rs1 = rs[1];
+
+                    int navail = nend[ri0] / rs[0];
+                    if (ri1 >= 0 && navail < nend[ri1] / rs1) {
+                        navail = nend[ri1] / rs1;
                     }
                     if (ngo > navail) {
                         ngo = navail;
@@ -434,16 +495,21 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         // than there actually are. Should regenerate all
                         // reactions on theis element
                         // or use a binomial to share them out
+                        // or use a smaller timestep;
                     }
 
 
-                    nend[ri[0]] -= ngo;
-                    if (ri[1] >= 0) {
-                        nend[ri[1]] -= ngo;
+                    nend[ri0] -= ngo * rs0;
+                    if (ri1 >= 0) {
+                        nend[ri1] -= ngo * rs1;
                     }
-                    nend[pi[0]] += ngo;
-                    if (pi[1] >= 0) {
-                        nend[pi[1]] += ngo;
+
+                    int pi0 = pi[0];
+                    int pi1 = pi[1];
+
+                    nend[pi0] += ngo * ps[0];
+                    if (pi1 >= 0) {
+                        nend[pi1] += ngo * ps[1];
                     }
 
                     // TODO this "if (ri[1] >= 0)" business is not great
@@ -451,6 +517,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     // second reactant. We could probably do better by
                     // unrolling the four cases into separate blocks according
                     // to the reaction type
+                    // - a good case for code generation.
                 }
             }
         }

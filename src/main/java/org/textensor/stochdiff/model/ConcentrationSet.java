@@ -62,6 +62,8 @@ public class ConcentrationSet implements AddableTo {
         return (region != null);
     }
 
-
+    public String getRegion() {
+        return region;
+    }
 
 }

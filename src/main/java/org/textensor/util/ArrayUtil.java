@@ -4,18 +4,22 @@ package org.textensor.util;
 public class ArrayUtil {
 
 
-    public static double[] log(double[] d) {
+    public static double[] log(double[] d, double dzero) {
         double[] ret = new double[d.length];
         for (int i = 0; i < d.length; i++) {
-            ret[i] = Math.log(d[i]);
+            if (d[i] <= 0.) {
+                ret[i] = dzero;
+            } else {
+                ret[i] = Math.log(d[i]);
+            }
         }
         return ret;
     }
 
-    public static double[][] log(double[][] d) {
+    public static double[][] log(double[][] d, double dzero) {
         double[][] ret = new double[d.length][];
         for (int i = 0; i < d.length; i++) {
-            ret[i] = log(d[i]);
+            ret[i] = log(d[i], dzero);
         }
         return ret;
     }

@@ -117,11 +117,17 @@ public class Reaction implements AddableTo {
 
 
 
-    private int[] getIndices(ArrayList<Specie> spa) {
+    private int[][] getIndices(ArrayList<Specie> spa, ArrayList<? extends SpecieRef> refs) {
         int n = spa.size();
-        int[] ret = new int[n];
+        int[][] ret = new int[2][n];
         for (int i = 0; i < n; i++) {
-            ret[i] = spa.get(i).getIndex();
+            ret[0][i] = spa.get(i).getIndex();
+            ret[1][i] = 1;
+        }
+        if (refs != null) {
+            for (int i = 0; i < n; i++) {
+                ret[1][i] = refs.get(i).getN();
+            }
         }
         return ret;
     }
@@ -132,18 +138,20 @@ public class Reaction implements AddableTo {
         int np= r_products.size();
         int icat = r_catalyst.getIndex();
         rtab.setCatalyzedReactionData(ir, nr, np, icat,
-                                      getIndices(r_reactants),  getIndices(r_products), michaelisConstant);
+                                      getIndices(r_reactants, p_reactants),  getIndices(r_products, p_products), michaelisConstant);
     }
 
 
 
     public void writeForwardToTable(ReactionTable rtab, int ir) {
-        rtab.setReactionData(ir, getIndices(r_reactants),  getIndices(r_products), forwardRate);
+        rtab.setReactionData(ir, getIndices(r_reactants, p_reactants),
+                             getIndices(r_products, p_products), forwardRate);
     }
 
 
     public void writeReverseToTable(ReactionTable rtab, int ir) {
-        rtab.setReactionData(ir, getIndices(r_products),  getIndices(r_reactants), reverseRate);
+        rtab.setReactionData(ir, getIndices(r_products, p_products),
+                             getIndices(r_reactants, p_reactants), reverseRate);
 
     }
 

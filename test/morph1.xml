@@ -30,18 +30,21 @@
 
 
 
-    <Segment id="seg1">
+    <Segment id="seg1" region="region1">
 	<start x="1.0" y="1.0" z="0.0" r="1.0" label="pointA"/>
 	<end x="5.0" y="1.0" z="0.0" r="1.5"/>
     </Segment>
 
 
-    <Segment id="seg2" region="region1">
+    <Segment id="seg2" region="region2">
 	<start  on="seg1" at="end"/>
 	<end x="10" y="1" z = "0" r="1.0"/>
     </Segment>
 
-
+   <Segment id="seg3" region="region3">
+	<start  on="seg2" at="end"/>
+	<end x="15" y="1" z = "0" r="1.0"/>
+    </Segment>
 
 
     <!--The following shows how you can get a branch into a minor dendrite spliting off from the main trunk -->

@@ -4,6 +4,7 @@ import org.textensor.report.E;
 
 
 
+
 /*
  * Step generator for the case that the calculation may include
  * very many different transition probabilities so that the
@@ -86,9 +87,15 @@ public class InterpolatingStepGenerator extends StepGenerator {
             ngo = (int)(Math.exp(lnp) * n + 0.5);
 
         } else {
+            if (ia+1 > nppts) {
+                E.error("ia too big " + n + " " + lnp + " " + r);
+            }
+
             double rna = pnTable[ia][n].rnGo(r);
             double rnb = pnTable[ia+1][n].rnGo(r);
             ngo = (int)(f * rnb + (1. - f) * rna + 0.5);
+
+
         }
         return ngo;
     }

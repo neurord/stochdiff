@@ -6,15 +6,15 @@
 
     <Specie name="Specie A" id="a" kdiff="50.5" kdiffunit = "mu2/s"/>
     <Specie name="Specie B" id="b" kdiff="5.125"/>
-    <Specie name="Specie C" id="c" kdiff="0.002" kdiffunit = "mu2/ms"/>
+    <Specie name="Specie C" id="c" kdiff="0.02" kdiffunit = "mu2/ms"/>
 
     <Reaction name = "Reaction 1" id="r1">
-	<Reactant specieID="a"/>
+	<Reactant specieID="a" n="2"/>
 	<Reactant specieID="b"/>
 	<Product specieID="c"/>
 
-	<forwardRate>0.00000001</forwardRate>
-	<reverseRate>0.00000001</reverseRate>
+	<forwardRate>0.0001</forwardRate>
+	<reverseRate>0.0001</reverseRate>
 	<Q10>0.2</Q10>
     </Reaction>
 

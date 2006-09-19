@@ -15,6 +15,9 @@ public class ReactionTable {
     int[][] reactantIndices;
     int[][] productIndices;
 
+    int[][] reactantStochiometry;
+    int[][] productStochiometry;
+
     double[] rates;
 
 
@@ -28,6 +31,9 @@ public class ReactionTable {
         reactantIndices = new int[nreaction][2];
         productIndices = new int[nreaction][2];
 
+        reactantStochiometry = new int[nreaction][2];
+        productStochiometry = new int[nreaction][2];
+
         for (int i = 0; i < nreaction; i++) {
             for (int j = 0; j < 2; j++) {
                 reactantIndices[i][j] = -1;
@@ -40,20 +46,28 @@ public class ReactionTable {
     }
 
 
+    public String[] getSpecieIDs() {
+        return speciesIDs;
+    }
+
     public void print() {
         StringBuffer sb = new StringBuffer();
         sb.append("nspecie = " + nspecie + "  nreaction = " + nreaction + "\n");
         for (int i = 0; i < nreaction; i++) {
             sb.append("reaction " + i + ":      ");
             sb.append("" + reactantIndices[i][0]);
+            sb.append(" (" + reactantStochiometry[i][0] + ")");
             if (reactantIndices[i][1] >= 0) {
                 sb.append(" + " + reactantIndices[i][1]);
+                sb.append(" (" + reactantStochiometry[i][1] + ")");
             }
 
             sb.append(" --> ");
-            sb.append("" + productIndices[i][2]);
-            if (productIndices[i][3] >= 0) {
-                sb.append(" + " + productIndices[i][3]);
+            sb.append("" + productIndices[i][0]);
+            sb.append(" (" + productStochiometry[i][0] + ")");
+            if (productIndices[i][1] >= 0) {
+                sb.append(" + " + productIndices[i][1]);
+                sb.append(" (" + productStochiometry[i][1] + ")");
             }
             sb.append("   rate " + rates[i] + " \n");
         }
@@ -62,16 +76,22 @@ public class ReactionTable {
 
 
 
-    public void setReactionData(int ireact, int[] aidx, int[] bidx, double rate) {
+    public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate) {
         // restrict to max 2 reactants, 2 products - faster than general case;
-        reactantIndices[ireact][0] = aidx[0];
-        if (aidx.length > 1) {
-            reactantIndices[ireact][1] = aidx[1];
+
+
+        reactantIndices[ireact][0] = aidx[0][0];
+        reactantStochiometry[ireact][0] = aidx[1][0];
+        if (aidx[0].length > 1) {
+            reactantIndices[ireact][1] = aidx[0][1];
+            reactantStochiometry[ireact][1] = aidx[1][1];
         }
 
-        productIndices[ireact][0] = bidx[0];
-        if (bidx.length > 1) {
-            productIndices[ireact][1] = bidx[1];
+        productIndices[ireact][0] = bidx[0][0];
+        productStochiometry[ireact][0] = bidx[1][0];
+        if (bidx[0].length > 1) {
+            productIndices[ireact][1] = bidx[0][1];
+            productStochiometry[ireact][1] = bidx[1][1];
         }
         rates[ireact] = rate;
 
@@ -88,8 +108,8 @@ public class ReactionTable {
     }
 
 
-    public void setCatalyzedReactionData(int ireact, int na, int nb, int icat, int[] aidx,
-                                         int[] bidx, double rate) {
+    public void setCatalyzedReactionData(int ireact, int na, int nb, int icat, int[][] aidx,
+                                         int[][] bidx, double rate) {
         /*
          * nreactant[ireact] = na; nproduct[ireact] = nb; for (int i = 0; i < na;
          * i++) { reactantIndices[ireact][i] = aidx[i]; } for (int i = 0; i < nb;
@@ -302,6 +322,16 @@ public class ReactionTable {
 
     public int[][] getProductIndices() {
         return productIndices;
+    }
+
+
+    public int[][] getReactantStochiometry() {
+        return reactantStochiometry;
+    }
+
+
+    public int[][] getProductStochiometry() {
+        return productStochiometry;
     }
 
 

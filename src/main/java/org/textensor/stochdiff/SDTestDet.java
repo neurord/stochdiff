@@ -3,7 +3,7 @@ package org.textensor.stochdiff;
 import org.catcmb.dataview.CCViz;
 
 
-public class SDTest1 {
+public class SDTestDet {
 
 
     public static void main(String[] argv) {

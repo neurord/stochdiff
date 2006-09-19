@@ -28,6 +28,11 @@ public class SDRun {
     // time step for fixed step calculations;
     public double fixedStepDt;
 
+    public double outputInterval;
+
+    public String outputRegions;
+    public String outputSpecies;
+
     // accepted tolerance for adaptive calculations (delta f / f  for an algorithm dependent function f);
     public double tolerance;
 

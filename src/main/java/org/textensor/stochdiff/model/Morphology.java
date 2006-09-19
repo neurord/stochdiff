@@ -143,10 +143,12 @@ public class Morphology implements AddableTo {
     public SpineDistribution getSpineDistribution() {
 
         ArrayList<SpinePopulation> spa = new ArrayList<SpinePopulation>();
-        for (SpineAllocation sa: p_spineAllocations) {
-            SpinePopulation sp = sa.makePopulation();
-            if (sp != null) {
-                spa.add(sp);
+        if (p_spineAllocations != null) {
+            for (SpineAllocation sa: p_spineAllocations) {
+                SpinePopulation sp = sa.makePopulation();
+                if (sp != null) {
+                    spa.add(sp);
+                }
             }
         }
         SpinePopulation[] pa = spa.toArray(new SpinePopulation[0]);

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Geom;
 
+
 public class VolumeGrid {
 
     public static final int GEOM_2D = 0;
@@ -22,7 +23,11 @@ public class VolumeGrid {
 
     int nelement;
     String[] eltLabels;
-    String[] eltRegions;
+
+    String[] regionLabels;
+    int[] eltRegions;
+
+
     double[] volumes;
     double[][] positions;
 
@@ -33,6 +38,7 @@ public class VolumeGrid {
     int[][] eltNbrs;
     double[][] eltNbrG;
 
+    HashMap<String, int[]> areaHM;
 
     public VolumeGrid() {
         elements = new ArrayList<VolumeElement>();
@@ -101,11 +107,14 @@ public class VolumeGrid {
             connections.addAll(ve.getConnections());
         }
 
+        ArrayList<String> rA = new ArrayList<String>();
+        rA.add("default");
+
         nelement = elements.size();
         volumes = new double[nelement];
         positions = new double[nelement][3];
         eltLabels = new String[nelement];
-        eltRegions = new String[nelement];
+        eltRegions = new int[nelement];
 
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
@@ -114,9 +123,22 @@ public class VolumeGrid {
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
             eltLabels[i] = ve.getLabel();
-            eltRegions[i] = ve.getRegion();
+            String sr = ve.getRegion();
+            if (sr == null || sr.length() == 0) {
+                eltRegions[i] = 0;
+            } else if (rA.contains(sr)) {
+                eltRegions[i] = rA.indexOf(sr);
+            } else {
+                int nn = rA.size();
+                eltRegions[i] = nn;
+                rA.add(sr);
+            }
             ve.cache(i);
         }
+        regionLabels = rA.toArray(new String[rA.size()]);
+
+        makeAreaHM();
+
 
         nconnection = connections.size();
         conI = new int[nconnection][2];
@@ -159,8 +181,15 @@ public class VolumeGrid {
             eltNbrG[i1][inbr[i1]] = conG[i];
             inbr[i1] += 1;
         }
+
+
+
     }
 
+
+    public int[] getRegionIndexes() {
+        return eltRegions;
+    }
 
     public int getNElements() {
         if (volumes == null) {
@@ -187,6 +216,11 @@ public class VolumeGrid {
 
     public int size() {
         return getNElements();
+    }
+
+
+    public String[] getRegionLabels() {
+        return regionLabels;
     }
 
 
@@ -220,46 +254,58 @@ public class VolumeGrid {
     }
 
 
-    public int[] getElementIndexes(String[] targetIDs) {
-        HashMap<String, Integer> idHM = new HashMap<String, Integer>();
+    public int[][] getAreaIndexes(String[] targetIDs) {
+        int[][] ret = new int[targetIDs.length][];
+        for (int i = 0; i < targetIDs.length; i++) {
+            String sti = targetIDs[i];
+            if (areaHM.containsKey(sti)) {
+                ret[i] = areaHM.get(sti);
+            } else {
+                ret[i] = new int[0];
+            }
+        }
+        return ret;
+    }
+
+
+
+
+    public void makeAreaHM() {
+        HashMap<String, ArrayList<Integer>> idHM;
+        idHM = new HashMap<String, ArrayList<Integer>>();
+
         for (int i = 0; i < nelement; i++) {
             String sl = eltLabels[i];
-            String sr = eltRegions[i];
             if (sl != null && sl.length() > 0) {
-                if (idHM.containsKey(sl)) {
-                    // do nothing, just the first is used for now - TODO
-                } else {
-                    idHM.put(sl, new Integer(i));
+                if (!idHM.containsKey(sl)) {
+                    idHM.put(sl, new ArrayList<Integer>());
                 }
-
+                idHM.get(sl).add(new Integer(i));
             }
+
+            String sr = regionLabels[eltRegions[i]];
             if (sr != null && sr.length() > 0) {
-                if (idHM.containsKey(sr)) {
-                    // do nothing, just the first is used for now - TODO
-                } else {
-                    idHM.put(sr, new Integer(i));
+                if (!idHM.containsKey(sr)) {
+                    idHM.put(sr, new ArrayList<Integer>());
                 }
+                idHM.get(sr).add(new Integer(i));
             }
         }
 
-        int[] iret = new int[targetIDs.length];
-        for (int i = 0; i < iret.length; i++) {
-            String st = targetIDs[i];
-            if (st != null) {
-                if (idHM.containsKey(st)) {
-                    iret[i] = idHM.get(st).intValue();
-                } else {
-                    if (st.equals("unused")) {
-                        // somewhat ADHOC - "unused" is taken to mean the user
-                        // doesn't want it, so generates no warning message;
-                    } else {
-                        E.warning("no such element in grid " + st);
-                    }
-                }
+
+        areaHM = new HashMap<String, int[]>();
+        for (String s : idHM.keySet()) {
+            ArrayList<Integer> ali = idHM.get(s);
+            int[] ia = new int[ali.size()];
+            for (int i = 0; i < ia.length; i++) {
+                ia[i] = ali.get(i).intValue();
             }
+            areaHM.put(s, ia);
         }
-        return iret;
     }
+
+
+
 
 
 

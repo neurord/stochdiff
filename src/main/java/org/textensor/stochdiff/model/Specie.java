@@ -60,6 +60,9 @@ public class Specie {
         } else if (su.equals("m2/s")) {
             ret = 1.e9;
 
+        } else if (su.equals("cm2/s")) {
+            ret = 1.e5;
+
         } else if (su.equals("mu2/ms")) {
             ret = 1.;
 
