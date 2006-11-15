@@ -92,6 +92,7 @@ public class VolumeLine {
                     psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
                 }
                 ve.setSurfaceBoundary(psb);
+                ve.setExposedArea(sl * dl);
             }
 
 

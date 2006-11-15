@@ -22,7 +22,9 @@ public abstract class BaseCalc {
 
 
     double[] baseConcentrations;
+
     double[][] regionConcentrations;
+    double[][] regionSurfaceDensities;
 
     protected ResultWriter resultWriter;
 
@@ -54,8 +56,14 @@ public abstract class BaseCalc {
     public void extractGrid() {
         Morphology morph = sdRun.getMorphology();
         TreePoint[] tpa = morph.getTreePoints();
+        Discretization disc = sdRun.getDiscretization();
 
-        double d = sdRun.maxElementSide;
+
+        double d = disc.defaultMaxElementSide;
+        if (d <= 0) {
+            d = 1.;
+
+        }
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
 
         int vgg = VolumeGrid.GEOM_2D;
@@ -73,16 +81,17 @@ public abstract class BaseCalc {
             }
         }
 
-        volumeGrid = tbd.buildGrid(d, vgg);
+        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg);
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed,
-                morph.getSpineDistribution(), sdRun.spineDeltaX);
+                morph.getSpineDistribution(), disc.spineDeltaX);
 
         spineloc.addSpinesTo(volumeGrid);
 
         volumeGrid.fix();
 
         makeRegionConcentrations(volumeGrid.getRegionLabels());
+        makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
 
     }
 
@@ -99,6 +108,9 @@ public abstract class BaseCalc {
         return regionConcentrations;
     }
 
+    public double[][] getRegionSurfaceDensities() {
+        return regionSurfaceDensities;
+    }
 
 
 
@@ -120,6 +132,19 @@ public abstract class BaseCalc {
         regionConcentrations = ret;
     }
 
+
+    private void makeRegionSurfaceDensities(String[] sra) {
+        InitialConditions icons = sdRun.getInitialConditions();
+        double[][] ret = new double[sra.length][];
+        for (int i = 0; i < sra.length; i++) {
+            if (icons.hasSurfaceDensitiesFor(sra[i])) {
+                ret[i] = icons.getRegionSurfaceDensities(sra[i], speciesList);
+            } else {
+                ret[i] = null;
+            }
+        }
+        regionSurfaceDensities = ret;
+    }
 
 
 

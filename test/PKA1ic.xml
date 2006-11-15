@@ -16,7 +16,20 @@
 
     
     <!-- should aslo be able to set 'region="abc"' to have a concentration
-	set apply only to a certain region (not implemented yet) -->
+	 set apply only to a certain region (not implemented yet) -->
+
+
+    <!-- surface concentrations for membrane-bound species. The value attribute for 
+	 a PicoSD element is the number of picomoles per square metre. For comparison
+	 with the volume concentrations, a surface density of 1 picomole/m^2, if spread
+	 over a layer 1 micron deep, gives a 1 nanoMolar solution, so to average one 
+	 particle per square micron you need a PicoSD value of about 1.6. -->
+
+    <SurfaceDensitySet region="dendrite">
+	<PicoSD specieID="PKAr" value="10"/>
+    </SurfaceDensitySet> 
+
+
 
 </InitialConditions>
 

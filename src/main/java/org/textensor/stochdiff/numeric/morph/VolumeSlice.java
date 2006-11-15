@@ -1,5 +1,6 @@
 package org.textensor.stochdiff.numeric.morph;
 
+import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public class VolumeSlice {
     public void discFill(Position pa, Position pb) {
         double cx = 0.5 * xSize;
         double cy = 0.5 * ySize;
+
+        E.missing("need to do surface areas");
 
         double seglength = Geom.distanceBetween(pa, pb);
 

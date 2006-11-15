@@ -15,6 +15,7 @@ public class VolumeElement {
     double cy;
     double cz;
     double volume;
+    double exposedArea;
 
     private int icache;
 
@@ -75,6 +76,10 @@ public class VolumeElement {
         volume = v;
     }
 
+    public void setExposedArea(double ea) {
+        exposedArea = ea;
+    }
+
 
 
     public void coupleTo(VolumeElement vx, double ca) {
@@ -88,6 +93,11 @@ public class VolumeElement {
     public double getVolume() {
         return volume;
     }
+
+    public double getExposedArea() {
+        return exposedArea;
+    }
+
 
     public double getX() {
         return cx;

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 
+
+import java.util.HashMap;
+
 /**
  * divided into segments either with fixed lengths or with
  * equal integral of the square root of the radiusr.
@@ -28,7 +31,9 @@ public class SegmentSlicer {
     final static int BALANCED = 2;
     int sdstyle;
     int maxnp;
+
     double delta;
+    HashMap<String, Double> deltaHM;
 
     TreePoint[] outPoints;
 
@@ -44,9 +49,10 @@ public class SegmentSlicer {
 
 
 
-    public TreePoint[] getFixedWidthSlices(double dx) {
+    public TreePoint[] getFixedWidthSlices(double dx, HashMap<String, Double> resHM) {
         sdstyle = FIXED;
         delta = dx;
+        deltaHM = resHM;
         maxnp = 20000; // should know waht your doing if set dx;
         discretize();
         return getSlices();
@@ -176,9 +182,32 @@ public class SegmentSlicer {
     }
 
 
+    private double getLocalDelta(TreePoint cpa, TreePoint cpb) {
+        double localDelta = 0.;
+        String id = cpa.segmentIDWith(cpb);
+        String region = cpa.regionClassWith(cpb);
+
+
+        if (id != null && deltaHM != null && deltaHM.containsKey(id)) {
+            localDelta = deltaHM.get(id).doubleValue();
+
+        } else if (region != null && deltaHM != null && deltaHM.containsKey(region)) {
+            localDelta = deltaHM.get(region).doubleValue();
+        } else {
+            localDelta = delta;
+        }
+        return localDelta;
+    }
+
+
+
     private double[] getFixedSubdivision(TreePoint cpa, TreePoint cpb) {
         double dab = cpa.distanceTo(cpb);
-        int nadd = (int)(dab / delta);
+
+        double localDelta = getLocalDelta(cpa, cpb);
+
+        int nadd = (int)(dab / localDelta);
+
         double[] dpos = new double[nadd];
         if (nadd > 0) {
             for (int i = 0; i < nadd; i++) {
@@ -195,7 +224,7 @@ public class SegmentSlicer {
         double ra = cpa.r;
         double rb = cpb.r;
 
-
+        double localDelta = getLocalDelta(cpa, cpb);
 
         double fdist = 0.0;
         // fdist is to be the integral in question between pta and ptb;
@@ -209,7 +238,7 @@ public class SegmentSlicer {
         }
         // aseg = dab * Math.PI * (ra + rb);
 
-        int nadd = (int)(fdist / delta);
+        int nadd = (int)(fdist / localDelta);
 
         double[] dpos = new double[nadd];
 

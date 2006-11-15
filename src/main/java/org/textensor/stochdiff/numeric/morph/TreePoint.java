@@ -1,10 +1,14 @@
 package org.textensor.stochdiff.numeric.morph;
 
 import org.textensor.report.E;
+
 import org.textensor.stochdiff.geom.Position;
 
 
+
 import java.util.ArrayList;
+
+import java.util.HashMap;
 
 
 public class TreePoint implements Position {
@@ -33,7 +37,11 @@ public class TreePoint implements Position {
     public double dgy;
 
 
+
     private ArrayList<TreePoint> offsetChildren;
+
+    private HashMap<TreePoint, String> segidHM;
+    private HashMap<TreePoint, String> regionHM;
 
     public String name; // not sure about this POSERR;
 
@@ -309,5 +317,38 @@ public class TreePoint implements Position {
         label = s;
     }
 
+
+
+    public void setIDWith(TreePoint point, String s) {
+        if (segidHM == null) {
+            segidHM = new HashMap<TreePoint, String>();
+        }
+        //  E.info("tp set region id to " + point + " as " + s);
+        segidHM.put(point, s);
+    }
+
+    public void setRegionWith(TreePoint point, String s) {
+        if (regionHM == null) {
+            regionHM = new HashMap<TreePoint, String>();
+        }
+        regionHM.put(point, s);
+    }
+
+
+    public String regionClassWith(TreePoint tp) {
+        String ret = null;
+        if (regionHM != null && regionHM.containsKey(tp)) {
+            ret = regionHM.get(tp);
+        }
+        return ret;
+    }
+
+    public String segmentIDWith(TreePoint tp) {
+        String ret = null;
+        if (segidHM != null && segidHM.containsKey(tp)) {
+            ret = segidHM.get(tp);
+        }
+        return ret;
+    }
 
 }

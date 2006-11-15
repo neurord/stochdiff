@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 
+import java.util.HashMap;
+
 
 public class MorphPoint {
 
@@ -28,6 +30,10 @@ public class MorphPoint {
     private ArrayList<MorphPoint> offsetNeighbors;
 
 
+    public HashMap<MorphPoint, String> segidHM;
+    public HashMap<MorphPoint, String> regionHM;
+
+
 
 
     public MorphPoint() {
@@ -35,6 +41,10 @@ public class MorphPoint {
         y = Double.NaN;
         z = Double.NaN;
         r = Double.NaN;
+
+        segidHM = new HashMap<MorphPoint, String>();
+        regionHM = new HashMap<MorphPoint, String>();
+
     }
 
     public void setSegment(Segment seg) {
@@ -129,6 +139,15 @@ public class MorphPoint {
                     mp.removeNeighbor(this);
                     r_peerPoint.addNeighbor(mp);
                     mp.addNeighbor(r_peerPoint);
+
+                    if (segidHM.containsKey(mp)) {
+                        r_peerPoint.setIDWith(mp, segidHM.get(mp));
+                    }
+                    if (regionHM.containsKey(mp)) {
+                        r_peerPoint.setRegionWith(mp, regionHM.get(mp));
+                    }
+
+                    mp.replaceNeighborLabels(this, r_peerPoint);
                 }
                 neighbors = null;
             }
@@ -167,5 +186,27 @@ public class MorphPoint {
         return ret;
     }
 
+
+    public void setIDWith(MorphPoint end, String id) {
+        segidHM.put(end, id);
+    }
+
+
+    public void setRegionWith(MorphPoint ep, String r) {
+        regionHM.put(ep, r);
+    }
+
+
+
+    public void replaceNeighborLabels(MorphPoint mp, MorphPoint mpnew) {
+        if (segidHM.containsKey(mp)) {
+            segidHM.put(mpnew, segidHM.get(mp));
+            segidHM.remove(mp);
+        }
+        if (regionHM.containsKey(mp)) {
+            regionHM.put(mpnew, regionHM.get(mp));
+            regionHM.remove(mp);
+        }
+    }
 
 }

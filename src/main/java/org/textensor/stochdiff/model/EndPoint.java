@@ -14,10 +14,10 @@ public class EndPoint extends MorphPoint {
 
 
 
-
     public EndPoint() {
         super();
         atFraction = -1.;
+
     }
 
 
@@ -134,6 +134,10 @@ public class EndPoint extends MorphPoint {
     public String writePos() {
         return "(x=" + x + ", y=" + y + ", z=" + z +")";
     }
+
+
+
+
 
 
 }

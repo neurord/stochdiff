@@ -15,17 +15,27 @@ results (also, 3D may not work yet...)  ->
 
 
     <!-- run time for the calculation, milliseconds -->
-    <runtime>40</runtime>
+    <runtime>20</runtime>
 
     <!-- set the seed to get the same spines each time testing -->
     <spineSeed>123</spineSeed>
 
-    <!-- discretization for spines, microns -->
-    <spineDeltaX>0.1</spineDeltaX>
-
-    <!-- largest size for elements in bulk volumes (dendrites), microns -->
-    <maxElementSide>0.5</maxElementSide>
     
+
+    <discretization>
+	<!-- default largest size for elements in bulk volumes (dendrites), microns -->	
+	<defaultMaxElementSide>0.5</defaultMaxElementSide>
+
+	<!-- discretization for spines, microns -->
+	<spineDeltaX>0.1</spineDeltaX>
+
+	<!-- override the default for a particular region. -->
+	<!-- Matches against id or regionClass in the morphology file -->
+	<MaxElementSide region="pipette">5.0</MaxElementSide>
+	
+    </discretization>
+
+
 
     <!-- timestep used in fixed step calculations, in milliseconds -->
     <fixedStepDt>0.05</fixedStepDt>

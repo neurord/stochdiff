@@ -125,6 +125,15 @@ public class Morphology implements AddableTo {
                 }
             }
 
+            for (MorphPoint pn : mp.segidHM.keySet()) {
+                tp.setIDWith(mtHM.get(pn), mp.segidHM.get(pn));
+            }
+
+            for (MorphPoint pn : mp.regionHM.keySet()) {
+                tp.setRegionWith(mtHM.get(pn), mp.segidHM.get(pn));
+            }
+
+
             if (mp.hasOffsetChildren()) {
                 for (MorphPoint oc : mp.getOffsetChildren()) {
                     TreePoint tpc = mtHM.get(oc);

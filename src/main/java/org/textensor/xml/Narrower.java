@@ -29,7 +29,7 @@ public final class Narrower {
             ret = new Double(makeDouble(arg));
 
         } else if (fcln.startsWith("java.lang.String")) {
-            ret = (String)arg;
+            ret = arg;
 
         } else if (fcln.startsWith("[D")) {
             ret = makeDoubleArray(arg);

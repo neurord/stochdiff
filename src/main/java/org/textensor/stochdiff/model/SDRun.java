@@ -14,12 +14,6 @@ public class SDRun {
     public double runtime;
 
     public int spineSeed;
-    public double spineDeltaX;
-
-
-    // discretization should ensure no boxes end up larger than this;
-    public double maxElementSide;
-
 
     //  volume to use for a single mixed pool calculation : could (should?) be computed
     // by summing the volume in the supplied morphology
@@ -46,6 +40,8 @@ public class SDRun {
     public Morphology morphology;
     public InitialConditions initialConditions;
 
+
+    public Discretization discretization;
 
 
     public void resolve() {
@@ -82,6 +78,9 @@ public class SDRun {
         return morphology;
     }
 
+    public Discretization getDiscretization() {
+        return discretization;
+    }
 
 
     public void setInitialConditions(InitialConditions initialConditions) {

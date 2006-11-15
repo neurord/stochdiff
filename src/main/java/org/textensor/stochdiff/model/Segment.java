@@ -7,7 +7,6 @@ import org.textensor.report.E;
 public class Segment {
 
     public String id;
-
     public String region;
 
     public EndPoint start;
@@ -52,6 +51,15 @@ public class Segment {
         if (region != null) {
             start.supplyRegion(region);
             end.supplyRegion(region);
+
+
+            start.setRegionWith(end, region);
+            end.setRegionWith(start, region);
+        }
+
+        if (id != null) {
+            start.setIDWith(end, id);
+            end.setIDWith(start, id);
         }
 
         resolved = true;

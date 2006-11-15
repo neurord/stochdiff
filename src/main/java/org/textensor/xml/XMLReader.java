@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import org.textensor.report.E;
+import org.textensor.stochdiff.inter.BodyValued;
 
 
 public class XMLReader {
@@ -77,7 +78,7 @@ public class XMLReader {
 
 
 
-    private class XMLHolder {
+    class XMLHolder {
 
         Object content;
 
@@ -250,6 +251,8 @@ public class XMLReader {
                             } else if (child instanceof Integer && ((Integer)child).intValue() == 0) {
                                 child = new Integer(next.svalue);
 
+                            } else if (child instanceof BodyValued) {
+                                ((BodyValued)child).setBodyValue(next.svalue);
 
                             } else {
                                 instantiator.appendContent(child, next.svalue);

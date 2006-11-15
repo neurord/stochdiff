@@ -38,9 +38,15 @@ import org.textensor.util.ArrayUtil;
 
 public class SteppedStochaticGridCalc extends BaseCalc {
 
-    public static final double PARTICLES_PUVC = 0.6022;
     // particles Per Unit Volume and Concentration
+    public static final double PARTICLES_PUVC = 0.6022;
+
     public final static double CONC_OF_N = 1. / 0.6022;
+
+
+    // particles per unit area and surface density
+    // (is the same as PUVC - sd unit is picomoles per square metre)
+    public static final double PARTICLES_PUASD = 0.6022;
 
 
     Column mconc;
@@ -60,6 +66,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     double[] fdiff;
     double[] lnfdiff;
 
+    double[] surfaceAreas;
 
     int[][] neighbors;
     double[][] couplingConstants;
@@ -132,6 +139,8 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         volumes = vgrid.getElementVolumes();
         lnvolumes = ArrayUtil.log(volumes, -999.);
 
+        surfaceAreas = vgrid.getExposedAreas();
+
         fdiff = rtab.getDiffusionConstants();
         lnfdiff = ArrayUtil.log(fdiff, -999.);
 
@@ -152,7 +161,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
         int[] eltregions = vgrid.getRegionIndexes();
         double[][] regcon = getRegionConcentrations();
-
+        double[][] regsd = getRegionSurfaceDensities();
 
 
         // apply initial conditions over the grid
@@ -173,6 +182,28 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 wkA[i][j] = irnp;
                 wkB[i][j] = irnp;
             }
+
+
+            double a = surfaceAreas[i];
+            double[] scs = regsd[eltregions[i]];
+            if (a > 0 && scs != null) {
+                for (int j = 0; j < nspec; j++) {
+                    double rnp = a * scs[j] * PARTICLES_PUASD;
+                    int irnp = (int)rnp;
+                    double drnp = rnp - irnp;
+
+                    // random allocation to implement the remainder of the
+                    // density (some cells get an extra particle, some dont)
+                    if (random.random() < drnp) {
+                        irnp += 1;
+                    }
+                    wkA[i][j] += irnp;
+                    wkB[i][j] += irnp;
+                }
+
+
+            }
+
 
             /*
             if (i % 20 == 0) {

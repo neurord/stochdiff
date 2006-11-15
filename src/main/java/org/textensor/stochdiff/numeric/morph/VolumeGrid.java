@@ -30,6 +30,7 @@ public class VolumeGrid {
 
     double[] volumes;
     double[][] positions;
+    double[] exposedAreas;
 
     int nconnection;
     int[][] conI;
@@ -112,6 +113,7 @@ public class VolumeGrid {
 
         nelement = elements.size();
         volumes = new double[nelement];
+        exposedAreas = new double[nelement];
         positions = new double[nelement][3];
         eltLabels = new String[nelement];
         eltRegions = new int[nelement];
@@ -119,6 +121,7 @@ public class VolumeGrid {
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
             volumes[i] = ve.getVolume();
+            exposedAreas[i] = ve.getExposedArea();
             positions[i][0] = ve.getX();
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
@@ -201,6 +204,10 @@ public class VolumeGrid {
 
     public double[] getElementVolumes() {
         return volumes;
+    }
+
+    public double[] getExposedAreas() {
+        return exposedAreas;
     }
 
 

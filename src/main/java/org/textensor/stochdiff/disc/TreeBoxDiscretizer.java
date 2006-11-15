@@ -7,6 +7,9 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 import java.io.File;
 
+import java.util.HashMap;
+
+
 public class TreeBoxDiscretizer {
 
     TreePoint[] srcPoints;
@@ -17,10 +20,10 @@ public class TreeBoxDiscretizer {
     }
 
 
-    public VolumeGrid buildGrid(double d, int geom) {
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, int geom) {
         SegmentSlicer ss = new SegmentSlicer(srcPoints);
 
-        TreePoint[] slicedPoints = ss.getFixedWidthSlices(d);
+        TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
 
         E.info("segment divisions yields " + slicedPoints.length + " points");
         TreeWriter tw = new TreeWriter(slicedPoints);
