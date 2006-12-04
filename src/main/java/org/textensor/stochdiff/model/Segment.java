@@ -28,8 +28,6 @@ public class Segment {
 
 
 
-
-
     public void checkResolved(HashMap<String, Segment> segmentHM) {
         if (!resolved) {
             resolve(segmentHM);
@@ -49,10 +47,6 @@ public class Segment {
         end.addNeighbor(start);
 
         if (region != null) {
-            start.supplyRegion(region);
-            end.supplyRegion(region);
-
-
             start.setRegionWith(end, region);
             end.setRegionWith(start, region);
         }
@@ -61,7 +55,6 @@ public class Segment {
             start.setIDWith(end, id);
             end.setIDWith(start, id);
         }
-
         resolved = true;
     }
 

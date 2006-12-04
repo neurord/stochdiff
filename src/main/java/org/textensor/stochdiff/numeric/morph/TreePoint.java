@@ -21,9 +21,6 @@ public class TreePoint implements Position {
     public TreePoint[] nbr;
     public int nnbr;
 
-    public String region;
-    public String region1; // for borders onto other regions;
-    public String region2;
 
     public String label;
 
@@ -85,11 +82,6 @@ public class TreePoint implements Position {
 
     public String getLabel() {
         return label;
-    }
-
-
-    public String getRegion() {
-        return region;
     }
 
 
@@ -187,6 +179,14 @@ public class TreePoint implements Position {
         } else {
             E.error(" (replaceNeighbor) couldnt find nbr " + cp + " in nbrs list of " + this);
         }
+
+        if (segidHM != null && segidHM.containsKey(cp)) {
+            segidHM.put(cr, segidHM.get(cp));
+        }
+        if (regionHM != null && regionHM.containsKey(cp)) {
+            regionHM.put(cr, regionHM.get(cp));
+        }
+
     }
 
 
@@ -290,27 +290,6 @@ public class TreePoint implements Position {
     }
 
 
-
-    public void setRegion(String s) {
-        region = s;
-    }
-
-    public void setRegion1(String s) {
-        region1 = s;
-    }
-    public void setRegion2(String s) {
-        region2 = s;
-    }
-
-    public boolean bordersRegion(String s) {
-        boolean ret = false;
-        if (s != null) {
-            if (s.equals(region) || s.equals(region1) || s.equals(region2)) {
-                ret = true;
-            }
-        }
-        return ret;
-    }
 
 
     public void setLabel(String s) {

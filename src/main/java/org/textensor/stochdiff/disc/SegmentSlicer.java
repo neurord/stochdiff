@@ -32,10 +32,11 @@ public class SegmentSlicer {
     int sdstyle;
     int maxnp;
 
-    double delta;
-    HashMap<String, Double> deltaHM;
+
 
     TreePoint[] outPoints;
+
+    Resolution resolution;
 
 
     public SegmentSlicer(TreePoint[] sp) {
@@ -51,8 +52,9 @@ public class SegmentSlicer {
 
     public TreePoint[] getFixedWidthSlices(double dx, HashMap<String, Double> resHM) {
         sdstyle = FIXED;
-        delta = dx;
-        deltaHM = resHM;
+
+        resolution = new Resolution(dx, resHM);
+
         maxnp = 20000; // should know waht your doing if set dx;
         discretize();
         return getSlices();
@@ -61,7 +63,7 @@ public class SegmentSlicer {
 
     public TreePoint[] getBalancedSlices(double disqrtr, int mnp) {
         sdstyle = BALANCED;
-        delta = disqrtr;
+        resolution = new Resolution(disqrtr, null);
         maxnp = mnp;
         discretize();
         return getSlices();
@@ -115,38 +117,41 @@ public class SegmentSlicer {
             TreePoint cpa = srcPoints[i];
             for (int j = 0; j < cpa.nnbr; j++) {
                 double[] div = subdiv[i][j];
+
                 if (div != null && div.length > 0) {
                     TreePoint cpb = cpa.nbr[j];
 
-                    String newRegion = null;
-                    if (cpa.region != null && cpb.bordersRegion(cpa.region)) {
-                        newRegion = cpa.region;
-                    } else if (cpb.region != null && cpa.bordersRegion(cpb.region)) {
-                        newRegion = cpb.region;
-                    }
 
-                    // E.info("subdiv segment as region " + newRegion);
+                    String newRegion = cpa.regionClassWith(cpb);
+                    String newID = cpa.segmentIDWith(cpb);
 
 
-                    TreePoint clast = null;
+                    TreePoint clast = cpa;
                     for (int id = 0; id < div.length; id++) {
                         TreePoint cp = new TreePoint();
                         cp.locateBetween(cpa, cpb, div[id]);
-                        cp.setRegion(newRegion);
+                        cp.addNeighbor(clast);
 
                         pr[nxp++] = cp;
                         if (id == 0) {
                             cpa.replaceNeighbor(cpb, cp);
-                            cp.addNeighbor(cpa);
+                        } else {
+                            clast.addNeighbor(cp);
                         }
+
+
                         if (id == div.length - 1) {
                             cpb.replaceNeighbor(cpa, cp);
                             cp.addNeighbor(cpb);
+                            cp.setIDWith(cpb, newID);
+                            cp.setRegionWith(cpb, newRegion);
                         }
-                        if (clast != null) {
-                            cp.addNeighbor(clast);
-                            clast.addNeighbor(cp);
-                        }
+
+                        clast.setIDWith(cp, newID);
+                        clast.setRegionWith(cp, newRegion);
+                        cp.setIDWith(clast, newID);
+                        cp.setRegionWith(clast, newRegion);
+
                         clast = cp;
                     }
                 }
@@ -182,29 +187,13 @@ public class SegmentSlicer {
     }
 
 
-    private double getLocalDelta(TreePoint cpa, TreePoint cpb) {
-        double localDelta = 0.;
-        String id = cpa.segmentIDWith(cpb);
-        String region = cpa.regionClassWith(cpb);
-
-
-        if (id != null && deltaHM != null && deltaHM.containsKey(id)) {
-            localDelta = deltaHM.get(id).doubleValue();
-
-        } else if (region != null && deltaHM != null && deltaHM.containsKey(region)) {
-            localDelta = deltaHM.get(region).doubleValue();
-        } else {
-            localDelta = delta;
-        }
-        return localDelta;
-    }
 
 
 
     private double[] getFixedSubdivision(TreePoint cpa, TreePoint cpb) {
         double dab = cpa.distanceTo(cpb);
 
-        double localDelta = getLocalDelta(cpa, cpb);
+        double localDelta = resolution.getLocalDelta(cpa, cpb);
 
         int nadd = (int)(dab / localDelta);
 
@@ -224,7 +213,7 @@ public class SegmentSlicer {
         double ra = cpa.r;
         double rb = cpb.r;
 
-        double localDelta = getLocalDelta(cpa, cpb);
+        double localDelta = resolution.getLocalDelta(cpa, cpb);
 
         double fdist = 0.0;
         // fdist is to be the integral in question between pta and ptb;

@@ -31,7 +31,7 @@ results (also, 3D may not work yet...)  ->
 
 	<!-- override the default for a particular region. -->
 	<!-- Matches against id or regionClass in the morphology file -->
-	<MaxElementSide region="pipette">5.0</MaxElementSide>
+	<MaxElementSide region="pipette">3.0</MaxElementSide>
 	
     </discretization>
 

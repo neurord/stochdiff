@@ -1,11 +1,13 @@
 package org.textensor.stochdiff.disc;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeSlice;
 
+import java.util.ArrayList;
 
 /*
  * Take a structure expressed as TreePoints each of which knows thier
@@ -23,10 +25,11 @@ public class DiscBoxer {
     TreePoint[] srcPoints;
 
 
-    HashSet<VolumeSlice> gridHS;
+    ArrayList<VolumeSlice> gridAL;
     HashSet<TreePoint> wkpHS;
 
-    double delta;
+    Resolution resolution;
+
 
 
     public DiscBoxer(TreePoint[] pts) {
@@ -34,8 +37,9 @@ public class DiscBoxer {
     }
 
 
-    public VolumeGrid buildGrid(double d) {
-        delta = d;
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM) {
+        resolution = new Resolution(d, resHM);
+
 
         TreePoint firstpt = null;
         // put them all in a set - take them out when they've been done;
@@ -48,14 +52,14 @@ public class DiscBoxer {
             }
         }
 
-        gridHS = new HashSet<VolumeSlice>();
+        gridAL = new ArrayList<VolumeSlice>();
         VolumeSlice vg0 = null;
         wkpHS.remove(firstpt);
 
         recAdd(vg0, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();
-        vgr.importSlices(gridHS);
+        vgr.importSlices(gridAL);
         return vgr;
 
     }
@@ -70,7 +74,7 @@ public class DiscBoxer {
             if (wkpHS.contains(tpn)) {
                 wkpHS.remove(tpn);
                 VolumeSlice vg = nextVolumeSlice(pGrid, tp, tpn);
-                gridHS.add(vg);
+                gridAL.add(vg);
                 recAdd(vg, tpn);
             }
         }

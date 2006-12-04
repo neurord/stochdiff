@@ -399,10 +399,10 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                             // gnbr contains the gometry:  contact_area / distance
 
                             if (lnpgo > -1.) {
-                                if (nwarn < 5) {
-                                    E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j] +
-                                              " - capping " + Math.exp(lnpgo) +
-                                              " coupling is " + lngnbr[j]);
+                                if (nwarn < 4) {
+                                    E.shortWarning("p too large at element " + iel + " transition " + j + " to  " + inbr[j] +
+                                                   " - capping " + Math.exp(lnpgo) +
+                                                   " coupling is " + lngnbr[j]);
                                     nwarn++;
                                 }
                                 lnpgo = -1.;
@@ -489,9 +489,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                 if (lnp > -1.) {
                     if (nwarn < 5) {
-                        E.warning("p too large at element " + iel + " reaction " +
-                                  ireac + " capping from " + Math.exp(lnp) + " to " +
-                                  " exp(-1.)");
+                        E.shortWarning("p too large at element " + iel + " reaction " +
+                                       ireac + " capping from " + Math.exp(lnp) + " to " +
+                                       " exp(-1.)");
                         nwarn++;
                     }
                     lnp = -1.;

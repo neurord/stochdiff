@@ -130,7 +130,7 @@ public class Morphology implements AddableTo {
             }
 
             for (MorphPoint pn : mp.regionHM.keySet()) {
-                tp.setRegionWith(mtHM.get(pn), mp.segidHM.get(pn));
+                tp.setRegionWith(mtHM.get(pn), mp.regionHM.get(pn));
             }
 
 

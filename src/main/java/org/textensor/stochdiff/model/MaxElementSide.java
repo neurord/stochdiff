@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.model;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.BodyValued;
 
 

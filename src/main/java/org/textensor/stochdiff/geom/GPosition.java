@@ -18,6 +18,10 @@ public class GPosition implements Position, Movable {
     }
 
 
+    public String toString() {
+        return ("(" + x + ", " + y + ", " + z + ")");
+    }
+
 
     public GPosition() {
         this(0.,0., 0.);

@@ -2,6 +2,11 @@ package org.textensor.stochdiff.disc;
 
 import java.util.HashSet;
 
+import java.util.HashMap;
+
+import java.util.ArrayList;
+
+import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
@@ -26,10 +31,12 @@ public class LineBoxer {
     TreePoint[] srcPoints;
 
 
-    HashSet<VolumeLine> gridHS;
+    ArrayList<VolumeLine> gridAL;
     HashSet<TreePoint> wkpHS;
 
-    double delta;
+
+
+    Resolution resolution;
 
 
     public LineBoxer(TreePoint[] pts) {
@@ -37,8 +44,8 @@ public class LineBoxer {
     }
 
 
-    public VolumeGrid buildGrid(double d) {
-        delta = d;
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM) {
+        resolution = new Resolution(d, resHM);
 
         TreePoint firstpt = null;
         // put them all in a set - take them out when they've been done;
@@ -51,14 +58,14 @@ public class LineBoxer {
             }
         }
 
-        gridHS = new HashSet<VolumeLine>();
+        gridAL = new ArrayList<VolumeLine>();
         VolumeLine vg0 = null;
         wkpHS.remove(firstpt);
 
         recAdd(vg0, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();
-        vgr.importLines(gridHS);
+        vgr.importLines(gridAL);
         return vgr;
 
     }
@@ -69,15 +76,13 @@ public class LineBoxer {
 
     private void recAdd(VolumeLine pGrid, TreePoint tp) {
         String lbl = tp.getLabel();
-        String rgn = tp.getRegion();
-        // POSERR - which points does the region label apply to?
 
         for (TreePoint tpn : tp.getNeighbors()) {
             if (wkpHS.contains(tpn)) {
                 wkpHS.remove(tpn);
-                VolumeLine vg = nextVolumeLine(pGrid, tp, tpn, lbl, rgn);
+                VolumeLine vg = nextVolumeLine(pGrid, tp, tpn, lbl);
                 lbl = null; // unly use it once
-                gridHS.add(vg);
+                gridAL.add(vg);
                 recAdd(vg, tpn);
             }
         }
@@ -87,30 +92,33 @@ public class LineBoxer {
 
 
     public VolumeLine nextVolumeLine(VolumeLine parentGrid,
-                                     TreePoint tpa, TreePoint tpb, String lbl, String rgn) {
+                                     TreePoint tpa, TreePoint tpb, String lbl) {
 
         VolumeLine ret = null;
         if (parentGrid == null) {
-            ret = baseGrid(tpa, tpb, lbl, rgn);
+            ret = baseGrid(tpa, tpb, lbl);
 
         } else {
             // TODO - probably not what we want
             // too much mumerical diffusion if boxes can have gradually changing
             // sizes? restrict to a few dicrete multiples?
-            ret = baseGrid(tpa, tpb, lbl, rgn);
+            ret = baseGrid(tpa, tpb, lbl);
             parentGrid.planeConnect(ret);
         }
         return ret;
     }
 
 
-    public VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl,
-                               String rgn) {
+    public VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
         VolumeLine ret = null;
+
+        double delta = resolution.getLocalDelta(tpa, tpb);
+        String rgn = tpa.regionClassWith(tpb);
+
         if (false) {
-            ret = baseSoftGrid(tpa, tpb, lbl, rgn);
+            ret = baseSoftGrid(tpa, tpb, lbl, rgn, delta);
         } else {
-            ret = baseHardGrid(tpa, tpb, lbl, rgn);
+            ret = baseHardGrid(tpa, tpb, lbl, rgn, delta);
         }
         return ret;
     }
@@ -118,9 +126,11 @@ public class LineBoxer {
 
 
     public VolumeLine baseHardGrid(TreePoint tpa, TreePoint tpb, String lbl,
-                                   String rgn) {
+                                   String rgn, double delta) {
         // odd number of cells, fixed size
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
+
+
 
         // number of boxes across the diameter;
         int nd = 1 + 2 * ((int)(r / delta));
@@ -133,9 +143,11 @@ public class LineBoxer {
 
 
     public VolumeLine baseSoftGrid(TreePoint tpa, TreePoint tpb, String lbl,
-                                   String rgn) {
+                                   String rgn, double delta) {
         // allows the cells to grow or shrink a little to fill the line;
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
+
+
 
         // number of boxes across the diameter;
         int nd = (int)(2 * r / delta + 0.5);

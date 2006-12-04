@@ -16,10 +16,6 @@ public class MorphPoint {
     public double z;
     public double r;
 
-    // bot sloppy - coud be at boundary of two of up to three regins;
-    public String region;
-    public String region1;
-    public String region2;
 
     private Segment r_segment;
 
@@ -52,20 +48,6 @@ public class MorphPoint {
 
     }
 
-    public void supplyRegion(String s) {
-        if (region == null || region == "" || region.equals(s)) {
-            region = s;
-        } else if (region1 == null || region1 == "" || region1.equals(s)) {
-            region1 = s;
-
-        } else if (region2 == null || region2 == "" || region2.equals(s)) {
-            region2 = s;
-        }
-
-        if (r_peerPoint != null) {
-            r_peerPoint.supplyRegion(s);
-        }
-    }
 
 
 
@@ -114,16 +96,6 @@ public class MorphPoint {
 
     public TreePoint toTreePoint() {
         TreePoint tp = new TreePoint(x, y, z, r);
-        if (region != null) {
-            tp.setRegion(region);
-            if (region1 != null) {
-                tp.setRegion1(region1);
-                if (region2 != null) {
-                    tp.setRegion2(region2);
-                }
-            }
-
-        }
         if (label != null) {
             tp.setLabel(label);
         }

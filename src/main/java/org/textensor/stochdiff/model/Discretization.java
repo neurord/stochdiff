@@ -1,7 +1,6 @@
 package org.textensor.stochdiff.model;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.textensor.report.E;

@@ -33,11 +33,11 @@ public class TreeBoxDiscretizer {
 
         if (geom == VolumeGrid.GEOM_2D) {
             LineBoxer lb = new LineBoxer(slicedPoints);
-            vgrid = lb.buildGrid(d);
+            vgrid = lb.buildGrid(d, resHM);
 
         } else if (geom == VolumeGrid.GEOM_3D) {
             DiscBoxer db = new DiscBoxer(slicedPoints);
-            vgrid = db.buildGrid(d);
+            vgrid = db.buildGrid(d, resHM);
 
         } else {
             E.error("unrecognized geometry");

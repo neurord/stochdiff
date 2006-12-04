@@ -75,15 +75,21 @@ public class SpineLocator {
                     eltSA[i] = sum;
                 }
 
-
-                for (int i = 1; i < eltSA.length; i++) {
-                    eltSA[i] += eltSA[i-1];
-                }
+                E.info("total surface area for spine group  " + reg + " is " + sum);
 
                 double totalArea = eltSA[eltSA.length - 1];
                 double avgNoSpines = totalArea * density;
 
+
                 double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
+
+                // the above might take a variable number of random nos off rngen
+                // for certain small variations in avgNoSpines so reseed rngen now
+                // to get reliable spine position repeats;
+
+                rngen.setSeed(spineSeed);
+
+
 
                 if (nspines > 0.5 * eltSA.length) {
                     E.error("too many spines (need more than one per segment");

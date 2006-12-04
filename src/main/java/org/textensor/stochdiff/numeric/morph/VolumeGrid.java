@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Geom;
+import org.textensor.stochdiff.geom.Position;
 
 
 public class VolumeGrid {
@@ -48,16 +49,16 @@ public class VolumeGrid {
     }
 
 
-    public void importSlices(HashSet<VolumeSlice> gridHS) {
-        for (VolumeSlice vs : gridHS) {
+    public void importSlices(ArrayList<VolumeSlice> gridAL) {
+        for (VolumeSlice vs : gridAL) {
             for (VolumeElement ve : vs.getElements()) {
                 addVolumeElement(ve);
             }
         }
     }
 
-    public void importLines(HashSet<VolumeLine> gridHS) {
-        for (VolumeLine vs : gridHS) {
+    public void importLines(ArrayList<VolumeLine> gridAL) {
+        for (VolumeLine vs : gridAL) {
             for (VolumeElement ve : vs.getElements()) {
                 addVolumeElement(ve);
 
@@ -79,6 +80,9 @@ public class VolumeGrid {
         if (sr != null) {
             if (regionHM.containsKey(sr)) {
                 regionHM.get(sr).add(ve);
+
+                Position[] sbdry = ve.getSurfaceBoundary();
+
             } else {
                 ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
                 ave.add(ve);
