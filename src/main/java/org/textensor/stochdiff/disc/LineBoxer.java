@@ -35,12 +35,14 @@ public class LineBoxer {
     HashSet<TreePoint> wkpHS;
 
 
+    double depth;
 
     Resolution resolution;
 
 
-    public LineBoxer(TreePoint[] pts) {
+    public LineBoxer(TreePoint[] pts, double d2d) {
         srcPoints = pts;
+        depth = d2d;
     }
 
 
@@ -135,7 +137,7 @@ public class LineBoxer {
         // number of boxes across the diameter;
         int nd = 1 + 2 * ((int)(r / delta));
 
-        VolumeLine ret = new VolumeLine(nd, nd * delta);
+        VolumeLine ret = new VolumeLine(nd, nd * delta, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
 
         return ret;
@@ -155,7 +157,7 @@ public class LineBoxer {
             nd = 1;
         }
 
-        VolumeLine ret = new VolumeLine(nd, 2. * r);
+        VolumeLine ret = new VolumeLine(nd, 2. * r, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
 
         return ret;

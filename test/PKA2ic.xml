@@ -1,0 +1,26 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+	<NanoMolarity specieID="PKArc" value="1200"/>
+	<NanoMolarity specieID="PKAcamp1" value="0"/>
+	<NanoMolarity specieID="PKAcamp2" value="0"/>
+	<NanoMolarity specieID="PKAc" value="0"/>
+	<NanoMolarity specieID="PKAr" value="0"/>
+	<NanoMolarity specieID="cAMP" value="0"/>
+    </ConcentrationSet>
+
+
+    <!-- number densities are in particles per cubic micron. You 
+	 get about one particles per cubic micron in a 1.6 nM solution -->
+
+    
+    <!-- should aslo be able to set 'region="abc"' to have a concentration
+	set apply only to a certain region (not implemented yet) -->
+    <ConcentrationSet region="cAMPsource">
+	<NanoMolarity specieID="PKArc" value="0" />
+	<NanoMolarity specieID="cAMP" value="60"/>
+    </ConcentrationSet>
+
+</InitialConditions>
+

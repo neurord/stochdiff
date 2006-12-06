@@ -20,7 +20,8 @@ public class TreeBoxDiscretizer {
     }
 
 
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, int geom) {
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, int geom,
+                                double d2d) {
         SegmentSlicer ss = new SegmentSlicer(srcPoints);
 
         TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
@@ -32,7 +33,8 @@ public class TreeBoxDiscretizer {
         VolumeGrid vgrid = null;
 
         if (geom == VolumeGrid.GEOM_2D) {
-            LineBoxer lb = new LineBoxer(slicedPoints);
+
+            LineBoxer lb = new LineBoxer(slicedPoints, d2d);
             vgrid = lb.buildGrid(d, resHM);
 
         } else if (geom == VolumeGrid.GEOM_3D) {

@@ -4,42 +4,32 @@
 	 reaction data brought in from other files --> 
 
     <reactionSchemeFile>PKA1reactions</reactionSchemeFile>
-    <morphologyFile>PKA1morph</morphologyFile>
-    <stimulationFile>PKA1stim</stimulationFile>
-    <initialConditionsFile>PKA1ic</initialConditionsFile>
+    <morphologyFile>PKA2morph</morphologyFile>
+    <stimulationFile>PKA2stim</stimulationFile>
+    <initialConditionsFile>PKA2ic</initialConditionsFile>
 
     <!--2D means the morphology is interpreted like a flatworm, 3D for
 roundworms. The 2D case is good for testing as it is easy to visualize the
 results (also, 3D may not work yet...)  ->
     <geometry>2D</geometry>
-
+	<depth2D>1.0</depth2D>
 
     <!-- run time for the calculation, milliseconds -->
-    <runtime>20</runtime>
+    <runtime>100</runtime>
 
     <!-- set the seed to get the same spines each time testing -->
     <spineSeed>123</spineSeed>
 
-	<simulationSeed>456</simulationSeed>
-    
-
     <discretization>
-	<!-- default largest size for elements in bulk volumes (dendrites), microns -->	
-	<defaultMaxElementSide>0.5</defaultMaxElementSide>
+      <!-- discretization for spines, microns -->
+      <spineDeltaX>0.1</spineDeltaX>
 
-	<!-- discretization for spines, microns -->
-	<spineDeltaX>0.1</spineDeltaX>
-
-	<!-- override the default for a particular region. -->
-	<!-- Matches against id or regionClass in the morphology file -->
-	<MaxElementSide region="pipette">3.0</MaxElementSide>
-	
-    </discretization>
-
-
+      <!-- largest size for elements in bulk volumes (dendrites), microns -->
+      <defaultMaxElementSide>1.0</defaultMaxElementSide>
+      </discretization>    
 
     <!-- timestep used in fixed step calculations, in milliseconds -->
-    <fixedStepDt>0.05</fixedStepDt>
+    <fixedStepDt>0.5</fixedStepDt>
 
 
     <!-- the tolerace is not used yet -->

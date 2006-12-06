@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.model;
 
+import org.textensor.report.E;
+
 
 public class SDRun {
 
@@ -10,10 +12,13 @@ public class SDRun {
 
 
     public String geometry;
+    public double depth2D;
 
     public double runtime;
 
     public int spineSeed;
+    public int simulationSeed;
+
 
     //  volume to use for a single mixed pool calculation : could (should?) be computed
     // by summing the volume in the supplied morphology

@@ -81,7 +81,13 @@ public abstract class BaseCalc {
             }
         }
 
-        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg);
+        double d2d = sdRun.depth2D;
+        if (d2d <= 0.) {
+            d2d = 0.5;
+        }
+        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
+
+
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed,
                 morph.getSpineDistribution(), disc.spineDeltaX);
@@ -146,6 +152,14 @@ public abstract class BaseCalc {
         regionSurfaceDensities = ret;
     }
 
+
+    public long getCalculationSeed() {
+        long ret = sdRun.simulationSeed;
+        if (ret <= 0) {
+            ret = (long)(1.e5 * Math.random());
+        }
+        return ret;
+    }
 
 
     public ReactionTable getReactionTable() {

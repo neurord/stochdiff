@@ -117,7 +117,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     public final void init() {
         // something to generate the random nunmbers
-        random = new MersenneTwister();
+        random = new MersenneTwister(getCalculationSeed());
 
         rtab = getReactionTable();
 
