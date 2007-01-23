@@ -52,6 +52,8 @@ public class StochDiff {
             sdCalc.setResultWriter(rw);
             sdCalc.run();
 
+            E.info("total number of particles at the end: " + sdCalc.getParticleCount());
+
             E.info("should have written " + outputFile);
         }
     }

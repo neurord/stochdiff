@@ -3,7 +3,6 @@ package org.textensor.stochdiff.disc;
 import java.util.HashMap;
 
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 
 

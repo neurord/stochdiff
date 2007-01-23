@@ -7,7 +7,6 @@ package org.textensor.stochdiff.numeric.morph;
 
 
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 
 import java.util.ArrayList;

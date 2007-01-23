@@ -51,5 +51,12 @@ public class ForwardExponentialPoolCalc extends DeterministicPoolCalc {
 
 
 
+    public long getParticleCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
+
 
 }

@@ -93,6 +93,11 @@ public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
         return m;
     }
 
+    public long getParticleCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 
 }
 

@@ -109,7 +109,7 @@ public class SegmentSlicer {
         TreePoint[] pr = new TreePoint[np + nnp];
         for (int i = 0; i < np; i++) {
             pr[i] = srcPoints[i];
-            // E.info("src point " + i + " " + pr[i].getRegion());
+            // E.info("src point " + i + " " + pr[i].getLabel());
         }
         int nxp = np;
 
@@ -120,7 +120,6 @@ public class SegmentSlicer {
 
                 if (div != null && div.length > 0) {
                     TreePoint cpb = cpa.nbr[j];
-
 
                     String newRegion = cpa.regionClassWith(cpb);
                     String newID = cpa.segmentIDWith(cpb);
@@ -195,7 +194,7 @@ public class SegmentSlicer {
 
         double localDelta = resolution.getLocalDelta(cpa, cpb);
 
-        int nadd = (int)(dab / localDelta);
+        int nadd = (int)(Math.round(dab / localDelta)) - 1;
 
         double[] dpos = new double[nadd];
         if (nadd > 0) {

@@ -1,6 +1,7 @@
 package org.textensor.stochdiff.model;
 
 import org.textensor.report.E;
+import org.textensor.stochdiff.numeric.BaseCalc;
 
 
 public class SDRun {
@@ -38,6 +39,11 @@ public class SDRun {
 
     public String calculation;
 
+    public String distribution;
+    public String algorithm;
+
+    private int distributionID;
+    private int algorithmID;
 
 
     public ReactionScheme reactionScheme;
@@ -50,14 +56,50 @@ public class SDRun {
 
 
     public void resolve() {
+        resolveCalcTypes();
         reactionScheme.resolve();
         morphology.resolve();
     }
 
 
+    private void resolveCalcTypes() {
 
+        if (distribution != null && distribution.length() > 0) {
+            if (distribution.toLowerCase().equals("binomial")) {
+                distributionID = BaseCalc.BINOMIAL;
+            } else if (distribution.toLowerCase().equals("poisson")) {
+                distributionID = BaseCalc.POISSON;
+            } else {
+                E.shortWarning("Unrecognized distribution (" + distribution
+                               + ") expecting binomial or poisson");
+            }
+        }
+
+        if (algorithm != null && algorithm.length() > 0) {
+            if (algorithm.toLowerCase().equals("independent")) {
+                algorithmID = BaseCalc.INDEPENDENT;
+            } else if (algorithm.toLowerCase().equals("shared")) {
+                algorithmID = BaseCalc.SHARED;
+            } else if (algorithm.toLowerCase().equals("particle")) {
+                algorithmID = BaseCalc.PARTICLE;
+
+            } else {
+                E.shortWarning("Unrecognized algorithm (" + algorithm
+                               + ") expecting independent or shared");
+            }
+        }
+    }
 
     // just getters and setters from here on;
+
+    public int getDistributionID() {
+        return distributionID;
+    }
+
+    public int getAlgorithmID() {
+        return algorithmID;
+    }
+
 
     public void setReactionScheme(ReactionScheme reactionScheme) {
         this.reactionScheme = reactionScheme;

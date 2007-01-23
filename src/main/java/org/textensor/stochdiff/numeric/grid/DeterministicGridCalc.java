@@ -298,4 +298,11 @@ public class DeterministicGridCalc extends BaseCalc {
     }
 
 
+
+    public long getParticleCount() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+
 }

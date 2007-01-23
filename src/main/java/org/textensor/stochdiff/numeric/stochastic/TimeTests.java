@@ -24,7 +24,7 @@ public class TimeTests {
 
 
     public static void interpTest() {
-        InterpolatingStepGenerator isg = new InterpolatingStepGenerator();
+        InterpolatingStepGenerator isg = InterpolatingStepGenerator.getBinomialGenerator();
         isg.timeTest();
     }
 

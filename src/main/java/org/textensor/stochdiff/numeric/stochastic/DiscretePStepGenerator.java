@@ -32,9 +32,11 @@ public class DiscretePStepGenerator extends StepGenerator {
 
     public final static double lnpmin = -20;
 
+    int mode;
 
-    public DiscretePStepGenerator() {
+    public DiscretePStepGenerator(int m) {
         generators = new HashMap<Integer, FixedPStepGenerator>();
+        mode = m;
     }
 
 
@@ -49,7 +51,7 @@ public class DiscretePStepGenerator extends StepGenerator {
         if (generators.containsKey(key)) {
             ret = generators.get(key);
         } else {
-            ret = new FixedPStepGenerator(lnp);
+            ret = new FixedPStepGenerator(lnp, mode);
             generators.put(key, ret);
         }
         return ret;

@@ -9,6 +9,7 @@ import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
+import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
 
 
@@ -47,7 +48,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     // particles per unit area and surface density
     // (is the same as PUVC - sd unit is picomoles per square metre)
     public static final double PARTICLES_PUASD = 0.6022;
-
 
     Column mconc;
 
@@ -100,22 +100,24 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     double[] intlogs;
     double lndt;
 
-
-
+    int ninjected = 0;
 
     InterpolatingStepGenerator interpSG;
-
     MersenneTwister random;
-
-
     int nwarn;
+
+    double[][] pSharedOut;
+    double[][] lnpSharedOut;
+    double[][][] fSharedExit;
 
     public SteppedStochaticGridCalc(SDRun sdm) {
         super(sdm);
     }
 
 
+
     public final void init() {
+
         // something to generate the random nunmbers
         random = new MersenneTwister(getCalculationSeed());
 
@@ -206,10 +208,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
             /*
-            if (i % 20 == 0) {
-               E.info("elt " + i + " region " + eltregions[i] + " n0 " + wkA[i][0]);
-            }
-            */
+             * if (i % 20 == 0) { E.info("elt " + i + " region " + eltregions[i] + "
+             * n0 " + wkA[i][0]); }
+             */
         }
         dt = sdRun.fixedStepDt;
         lndt = Math.log(dt);
@@ -224,10 +225,67 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
         // final things we need is something to generate particle numbers
         // for steps of given n, p
-        interpSG = InterpolatingStepGenerator.getGenerator();
+        if (useBinomial())
+            interpSG = InterpolatingStepGenerator.getBinomialGenerator();
+        else if (usePoisson()) {
+            interpSG = InterpolatingStepGenerator.getPoissonGenerator();
+        } else {
+            E.error("unknown probability distribution");
+        }
 
 
+
+        if (doShared() || doParticle()) {
+            if (doShared()) {
+                E.info("Using SHARED destination allocation");
+            } else {
+                E.info("Using PER PARTICLE destination allocation");
+            }
+            lnpSharedOut = new double[nel][nspec];
+            pSharedOut = new double[nel][nspec];
+            fSharedExit = new double[nel][nspec][8];
+            for (int iel = 0; iel < nel; iel++) {
+                for (int k = 0; k < nspec; k++) {
+                    int inbr[] = neighbors[iel];
+                    double lngnbr[] = lnCC[iel];
+                    int nnbr = inbr.length;
+                    int np0 = wkA[iel][k];
+
+                    double ptot = 0.;
+                    double[] pcnbr = new double[nnbr];
+
+                    for (int j = 0; j < nnbr; j++) {
+                        double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
+                        // probability is dt * K_diff * contact_area /
+                        // (center_to_center_distance * source_volume)
+                        // gnbr contains the gometry: contact_area / distance
+
+                        double p = Math.exp(lnpgo);
+                        ptot += p;
+                        pcnbr[j] = ptot;
+                    }
+
+                    double lnptot = Math.log(ptot);
+                    if (lnptot > -1.) {
+                        if (nwarn < 4) {
+                            E.shortWarning("p too large at element " + iel + " species "  + k +
+                                           " - capping from " + Math.exp(lnptot) + " to " + Math.exp(-1.));
+                            nwarn++;
+                        }
+                        lnptot= -1.;
+                    }
+
+                    pSharedOut[iel][k] = ptot;
+                    lnpSharedOut[iel][k] = lnptot;
+                    for (int j = 0; j < nnbr; j++) {
+                        fSharedExit[iel][k][j]  = pcnbr[j] / ptot;
+                    }
+                }
+            }
+        }
     }
+
+
 
     @SuppressWarnings("boxing")
     private String getGridConcsText(double time) {
@@ -242,7 +300,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < nspec; j++) {
-                sb.append(stringd((CONC_OF_N * wkB[i][j] / volumes[i])));
+                sb.append(stringd((CONC_OF_N * wkA[i][j] / volumes[i])));
             }
             sb.append("\n");
         }
@@ -257,7 +315,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         sb.append(stringd(time));
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < nspec; j++) {
-                sb.append(stringd((CONC_OF_N * wkB[i][j] / volumes[i])));
+                sb.append(stringd((CONC_OF_N * wkA[i][j] / volumes[i])));
             }
         }
         sb.append("\n");
@@ -303,6 +361,8 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         double tlog = 5.;
 
 
+        long startTime = System.currentTimeMillis();
+
         // int iwr = 0;
         double writeTime = -1.e-9;
         while (time < runtime) {
@@ -324,6 +384,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
         }
 
+        long endTime = System.currentTimeMillis();
+        E.info("total time " + (endTime - startTime) + "ms");
+
     }
 
 
@@ -331,10 +394,10 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     // NB the following method is one of the only two that need optimizing
     // (the other is nGo in the interpolating step generator)
     // things to do (in the c version)
-    //  - use BLAS calls for array operations,
-    //  - remove the two remaining exps
-    //  - unwrap inner conditionals for different reaction types
-    //  - make nGo inlinable
+    // - use BLAS calls for array operations,
+    // - remove the two remaining exps
+    // - unwrap inner conditionals for different reaction types
+    // - make nGo inlinable
 
 
     public double advance(double tnow) {
@@ -350,16 +413,20 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     // elements (TODO)
                     // the random < asr ensures we get the right number of
                     // particles even the average entry per volume is less than one
-                    // TODO - allow stim type (deterministic or poisson etc) in config;
+                    // TODO - allow stim type (deterministic or poisson etc) in
+                    // config;
 
                     int nk = stimtargets[i].length;
                     if (nk > 0) {
                         double as = astim[j] / nk;
-                        double ias = (int)as;
+                        int ias = (int)as;
                         double asr = as - ((int)as);
 
                         for (int k = 0; k < nk; k++) {
-                            wkA[stimtargets[i][k]][j] += (ias + (random.random() < asr ? 1 : 0));
+                            int nin = (ias + (random.random() < asr ? 1 : 0));
+                            ninjected += nin;
+
+                            wkA[stimtargets[i][k]][j] += nin;
                         }
                     }
                 }
@@ -379,9 +446,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         // diffusion step;
         for (int iel = 0; iel < nel; iel++) {
 
-            int inbr[] = neighbors[iel];
-            double lngnbr[] = lnCC[iel];
-            int nnbr = inbr.length;
+
 
             for (int k = 0; k < nspec; k++) {
                 if (lnfdiff[k] > -90) {
@@ -389,50 +454,15 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     int np0 = wkA[iel][k];
 
                     if (np0 > 0) {
-                        for (int j = 0; j < nnbr; j++) {
-                            // use logs here so the operations are all additions
-                            // and the compiler should be able to be clever
 
-                            double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
-                            // probability is  dt * K_diff * contact_area /
-                            //    (center_to_center_distance * source_volume)
-                            // gnbr contains the gometry:  contact_area / distance
+                        if (algoID == INDEPENDENT) {
+                            parallelDiffusionStep(iel, k);
 
-                            if (lnpgo > -1.) {
-                                if (nwarn < 4) {
-                                    E.shortWarning("p too large at element " + iel + " transition " + j + " to  " + inbr[j] +
-                                                   " - capping " + Math.exp(lnpgo) +
-                                                   " coupling is " + lngnbr[j]);
-                                    nwarn++;
-                                }
-                                lnpgo = -1.;
-                            }
+                        } else if (algoID == SHARED) {
+                            sharedDiffusionStep(iel, k);
 
-
-                            int ngo = 0;
-                            if (np0 == 1) {
-                                // TODO - use table anyway - avoid exp!
-                                ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
-
-                            } else {
-                                ngo = interpSG.nGo(np0, lnpgo, random.random());
-
-                            }
-
-
-                            if (ngo > wkB[iel][k]) {
-                                ngo = wkB[iel][k];
-                                // TODO probably worth flagging if this ever happens
-                                // it means your steps could be too large
-                                // MATH if it does happen, there is a consistent
-                                // bias in that the last exit is the one that
-                                // is curtailed. We should actually restart
-                                // this set of jumps and get new fluxes to all
-                                // neighbours
-                            }
-
-                            wkB[iel][k] -= ngo;
-                            wkB[inbr[j]][k] += ngo;
+                        } else if (algoID == PARTICLE) {
+                            particleDiffusionStep(iel, k);
                         }
                     }
                 }
@@ -489,9 +519,8 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                 if (lnp > -1.) {
                     if (nwarn < 5) {
-                        E.shortWarning("p too large at element " + iel + " reaction " +
-                                       ireac + " capping from " + Math.exp(lnp) + " to " +
-                                       " exp(-1.)");
+                        E.shortWarning("p too large at element " + iel + " reaction " + ireac
+                                       + " capping from " + Math.exp(lnp) + " to " + " exp(-1.)");
                         nwarn++;
                     }
                     lnp = -1.;
@@ -506,9 +535,13 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     if (n == 1) {
                         // TODO use table to get rid of exp
                         ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-                    } else {
+                    } else if (n < interpSG.NMAX_STOCHASTIC) {
                         ngo = interpSG.nGo(n, lnp, random.random());
+
+                    } else {
+                        ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian());
                     }
+
 
                     // update the new quantities in npn;
                     int ri0 = ri[0];
@@ -560,6 +593,135 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
 
+    private final void parallelDiffusionStep(int iel, int k) {
+        int inbr[] = neighbors[iel];
+        double lngnbr[] = lnCC[iel];
+        int nnbr = inbr.length;
+        int np0 = wkA[iel][k];
+
+        for (int j = 0; j < nnbr; j++) {
+            // use logs here so the operations are all additions
+            // and the compiler should be able to be clever
+
+            double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
+            // probability is dt * K_diff * contact_area /
+            // (center_to_center_distance * source_volume)
+            // gnbr contains the gometry: contact_area / distance
+
+
+
+            if (lnpgo > -1.) {
+                if (nwarn < 4) {
+                    E.shortWarning("p too large at element " + iel + " transition " + j + " to  "
+                                   + inbr[j] + " - capping " + Math.exp(lnpgo) + " coupling is " + lngnbr[j]);
+                    nwarn++;
+                }
+                lnpgo = -1.;
+            }
+
+
+            int ngo = 0;
+            if (np0 == 1) {
+                // TODO - use table anyway - avoid exp!
+                ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
+
+            } else if (np0 < interpSG.NMAX_STOCHASTIC) {
+                ngo = interpSG.nGo(np0, lnpgo, random.random());
+
+            } else {
+                ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian());
+            }
+
+
+
+
+
+
+            if (ngo > wkB[iel][k]) {
+                if (nwarn < 10) {
+                    E.shortWarning("ran out of particles - curtailing last transition from " + ngo + " to "
+                                   + wkB[iel][k] + " leaving point " + iel + " species " + k);
+                } else if (nwarn == 10) {
+                    E.info("Suppressing future warnings");
+                }
+                nwarn++;
+
+                ngo = wkB[iel][k];
+                // TODO probably worth flagging if this ever happens
+                // it means your steps could be too large
+                // MATH if it does happen, there is a consistent
+                // bias in that the last exit is the one that
+                // is curtailed. We should actually restart
+                // this set of jumps and get new fluxes to all
+                // neighbours
+            }
+
+            wkB[iel][k] -= ngo;
+            wkB[inbr[j]][k] += ngo;
+        }
+    }
+
+
+
+
+    private final void sharedDiffusionStep(int iel, int k) {
+        int np0 = wkA[iel][k];
+        int inbr[] = neighbors[iel];
+        int nnbr = inbr.length;
+        double[] fshare = fSharedExit[iel][k];
+        double lnptot = lnpSharedOut[iel][k];
+
+        int ngo = 0;
+        if (np0 == 1) {
+            // TODO - use table anyway - avoid exp!
+            ngo = (random.random() < Math.exp(lnptot) ? 1 : 0);
+
+
+        } else if (np0 < interpSG.NMAX_STOCHASTIC) {
+            ngo = interpSG.nGo(np0, lnptot, random.random());
+
+        } else {
+            ngo = StepGenerator.gaussianStep(np0, Math.exp(lnptot), random.gaussian());
+        }
+
+
+
+
+
+        wkB[iel][k] -= ngo;
+        for (int i = 0; i < ngo; i++) {
+            double r =  random.random();
+            int io = 0;
+            while (r > fshare[io]) {
+                io++;
+            }
+            wkB[inbr[io]][k] += 1;
+        }
+    }
+
+    private final void particleDiffusionStep(int iel, int k) {
+        int np0 = wkA[iel][k];
+        int inbr[] = neighbors[iel];
+        int nnbr = inbr.length;
+        double[] fshare = fSharedExit[iel][k];
+        double ptot = pSharedOut[iel][k];
+
+        for (int i = 0; i < np0; i++) {
+            double r = random.random();
+
+            if (r < ptot) {
+                wkB[iel][k] -= 1;
+                double fr = r / ptot;
+                int io = 0;
+                while (fr > fshare[io]) {
+                    io++;
+                }
+                wkB[inbr[io]][k] += 1;
+            }
+        }
+    }
+
+
     public final double intlog(int i) {
         double ret = 0.;
         if (i <= 0) {
@@ -567,6 +729,19 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         } else {
             ret = (i < intlogs.length ? intlogs[i] : Math.log(i));
         }
+        return ret;
+    }
+
+
+    public long getParticleCount() {
+        long ret = 0;
+        for (int i = 0; i < nel; i++) {
+            for (int j = 0; j < nspec; j++) {
+                ret += wkA[i][j];
+            }
+        }
+
+        E.info("number injected = " + ninjected);
         return ret;
     }
 

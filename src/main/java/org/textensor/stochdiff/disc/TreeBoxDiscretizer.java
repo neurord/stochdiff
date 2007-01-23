@@ -26,7 +26,6 @@ public class TreeBoxDiscretizer {
 
         TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
 
-        E.info("segment divisions yields " + slicedPoints.length + " points");
         TreeWriter tw = new TreeWriter(slicedPoints);
         tw.writeSWC(new File("discretized-tree.swc"));
 

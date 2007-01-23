@@ -1,0 +1,92 @@
+<ReactionScheme>
+    
+    <!-- you can specify the units of the diffusion constant. If they are not 
+         specified they are assumed to be micron^2/second, (microns written "mu" here)
+         it should understand microns, mm, and m for distances and seconds and ms for times --> 
+
+    <Specie name="PKArc"     id="PKArc"     kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PKAcamp1"  id="PKAcamp1"  kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PKAcamp2"  id="PKAcamp2"  kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PKAc"      id="PKAc"      kdiff="3e-8" kdiffunit = "mu2/s"/>
+    <Specie name="PKAr"      id="PKAr"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="cAMP"      id="cAMP"      kdiff="300"  kdiffunit = "mu2/s"/>
+<!--    <Specie name="cAMP"      id="cAMP"      kdiff="3e-6"    kdiffunit = "cm2/s"/> -->
+<!--
+    <Specie name="PDE4B"     id="PDE4B"     kdiff="0"    kdiffunit = "cm2/s"/>
+    <Specie name="PDE4D"     id="PDE4D"     kdiff="0"    kdiffunit = "cm2/s"/>
+    <Specie name="PDE4BcAMP" id="PDE4BcAMP" kdiff="0"    kdiffunit = "cm2/s"/>
+    <Specie name="PDE4DcAMP" id="PDE4DcAMP" kdiff="0"    kdiffunit = "cm2/s"/>
+    <Specie name="AMP"       id="AMP"       kdiff="3e-6" kdiffunit = "cm2/s"/>
+-->
+    <!-- 2cAMP + PKArc <-> PKAr2cAMP2c2         ( B site binding ) -->
+<!--    <Reaction name = "cAMP B bind" id="cAMP_B_bind">
+        <Reactant specieID="PKArc"/>
+        <Reactant specieID="cAMP"       n="2"/>
+        <Product  specieID="PKAcamp1"/>-->            <!-- PKAr2cAMP2c2 -->
+<!--
+        <forwardRate> 4.3478e-05 </forwardRate>
+        <reverseRate> 0.02       </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>-->
+    <!-- 2cAMP + PKAr2cAMP2c2 <-> PKAr2cAMP4c2  ( A site binding ) -->
+<!--    <Reaction name = "cAMP A bind" id="cAMP_A_bind">
+        <Reactant specieID="PKAcamp1"/>
+        <Reactant specieID="cAMP"       n="2"/>
+        <Product  specieID="PKAcamp2"/>            --><!-- PKAr2cAMP4c2 -->
+<!--
+        <forwardRate> 5.7703e-05 </forwardRate>
+        <reverseRate> 0.2        </reverseRate>
+        <Q10>         2          </Q10>
+    </Reaction>-->
+    <!-- PKAr2cAMP4c2 <-> PKAr2camp4 + 2PKAc -->
+<!--    <Reaction name = "PKArc dissocation" id="PKAdissoc">
+        <Reactant specieID="PKAcamp2"/>
+        <Product  specieID="PKAr"/>                  --><!-- PKAr2camp4 -->
+<!--        <Product  specieID="PKAc" n="2"/>
+
+        <forwardRate> 0.016      </forwardRate>
+        <reverseRate> 0.0017     </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>-->
+
+<!--    <Reaction name = "PDE4B enzyme1" id="PDE4Bbind">
+        <Reactant specieID="PDE4B"/>
+        <Reactant specieID="cAMP"/>
+        <Product  specieID="PDE4BcAMP"/>
+
+        <forwardRate> 0.02       </forwardRate>
+        <reverseRate> 72         </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>
+
+    <Reaction name = "PDE4B enzyme2" id="PDE4Bcat">
+        <Reactant specieID="PDE4BcAMP"/>
+        <Product  specieID="PDE4B"/>
+        <Product  specieID="AMP"/>
+
+        <forwardRate> 18         </forwardRate>
+        <reverseRate> 0          </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>
+    
+    <Reaction name = "PDE4D enzyme1" id="PDE4Dbind">
+        <Reactant specieID="PDE4D"/>
+        <Reactant specieID="cAMP"/>
+        <Product  specieID="PDE4DcAMP"/>
+
+        <forwardRate> 0.02       </forwardRate>
+        <reverseRate> 72         </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>
+
+    <Reaction name = "PDE4D enzyme2" id="PDE4Dcat">
+        <Reactant specieID="PDE4DcAMP"/>
+        <Product  specieID="PDE4D"/>
+        <Product  specieID="AMP"/>
+
+        <forwardRate> 18      </forwardRate>
+        <reverseRate> 0       </reverseRate>
+        <Q10>         0.2     </Q10>
+    </Reaction>-->    
+
+</ReactionScheme>

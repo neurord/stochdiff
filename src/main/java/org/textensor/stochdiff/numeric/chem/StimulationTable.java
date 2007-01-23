@@ -27,8 +27,7 @@ public class StimulationTable {
     }
 
 
-    public void addSquarePulse(String injectionSite, double[] vrate,
-                               double xonset, double xduration) {
+    public void addSquarePulse(String injectionSite, double[] vrate, double xonset, double xduration) {
         sites[nstim] = injectionSite;
         rates[nstim] = vrate;
         onset[nstim] = xonset;
@@ -41,8 +40,8 @@ public class StimulationTable {
     }
 
 
-    public void addPeriodicSquarePulse(String injectionSite, double[] vrate,
-                                       double xonset, double xduration, double xperiod, double xend) {
+    public void addPeriodicSquarePulse(String injectionSite, double[] vrate, double xonset,
+                                       double xduration, double xperiod, double xend) {
         sites[nstim] = injectionSite;
         sites[nstim] = injectionSite;
         rates[nstim] = vrate;
@@ -73,9 +72,7 @@ public class StimulationTable {
 
 
 
-
-    private double effectiveRate(double t, double dt,
-                                 double ons, double dur, double per, double end) {
+    private double effectiveRate(double t, double dt, double ons, double dur, double per, double end) {
         double f = 0.;
         if (per < 0) {
             f = pulseOverlap(t, dt, ons, dur);
@@ -93,17 +90,18 @@ public class StimulationTable {
         return f;
     }
 
+
     private double pulseOverlap(double t, double dt, double ons, double dur) {
         double f = 0.;
         if (t + dt < ons || t > ons + dur) {
             f = 0;
-        } else if (t > ons && t +dt < ons + dur) {
+        } else if (t >= ons && t + dt <= ons + dur) {
             // fully inside;
             f = 1;
-        } else if (t < ons && t + dt > ons + dur) {
+        } else if (t <= ons && t + dt >= ons + dur) {
             // spans whole pulse;
             f = dur / dt;
-        } else if (t < ons) {
+        } else if (t <= ons) {
             // straddles start
             f = (t + dt - ons) / dt;
         } else {
@@ -146,32 +144,23 @@ public class StimulationTable {
 
 
     /*
-     * following is an alternative stimulation approach - could
-     * be useful within the main calculation loop?
+     * following is an alternative stimulation approach - could be useful within
+     * the main calculation loop?
+     *  // update position in each injection profile. If the value for this //
+     * step is non-zero, just add them to the correspoinding element of // wkA //
+     * Extensions: could need // - distributed injections (shared over multiple
+     * volumes) // - solution injections (multiple species from one profile)
      *
-    // update position in each injection profile. If the value for this
-    // step is non-zero, just add them to the correspoinding element of
-    // wkA
-    // Extensions: could need
-    //   - distributed injections (shared over multiple volumes)
-    //   - solution injections (multiple species from one profile)
-
-    for (int iin = 0; iin < ninjection; iin++) {
-       double finj = injvals[iin][injpos[iin]];
-       // if the next step will take us over a step edge in the injection,
-       // need to work scale by the amount of time in each part
-       if (tnow + dt > injsteps[iin][injpos[iin]+1]) {
-          double fns = (tnow + dt - injsteps[iin][injpos[iin]+1]) / dt;
-          injpos[iin] += 1;
-
-          finj = (1. - fns) * finj + fns + injvals[iin][injpos[iin]];
-
-          int np = (int)(finj * dt);
-          if (np > 0) {
-             wkA[injelt[iin]][injspec[iin]] += np;
-          }
-       }
-    }
-    */
+     * for (int iin = 0; iin < ninjection; iin++) { double finj =
+     * injvals[iin][injpos[iin]]; // if the next step will take us over a step
+     * edge in the injection, // need to work scale by the amount of time in each
+     * part if (tnow + dt > injsteps[iin][injpos[iin]+1]) { double fns = (tnow +
+     * dt - injsteps[iin][injpos[iin]+1]) / dt; injpos[iin] += 1;
+     *
+     * finj = (1. - fns) * finj + fns + injvals[iin][injpos[iin]];
+     *
+     * int np = (int)(finj * dt); if (np > 0) { wkA[injelt[iin]][injspec[iin]] +=
+     * np; } } }
+     */
 
 }

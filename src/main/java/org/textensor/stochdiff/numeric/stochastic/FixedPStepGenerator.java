@@ -8,10 +8,11 @@ public class FixedPStepGenerator {
 
     NGoTable[] tables;
 
+    int mode;
 
-
-    public FixedPStepGenerator(double lnp0) {
+    public FixedPStepGenerator(double lnp0, int mod) {
         lnp = lnp0;
+        mode = mod;
         tables = new NGoTable[StepGenerator.NMAX_STOCHASTIC + 1];
         p = Math.exp(lnp);
     }
@@ -39,7 +40,7 @@ public class FixedPStepGenerator {
 
 
             if (tables[n] == null) {
-                tables[n] = new NGoTable(n, lnp);
+                tables[n] = new NGoTable(n, lnp, mode);
             }
             ngo = tables[n].nGo(r);
 

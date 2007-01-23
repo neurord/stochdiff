@@ -30,6 +30,15 @@ public abstract class BaseCalc {
 
     String[] speciesList;
 
+    public static final int BINOMIAL = 0;
+    public static final int POISSON = 1;
+
+    public static final int INDEPENDENT = 0;
+    public static final int SHARED = 1;
+    public static final int PARTICLE = 2;
+
+    int distID = BINOMIAL;
+    protected int algoID = INDEPENDENT;
 
 
     public BaseCalc(SDRun sdr) {
@@ -37,7 +46,14 @@ public abstract class BaseCalc {
     }
 
 
+
+
+
+
     public void extractTables() {
+        distID = sdRun.getDistributionID();
+        algoID = sdRun.getAlgorithmID();
+
         ReactionScheme rsch = sdRun.getReactionScheme();
 
         reactionTable= rsch.makeReactionTable();
@@ -102,6 +118,25 @@ public abstract class BaseCalc {
     }
 
 
+    public final boolean useBinomial() {
+        return (distID == BINOMIAL);
+    }
+
+    public final boolean usePoisson() {
+        return (distID == POISSON);
+    }
+
+    public final boolean doIndependent() {
+        return (algoID == INDEPENDENT);
+    }
+
+    public final boolean doShared() {
+        return (algoID == SHARED);
+    }
+
+    public final boolean doParticle() {
+        return (algoID == PARTICLE);
+    }
 
     public double[] getNanoMolarConcentrations() {
         return baseConcentrations;
@@ -194,5 +229,8 @@ public abstract class BaseCalc {
 
 
     public abstract void run();
+
+
+    public abstract long getParticleCount();
 
 }

@@ -14,6 +14,9 @@ public class SDCalc {
 
     ResultWriter resultWriter;
 
+
+    BaseCalc bCalc;
+
     public SDCalc(SDRun sdr) {
         sdRun = sdr;
         String sr = sdRun.calculation;
@@ -34,16 +37,21 @@ public class SDCalc {
     }
 
     public void run() {
-        BaseCalc bc = calculationType.getCalc(sdRun);
+        bCalc = calculationType.getCalc(sdRun);
         if (resultWriter != null) {
-            bc.setResultWriter(resultWriter);
+            bCalc.setResultWriter(resultWriter);
         }
-        bc.run();
+        bCalc.run();
 
         if (resultWriter != null) {
             resultWriter.close();
         }
 
+    }
+
+
+    public Long getParticleCount() {
+        return bCalc.getParticleCount();
     }
 
 

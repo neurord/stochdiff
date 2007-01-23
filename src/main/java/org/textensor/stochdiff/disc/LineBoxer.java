@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
@@ -82,6 +81,12 @@ public class LineBoxer {
         for (TreePoint tpn : tp.getNeighbors()) {
             if (wkpHS.contains(tpn)) {
                 wkpHS.remove(tpn);
+
+                // if a terminal has a label, and the current point doesn't, then use it
+                if (lbl == null && tpn.nnbr == 1 && tpn.getLabel() != null) {
+                    lbl = tpn.getLabel();
+                }
+
                 VolumeLine vg = nextVolumeLine(pGrid, tp, tpn, lbl);
                 lbl = null; // unly use it once
                 gridAL.add(vg);

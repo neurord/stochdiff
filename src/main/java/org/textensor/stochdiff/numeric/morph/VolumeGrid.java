@@ -1,14 +1,12 @@
 package org.textensor.stochdiff.numeric.morph;
 
-import java.util.HashSet;
-
 import java.util.ArrayList;
 
 import java.util.HashMap;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Geom;
-import org.textensor.stochdiff.geom.Position;
+//  import org.textensor.stochdiff.geom.Position;
 
 
 public class VolumeGrid {
@@ -81,7 +79,7 @@ public class VolumeGrid {
             if (regionHM.containsKey(sr)) {
                 regionHM.get(sr).add(ve);
 
-                Position[] sbdry = ve.getSurfaceBoundary();
+                //  Position[] sbdry = ve.getSurfaceBoundary();
 
             } else {
                 ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
@@ -272,6 +270,7 @@ public class VolumeGrid {
             if (areaHM.containsKey(sti)) {
                 ret[i] = areaHM.get(sti);
             } else {
+                E.warning("An action defined for area " + sti + " but there are no points with this label");
                 ret[i] = new int[0];
             }
         }

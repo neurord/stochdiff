@@ -11,58 +11,114 @@ public final class NGoTable {
     double[] cprob; // cumulative probabilities
     int ncprob;
 
-    public NGoTable(int n, double lnp0) {
+    int mode;
+
+    public NGoTable(int n, double lnp0, int m) {
         lnp = lnp0;
         nparticle = n;
+        mode = m;
 
         double p = Math.exp(lnp);
         double q = 1. - p;
         double lnq = Math.log(q);
 
 
-        BinomialTable btab = BinomialTable.getTable();
 
-        // pf is the full table - don't want the whole thing stored;
-        double[] wk = new double[n+1];
 
-        /*
-         * accumulate c in reverse order: we add the small quantities first
-         * so they don't get lost in rounding errors
-         * (which is what would happen if we add them to
-         * something of order 1)
-         */
-        double c = 0.;
-        ncprob = -1;
-        for (int i = n; i >= 0; i--) {
-            double pn = Math.exp(i * lnp + (n-i) * lnq) * btab.ncm(n, i);
-            c += pn;
-            wk[i] = c;
-            if (ncprob < 0 && c > 1.e-11) {
-                ncprob = i;
+        if (mode == StepGenerator.BINOMIAL) {
+            BinomialTable btab = BinomialTable.getTable();
+            /*
+             * accumulate c in reverse order: we add the small quantities first
+             * so they don't get lost in rounding errors
+             * (which is what would happen if we add them to
+             * something of order 1)
+             */
+            double[] wk = new double[n+1];
+
+            double c = 0.;
+            ncprob = -1;
+            for (int i = n; i >= 0; i--) {
+                double pn = Math.exp(i * lnp + (n-i) * lnq) * btab.ncm(n, i);
+                c += pn;
+                wk[i] = c;
+                if (ncprob < 0 && c > 1.e-11) {
+                    ncprob = i;
+                }
             }
+
+            /* at this stage, wk[i] contains the probability that
+             * i or more particles move in the step. wk[0] must be 1
+             * unless something has gone wrong.
+             */
+            if (Math.abs(1. - c) > 1.e-14) {
+                E.error("cumulative probability miscount? "+ c +
+                        " for n, p, nkept " + n + " " + p + " " + ncprob);
+            }
+
+            /*
+             * What we actually want is the cumulative probability of n or fewer
+             * particles moving: cprob[0] is the probabiulioty of 0 moving
+             * cprob[1] is the probability of either 0 or 1 moving etc
+             */
+            cprob = new double[ncprob+1];
+            for (int i = 0; i < ncprob; i++) {
+                cprob[i] = 1. - wk[i+1];
+            }
+            cprob[ncprob] = 2.;
+            // one extra element on the end to save testing for the end condition;
+
+
+
+
+
+
+        } else if (mode == StepGenerator.POISSON) {
+            double lambda = n * Math.exp(lnp0);
+            double emlambda = Math.exp(-1. * lambda);
+
+
+            ncprob = -1;
+            int nmax = 4 * n + 20;  // sure
+            double[] wk = new double[nmax];
+
+            double lampnbynfac = 1.; // lambda to the power n over n factorial;
+
+            for (int i = 0; i < nmax; i++) {
+                double pn = emlambda * lampnbynfac;
+                lampnbynfac *= (lambda/ (i+1));
+
+                wk[i] = pn;
+                if (i > lambda && ncprob < 0 && pn < 1.e-11) {
+                    ncprob = i;
+                }
+
+            }
+
+            if (ncprob < 0) {
+                E.error("never terminated tabled? " + n + " " + lambda + " " +  emlambda * lampnbynfac);
+            }
+
+
+            /*
+             * What we actually want is the cumulative probability of n or fewer
+             * particles moving: cprob[0] is the probabiulioty of 0 moving
+             * cprob[1] is the probability of either 0 or 1 moving etc
+             */
+            // POSERR - just accumulating forwards here - should still be ok with doubles;
+            cprob = new double[ncprob+1];
+            cprob[0] = wk[0];
+            for (int i = 1; i < ncprob; i++) {
+                cprob[i] = cprob[i-1] + wk[i];
+            }
+            cprob[ncprob] = 2.;
+
+
+
+        } else {
+            E.warning("unrecognized distribution " + mode);
         }
 
 
-        /* at this stage, wk[i] contains the probability that
-         * i or more particles move in the step. wk[0] must be 1
-         * unless something has gone wrong.
-         */
-        if (Math.abs(1. - c) > 1.e-14) {
-            E.error("cumulative probability miscount? "+ c +
-                    " for n, p, nkept " + n + " " + p + " " + ncprob);
-        }
-
-        /*
-         * What we actually want is the cumulative probability of n or fewer
-         * particles moving: cprob[0] is the probabiulioty of 0 moving
-         * cprob[1] is the probability of either 0 or 1 moving etc
-         */
-        cprob = new double[ncprob+1];
-        for (int i = 0; i < ncprob; i++) {
-            cprob[i] = 1. - wk[i+1];
-        }
-        cprob[ncprob] = 2.;
-        // one extra element on the end to save testing for the end condition;
 
     }
 
@@ -165,19 +221,20 @@ public final class NGoTable {
     public void print() {
         StringBuffer sb = new StringBuffer();
         sb.append("n=" + nparticle + " p="+ Math.exp(lnp) +
-                  " njmax=" + ncprob + "\n");
-
+                  " njmax=" + ncprob + " mode=" + mode + "\n");
+        sb.append("p(n < i): ");
         for (int i = 0; i < ncprob; i++) {
-            sb.append("P(n<=" + i + ")= ");
-            sb.append(cprob[i] + "\n");
+            sb.append(cprob[i] + ", ");
         }
-        System.out.println(sb.toString());
+        sb.append("\n");
 
-
+        sb.append("rngo, ngo 0 to 10: ");
         for (int i = 0; i < 10; i++) {
             double r = 0.001 + 0.99 * (i / 9.);
-            System.out.println("" + i + " " + nGo(r) + " " + rnGo(r));
+            sb.append("(" + nGo(r) + ",  " + rnGo(r) + ") ");
         }
+        sb.append("\n");
+        System.out.println(sb.toString());
     }
 
 
@@ -239,10 +296,12 @@ public final class NGoTable {
         long tbtot = 0;
         long tctot = 0;
 
+        int m = StepGenerator.BINOMIAL;
+
         for (int i = 10; i <= 90; i+= 10) {
             for (int ip = -6; ip < -1; ip++) {
                 double lp = 2. * ip;
-                NGoTable jc = new NGoTable(i, lp);
+                NGoTable jc = new NGoTable(i, lp, m);
 
                 jc.lookupCheck();
 
@@ -265,14 +324,31 @@ public final class NGoTable {
 
 
     private static void dumpExamples() {
-        new NGoTable(10, Math.log(0.1)).print();
-        new NGoTable(90, Math.log(0.1)).print();
-        new NGoTable(10, Math.log(0.01)).print();
-        new NGoTable(90, Math.log(0.01)).print();
-        new NGoTable(10, Math.log(0.001)).print();
-        new NGoTable(90, Math.log(0.001)).print();
-        new NGoTable(10, Math.log(0.0001)).print();
-        new NGoTable(90, Math.log(0.0001)).print();
+        int mb = StepGenerator.BINOMIAL;
+        int mp = StepGenerator.POISSON;
+        new NGoTable(10, Math.log(0.1), mb).print();
+        new NGoTable(10, Math.log(0.1), mp).print();
+
+        new NGoTable(90, Math.log(0.1), mb).print();
+        new NGoTable(90, Math.log(0.1), mp).print();
+
+        new NGoTable(10, Math.log(0.01), mb).print();
+        new NGoTable(10, Math.log(0.01), mp).print();
+
+        new NGoTable(90, Math.log(0.01), mb).print();
+        new NGoTable(90, Math.log(0.01), mp).print();
+
+        new NGoTable(10, Math.log(0.001), mb).print();
+        new NGoTable(10, Math.log(0.001), mp).print();
+
+        new NGoTable(90, Math.log(0.001), mb).print();
+        new NGoTable(90, Math.log(0.001), mp).print();
+
+        new NGoTable(10, Math.log(0.0001), mb).print();
+        new NGoTable(10, Math.log(0.0001), mp).print();
+
+        new NGoTable(90, Math.log(0.0001), mb).print();
+        new NGoTable(90, Math.log(0.0001), mp).print();
     }
 
 

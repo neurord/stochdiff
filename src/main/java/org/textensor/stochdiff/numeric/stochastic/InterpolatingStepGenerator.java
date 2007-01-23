@@ -24,39 +24,53 @@ public class InterpolatingStepGenerator extends StepGenerator {
     public final static double deltalnp = 0.3;
 
 
+
     NGoTable[][] pnTable;
 
     int nppts;
 
-    private static InterpolatingStepGenerator instance;
+    private static InterpolatingStepGenerator bInstance;
+    private static InterpolatingStepGenerator pInstance;
 
 
-    public static InterpolatingStepGenerator getGenerator() {
-        if (instance == null) {
-            instance = new InterpolatingStepGenerator();
+
+    public static InterpolatingStepGenerator getBinomialGenerator() {
+        if (bInstance == null) {
+            bInstance = new InterpolatingStepGenerator(BINOMIAL);
         }
-        return instance;
+        return bInstance;
     }
 
+    public static InterpolatingStepGenerator getPoissonGenerator() {
+        if (pInstance == null) {
+            pInstance = new InterpolatingStepGenerator(POISSON);
+        }
+        return pInstance;
+    }
 
+    public InterpolatingStepGenerator(int mode) {
 
-    public InterpolatingStepGenerator() {
+        if (mode == BINOMIAL) {
+            E.info("Using a BINOMIAL step generator");
+        } else {
+            E.info("Using a POISSON step generator");
+        }
 
         nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
 
         pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
 
-        fullInit();
+        fullInit(mode);
     }
 
 
     // initialize all the tables - may not all be used ever -
     // could evaluate them as required
-    private void fullInit() {
+    private void fullInit(int mode) {
         for (int i = 0; i <= nppts; i++) {
             double lnp = lnpmin + i * deltalnp;
             for (int j = 2; j <= StepGenerator.NMAX_STOCHASTIC; j++) {
-                pnTable[i][j] = new NGoTable(j, lnp);
+                pnTable[i][j] = new NGoTable(j, lnp, mode);
             }
         }
     }
@@ -83,8 +97,9 @@ public class InterpolatingStepGenerator extends StepGenerator {
         int ngo = 0;
 
         if (n > NMAX_STOCHASTIC) {
-            // TODO avoid this exp
-            ngo = (int)(Math.exp(lnp) * n + 0.5);
+            E.error("n too large");
+
+
 
         } else {
             if (ia+1 > nppts) {

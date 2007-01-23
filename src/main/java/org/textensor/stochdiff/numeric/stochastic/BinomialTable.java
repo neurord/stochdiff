@@ -1,9 +1,9 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
 
-public class BinomialTable {
+public class BinomialTable extends ProbabilityTable {
 
-    private final static int NMAX = 150;
+    private final static int NMAX = 140;
 
     private static BinomialTable instance;
 
