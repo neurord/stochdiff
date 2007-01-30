@@ -108,7 +108,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
             double rna = pnTable[ia][n].rnGo(r);
             double rnb = pnTable[ia+1][n].rnGo(r);
-            ngo = (int)(f * rnb + (1. - f) * rna + 0.5);
+            ngo = (int)(f * rnb + (1. - f) * rna);
 
 
         }
@@ -151,6 +151,19 @@ public class InterpolatingStepGenerator extends StepGenerator {
                 }
             }
         }
+    }
+
+    public void dumpTable(int n, double lnp) {
+        // TODO Auto-generated method stub
+        int ia = (int)((lnp - lnpmin) / deltalnp);
+        double f = (lnp - (lnpmin + ia * deltalnp)) / deltalnp;
+        if (ia < 0) {
+            ia = 0;
+            f = 0.;
+        }
+        E.info("interpolationg between tables " + ia + " and " + (ia+1) + " factor " + f);
+        pnTable[ia][n].print();
+        pnTable[ia+1][n].print();
     }
 
 

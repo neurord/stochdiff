@@ -44,7 +44,7 @@ results (also, 3D may not work yet...)  ->
          reaction-diffusion systems. Single mixed pool calculations should be listed here too (TODO) -->
     <calculation> GRID_STEPPED_STOCHASTIC  </calculation>
 	
-	<distribution>BINOMIAL</distribution>
-	<algorithm>PARTICLE</algorithm>
+	<distribution>POISSON</distribution>
+	<algorithm>PARALLEL</algorithm>
 	
 </SDRun>

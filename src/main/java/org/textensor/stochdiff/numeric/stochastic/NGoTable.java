@@ -228,7 +228,7 @@ public final class NGoTable {
         }
         sb.append("\n");
 
-        sb.append("rngo, ngo 0 to 10: ");
+        sb.append("ngo, rngo for ten equally spaced randoms starting at 0.001 ");
         for (int i = 0; i < 10; i++) {
             double r = 0.001 + 0.99 * (i / 9.);
             sb.append("(" + nGo(r) + ",  " + rnGo(r) + ") ");

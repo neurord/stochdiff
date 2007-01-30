@@ -1,5 +1,6 @@
 package org.textensor.stochdiff.numeric.grid;
 
+import org.textensor.report.Debug;
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
@@ -41,6 +42,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.6022;
+    public static final double LN_PARTICLES_PUVC = Math.log(PARTICLES_PUVC);
 
     public final static double CONC_OF_N = 1. / 0.6022;
 
@@ -105,6 +107,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     InterpolatingStepGenerator interpSG;
     MersenneTwister random;
     int nwarn;
+    int ninfo;
 
     double[][] pSharedOut;
     double[][] lnpSharedOut;
@@ -125,6 +128,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
         nreaction = rtab.getNReaction();
         rates = rtab.getRates();
+
+        Debug.dump("rates", rates);
+
         lnrates = ArrayUtil.log(rates, -999.);
 
         reactantIndices = rtab.getReactantIndices();
@@ -380,7 +386,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (time > tlog) {
                 E.info("time " + time + " dt=" + dt);
-                tlog += 5;
+                tlog += 50 * sdRun.outputInterval;
             }
         }
 
@@ -506,14 +512,18 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
                 int n = nstart[ri[0]];
-                lnp += intlog(n);
+
                 if (ri[1] >= 0) {
                     int nk = nstart[ri[1]];
-                    lnp += intlog(nk);
-                    lnp -= lnvol;
+
                     if (nk < n) {
+                        lnp += intlog(n);
                         n = nk;
+                    } else {
+                        lnp += intlog(nk);
                     }
+                    lnp -= lnvol;
+                    lnp -= LN_PARTICLES_PUVC;
                 }
 
 
@@ -527,7 +537,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 }
 
 
-
                 if (n <= 0) {
 
                 } else {
@@ -539,8 +548,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         ngo = interpSG.nGo(n, lnp, random.random());
 
                     } else {
-                        ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian());
+                        if (useBinomial()) {
+                            ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian());
+                        } else {
+                            ngo = StepGenerator.poissonStep(n, Math.exp(lnp), random.gaussian());
+                        }
                     }
+
+
 
 
                     // update the new quantities in npn;
@@ -554,12 +569,20 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         navail = nend[ri1] / rs1;
                     }
                     if (ngo > navail) {
-                        ngo = navail;
                         // TODO as for diffusion, we've got more particles going
                         // than there actually are. Should regenerate all
                         // reactions on theis element
                         // or use a binomial to share them out
                         // or use a smaller timestep;
+
+                        if (nwarn < 10) {
+                            E.shortWarning("reaction " + ireac + " ran out of particles - need " +
+                                           ngo + " but have " + navail);
+                            nwarn++;
+                        }
+
+                        ngo = navail;
+
                     }
 
 
@@ -629,7 +652,11 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 ngo = interpSG.nGo(np0, lnpgo, random.random());
 
             } else {
-                ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian());
+                if (useBinomial()) {
+                    ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian());
+                } else {
+                    ngo =  StepGenerator.poissonStep(np0, Math.exp(lnpgo), random.gaussian());
+                }
             }
 
 
@@ -681,7 +708,11 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             ngo = interpSG.nGo(np0, lnptot, random.random());
 
         } else {
-            ngo = StepGenerator.gaussianStep(np0, Math.exp(lnptot), random.gaussian());
+            if (useBinomial()) {
+                ngo = StepGenerator.gaussianStep(np0, Math.exp(lnptot), random.gaussian());
+            } else {
+                ngo = StepGenerator.poissonStep(np0, Math.exp(lnptot), random.gaussian());
+            }
         }
 
 

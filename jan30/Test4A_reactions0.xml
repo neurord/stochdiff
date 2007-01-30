@@ -1,0 +1,22 @@
+<ReactionScheme>
+    
+    <!-- you can specify the units of the diffusion constant. If they are not 
+         specified they are assumed to be micron^2/second, (microns written "mu" here)
+         it should understand microns, mm, and m for distances and seconds and ms for times -->
+    <Specie name="PKArc"     id="PKArc"     kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="cAMP"      id="cAMP"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PKAcamp1"  id="PKAcamp1"  kdiff="0"    kdiffunit = "mu2/s"/>
+
+    <!-- 2cAMP + PKArc <-> PKAr2cAMP2c2         ( B site binding ) -->
+    <Reaction name = "cAMP B bind" id="cAMP_B_bind">
+        <Reactant specieID="PKArc"   />
+        <Reactant specieID="cAMP"    />
+        <Product  specieID="PKAcamp1"/>
+
+<!--        <forwardRate> 4.3478e-08 </forwardRate> -->
+        <forwardRate> 4.3e-08 </forwardRate>
+       <reverseRate> 0.02e-3   </reverseRate>
+        <Q10>         0.2        </Q10>
+
+   </Reaction>
+</ReactionScheme>
