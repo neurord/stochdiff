@@ -60,7 +60,13 @@ public class InitialConditions implements AddableTo {
 
 
     public double[] getDefaultNanoMolarConcentrations(String[] spl) {
-        return defaultConcs.getNanoMolarConcentrations(spl);
+        double[] ret = null;
+        if (defaultConcs != null) {
+            ret = defaultConcs.getNanoMolarConcentrations(spl);
+        } else {
+            ret = new double[spl.length];
+        }
+        return ret;
     }
 
     public boolean hasConcentrationsFor(String rnm) {

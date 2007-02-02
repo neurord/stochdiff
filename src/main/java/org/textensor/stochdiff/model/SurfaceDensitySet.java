@@ -51,6 +51,8 @@ public class SurfaceDensitySet implements AddableTo {
         for (int i = 0; i < ids.length; i++) {
             if (chm.containsKey(ids[i])) {
                 ret[i] = chm.get(ids[i]).getPicoMoleSurfaceDensity();
+            } else {
+                ret[i] = Double.NaN;
             }
         }
 

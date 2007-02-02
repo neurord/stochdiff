@@ -196,17 +196,25 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             double[] scs = regsd[eltregions[i]];
             if (a > 0 && scs != null) {
                 for (int j = 0; j < nspec; j++) {
-                    double rnp = a * scs[j] * PARTICLES_PUASD;
-                    int irnp = (int)rnp;
-                    double drnp = rnp - irnp;
+                    if (Double.isNaN(scs[j])) {
+                        // means not specified by the user;
 
-                    // random allocation to implement the remainder of the
-                    // density (some cells get an extra particle, some dont)
-                    if (random.random() < drnp) {
-                        irnp += 1;
+                    } else {
+                        wkA[i][j] = 0;
+                        wkB[i][j] = 0;
+
+                        double rnp = a * scs[j] * PARTICLES_PUASD;
+                        int irnp = (int)rnp;
+                        double drnp = rnp - irnp;
+
+                        // random allocation to implement the remainder of the
+                        // density (some cells get an extra particle, some dont)
+                        if (random.random() < drnp) {
+                            irnp += 1;
+                        }
+                        wkA[i][j] += irnp;
+                        wkB[i][j] += irnp;
                     }
-                    wkA[i][j] += irnp;
-                    wkB[i][j] += irnp;
                 }
 
 
@@ -255,7 +263,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     int inbr[] = neighbors[iel];
                     double lngnbr[] = lnCC[iel];
                     int nnbr = inbr.length;
-                    int np0 = wkA[iel][k];
+                    //  int np0 = wkA[iel][k];
 
                     double ptot = 0.;
                     double[] pcnbr = new double[nnbr];
@@ -544,7 +552,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     if (n == 1) {
                         // TODO use table to get rid of exp
                         ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-                    } else if (n < interpSG.NMAX_STOCHASTIC) {
+                    } else if (n < StepGenerator.NMAX_STOCHASTIC) {
                         ngo = interpSG.nGo(n, lnp, random.random());
 
                     } else {
@@ -648,7 +656,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 // TODO - use table anyway - avoid exp!
                 ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
 
-            } else if (np0 < interpSG.NMAX_STOCHASTIC) {
+            } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
                 ngo = interpSG.nGo(np0, lnpgo, random.random());
 
             } else {
@@ -694,7 +702,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     private final void sharedDiffusionStep(int iel, int k) {
         int np0 = wkA[iel][k];
         int inbr[] = neighbors[iel];
-        int nnbr = inbr.length;
+        //  int nnbr = inbr.length;
         double[] fshare = fSharedExit[iel][k];
         double lnptot = lnpSharedOut[iel][k];
 
@@ -704,7 +712,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             ngo = (random.random() < Math.exp(lnptot) ? 1 : 0);
 
 
-        } else if (np0 < interpSG.NMAX_STOCHASTIC) {
+        } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
             ngo = interpSG.nGo(np0, lnptot, random.random());
 
         } else {
@@ -733,7 +741,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     private final void particleDiffusionStep(int iel, int k) {
         int np0 = wkA[iel][k];
         int inbr[] = neighbors[iel];
-        int nnbr = inbr.length;
+        // int nnbr = inbr.length;
         double[] fshare = fSharedExit[iel][k];
         double ptot = pSharedOut[iel][k];
 

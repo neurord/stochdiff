@@ -163,6 +163,7 @@ public abstract class BaseCalc {
             if (icons.hasConcentrationsFor(sra[i])) {
                 ret[i] = icons.getRegionConcentrations(sra[i], speciesList);
             } else {
+
                 // could also leave at zero?
                 ret[i] = new double[baseConcentrations.length];
                 for (int j = 0; j < nc; j++) {

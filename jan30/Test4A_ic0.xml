@@ -1,11 +1,21 @@
 <InitialConditions>
 
     <!-- these apply to everything unless overridden -->
-    <ConcentrationSet>
-        <NanoMolarity specieID="cAMP"      value="2656"  />  <!--2656 nM -->
-        <NanoMolarity specieID="PKArc"     value="100"   />  <!--100 nM = 0.1uM -->
+
+
+
+
+    <ConcentrationSet>      
+        <NanoMolarity specieID="cAMP"  value="2656"  />     
+        <NanoMolarity specieID="PKArc"     value="100"   />  
         <NanoMolarity specieID="PKAcamp1"  value="0"     />
     </ConcentrationSet>
+
+ 
+   <SurfaceDensitySet region="dendrite">
+        <PicoSD        specieID="cAMP" value="100" />
+   </SurfaceDensitySet>
+
 
 
     <!-- number densities are in particles per cubic micron. You 

@@ -50,7 +50,7 @@ public class SDCalc {
     }
 
 
-    public Long getParticleCount() {
+    public long getParticleCount() {
         return bCalc.getParticleCount();
     }
 
