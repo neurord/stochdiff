@@ -1,0 +1,67 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+        <NanoMolarity specieID="GaGTP"      value="45"    />  <!-- less than AC/10 -->
+        <NanoMolarity specieID="AC"         value="0"     />
+        <NanoMolarity specieID="E"          value="0"     />
+        <NanoMolarity specieID="E2"         value="0"     />
+        <NanoMolarity specieID="ATP"        value="2e6"   />
+        <NanoMolarity specieID="EATP"       value="0"     />
+
+        <NanoMolarity specieID="cAMP"       value="1000"  />  <!--500 nM = 0.5uM -->
+        <NanoMolarity specieID="PKArc"      value="0"     />  <!--100 nM = 0.1uM -->
+        <NanoMolarity specieID="PKAcamp1"   value="0"     />
+        <NanoMolarity specieID="PKAcamp2"   value="0"     />
+        <NanoMolarity specieID="PKAc"       value="0"     />
+        <NanoMolarity specieID="PKAr"       value="0"     />
+<!--
+        Rich, T.C.; Fagan, K.A. et al. (2001) A uniform extracellular
+        stimulus triggers distinct cAMP signals in different compartments
+        of a simple cell ............................(Total PDE=0.8 uM)
+        Lynch, M.J. et al. (2005) RNA Silencing Identifies PDE4D5 as
+        the Functionally Relevant cAMP Phosphodiesterase.............
+        ........................PDE4A ~ 5%; PDE4B ~ 30%; PDE4D ~ 65%
+-->
+        <NanoMolarity specieID="PDE4B"      value="0"     />  <!--240 nM = 0.24uM -->
+        <NanoMolarity specieID="PDE4BcAMP"  value="0"     />
+        <NanoMolarity specieID="pPDE4B"     value="0"     />
+        <NanoMolarity specieID="pPDE4BcAMP" value="0"     />
+        <NanoMolarity specieID="PDE4D"      value="600"   />
+        <NanoMolarity specieID="PDE4DcAMP"  value="0"     />
+        <NanoMolarity specieID="pPDE4D"     value="0"     />
+        <NanoMolarity specieID="pPDE4DcAMP" value="0"     />
+        <NanoMolarity specieID="AMP"        value="0"     />
+        <NanoMolarity specieID="EPAc"       value="0"     /> <!--272.72 -->
+        <NanoMolarity specieID="EPAccAMP"   value="0"     />
+    </ConcentrationSet>
+
+
+    <!-- number densities are in particles per cubic micron. You
+         get about one particles per cubic micron in a 1.6 nM solution -->
+
+
+    <!-- should aslo be able to set 'region="abc"' to have a concentration
+         set apply only to a certain region (not implemented yet) -->
+<!--    <ConcentrationSet  region="cAMPsource">
+        <NanoMolarity  specieID="PKArc"  value="0" />
+        <NanoMolarity  specieID="cAMP"   value="60"/>
+    </ConcentrationSet>-->
+
+    <!-- surface concentrations for membrane-bound species. The value attribute for
+         a PicoSD element is the number of picomoles per square metre. For comparison
+         with the volume concentrations, a surface density of 1 picomole/m^2, if spread
+         over a layer 1 micron deep, gives a 1 nanoMolar solution, so to average one
+         particle per square micron you need a PicoSD value of about 1.6. -->
+
+    <SurfaceDensitySet region="dendrite">
+        <PicoSD        specieID="AC"        value="1000"  />
+        <PicoSD        specieID="PKArc"     value="1200"  /> <!-- 1200 uM -->
+        <PicoSD        specieID="PDE4B"     value="200"   /> <!-- 240 nM = 0.24uM -->
+        <PicoSD        specieID="PDE4D"     value="0"     /> <!-- 240 nM = 0.24uM -->
+<!--    <PicoSD        specieID="GaGTP"     value="150"   /> <!-- less than AC/10 -->
+        <PicoSD        specieID="EPAc"      value="1500"  />
+        <PicoSD        specieID="EPAccAMP"  value="0"     />
+    </SurfaceDensitySet>
+</InitialConditions>
+

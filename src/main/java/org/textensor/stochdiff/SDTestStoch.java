@@ -1,6 +1,6 @@
 package org.textensor.stochdiff;
 
-import org.catcmb.dataview.CCViz;
+import org.catacomb.dataview.CCViz;
 
 
 public class SDTestStoch {

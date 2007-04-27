@@ -3,15 +3,16 @@ package org.textensor.stochdiff;
 import org.catacomb.dataview.CCViz;
 
 
-public class SDTestDet {
+public class SDTestSuite3B {
 
 
     public static void main(String[] argv) {
-        String[] args = {"data/test/model1-det.xml"};
+        String root = "data/apr25/New_EPAC_S_1500/HEK293model";
+        String[] args = {root + ".xml"};
 
         StochDiff.main(args);
 
-        String[] sa = {"data/test/model1-det.out"};
+        String[] sa = {root + ".out"};
         CCViz.main(sa);
     }
 
