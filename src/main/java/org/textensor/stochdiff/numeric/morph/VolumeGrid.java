@@ -151,14 +151,6 @@ public class VolumeGrid {
                 eltRegions[i] = nn;
                 rA.add(sr);
             }
-
-            /*      System.out.println("VE " + i + ": volume " + volumes[i] +
-                 		 " exposedArea " + exposedAreas[i] +
-                 		 " position " + positions[i][0] + " " +
-                 		 positions[i][1] + " " + positions[i][2] +
-                 		 " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
-              */
-            ve.cache(i);
         }
         regionLabels = rA.toArray(new String[rA.size()]);
 

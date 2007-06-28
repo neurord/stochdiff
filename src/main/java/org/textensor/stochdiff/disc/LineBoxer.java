@@ -137,8 +137,6 @@ public class LineBoxer {
         // odd number of cells, fixed size
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
 
-
-
         // number of boxes across the diameter;
         int nd = 1 + 2 * ((int)(r / delta));
 

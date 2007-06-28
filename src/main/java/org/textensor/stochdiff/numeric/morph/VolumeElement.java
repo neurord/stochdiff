@@ -30,7 +30,7 @@ public class VolumeElement {
     boolean fixcon = false;
 
     //<--WK
-    boolean submembrane; //true ifn this volume element lies on submembrane
+    boolean submembrane; //true if this volume element lies on submembrane
     //WK-->
 
 
