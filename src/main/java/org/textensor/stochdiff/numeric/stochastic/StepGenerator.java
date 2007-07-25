@@ -1,8 +1,9 @@
-//5 20 2007: WK modified the gaussianStep() and poissonStep() functions
-//           per RC's email on 5-17-07.
-//written by Robert Cannon
 package org.textensor.stochdiff.numeric.stochastic;
 
+//<--WK
+//this package needs to be imported
+import org.textensor.stochdiff.numeric.math.MersenneTwister;
+//WK-->
 /*
  * Return the integer number of particles that going to move (or
  * reactions to occur) as a function of:

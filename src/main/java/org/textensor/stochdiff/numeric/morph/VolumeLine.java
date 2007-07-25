@@ -1,4 +1,4 @@
-//6 18 2007: WK added "ve.setSubmembrane()" to the lineFill function.
+//6 18 2007: WK added "ve.setSubmembrane()" to the lineFill function
 //written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
@@ -103,6 +103,7 @@ public class VolumeLine {
                 ve.setSurfaceBoundary(psb);
                 ve.setExposedArea(sl * depth);
             }
+
 
             ve.setVolume(dl * sl * depth);
             elements[i][0] = ve;

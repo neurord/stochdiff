@@ -1,7 +1,3 @@
-//5 20 2007: WK changed deltalnp's value to 0.03 from 0.3 to narrow the
-//             probability interpolation intervals (and thus increased
-//             the probability table size)
-//written by Robert Cannon
 package org.textensor.stochdiff.numeric.stochastic;
 
 import org.textensor.report.E;
@@ -25,9 +21,8 @@ public class InterpolatingStepGenerator extends StepGenerator {
     public final double lnpmin = Math.log(1.e-8);
     public final double lnpmax = Math.log(0.5);
 
-    //<--WK
-    public final static double deltalnp = 0.03;  //0.3 was the original value;
-    //WK-->
+    public final static double deltalnp = 0.3;  //0.3;
+
 
 
     NGoTable[][] pnTable;

@@ -785,7 +785,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                     } else {
                         if (useBinomial()) {
-                            ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random(), random.poisson(n*(Math.exp(lnp))));
+                            if (n*(Math.exp(lnp)) < 10)
+                            {
+                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random(), random.poisson(n*(Math.exp(lnp))));
+                            }
+                            else
+                            {
+                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random());
+                            }
                         } else {
                             ngo = StepGenerator.poissonStep(n, Math.exp(lnp), random.gaussian(), random.random());
                         }
@@ -889,7 +896,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             } else {
                 if (useBinomial()) {
-                    ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
+                    if (np0*(Math.exp(lnpgo)) >= 10)
+                    {
+                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
+                    }
+                    else
+                    {
+                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(np0*(Math.exp(lnpgo))));
+                    }
                 } else {
                     ngo =  StepGenerator.poissonStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
                 }
