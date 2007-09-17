@@ -1,9 +1,5 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
-//<--WK
-//this package needs to be imported
-import org.textensor.stochdiff.numeric.math.MersenneTwister;
-//WK-->
 /*
  * Return the integer number of particles that going to move (or
  * reactions to occur) as a function of:
@@ -69,5 +65,4 @@ public abstract class StepGenerator {
         }
         return ngo;
     }
-
 }

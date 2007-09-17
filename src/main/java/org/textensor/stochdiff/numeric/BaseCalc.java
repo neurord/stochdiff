@@ -1,4 +1,6 @@
-//6 19 2007: WK added 1 variable and 1 function to be able to output by 'region's.
+//6 22 2007: WK modified the extractGrid() function to calculate the side-length of
+//           each volume element (which is a square with a predefined thickness).
+//6 19 2007: WK added 1 variable and 1 function to be able to output by user-specified 'region's.
 //5 16 2007: WK added 4 variables and 5 functions (within <--WK ... WK-->)
 //written by Robert Cannon
 package org.textensor.stochdiff.numeric;
@@ -102,8 +104,7 @@ public abstract class BaseCalc {
         //System.out.print(dt_list);
         //System.out.print(filename_list);
         //System.out.print(specie_names_list);
-        System.out.println(region_list);
-
+        //System.out.println(region_list);
     }
 
     public String get_nlist()
@@ -133,8 +134,6 @@ public abstract class BaseCalc {
     //WK-->
 
 
-
-
     public void extractTables() {
         distID = sdRun.getDistributionID();
         algoID = sdRun.getAlgorithmID();
@@ -162,12 +161,39 @@ public abstract class BaseCalc {
         TreePoint[] tpa = morph.getTreePoints();
         Discretization disc = sdRun.getDiscretization();
 
-
         double d = disc.defaultMaxElementSide;
         if (d <= 0) {
             d = 1.;
 
         }
+
+        //<--WK 6 22 2007
+        //(1) iterate through all endpoints and their associated radii.
+        //(2) divide each radius by successively increasing odd numbers until
+        //the divided value becomes less than the defaultMaxElementSide.
+        //(3) select the smallest among the divided radii values as d.
+        double[] candidate_grid_sizes = new double[tpa.length];
+        for (int i = 0; i < tpa.length; i++)
+        {
+            double diameter = tpa[i].r*2.0;
+            double denominator = 3.0;
+            while ((diameter/denominator) > d)
+            {
+                denominator += 2.0; //divide by successive odd numbers
+            }
+            candidate_grid_sizes[i] = diameter/denominator;
+        }
+
+        double min_grid_size = d;
+        for (int i = 0; i < tpa.length; i++)
+        {
+            if (candidate_grid_sizes[i] < min_grid_size)
+                min_grid_size = candidate_grid_sizes[i];
+        }
+
+        d = min_grid_size;
+        //WK-->
+
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
 
         int vgg = VolumeGrid.GEOM_2D;
@@ -191,7 +217,6 @@ public abstract class BaseCalc {
         }
 
         volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
-
 
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed,

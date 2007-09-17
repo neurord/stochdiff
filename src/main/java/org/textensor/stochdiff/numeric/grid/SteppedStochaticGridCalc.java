@@ -1,3 +1,12 @@
+//9 11 2007 WK: In parallelAndSharedDiffusionStep(), for the independent diffusion,
+//			(i) the probability to diffuse to a neighboring subvolume is the probability
+//          to diffuse to that neighbor divided by the sum of all the probabilities
+//   		to diffuse to all neighbors; (ii) for calculating ngo, we use
+//			binomial variance.
+//8 28 2007 WK: In advance(), for the diffusion step, when algoID is INDEPENDENT,
+//			we call parallelAndSharedDiffusionStep() instead of calling
+//          parallelDiffusionStep().  WK added the parallelAndSharedDiffusionStep()
+//          function and SHARED_DIFF_PARTICLES constant.
 //6 18 2007 WK: The getGridConcsPlainText_dumb() function is modified to (i) flag
 //           a volume element as either on submembrane or on cytosol, and
 //			 (ii) identify its region.
@@ -55,6 +64,15 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     // particles per unit area and surface density
     // (is the same as PUVC - sd unit is picomoles per square metre)
     public static final double PARTICLES_PUASD = 0.6022;
+
+    //<--WK 8 28 2007
+    // in parallelAndSharedDiffusionStep(),
+    // (1) if the number of molecules to duffuse is less than
+    //     SHARED_DIFF_PARTICLES*(number of neighboring subvolume elements),
+    //     we do shared diffusion,
+    // (2) otherwise, we do parallel diffusion.
+    public static final int SHARED_DIFF_PARTICLES = 4;
+    //WK-->
 
     Column mconc;
 
@@ -374,7 +392,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
 
-        if (doShared() || doParticle()) {
+        if (doShared() || doParticle() || doIndependent()) {
             if (doShared()) {
                 E.info("Using SHARED destination allocation");
             } else {
@@ -406,12 +424,22 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                     double lnptot = Math.log(ptot);
                     if (lnptot > -1.) {
-                        if (nwarn < 4) {
+                        //<--WK 9 11 2007
+                        System.out.println("WK===================================");
+                        System.out.println("In DIFFUSION: probability TOO HIGH!");
+                        System.out.println("Reduce your timestep, and try again...");
+                        System.out.println("WK====================================");
+                        System.exit(0);
+
+                        /*
+                          if (nwarn < 4) {
                             E.shortWarning("p too large at element " + iel + " species "  + k +
-                                           " - capping from " + Math.exp(lnptot) + " to " + Math.exp(-1.));
+                                  " - capping from " + Math.exp(lnptot) + " to " + Math.exp(-1.));
                             nwarn++;
-                        }
-                        lnptot= -1.;
+                         }
+                         lnptot= -1.;
+                         */
+                        //WK-->
                     }
 
                     pSharedOut[iel][k] = ptot;
@@ -501,7 +529,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     private String getGridConcsHeadings_dumb(int filenum) {
         StringBuffer sb = new StringBuffer();
         //System.out.println("getGridConcsHeadings_dumb1 filenum: "+filenum);
-        sb.append("time ");
+        sb.append("time");
         // System.out.println("getGridConcsHeadings_dumb filenum: "+filenum);
         // System.out.println("speciesOutNperFilef[i]: "+Integer.valueOf(speciesOutNperFilef[filenum]));
         // for (int j = 0; j < speciesIndexOutfm[filenum][j]; j++ ) {
@@ -528,7 +556,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     }
                     //WK-->
 
-                    sb.append("_Spc_" + specieIDs[speciesIndexOutfm[filenum][j]] + " ");
+                    sb.append("_Spc_" + specieIDs[speciesIndexOutfm[filenum][j]]);
 
                     //sb.append(" Vol_" + i + "_Spc_" + specieIDs[speciesIndexOutfm[filenum][j]] + " ");
                     // System.out.println("speciesIDsOutf : " + specieIDs[speciesIndexOutfm[filenum][j]]);
@@ -698,11 +726,15 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     if (np0 > 0) {
 
                         if (algoID == INDEPENDENT) {
-                            parallelDiffusionStep(iel, k);
-
+                            //<--WK 8 28 2007
+                            //parallelDiffusionStep(iel, k);
+                            parallelAndSharedDiffusionStep(iel, k);
+                            //WK-->
                         } else if (algoID == SHARED) {
-                            sharedDiffusionStep(iel, k);
-
+                            //<--WK 9 11 2007
+                            //sharedDiffusionStep(iel, k);
+                            parallelAndSharedDiffusionStep(iel, k);
+                            //WK-->
                         } else if (algoID == PARTICLE) {
                             particleDiffusionStep(iel, k);
                         }
@@ -856,8 +888,74 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         return dt;
     }
 
+    //<--WK 8 28 2007
+    private final void parallelAndSharedDiffusionStep(int iel, int k)
+    {
+        int np0 = wkA[iel][k];
+        int inbr[] = neighbors[iel];
+        double[] fshare = fSharedExit[iel][k];
 
+        int ngo = 0;
+        int ngo_total = 0; //for independent diffusion step
+        int num_molecules_diffused_so_far = 0;
 
+        if (np0 == 1)
+        {
+            ngo = (random.random() < pSharedOut[iel][k] ? 1: 0);
+        }
+        else  if (np0 < StepGenerator.NMAX_STOCHASTIC)
+        {
+            ngo = interpSG.nGo(np0, Math.log(pSharedOut[iel][k]), random.random());
+        }
+        else
+        {
+            if (useBinomial())
+            {
+                ngo = StepGenerator.gaussianStep(np0, pSharedOut[iel][k], random.gaussian(), random.random());
+            }
+            else
+            {
+                ngo = StepGenerator.poissonStep(np0, pSharedOut[iel][k], random.gaussian(), random.random());
+            }
+        }
+        // if (ngo  < (# of neighbors)*SHARED_DIFF_PARTICLES) then do shared_diffusion
+        // else                                               then do independent_diffusion
+        if (ngo <= (inbr.length)*SHARED_DIFF_PARTICLES) //SHARED diffusion
+        {
+            wkB[iel][k] -= ngo;
+            for (int i = 0; i < ngo; i++)
+            {
+                double r =  random.random();
+                int io = 0;
+                while (r > fshare[io])
+                {
+                    io++;
+                }
+                wkB[inbr[io]][k] += 1;
+            }
+        }
+        else	//INDEPENDENT diffusion
+        {
+            ngo_total = ngo;
+            //<--WK 9 11 2007
+            double prev = 0;
+            for (int j = 0; j < inbr.length-1 ; j++)
+            {
+                double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);
+                prev = fSharedExit[iel][k][j];
+                ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random());
+                //WK-->
+                wkB[iel][k] -= ngo;
+                wkB[inbr[j]][k] += ngo;
+                num_molecules_diffused_so_far += ngo;
+            }
+
+            ngo = ngo_total - num_molecules_diffused_so_far;
+            wkB[iel][k] -= ngo;
+            wkB[inbr[inbr.length-1]][k] += ngo;
+        }
+    }
+    //WK-->
 
     private final void parallelDiffusionStep(int iel, int k) {
         int inbr[] = neighbors[iel];
@@ -875,7 +973,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             // gnbr contains the gometry: contact_area / distance
 
 
-
             if (lnpgo > -1.) {
                 if (nwarn < 4) {
                     E.shortWarning("p too large at element " + iel + " transition " + j + " to  "
@@ -887,15 +984,19 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
             int ngo = 0;
-            if (np0 == 1) {
+            if (np0 == 1)
+            {
                 // TODO - use table anyway - avoid exp!
                 ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
-
-            } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
+            }
+            else if (np0 < StepGenerator.NMAX_STOCHASTIC)
+            {
                 ngo = interpSG.nGo(np0, lnpgo, random.random());
-
-            } else {
-                if (useBinomial()) {
+            }
+            else
+            {
+                if (useBinomial())
+                {
                     if (np0*(Math.exp(lnpgo)) >= 10)
                     {
                         ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
@@ -904,12 +1005,15 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     {
                         ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(np0*(Math.exp(lnpgo))));
                     }
-                } else {
+                }
+                else
+                {
                     ngo =  StepGenerator.poissonStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
                 }
             }
 
 
+            //System.out.println("iel j ngo " + iel + " " + j + " " + ngo + " " + np0);
 
 
 
@@ -942,6 +1046,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
 
     private final void sharedDiffusionStep(int iel, int k) {
+
         int np0 = wkA[iel][k];
         int inbr[] = neighbors[iel];
         //  int nnbr = inbr.length;
@@ -1012,7 +1117,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         }
         return ret;
     }
-
 
     public long getParticleCount() {
         long ret = 0;
