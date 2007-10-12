@@ -1,3 +1,5 @@
+//6 18 2007: WK added "ve.setSubmembrane()" to the lineFill function
+//written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
 /*
@@ -54,6 +56,11 @@ public class VolumeLine {
             Position pr = rot.getRotatedPosition(cp);
             Position pc = trans.getTranslated(pr);
             ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
+
+            //<--WK
+            if ((i == 0) || (i == (nl-1)))
+                ve.setSubmembrane();
+            //WK-->
 
             Position[] pbdry = {Geom.position(vcl - 0.5 * dl, -0.5 * sl, 0),
                                 Geom.position(vcl - 0.5 * dl, 0.5 * sl, 0),

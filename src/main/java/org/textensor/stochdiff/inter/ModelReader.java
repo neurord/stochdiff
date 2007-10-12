@@ -1,3 +1,5 @@
+//5 16 2007: modified by RO
+//written by Robert Cannon
 package org.textensor.stochdiff.inter;
 
 import java.io.File;
@@ -25,13 +27,22 @@ public class ModelReader {
         File fmorph = getFile(parentFile, sdm.morphologyFile);
         File fstim = getFile(parentFile, sdm.stimulationFile);
         File finitc = getFile(parentFile, sdm.initialConditionsFile);
+        //<--RO
+        //------------------
+        File foutput = getFile(parentFile, sdm.outputSchemeFile);
+        //------------------
+        //RO-->
 
 
         sdm.setReactionScheme((ReactionScheme)readFile(freact, xmlr));
         sdm.setMorphology((Morphology)readFile(fmorph, xmlr));
         sdm.setStimulationSet((StimulationSet)readFile(fstim, xmlr));
         sdm.setInitialConditions((InitialConditions)readFile(finitc, xmlr));
-
+        //<--RO
+        //------------------
+        sdm.setOutputScheme((OutputScheme)readFile(foutput, xmlr));
+        //------------------
+        //RO-->
         return sdm;
     }
 

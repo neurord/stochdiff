@@ -1,3 +1,8 @@
+//6 22 2007: WK modified the extractGrid() function to calculate the side-length of
+//           each volume element (which is a square with a predefined thickness).
+//6 19 2007: WK added 1 variable and 1 function to be able to output by user-specified 'region's.
+//5 16 2007: WK added 4 variables and 5 functions (within <--WK ... WK-->)
+//written by Robert Cannon
 package org.textensor.stochdiff.numeric;
 
 import org.textensor.report.E;
@@ -40,14 +45,93 @@ public abstract class BaseCalc {
     int distID = BINOMIAL;
     protected int algoID = INDEPENDENT;
 
+    //<--WK
+    public String n_list, dt_list, filename_list, specie_names_list;
+    //6 18 2007
+    public String region_list;
+    //WK-->
 
     public BaseCalc(SDRun sdr) {
         sdRun = sdr;
     }
 
+    //<--WK
+    public void extractOutputScheme()
+    {
+        n_list = new String();
+        dt_list = new String();
+        filename_list = new String();
+        specie_names_list = new String();
+        region_list = new String();
 
+        OutputScheme os = sdRun.outputScheme;
 
+        for (int i = 0; i < os.outputSets.size()-1; i++)
+        {
+            OutputSet current_oset = (os.outputSets).get(i);
+            n_list += current_oset.getNumberOfOutputSpecies();
+            n_list += " ";
 
+            if (current_oset.hasdt())
+                dt_list += current_oset.getdt();
+            else
+                dt_list += sdRun.fixedStepDt;
+            dt_list += " ";
+            filename_list += current_oset.getFname();
+            filename_list += " ";
+            specie_names_list += current_oset.getNamesOfOutputSpecies();
+            specie_names_list += " ";
+            if (current_oset.hasRegion())
+                region_list += current_oset.getRegion();
+            else
+                region_list += "default"; //RC uses "default" as default value
+            region_list += " ";
+        }
+        OutputSet current_oset = (os.outputSets).get(os.outputSets.size()-1);
+        n_list += current_oset.getNumberOfOutputSpecies();
+        if (current_oset.hasdt())
+            dt_list += current_oset.getdt();
+        else
+            dt_list += sdRun.fixedStepDt;
+        filename_list += current_oset.getFname();
+        specie_names_list += current_oset.getNamesOfOutputSpecies();
+        if (current_oset.hasRegion())
+            region_list += current_oset.getRegion();
+        else
+            region_list += "default";
+
+        //System.out.print(n_list);
+        //System.out.print(dt_list);
+        //System.out.print(filename_list);
+        //System.out.print(specie_names_list);
+        //System.out.println(region_list);
+    }
+
+    public String get_nlist()
+    {
+        return n_list;
+    }
+
+    public String get_dtlist()
+    {
+        return dt_list;
+    }
+
+    public String get_filenamelist()
+    {
+        return filename_list;
+    }
+
+    public String get_specienameslist()
+    {
+        return specie_names_list;
+    }
+
+    public String get_regionlist()
+    {
+        return region_list;
+    }
+    //WK-->
 
 
     public void extractTables() {
@@ -63,6 +147,9 @@ public abstract class BaseCalc {
 
         InitialConditions icons = sdRun.getInitialConditions();
         speciesList = reactionTable.getSpeciesIDs();
+        // -------------------------
+        // OutputScheme output = sdRun.getOutputScheme();
+        // -------------------------
         // double vol = sdRun.poolVolume;
         baseConcentrations = icons.getDefaultNanoMolarConcentrations(speciesList);
     }
@@ -74,12 +161,39 @@ public abstract class BaseCalc {
         TreePoint[] tpa = morph.getTreePoints();
         Discretization disc = sdRun.getDiscretization();
 
-
         double d = disc.defaultMaxElementSide;
         if (d <= 0) {
             d = 1.;
 
         }
+
+        //<--WK 6 22 2007
+        //(1) iterate through all endpoints and their associated radii.
+        //(2) divide each radius by successively increasing odd numbers until
+        //the divided value becomes less than the defaultMaxElementSide.
+        //(3) select the smallest among the divided radii values as d.
+        double[] candidate_grid_sizes = new double[tpa.length];
+        for (int i = 0; i < tpa.length; i++)
+        {
+            double diameter = tpa[i].r*2.0;
+            double denominator = 3.0;
+            while ((diameter/denominator) > d)
+            {
+                denominator += 2.0; //divide by successive odd numbers
+            }
+            candidate_grid_sizes[i] = diameter/denominator;
+        }
+
+        double min_grid_size = d;
+        for (int i = 0; i < tpa.length; i++)
+        {
+            if (candidate_grid_sizes[i] < min_grid_size)
+                min_grid_size = candidate_grid_sizes[i];
+        }
+
+        d = min_grid_size;
+        //WK-->
+
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
 
         int vgg = VolumeGrid.GEOM_2D;
@@ -101,8 +215,8 @@ public abstract class BaseCalc {
         if (d2d <= 0.) {
             d2d = 0.5;
         }
-        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
 
+        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
 
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed,
@@ -154,7 +268,6 @@ public abstract class BaseCalc {
     }
 
 
-
     private void makeRegionConcentrations(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
         int nc = baseConcentrations.length;
@@ -204,7 +317,6 @@ public abstract class BaseCalc {
         }
         return reactionTable;
     }
-
 
     public StimulationTable getStimulationTable() {
         if (stimulationTable == null) {

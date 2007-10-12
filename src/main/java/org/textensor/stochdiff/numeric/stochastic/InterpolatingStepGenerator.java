@@ -21,7 +21,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
     public final double lnpmin = Math.log(1.e-8);
     public final double lnpmax = Math.log(0.5);
 
-    public final static double deltalnp = 0.3;
+    public final static double deltalnp = 0.3;  //0.3;
 
 
 
@@ -57,7 +57,6 @@ public class InterpolatingStepGenerator extends StepGenerator {
         }
 
         nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
-
         pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
 
         fullInit(mode);
@@ -110,8 +109,14 @@ public class InterpolatingStepGenerator extends StepGenerator {
             double rnb = pnTable[ia+1][n].rnGo(r);
             ngo = (int)(f * rnb + (1. - f) * rna);
 
-
+            //if (ngo != 0)
+            {
+                //    System.out.println(n + " " + lnp + " " + ngo);
+                // System.out.println(ia + " " + lnp + " " + (lnpmin + ia*deltalnp) + " " + (lnpmin + (ia+1)*deltalnp));
+            }
         }
+
+
         return ngo;
     }
 

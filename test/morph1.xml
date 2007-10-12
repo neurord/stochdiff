@@ -22,12 +22,10 @@
     </SpineType>
 
 
-    <!-- lengthDensity means you set the number per micron along the segment -->
-    <SpineAllocation spineType="spineA" region="region1" lengthDensity="0.01"/>
-    
-    <!-- areaDensity is the number per unit area -->   
+<!--
+    <SpineAllocation spineType="spineA" region="region1" areaDensity="0.01"/>
     <SpineAllocation spineType="spineB" region="region1" areaDensity="0.01"/>
-
+-->
 
 
     <Segment id="seg1" region="region1">
@@ -54,6 +52,6 @@
 	<end x="7." y = "12." z = "0" r = "0.3"/>
     </Segment>
 	      -->
-    
+
 </Morphology>
 

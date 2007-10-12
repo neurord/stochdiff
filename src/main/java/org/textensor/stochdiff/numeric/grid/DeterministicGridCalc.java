@@ -71,6 +71,7 @@ public class DeterministicGridCalc extends BaseCalc {
 
 
         nel = vgrid.getNElements();
+
         nspec = rtab.getNSpecies();
         specieIDs = rtab.getSpecieIDs();
 

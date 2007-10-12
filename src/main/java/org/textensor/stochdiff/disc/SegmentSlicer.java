@@ -1,3 +1,7 @@
+//6 26 2007: WK modified the discretize() function to make all volume elements
+//           be a-by-a squares where a is the 'max element side' calculated
+//           in the extractGrid() function in BaseCalc.java
+//written by Robert Cannon
 package org.textensor.stochdiff.disc;
 
 import java.util.ArrayList;
@@ -90,7 +94,47 @@ public class SegmentSlicer {
                 if (cpa.getWork() < cpb.getWork()) {
 
                     if (sdstyle == FIXED) {
+                        /*
                         subdiv[i][j] = getFixedSubdivision(cpa, cpb);
+                        */
+                        //<--WK (1)moved the body of getFixedSubdivision(...) here,
+                        //(2) added the 'distance_over_delta' variable, and
+                        //(3) modified the 'nadd' variable
+                        double dab = cpa.distanceTo(cpb);
+                        double localDelta = resolution.getLocalDelta(cpa, cpb);
+
+                        double distance_over_delta = dab/localDelta; //wk
+                        int nadd = (int)distance_over_delta - 1; //wk
+                        /*
+                        int nadd = (int)(Math.round(dab / localDelta)) - 1;
+                         */
+
+                        double[] dpos = new double[nadd];
+                        if (nadd > 0) {
+                            for (int ii = 0; ii < nadd; ii++) {
+                                dpos[ii] = (1. + ii) / (nadd + 1.);
+                            }
+                        }
+                        /*
+                        return dpos;
+                        */
+                        subdiv[i][j] = dpos;
+                        //WK-->
+
+                        //<--WK: change the coordinates of cpb to make all volume elements
+                        //be localDelta-by-localDelta-squares.  The distance between cpa and modified cpb
+                        //now becomes localDelta*(floor(dab/localDelta)).
+                        TreePoint cp = new TreePoint();
+                        cp.locateBetween(cpa, cpb, (nadd+1)/distance_over_delta);
+                        cpb.x = cp.x;
+                        cpb.y = cp.y;
+                        cpb.z = cp.z;
+
+                        //System.out.println("start and end points " + cpa.x + " " + cpa.y + " " + cpb.x + " " + cpb.y); //wk
+                        //System.out.println("distance delta nadd " + dab + " " + localDelta + " " + nadd); //wk
+                        //WK-->
+
+
                     } else if (sdstyle == BALANCED) {
                         subdiv[i][j] = getBalancedSubdivision(cpa, cpb);
                     } else {
@@ -202,6 +246,7 @@ public class SegmentSlicer {
                 dpos[i] = (1. + i) / (nadd + 1.);
             }
         }
+
         return dpos;
     }
 

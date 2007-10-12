@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import org.textensor.stochdiff.numeric.morph.VolumeLine;
 import org.textensor.stochdiff.numeric.morph.VolumeSlice;
 
 import java.util.ArrayList;
@@ -69,11 +70,18 @@ public class DiscBoxer {
 
 
     private void recAdd(VolumeSlice pGrid, TreePoint tp) {
-
+        String lbl = tp.getLabel();
         for (TreePoint tpn : tp.getNeighbors()) {
             if (wkpHS.contains(tpn)) {
                 wkpHS.remove(tpn);
-                VolumeSlice vg = nextVolumeSlice(pGrid, tp, tpn);
+
+                // if a terminal has a label, and the current point doesn't, then use it
+                if (lbl == null && tpn.nnbr == 1 && tpn.getLabel() != null) {
+                    lbl = tpn.getLabel();
+                }
+
+                VolumeSlice vg = nextVolumeSlice(pGrid, tp, tpn, lbl);
+                lbl = null;
                 gridAL.add(vg);
                 recAdd(vg, tpn);
             }
@@ -84,36 +92,45 @@ public class DiscBoxer {
 
 
     public VolumeSlice nextVolumeSlice(VolumeSlice parentGrid,
-                                       TreePoint tpa, TreePoint tpb) {
+                                       TreePoint tpa, TreePoint tpb, String lbl) {
 
         VolumeSlice ret = null;
         if (parentGrid == null) {
-            ret = baseGrid(tpa, tpb);
+            ret = baseGrid(tpa, tpb, lbl);
 
         } else {
             // TODO - probably not what we want
             // too much mumerical diffusion if boxes can have gradually changing
             // sizes? restrict to a few dicrete multiples?
-            ret = baseGrid(tpa, tpb);
+            ret = baseGrid(tpa, tpb, lbl);
             parentGrid.planeConnect(ret);
         }
         return ret;
     }
 
 
-    public VolumeSlice baseGrid(TreePoint tpa, TreePoint tpb) {
+    public VolumeSlice baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
 
-        // number of boxes across the diameter;
-        int nd = (int)(2 * r + 0.5);
-        if (nd < 1) {
-            nd = 1;
-        }
+        String rgn = tpa.regionClassWith(tpb);
+        double delta = resolution.getLocalDelta(tpa, tpb);
 
-        VolumeSlice ret = new VolumeSlice(nd, 2. * r);
-        ret.discFill(tpa, tpb);
+
+        VolumeSlice ret = new VolumeSlice(delta, 2. * r);
+        ret.discFill(tpa, tpb, lbl, rgn);
 
         return ret;
     }
+
+
+
+
+
+
+
+
+
+
+
 
 }

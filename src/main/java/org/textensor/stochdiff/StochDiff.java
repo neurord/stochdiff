@@ -7,7 +7,6 @@ import org.textensor.stochdiff.inter.ModelReader;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.xml.XMLWriter;
 
-
 public class StochDiff {
 
     // The main method - a bit of basic checking and if all is well, create the
@@ -43,6 +42,9 @@ public class StochDiff {
                 }
                 outputFile = new File(s + ".out");
             }
+
+
+
 
             ResultWriter rw = new ResultWriter(outputFile);
             SDRun sdModel = ModelReader.read(modelFile);

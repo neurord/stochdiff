@@ -1,3 +1,6 @@
+//6 18 2007: WK added a variable (submembranes[]) and a function (getSubmembranes());
+//			 the variable is init and set in the fix() function.
+//written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
 import java.util.ArrayList;
@@ -30,6 +33,10 @@ public class VolumeGrid {
     double[] volumes;
     double[][] positions;
     double[] exposedAreas;
+
+    //<--WK
+    boolean[] submembranes;
+    //WK-->
 
     int nconnection;
     int[][] conI;
@@ -119,6 +126,9 @@ public class VolumeGrid {
         positions = new double[nelement][3];
         eltLabels = new String[nelement];
         eltRegions = new int[nelement];
+        //<--WK
+        submembranes = new boolean[nelement];
+        //WK-->
 
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
@@ -128,6 +138,9 @@ public class VolumeGrid {
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
             eltLabels[i] = ve.getLabel();
+            //<--WK
+            submembranes[i] = ve.getSubmembrane();
+            //WK-->
             String sr = ve.getRegion();
             if (sr == null || sr.length() == 0) {
                 eltRegions[i] = 0;
@@ -138,6 +151,13 @@ public class VolumeGrid {
                 eltRegions[i] = nn;
                 rA.add(sr);
             }
+
+            /*      System.out.println("VE " + i + ": volume " + volumes[i] +
+                 		 " exposedArea " + exposedAreas[i] +
+                 		 " position " + positions[i][0] + " " +
+                 		 positions[i][1] + " " + positions[i][2] +
+                 		 " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
+              */
             ve.cache(i);
         }
         regionLabels = rA.toArray(new String[rA.size()]);
@@ -212,6 +232,12 @@ public class VolumeGrid {
         return exposedAreas;
     }
 
+    //<--WK
+    public boolean[] getSubmembranes()
+    {
+        return submembranes;
+    }
+    //WK-->
 
     public int[][] getPerElementNeighbors() {
         return eltNbrs;

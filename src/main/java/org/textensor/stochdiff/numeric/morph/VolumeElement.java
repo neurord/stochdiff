@@ -1,3 +1,5 @@
+//6 18 2007: WK added a boolean variable (submembrane), and three functions (isSubmembrane, getSubmembrane, and setSubmembrane)
+//written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ public class VolumeElement {
 
     boolean fixcon = false;
 
+    //<--WK
+    boolean submembrane; //true ifn this volume element lies on submembrane
+    //WK-->
+
 
     // these are for caching connection areas to neighbors for
     // cuboid volumes only
@@ -39,8 +45,20 @@ public class VolumeElement {
 
     public VolumeElement() {
         connections = new ArrayList<ElementConnection>();
+        submembrane = false;
     }
 
+    //<--WK
+    public boolean isSubmembrane()
+    {
+        return (submembrane == true);
+    }
+
+    public void setSubmembrane()
+    {
+        submembrane = true;
+    }
+    //WK-->
 
     public void setLabel(String s) {
         label = s;
@@ -111,6 +129,12 @@ public class VolumeElement {
         return cz;
     }
 
+    //<--WK
+    public boolean getSubmembrane()
+    {
+        return submembrane;
+    }
+    //WK-->
 
     public void cache(int ind) {
         icache = ind;

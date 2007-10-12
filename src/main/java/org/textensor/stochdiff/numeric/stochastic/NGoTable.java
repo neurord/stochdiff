@@ -46,6 +46,7 @@ public final class NGoTable {
                 }
             }
 
+
             /* at this stage, wk[i] contains the probability that
              * i or more particles move in the step. wk[0] must be 1
              * unless something has gone wrong.

@@ -1,3 +1,5 @@
+//5 16 2007: modified by RO (modifications within <--RO ... RO-->)
+//written by Robert Cannon
 package org.textensor.stochdiff.model;
 
 import org.textensor.report.E;
@@ -10,7 +12,11 @@ public class SDRun {
     public String morphologyFile;
     public String stimulationFile;
     public String initialConditionsFile;
-
+    //<--RO
+    // ------------------------
+    public String outputSchemeFile;
+    // ------------------------
+    //RO-->
 
     public String geometry;
     public double depth2D;
@@ -28,6 +34,7 @@ public class SDRun {
     // time step for fixed step calculations;
     public double fixedStepDt;
 
+    // public double outputInterval=0.8;
     public double outputInterval;
 
     public String outputRegions;
@@ -50,7 +57,11 @@ public class SDRun {
     public StimulationSet stimulationSet;
     public Morphology morphology;
     public InitialConditions initialConditions;
-
+    //<--RO
+    // ------------------------
+    public OutputScheme outputScheme;
+    // ------------------------
+    //RO-->
 
     public Discretization discretization;
 
@@ -100,6 +111,17 @@ public class SDRun {
         return algorithmID;
     }
 
+    //<--RO
+    // -------------------------
+    public void setOutputScheme(OutputScheme outputScheme) {
+        this.outputScheme = outputScheme;
+    }
+
+    public OutputScheme getOutputScheme() {
+        return outputScheme;
+    }
+    // -------------------------
+    //RO-->
 
     public void setReactionScheme(ReactionScheme reactionScheme) {
         this.reactionScheme = reactionScheme;
