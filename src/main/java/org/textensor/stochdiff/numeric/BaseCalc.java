@@ -1,3 +1,4 @@
+//3 5 2008: WK changed the initial value of the denominator variable in the extractGrid function from 3 to 1
 //6 22 2007: WK modified the extractGrid() function to calculate the side-length of
 //           each volume element (which is a square with a predefined thickness).
 //6 19 2007: WK added 1 variable and 1 function to be able to output by user-specified 'region's.
@@ -176,7 +177,7 @@ public abstract class BaseCalc {
         for (int i = 0; i < tpa.length; i++)
         {
             double diameter = tpa[i].r*2.0;
-            double denominator = 3.0;
+            double denominator = 1.0;
             while ((diameter/denominator) > d)
             {
                 denominator += 2.0; //divide by successive odd numbers
@@ -192,6 +193,9 @@ public abstract class BaseCalc {
         }
 
         d = min_grid_size;
+        System.out.println("****************************");
+        System.out.println("subvolume grid size is: " + min_grid_size);
+        System.out.println("****************************");
         //WK-->
 
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);

@@ -28,6 +28,7 @@ public class InjectionStim {
     public int numTrains;
     //WK-->
 
+
     public void writeTo(StimulationTable stab, ReactionTable rtab) {
         int specInd = rtab.getSpecieIndex(specieID);
         double[] vrate = new double[rtab.getNSpecies()];
@@ -48,7 +49,7 @@ public class InjectionStim {
         for (int i = 0; i < numTrains; i++)
         {
             if (period <= 0) {
-                stab.addSquarePulse(injectionSite, vrate, onset, duration);
+                stab.addSquarePulse(injectionSite, vrate, onset + i*(duration + interTrainInterval), duration);
             } else {
                 stab.addPeriodicSquarePulse(injectionSite, vrate,
                                             onset + i*(end + interTrainInterval),

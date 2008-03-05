@@ -1,0 +1,1 @@
+Main-Class: org.textensor.stochdiff.StochDiff

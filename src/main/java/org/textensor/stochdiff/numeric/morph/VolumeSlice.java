@@ -9,52 +9,16 @@ public class VolumeSlice {
 
     int nx;
     int ny;
-    double boxSize;
-    double radius;
     double xSize;
     double ySize;
 
-    int icenter;
-    int jcenter;
-    boolean[][] present;
-
     VolumeElement[][] elements;
 
-    public VolumeSlice(double delta, double r) {
-        boxSize = delta;
-        radius = r;
-
-        int nr = (int)(r / delta);
-        int n = 1 + 2 * nr;
+    public VolumeSlice(int n, double w) {
         nx = n;
         ny = n;
-        icenter = nr;
-        jcenter = nr;
-
-
-        // work out which squares in the grid are going to be present as elements.
-        // for a square section, just set all elements of present to true
-        present = new boolean[nx][ny];
-        int nt = 0;
-        int nf = 0;
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
-                double dx = (i - icenter) * boxSize;
-                double dy = (j - jcenter) * boxSize;
-                double r2 = dx * dx + dy * dy;
-                if (r2 < radius * radius) {
-                    present[i][j] = true;
-                    nt += 1;
-                } else {
-                    present[i][j] = false;
-                    nf += 1;
-                }
-            }
-        }
-
-        E.info("created a volume slice " + nx + " by " + ny + " filling " + nt + " of " + (nt + nf));
-
-
+        xSize = w;
+        ySize = w;
     }
 
 
@@ -63,130 +27,50 @@ public class VolumeSlice {
     }
 
 
-    public void discFill(Position pa, Position pb, String pointLabel, String regionLabel) {
+    public void discFill(Position pa, Position pb) {
+        double cx = 0.5 * xSize;
+        double cy = 0.5 * ySize;
 
-        double sl = Geom.distanceBetween(pa, pb);
+        E.missing("need to do surface areas");
+
+        double seglength = Geom.distanceBetween(pa, pb);
+
         Translation trans = Geom.translation(Geom.midpoint(pa, pb));
-        Vector vab = Geom.fromToVector(pa, pb);
-        double theta = Geom.zRotationAngle(Geom.unitY(), vab);
-        Rotation rot = Geom.aboutZRotation(theta);
+        Rotation rot = Geom.fromZRotation(Geom.fromToVector(pa, pb));
 
         elements = new VolumeElement[nx][ny];
 
+        double r2 = cx * cx + cy * cy;
 
-        // center of the box at 0,0
-        double x0 = -1 * icenter * boxSize;
-        double y0 = -1 * icenter * boxSize;
-
-
-        // this is a little confusing. X and Y axes are used within the slice, but when these are
-        // turned into boxes, the slab of boxes is initially created in the X-Z plane before being rotated
-        // into place
-
-
+        double dx = xSize / nx;
+        double dy = ySize / ny;
         for (int i = 0; i < nx; i++) {
             for (int j = 0; j < ny; j++) {
+                double vcx = -cx + (i + 0.5) * dx;
+                double vcy =  -cy + (j + 0.5) * dy;
+                double rc2 = vcx * vcx + vcy * vcy;
 
-                if (present[i][j]) {
-
-                    double vcx = x0 + i * boxSize;
-                    double vcy =  y0 + j * boxSize;
-
+                if (rc2 < r2) {
                     VolumeElement ve = new VolumeElement();
-                    elements[i][j] = ve;
-                    if (regionLabel != null) {
-                        ve.setRegion(regionLabel);
-                    }
-                    ve.setVolume(boxSize * boxSize * sl);
 
                     Position cp = Geom.position(vcx, vcy, 0.);
                     Position pr = rot.getRotatedPosition(cp);
                     Position pc = trans.getTranslated(pr);
                     ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
+                    ve.setVolume(dx * dy * seglength);
+                    elements[i][j] = ve;
 
+                    ve.setAlongArea(dy * seglength);
+                    ve.setSideArea(dx * dy);
+                    ve.setTopArea(dx * seglength);
 
-                    ve.setAlongArea(boxSize * sl);
-                    ve.setSideArea(boxSize * boxSize);
-                    ve.setTopArea(boxSize * sl);
+                } else {
 
-
-                    // this is the boundary of a slice through the box perpendicular to the z axis
-                    // it is not used for the computation, just for visualization
-                    Position[] pbdry = {Geom.position(vcx - 0.5 * boxSize, -0.5 * sl, vcy),
-                                        Geom.position(vcx - 0.5 * boxSize, 0.5 * sl, vcy),
-                                        Geom.position(vcx + 0.5 * boxSize, 0.5 * sl, vcy),
-                                        Geom.position(vcx + 0.5 * boxSize, -0.5 * sl, vcy)
-                                       };
-
-                    for (int ib = 0; ib < pbdry.length; ib++) {
-                        pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
-                    }
-                    ve.setBoundary(pbdry);
-
-
-                    if (regionLabel != null) {
-                        ve.setRegion(regionLabel);
-                    }
-
-
-                    boolean surf = false;
-                    double hb = 0.5 * boxSize;
-                    Position[] psb = new Position[4];
-                    // four different cases here since the boundary points have to go in the right order to give
-                    // the right-hand normal pointing outwards
-                    if (i == 0 || !present[i-1][j]) {
-                        surf = true;
-                        double xb = vcx + -0.5 * boxSize;
-                        psb[0] = Geom.position(xb, -0.5 * sl, vcy - hb);
-                        psb[1] = Geom.position(xb, -0.5 * sl, vcy + hb);
-                        psb[2] = Geom.position(xb, 0.5 * sl, vcy + hb);
-                        psb[3] = Geom.position(xb, 0.5 * sl, vcy - hb);
-
-                    } else if (i == nx-1 || !present[i+1][j]) {
-                        surf = true;
-                        double xb = vcx + 0.5 * boxSize;
-                        psb[0] = Geom.position(xb, -0.5 * sl, vcy + hb);
-                        psb[1] = Geom.position(xb, -0.5 * sl, vcy - hb);
-                        psb[2] = Geom.position(xb, 0.5 * sl, vcy - hb);
-                        psb[3] = Geom.position(xb, 0.5 * sl, vcy + hb);
-
-                    } else if (j == 0 || !present[i][j-1]) {
-                        surf = true;
-                        double yb = vcy - 0.5 * boxSize;
-                        psb[0] = Geom.position(vcx + hb, -0.5 * sl, yb);
-                        psb[1] = Geom.position(vcx - hb, -0.5 * sl, yb);
-                        psb[2] = Geom.position(vcx - hb, 0.5 * sl, yb);
-                        psb[3] = Geom.position(vcx + hb, 0.5 * sl, yb);
-
-                    } else if (j == ny - 1 || !present[i][j+1]) {
-                        surf = true;
-                        double yb = vcy + 0.5 * boxSize;
-                        psb[0] = Geom.position(vcx - hb, -0.5 * sl, yb);
-                        psb[1] = Geom.position(vcx + hb, -0.5 * sl, yb);
-                        psb[2] = Geom.position(vcx + hb, 0.5 * sl, yb);
-                        psb[3] = Geom.position(vcx - hb, 0.5 * sl, yb);
-                    }
-
-                    if (surf) {
-                        ve.setSubmembrane();
-
-                        for (int ib = 0; ib < psb.length; ib++) {
-                            psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
-                        }
-                        ve.setSurfaceBoundary(psb);
-                        ve.setExposedArea(sl * boxSize);
-                    }
                 }
-
             }
-        }
-
-        if (pointLabel != null) {
-            elements[icenter][icenter].setLabel(pointLabel);
         }
         neighborize();
     }
-
 
 
 
@@ -216,8 +100,6 @@ public class VolumeSlice {
 
 
 
-
-
     public void planeConnect(VolumeSlice tgt) {
         if (tgt.nx == nx && tgt.ny == ny) {
             // the easy case;
@@ -232,28 +114,24 @@ public class VolumeSlice {
             }
 
         } else {
-            if (tgt.nx < nx) {
-                tgt.planeConnectUp(this);
-            } else {
-                planeConnectUp(tgt);
-            }
-        }
+            // not sure this is the right thing, but we should do it to see...
+            // MISSING - just do as above for now...
 
-    }
-
-    private void planeConnectUp(VolumeSlice tgt) {
-        // tgt is bigger than present slice;
-        int io = (tgt.nx - nx) / 2;
-        int jo = (tgt.ny - ny) / 2;
-
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
-                VolumeElement va = getElement(i, j);
-                VolumeElement vb = tgt.getElement(io + i, jo + j);
-                if (va != null && vb != null) {
-                    va.coupleTo(vb, va.getSideArea());
+            int nxu = (nx < tgt.nx ? nx : tgt.nx);
+            int nyu = (ny < tgt.ny ? ny : tgt.ny);
+            for (int i = 0; i < nxu; i++) {
+                for (int j = 0; j < nyu; j++) {
+                    VolumeElement va = getElement(i, j);
+                    VolumeElement vb = tgt.getElement(i, j);
+                    if (va != null && vb != null) {
+                        va.coupleTo(vb, va.getTopArea());
+                    }
                 }
             }
+
+
+
+
         }
     }
 

@@ -1,3 +1,5 @@
+//9 25 2007 WK: In advance() function, we set the inc/decrements (i.e., ngo*xxx) to zero explicitly
+//          to avoid floating point error
 //9 11 2007 WK: In parallelAndSharedDiffusionStep(), for the independent diffusion,
 //			(i) the probability to diffuse to a neighboring subvolume is the probability
 //          to diffuse to that neighbor divided by the sum of all the probabilities
@@ -860,18 +862,35 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                     }
 
-
-                    nend[ri0] -= ngo * rs0;
-                    if (ri1 >= 0) {
-                        nend[ri1] -= ngo * rs1;
+                    //<--WK 9 25 2007: setting inc/decrements (i.e., ngo*xxx) to zero explicitly
+                    // to avoid floating point error
+                    if (ngo == 0)
+                    {
+                        int pi0 = pi[0];
+                        int pi1 = pi[1];
+                        nend[ri0] -= 0;
+                        if (ri1 >= 0)
+                            nend[ri1] -= 0;
+                        nend[pi0] += 0;
+                        if (pi1 >= 0)
+                            nend[pi1] += 0;
                     }
+                    else
+                    {
+                        //WK-->
+                        nend[ri0] -= ngo * rs0;
 
-                    int pi0 = pi[0];
-                    int pi1 = pi[1];
+                        if (ri1 >= 0) {
+                            nend[ri1] -= ngo * rs1;
+                        }
 
-                    nend[pi0] += ngo * ps[0];
-                    if (pi1 >= 0) {
-                        nend[pi1] += ngo * ps[1];
+                        int pi0 = pi[0];
+                        int pi1 = pi[1];
+
+                        nend[pi0] += ngo * ps[0];
+                        if (pi1 >= 0) {
+                            nend[pi1] += ngo * ps[1];
+                        }
                     }
 
                     // TODO this "if (ri[1] >= 0)" business is not great
