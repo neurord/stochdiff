@@ -21,7 +21,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
     public final double lnpmin = Math.log(1.e-8);
     public final double lnpmax = Math.log(0.5);
 
-    public final static double deltalnp = 0.3;  //0.3;
+    public final static double deltalnp = 0.03;  //0.3;
 
 
 
