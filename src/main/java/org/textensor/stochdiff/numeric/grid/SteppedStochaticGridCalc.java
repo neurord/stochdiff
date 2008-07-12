@@ -1,5 +1,7 @@
-//7 3 2008 RO: if observe negative ngo, ngo=0
-//7 2 2008 WK: In parallelAndSharedDiffusionStep() function, when np0 > NMAX_STOCHASTIC and if n*p < 10,
+//7 11 2008 RO & WK: IF ( ( NumberofMolecules*(Probablity of diffusion or reaction) ) < NP && using binomial),
+//          THEN calculate ngo from poisson distribution, ELSE calculate ngo from gaussian; NP=20.
+//7 3 2008  RO: if observe negative ngo, ngo=0
+//7 2 2008  WK: In parallelAndSharedDiffusionStep() function, when np0 > NMAX_STOCHASTIC and if n*p < 10,
 //          then use poission to get ngo; otherwise, use gaussian
 //9 25 2007 WK: In advance() function, we set the inc/decrements (i.e., ngo*xxx) to zero explicitly
 //          to avoid floating point error
@@ -77,6 +79,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     //     we do shared diffusion,
     // (2) otherwise, we do parallel diffusion.
     public static final int SHARED_DIFF_PARTICLES = 4;
+    public static final int NP = 20;
     //WK-->
 
     Column mconc;
@@ -522,7 +525,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         }
     }
 //<--RO 7 02 2008
-// Saves as integers
+// Saves as integers; used to save particles instead of concentrations
     private String stringi(int d) {
         if (d == 0) {
             return "00 ";
@@ -650,9 +653,11 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         // int iwr = 0;
         double writeTime = -1.e-9;
         sdRun.outputInterval = 100.0;
-        double [] writeTimeArray = {-1.e-9, -1.e-9, -1.e-9, -1.e-9};
-        for (int i=0; i< writeTimeArray.length; i++) {
-            System.out.println("writeTimeArray : " + writeTimeArray[i]);
+        double [] writeTimeArray;
+        writeTimeArray = new double[NspeciesFilef];
+        for (int i=0; i< NspeciesFilef; i++) {
+            writeTimeArray[i]=-1.e-9;
+            // System.out.println("writeTimeArray["+i+"] : " + writeTimeArray[i]);
         }
 
         while (time < runtime) {
@@ -851,25 +856,46 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                     } else {
                         if (useBinomial()) {
-                            if (n*(Math.exp(lnp)) < 10)
+                            if (n*(Math.exp(lnp)) < NP)
                             {
-                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random(), random.poisson(n*(Math.exp(lnp))));
+                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random(), random.poisson(n*(Math.exp(lnp))), NP);
+                                if (ngo < 0)
+                                {
+                                    ngo=0;
+
+                                    System.out.println("in advance (reaction), if (n*Math.exp(lnp)) < "+NP+"): ngo is NEGATIVE.");
+                                    System.out.println("ngo: "+ngo+" n: "+n+" Math.exp(lnp): "+Math.exp(lnp));
+                                }
                             }
                             else
                             {
                                 ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random());
+                                if (ngo < 0)
+                                {
+                                    ngo=0;
+
+                                    System.out.println("in advance (reaction), if (n*Math.exp(lnp)) >= "+NP+"): ngo is NEGATIVE.");
+                                    System.out.println("ngo: "+ngo+" n: "+n+" Math.exp(lnp): "+Math.exp(lnp));
+                                }
                             }
 
                         } else {
                             ngo = StepGenerator.poissonStep(n, Math.exp(lnp), random.gaussian(), random.random());
+                            if (ngo < 0)
+                            {
+                                ngo=0;
+
+                                System.out.println("in advance (reaction), if not using binomial: ngo is NEGATIVE.");
+                                System.out.println("ngo: "+ngo+" n: "+n+" Math.exp(lnp): "+Math.exp(lnp));
+                            }
                         }
                     }
 //             <--WK 7 2 2008: if ngo is negative, exit.
-                    if (ngo < 0)
-                    {
-                        System.out.println("in advance: ngo is NEGATIVE. Exiting...");
-                        System.exit(0);
-                    }
+//                if (ngo < 0)
+//                {
+//                    System.out.println("in advance: ngo is NEGATIVE. Exiting...");
+//                    System.exit(0);
+//                }
                     //WK-->
 
 
@@ -980,16 +1006,16 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             {
                 //<--WK 7 2 2008: if n*p < 10, then use poission to get ngo; otherwise, use gaussian.
                 //<--RO 7 3 2008: changed from 10 to 20 because observed negative ngo
-                if (np0*pSharedOut[iel][k] < 10)
+                if (np0*pSharedOut[iel][k] < NP)
                 {
                     //RO-->
-                    ngo = StepGenerator.gaussianStep(np0, pSharedOut[iel][k], random.gaussian(), random.random(), random.poisson(np0*pSharedOut[iel][k]));
+                    ngo = StepGenerator.gaussianStep(np0, pSharedOut[iel][k], random.gaussian(), random.random(), random.poisson(np0*pSharedOut[iel][k]), NP);
 
                     if (ngo < 0)
                     {
                         ngo=0;
 
-                        System.out.println("in parallelAndSharedDiffusionStep, if (np0*pSharedOut[iel][k] < 10): ngo is NEGATIVE.");
+                        System.out.println("in parallelAndSharedDiffusionStep, if (np0*pSharedOut[iel][k] < "+NP+"): ngo is NEGATIVE.");
                         System.out.println("ngo: "+ngo+" np0: "+np0+" pSharedOut[iel][k]: "+pSharedOut[iel][k]);
                     }
 
@@ -1002,7 +1028,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     {
                         ngo=0;
 
-                        System.out.println("in parallelAndSharedDiffusionStep, if !(np0*pSharedOut[iel][k] < 10): ngo is NEGATIVE.");
+                        System.out.println("in parallelAndSharedDiffusionStep, if (np0*pSharedOut[iel][k] >= "+NP+"): ngo is NEGATIVE.");
                         System.out.println("ngo: "+ngo+" np0: "+np0+" pSharedOut[iel][k]: "+pSharedOut[iel][k]);
                     }
                     //WK-->
@@ -1055,14 +1081,14 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                 double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);
                 prev = fSharedExit[iel][k][j];
                 //<--RO 7 3 2008: changed from 10 to 20 because observed negative ngo
-                if (ngo_total*Math.exp(lnpgo) < 10)
+                if (ngo_total*Math.exp(lnpgo) < NP)
                 {
-                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(ngo_total*Math.exp(lnpgo)));
+                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(ngo_total*Math.exp(lnpgo)), NP);
                     if (ngo < 0)
                     {
                         ngo=0;
 
-                        System.out.println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) < 10): ngo is NEGATIVE.");
+                        System.out.println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) < "+NP+"): ngo is NEGATIVE.");
                         System.out.println("ngo: "+ngo+" ngo_total: "+ngo_total+" Math.exp(lnpgo): "+Math.exp(lnpgo));
                     }
                 }
@@ -1073,7 +1099,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     {
                         ngo=0;
 
-                        System.out.println("in parallelAndSharedDiffusionStep, INDEPENDENT, if !(ngo_total*Math.exp(lnpgo) < 10): ngo is NEGATIVE.");
+                        System.out.println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) >= "+NP+"): ngo is NEGATIVE.");
                         System.out.println("ngo: "+ngo+" ngo_total: "+ngo_total+" Math.exp(lnpgo): "+Math.exp(lnpgo));
                     }
                 }
@@ -1144,7 +1170,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     }
                     else
                     {
-                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(np0*(Math.exp(lnpgo))));
+                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random(), random.poisson(np0*(Math.exp(lnpgo))), NP);
                     }
                 }
                 else
