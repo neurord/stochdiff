@@ -1,0 +1,36 @@
+
+<AutonomousDialog title="Folder selector"  backgroundColor="#f0f0f0"> 
+
+    <BorderPanel prefWidth="500" prefHeight="280" xspace="2" yspace="6" borderWidth="10">
+	
+	<Center>
+	       	<InfoPanel id="info" prefWidth="400" prefHeight="150" borderWidth="6"/>
+	</Center>
+
+
+	<South>
+	
+	    <GridPanel nrow="2">
+		<BorderPanel borderWidth="8">
+		    <Center>
+			<TextField id="nameTF" width="50">
+			    
+			</TextField>
+		    </Center>
+		    <East>
+			<Button label="choose..." action="chooseFolder"/>
+		    </East>
+		</BorderPanel>
+		
+		<RightFlowPanel borderWidth="8">
+		    <Button label="OK" action="OK" borderWidth="2" xPadding="6" yPadding="3"/>
+		    <Button label="Cancel" action="cancel" borderWidth="2" xPadding="6" yPadding="3"/>
+		</RightFlowPanel>
+	    </GridPanel>
+	</South>
+
+    </BorderPanel>
+
+
+</AutonomousDialog>
+

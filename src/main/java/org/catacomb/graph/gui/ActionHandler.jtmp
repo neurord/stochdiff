@@ -1,0 +1,73 @@
+
+   public final void setMenuOptions(String[] sa, ActionListener al) {
+      myal = al;
+      mymenu = new JPopupMenu();
+
+      String[] mysa = {"reFrame", "Refresh", "zoom In", "zoom Out",
+		       "Keep snapshot", "Save image", "toggle Box",
+		       "save as Xfig",
+		       "start/stop Movie recording", "Helper"};
+      for (int i = 0; i < mysa.length; i++) {
+	 JMenuItem mi = new JMenuItem (mysa[i]);
+	 mi.addActionListener (this);
+	 mymenu.add(mi);
+      }
+      
+      mymenu.addSeparator();
+      if (sa != null) {
+	 for (int i = 0; i < sa.length; i++) {
+	    JMenuItem mi = new JMenuItem (sa[i]);
+	    mi.addActionListener (al);
+	    mymenu.add(mi);
+	 }
+      }
+   }
+
+
+   public final void setlabelActions(String[] sa, LabelActor bac) {
+      labelActions = sa;
+      this.bac = bac;
+      if (mymenu == null) {
+	 mymenu = new JPopupMenu();
+      } else {
+	 mymenu.addSeparator();
+      }
+
+      for (int i = 0; i < labelActions.length; i++) {
+	 JMenuItem mi = new JMenuItem (labelActions[i]);
+	 mi.addActionListener(this);
+	 mymenu.add(mi);
+      }
+   }
+   
+
+
+  public void actionPerformed (ActionEvent ev) {
+     String sarg = ev.getActionCommand();
+     if (sarg.equals("reFrame")) letterAction("F");
+     else if (sarg.equals("Refresh")) letterAction("R");
+     else if (sarg.equals("save as Xfig")) letterAction("X");
+     else if (sarg.equals("zoom In")) letterAction("I");
+     else if (sarg.equals("zoom Out")) letterAction("O");
+     else if (sarg.equals("Keep snapshot")) letterAction("K");
+     else if (sarg.equals("Save image")) letterAction("S");
+     else if (sarg.equals("toggle Box")) letterAction("B");
+     else if (sarg.equals("start/stop Movie recording")) letterAction("M");
+     else if (sarg.equals("Helper")) letterAction("H");
+     else {
+	boolean got = false;
+	if (labelActions != null) {
+	   for (int i = 0; i < labelActions.length; i++) {
+	     if (labelActions[i].equals(sarg)) {
+		got = true;
+		if (bac != null) bac.labelAction(sarg, true);
+	     }
+	   }
+	}
+	if (!got) {
+	   Sp ("unknown evt in graph data canvas " + sarg);
+	}
+     }
+  }
+
+

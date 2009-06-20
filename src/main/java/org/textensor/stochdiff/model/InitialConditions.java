@@ -70,7 +70,7 @@ public class InitialConditions implements AddableTo {
     }
 
     public boolean hasConcentrationsFor(String rnm) {
-        return (rnm.equals("defalut") || concSetHM.containsKey(rnm));
+        return (rnm.equals("default") || concSetHM.containsKey(rnm));
     }
 
 
@@ -78,7 +78,7 @@ public class InitialConditions implements AddableTo {
         double[] ret = null;
         if (concSetHM.containsKey(rnm)) {
             ret = concSetHM.get(rnm).getNanoMolarConcentrations(spl);
-        } else if (rnm.equals("deflault")) {
+        } else if (rnm.equals("default")) {
             ret = defaultConcs.getNanoMolarConcentrations(spl);
         } else {
             E.error("want concentrations for unknown region " + rnm);

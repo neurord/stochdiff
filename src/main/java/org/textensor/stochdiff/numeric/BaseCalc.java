@@ -1,9 +1,14 @@
+//3 5 2008: WK changed the initial value of the denominator variable in the extractGrid function from 3 to 1
 //6 22 2007: WK modified the extractGrid() function to calculate the side-length of
 //           each volume element (which is a square with a predefined thickness).
 //6 19 2007: WK added 1 variable and 1 function to be able to output by user-specified 'region's.
 //5 16 2007: WK added 4 variables and 5 functions (within <--WK ... WK-->)
 //written by Robert Cannon
 package org.textensor.stochdiff.numeric;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.ResultWriter;
@@ -34,6 +39,10 @@ public abstract class BaseCalc {
     protected ResultWriter resultWriter;
 
     String[] speciesList;
+
+    // indices of output species
+    public int[] ispecout;
+
 
     public static final int BINOMIAL = 0;
     public static final int POISSON = 1;
@@ -152,6 +161,66 @@ public abstract class BaseCalc {
         // -------------------------
         // double vol = sdRun.poolVolume;
         baseConcentrations = icons.getDefaultNanoMolarConcentrations(speciesList);
+
+
+        String specout = sdRun.outputSpecies;
+        if (specout == null || specout.equals("all")) {
+            ispecout = new int[speciesList.length];
+            for (int i = 0; i < speciesList.length; i++) {
+                ispecout[i] = i;
+            }
+
+        } else if (specout.length() == 0 || specout.equals("none")) {
+            ispecout = new int[0];
+
+        } else {
+            ispecout = getIndices(specout, speciesList);
+        }
+        /* RCC - not sure restricting the output regions is useful for the
+         * ccviz file?
+        String regout = sdRun.outputRegions;
+        if (regout == null || regout.equals("all")) {
+        	iregout = null;
+
+        } else if (regout.length() == 0 || regout.equals("none")) {
+        	iregout = new int[0];
+
+        } else {
+        	iregout = getIndices(regout, speciesList);
+        }
+        */
+
+
+
+    }
+
+
+
+
+
+
+
+
+    public int[] getIndices(String matchString, String[] idlist) {
+        HashMap<String, Integer> isdhm = new HashMap<String, Integer>();
+        for (int i = 0; i < idlist.length; i++) {
+            isdhm.put(idlist[i], i);
+        }
+        StringTokenizer st = new StringTokenizer(matchString, " ,");
+        ArrayList<Integer> wk = new ArrayList<Integer>();
+        while (st.hasMoreTokens()) {
+            String so = st.nextToken();
+            if (isdhm.containsKey(so)) {
+                wk.add(isdhm.get(so));
+            } else {
+                E.warning("Unknown output species " + so + " (requested or output but not in reaction scheme)");
+            }
+        }
+        int[] ret = new int[wk.size()];
+        for (int i = 0; i < wk.size(); i++) {
+            ret[i] = wk.get(i);
+        }
+        return ret;
     }
 
 
@@ -176,7 +245,7 @@ public abstract class BaseCalc {
         for (int i = 0; i < tpa.length; i++)
         {
             double diameter = tpa[i].r*2.0;
-            double denominator = 3.0;
+            double denominator = 1.0;
             while ((diameter/denominator) > d)
             {
                 denominator += 2.0; //divide by successive odd numbers
@@ -192,6 +261,9 @@ public abstract class BaseCalc {
         }
 
         d = min_grid_size;
+        System.out.println("****************************");
+        System.out.println("subvolume grid size is: " + min_grid_size);
+        System.out.println("****************************");
         //WK-->
 
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);

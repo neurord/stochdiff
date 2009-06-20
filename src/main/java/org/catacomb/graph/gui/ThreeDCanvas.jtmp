@@ -1,0 +1,98 @@
+
+package org.enorg.visua.twod;
+
+import javax.swing.*;
+
+import java.awt.Color;
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Dimension;
+
+
+import java.awt.geom.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import javax.swing.*;
+
+
+
+public class ThreeDCanvas extends WorldCanvas {
+
+
+
+   RangeManager  zman;
+
+
+
+
+
+   public WorldCanvas(int w, int h) {
+      super();
+      setPreferredSize(new Dimension(w, h));
+
+      addMouseListener(this);    
+      addMouseMotionListener(this);
+      addKeyListener(this);
+
+      zman = new ZoneManager(this);
+      rman = new RangeManager(this);
+
+   }
+   
+
+
+
+   
+   public void paintComponent(Graphics g0) {
+      
+      g0.setColor(Color.black);
+      g0.fillRect(0, 0, getWidth(), getHeight());
+      Graphics2D g = (Graphics2D)g0;
+
+      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+			 RenderingHints.VALUE_ANTIALIAS_ON);
+
+      
+      paint2D(g);
+
+   }
+
+
+   public void paint2D(Graphics2D g) {
+
+   }
+
+
+
+
+   public final void addColoredClickable3DPoint (Graphics g, Color col, 
+						 double x, double y, double z,
+						 int i0, int i1, int i2) {
+      addColoredClickablePoint (g, col, xProj(x,y,z), yProj(x,y,z), 
+				i0, i1, i2);
+   }
+
+   public final void addClickable3DPoint (Graphics g,  
+					  double x, double y, double z,
+					  int i0, int i1, int i2) {
+      addClickablePoint (g, xProj(x,y,z), yProj(x,y,z), i0, i1, i2);
+   }
+
+   public final void addInvisibleClickable3DPoint (Graphics g,  
+					  double x, double y, double z,
+					  int i0, int i1, int i2) {
+      addInvisibleClickablePoint (g, xProj(x,y,z), yProj(x,y,z), i0, i1, i2);
+   }
+
+
+
+
+
+
+
+}
+
+

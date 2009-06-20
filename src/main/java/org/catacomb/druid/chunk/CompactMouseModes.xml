@@ -1,0 +1,61 @@
+
+<AutonomousPanel
+    controllerClass="MouseModeController">
+
+	    <FlowPanel xspace="2" yspace="2">
+		<ToggleButton title="Pan" group="mouse"
+			      value="pan" label="P" initial="true" action="setPan">
+		    <tip>Move the canvas under the viewport</tip>
+		</ToggleButton>
+
+		<ToggleButton title="Zoom in" group="mouse"
+			      value="zoomIn" label="I" action="setZoomIn">
+		    <tip>zoom in by clicking in the image</tip>
+		</ToggleButton>
+
+		<ToggleButton title="Zoom out" group="mouse"
+			      value="zoomOut" label="O" action="setZoomOut">
+		    <tip>zoom out...</tip>
+		</ToggleButton>
+		<ToggleButton title="Box select" group="mouse"
+			      value="box" label="B" action="setBox">
+		    <tip>rubber band cursor to select the view area</tip>
+		    <info>About the box select mode...</info>
+		</ToggleButton>
+
+		<ToggleButton title="Combined mode" group="mouse"
+			      value="all" label="M" action="setMulti">
+		    <tip>All the actions accesible using differnt mouse buttons</tip>
+		    <info>
+			The effect of clicking or dragging is determined by
+			which mouse button is used and how the mouse is moved.
+			-p- To zoom in, click with the left button.
+			-p- To zoom out, click with the right button.
+			-p- To pan, press and drag with the right button.
+			-p- For a box cursor, press the left button at one desired
+			corner, drag up and to the left a little way, then drag
+			back past the starting point. The cursor will appeaar as you
+			recross the starting point.
+		    </info>
+		</ToggleButton>
+
+		<Checkbox title="Smoothing" label="S" id="antialias" action="setAntialias"/>
+
+		<Checkbox title="Labels" label="L" id="labels" initial="true" action="setLabels"/>
+
+		<Button label="F" action="reframe">
+		    <tip>reset the ranges so all the data is visible</tip>
+		    <info>
+			About framing?
+		    </info>
+		</Button>
+
+
+	    </FlowPanel>
+
+
+</AutonomousPanel>
+
+
+
+

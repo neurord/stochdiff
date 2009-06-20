@@ -1,0 +1,8 @@
+ 
+ <Shape xpts="{-0.8, -0.8, 0.8, 0.8}" ypts="{-0.8, 0.8, 0.8, -0.8}"
+  	      curviness="0" 
+              lineColor="#404040"
+  	      symmetry="square"
+	      fillColor="#b0b0b0"
+  	      closure="filled"/>
+ 

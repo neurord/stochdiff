@@ -1,0 +1,167 @@
+
+package org.enorg.druid.visio;
+
+
+import org.enorg.app.*;
+import org.enorg.druid.gui.*;
+
+import org.enorg.druid.event.*;
+
+import org.enorg.structure.*;
+
+import java.util.*;
+
+
+
+public class DruActivable implements Controllable, ControllerSpecifier {
+
+
+   String name;
+
+   int nroot;
+   GUIConnectable[] roots; // frames, dialogs et al - each gets its own controller;
+   
+   Controller controller; // the main controller;
+
+   GUIConnector[] connectors;
+   HashMap connectorHM;   
+
+
+   String controllerClass;
+
+
+   public DruActivable(String s) {
+      name = s;
+   }
+
+   
+   public void setControllerClass(String s) {
+      controllerClass = s;
+   }
+
+   public String getControllerClass() {
+      return controllerClass;
+   }
+
+
+
+
+   
+   public void showViaController(Object obj) {
+      if (controller != null) {
+	 controller.show(obj);
+      } else {
+	 E.error("no controller for " + this);
+      }
+   }
+
+
+   public Controller getController() {
+      return controller;
+   }
+
+
+   public Object getRoot() {
+      return roots[0];
+   }
+
+   public void addRoot(GUIConnectable gc) {
+      
+      if (roots == null) {
+	 roots = new GUIConnectable[50];
+      }
+      roots[nroot++] = gc;
+   }
+
+
+
+   private void createConnectors() {
+      connectorHM = new HashMap();
+
+      connectors = new GUIConnector[nroot];
+
+      if (nroot == 0) {
+	 System.out.println("WARNING - DruActivable has no root connectables");
+	 
+      }
+
+
+      for (int i = 0; i < nroot; i++) {
+	 GUIConnectable gc = roots[i];
+	 GUIConnector gcon = new GUIConnector(gc);
+	 connectors[i] = gcon;
+	 String id = gc.getID();
+	 connectorHM.put(id, gcon);
+      }
+   }
+
+
+
+
+   public void attachController(Controller ctrl) {
+      activate(ctrl);
+   }
+   
+   public void activate(Controller ctrl) {
+      controller = ctrl;
+      activate(ctrl.getConnectors());
+   }
+
+
+
+
+
+
+   public void activate(Controller gh) {
+      ArrayList arl = new ArrayList();
+      arl.add(gh);
+      activate(arl);
+   }
+
+
+
+
+   public void activate(ArrayList controllers) {
+      createConnectors();
+      
+      Iterator iter = controllers.iterator();
+
+      while (iter.hasNext()) {
+	 Controller gh = (Controller)(iter.next());
+	 
+	 String ss = gh.getGUISources();
+	 String st = gh.getGUITargets();
+	 String scope =  (ss != null ? ss : "") + " " + (st != null ? st : "");
+	 
+	 String[] sfid = Scope.getFrameIDs(scope);
+	 
+	 if (ss != null && ss.startsWith("*")) {
+	    for (int i = 0; i < nroot; i++) {
+	       connectors[i].attachController(gh);
+	    }
+
+	 } else {
+	    for (int i = 0; i < sfid.length; i++) {
+	       if (connectorHM.containsKey(sfid[i])) {
+
+		  GUIConnector gc = (GUIConnector)connectorHM.get(sfid[i]);
+		  
+		  gc.attachController(gh);
+		  
+	       } else {
+		  E.error("handler refers to frame " + sfid[i] + " ( " + gh + ") " +
+			  " but there is no such frame defined");
+	       }
+	    }
+	 }
+      }
+
+
+      // maybe could only do this as required - just before showinga dialog the first time, for instance;
+      for (int i = 0; i < nroot; i++) {
+	 connectors[i].activate();
+      }
+   }
+
+
+}

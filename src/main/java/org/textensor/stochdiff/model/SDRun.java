@@ -37,7 +37,6 @@ public class SDRun {
     // public double outputInterval=0.8;
     public double outputInterval;
 
-    public String outputRegions;
     public String outputSpecies;
 
     // accepted tolerance for adaptive calculations (delta f / f  for an algorithm dependent function f);

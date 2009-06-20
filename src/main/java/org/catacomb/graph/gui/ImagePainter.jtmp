@@ -1,0 +1,244 @@
+
+  public final void drawColorTableImage (Graphics g, ColorTable ctab, 
+				  int nlin, int npoint, double[][] d2) {
+    double[] ypts = new double[nlin];
+    for (int i = 0; i < nlin; i++) ypts[i] = i;
+    drawColorTableImage (g, ctab, nlin, npoint, d2, ypts);
+  }
+
+
+
+
+
+
+  public final void drawPixelImage (Graphics g, int[][] ii, 
+				    Color[] cols, double cmin, double cmax) {
+     if (ii == null || cols == null || cols.length < 1) return;
+     int ncol = cols.length;
+     for (int i = 0; i < ii.length; i++) {
+	int[] r = ii[i];
+	if (r != null) {
+	   for (int j = 0; j < r.length; j++) {
+	      int icol = (int)(ncol * (r[j] - cmin) / (cmax - cmin));
+	      icol = (icol < 0 ? 0 : (icol >= ncol ? ncol-1 : icol));
+	      g.setColor(cols[icol]);
+	      fillRect(g, 1.*i, 1.*j, i+1., j+1.);
+	   }
+	}
+     }
+  }
+
+
+
+  public final void drawGridImage (Graphics g, double[] xp, double[] yp, 
+				    double[][] imdat, 
+				    Color[] cols, double cmin, double cmax) {
+     if (imdat == null || cols == null || cols.length < 1) return;
+     int ncol = cols.length;
+     double dx = 1.;
+     double dy = 1.;
+     for (int i = 0; i < imdat.length && i < xp.length; i++) {
+	if (i+1 < xp.length) dx = xp[i+1] - xp[i];
+	
+	double[] r = imdat[i];
+	if (r != null) {
+	   for (int j = 0; j < r.length; j++) {
+	      if (j+1 < yp.length) {
+                 dy = yp[j+1] - yp[j]; 
+              }
+	      int icol = (int)(ncol * (r[j] - cmin) / (cmax - cmin));
+	      icol = (icol < 0 ? 0 : (icol >= ncol ? ncol-1 : icol));
+	      g.setColor(cols[icol]);
+	      fillRect(g, xp[i], yp[j], xp[i] + dx, yp[j] + dy);
+	   }
+	}
+     }
+  }
+
+
+
+
+  public final void drawColorTableImage (Graphics g, ColorTable ctab, 
+				   double x0, double dx, double y0, double dy,
+				   double[][] im) {
+     if (im == null || im.length < 1 || 
+	 im[0] == null || im[0].length < 1) return;
+     int nx = im.length;
+     int ny = im[0].length;
+     
+     Color[] cols = ctab.getColors();
+     // nx-1 because first line is different, but check always the case----;
+     for (int i = 0; i < nx-1; i++) {
+	for (int j = 0; j < ny; j++) {
+	   double xl = x0 + i * dx;
+	   double xh = xl + dx;
+	   double yl = y0 + j * dy;
+	   double yh = yl + dy;
+	   drawImageCell(g, xl, xh, yl, yh, ctab, cols, im[i+1][j]);
+	}
+     }
+  }
+   
+
+
+
+  public final void drawColorTableImage (Graphics g, ColorTable ctab, 
+				  int nlin, int npoint, 
+				  double[][] d2, double[] ypts) {
+     
+    // NB first elt of ypts corresponds to 
+    // d2[k][1][] since d2[k][0] is the x grid. So ypts has nlin-1 elts;
+
+    if (nlin < 2 || npoint < 3 || d2 == null || d2.length < 1 || 
+	d2[0].length < npoint) return;
+    Color[] cols = ctab.getColors();
+    
+    double[] tr = d2[0];
+    double[] tt = new double[npoint+1];
+    for (int i = 1; i < npoint; i++) tt[i] = 0.5 * (tr[i-1] + tr[i]);
+    tt[0] = tr[0]; // tt[1] - 2 * tt[2];
+    tt[npoint] = tr[npoint-1]; //2 * tt[npoint-1] - tt[npoint-2]; 
+    
+    for (int i = 1; i < nlin; i++) {
+      for (int j = 0; j < npoint-1; j++) {
+	drawImageCell(g, tt[j], tt[j+1], ypts[i-1], ypts[i], 
+		      ctab, cols, d2[i][j]);
+      }
+    }
+  }
+
+
+  public final void drawIrregularColorTableImage (Graphics g, ColorTable ctab, 
+					   int nlin, int npoint, 
+					   double[][] x2, double[][] d2, 
+					   double[] ypts) {
+     
+    if (nlin < 2 || npoint < 3 || d2 == null || d2.length < 1 || 
+	d2[0].length < npoint) return;
+    Color[] cols = ctab.getColors();
+    
+    for (int i = 0; i < nlin; i++) {
+       double[] xx = x2[i];
+       for (int j = 0; j < npoint; j++) {
+	  double xa = (j > 0 ? 0.5 * (xx[j-1] + xx[j]) : xx[j]);
+	  double xb = (j < npoint-1 ? 0.5 * (xx[j] + xx[j+1]) : xx[j]);
+	  drawImageCell(g, xa, xb, ypts[i], ypts[i+1], ctab, cols, d2[i][j]);
+       }
+    }
+ }
+
+
+ 
+   public final void drawImageCell (Graphics g, double xl, double xh, 
+				     double yl,  double yh, 
+				     ColorTable ctab, Color[] cols, double z) {
+      int ncol = ctab.Ncol;
+      int icol = (int) ((z - ctab.Cmin) / ctab.getDC()); //  **** was  ctab.dc
+      if ((icol >= 0 && icol < ncol) || 
+	  (icol < 0 && ctab.fillBelow) || 
+	  (icol >= ncol && ctab.fillAbove) ) {
+	 icol = (icol < 0 ? 0 : (icol >= ncol ? ncol-1 : icol));
+	 g.setColor (cols[icol]);
+	 fillRect (g, xl, yl, xh, yh);
+      }
+   }
+
+
+
+   // RB for RingBuffer - the first column of im is at ipos and 
+   // wraps round to ipos-1
+   public final void drawRBColorTableImage (Graphics g, ColorTable ctab, 
+				     double x0, double dx,
+				     double y0, double dy,
+				     double[][] im, int ipos) {
+      if (im == null || im.length < 1) return;
+      int nx = im.length;
+      Color[] cols = ctab.getColors();
+      int ncol = cols.length;
+      double cmax = ctab.Cmax;
+      double cmin = ctab.Cmin;
+      double dc = (cmax - cmin) / ncol;
+      if (dc <= 0.0) dc = 1.0;
+      
+      for (int i = 0; i < nx; i++) {
+	 int irb =  (i+ipos) % nx;
+	 double[] iml = im[irb];
+	 if (iml != null) {
+	    int ny = iml.length;
+	    double xl = x0 + i * dx;
+	    double xh = xl + dx;
+
+	    for (int j = 0; j < ny; j++) {
+	       double yl = y0 + j * dy;
+	       double yh = yl + dy;
+	       
+	       int icol = (int) ((iml[j] - cmin) / dc);
+	       icol = (icol < 0 ? 0 : (icol >= ncol ? ncol-1 : icol));
+	       
+	       g.setColor (cols[icol]);
+	       fillRect (g, xl, yl, xh, yh);
+	    }
+	 }
+      }
+   }
+
+
+
+  public final void drawColorTableLegend (Graphics g, ColorTable ctab) {
+    
+     Color[] cols = ctab.getColors();
+     int ncol = cols.length;
+     
+     int xl = width - 12;
+     int hd = (height - topMargin - bottomMargin);
+     int yb = topMargin + (5 * hd) / 6;
+     int dy = (2 * hd) / 3;
+     
+     g.setColor (bgColor);
+     g.fillRect (width-rightMargin, 0, rightMargin, height);
+     
+     if (hd > 100) {
+	// otherwise not worth drawing;
+	for (int i = 0; i < ncol; i++) {
+	   int ia = yb - (i * dy) / ncol; 
+	   int ib = yb - ((i+1) * dy) / ncol; 
+	   
+	   if (ia > ib) {
+	      g.setColor (cols[i]);
+	      g.fillRect (xl, ib, 7, ia-ib);
+	      
+	   }
+	}
+	
+	g.setColor (CcmbColor.white);
+	
+	FontMetrics fm = g.getFontMetrics();
+	String s1 = Formatter.prettyTrim(ctab.Cmin, 3, 7);
+	String s2 = Formatter.prettyTrim(ctab.Cmax, 3, 7);
+	
+	if (BoW) bwOnly(g);
+	g.drawString (s1, xl - fm.stringWidth(s1) - 3, yb+4);
+	g.drawString (s2, xl - fm.stringWidth (s2) - 2, yb-dy+4);
+	
+     }
+  }
+
+   
+
+
+}
+
+
+
+
+ 						     
+
+
+
+
+
+
+
+
+
+

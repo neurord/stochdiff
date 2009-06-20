@@ -1,0 +1,28 @@
+<AutonomousPanel id="GuiseEditor" controllerClass="GuiseController">
+
+    
+    <BorderPanel>
+	<North>
+	    <VerticalBoxPanel yspace="4" borderTitle="Source display">
+		<Choice id="family" label="font" options="serif, sansserif" labels="Serif, Sans serif">
+		    <tip>font family</tip>
+		</Choice>
+		
+		<Choice id="size" label="size" options="6, 8, 12, 14, 16, 18, 20, 22, 24">
+		    <tip>Font size</tip>
+		</Choice>
+		
+		<Choice id="style" label="style" options="plain, italic, bold" labels="Normal, Italic, Bold">
+		    <tip>Font style</tip>
+		</Choice>
+
+		<ColorChoice id="color" label="color">
+		    <tip>Color...</tip>
+		</ColorChoice>
+		
+		<Button label="apply" action="applyFontProperties"/>
+	    </VerticalBoxPanel>
+	</North>
+    </BorderPanel>
+</AutonomousPanel>
+

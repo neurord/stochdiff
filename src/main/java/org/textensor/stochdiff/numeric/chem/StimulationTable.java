@@ -1,3 +1,6 @@
+//2 4 2009: WK added tableSize to the constructor per AB.
+//written by Robert Cannon
+
 package org.textensor.stochdiff.numeric.chem;
 
 
@@ -17,13 +20,16 @@ public class StimulationTable {
 
 
     public StimulationTable() {
-        sites = new String[10];
-        rates = new double[10][];
+        //<--WK
+        int tableSize = 100;
+        //WK-->
+        sites = new String[tableSize];
+        rates = new double[tableSize][];
 
-        onset = new double[10];
-        duration = new double[10];
-        period = new double[10];
-        ends = new double[10];
+        onset = new double[tableSize];
+        duration = new double[tableSize];
+        period = new double[tableSize];
+        ends = new double[tableSize];
     }
 
 

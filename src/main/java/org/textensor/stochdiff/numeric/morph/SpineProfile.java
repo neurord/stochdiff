@@ -9,14 +9,16 @@ public class SpineProfile {
     double[] widths;
 
     String[] labels;
+    String[] regions;
 
     public SpineProfile(String sid, double[] vl, double[] vw,
-                        String[] lbls) {
+                        String[] lbls, String[] rgs) {
         id = sid;
         lpoints = vl;
         widths = vw;
 
         labels = lbls;
+        regions = rgs;
     }
 
     public String getID() {
@@ -33,5 +35,11 @@ public class SpineProfile {
         return widths;
     }
 
+    public String[] getLabels() {
+        return labels;
+    }
 
+    public String[] getRegions() {
+        return regions;
+    }
 }

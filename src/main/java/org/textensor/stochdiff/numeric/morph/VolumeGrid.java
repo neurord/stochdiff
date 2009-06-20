@@ -295,8 +295,20 @@ public class VolumeGrid {
             String sti = targetIDs[i];
             if (areaHM.containsKey(sti)) {
                 ret[i] = areaHM.get(sti);
+
+            } else if (sti.indexOf("[") >= 0) {
+                int[] ms = getMatches(areaHM, sti);
+                if (ms != null && ms.length > 0) {
+
+                    ret[i] = ms;
+
+
+                } else {
+                    E.warning("There are no matches for target: " + sti);
+                }
+
             } else {
-                E.warning("An action defined for area " + sti + " but there are no points with this label");
+                E.warning("An action is defined for area " + sti + " but there are no points with this label");
                 ret[i] = new int[0];
             }
         }
@@ -304,6 +316,65 @@ public class VolumeGrid {
     }
 
 
+    private int[] getMatches(HashMap<String, int[]> areaHM, String sti) {
+
+        ArrayList<Integer> aidx = new ArrayList<Integer>();
+
+        int iob = sti.indexOf("[");
+        int icb = sti.indexOf("]");
+        String pre = sti.substring(0, iob+1);
+        String post = sti.substring(icb, sti.length());
+
+        String range = sti.substring(iob + 1, icb);
+
+        range = range.replace(" ", "");
+        int rangemin = 0;
+        int rangemax = -1;
+        if (range.indexOf(":") >= 0) {
+            String rpre = range.substring(0, range.indexOf(":"));
+            String rpost = range.substring(range.indexOf(":") + 1, range.length());
+            if (rpre.length() > 0) {
+                rangemin = Integer.parseInt(rpre);
+            }
+            if (rpost.length() > 0) {
+                rangemax = Integer.parseInt(rpost);
+            } else {
+                rangemax = 1000000;
+                // just a large number bigger than the max number of spines
+            }
+        }
+
+        for (String s : areaHM.keySet()) {
+            if (s.startsWith(pre) && s.endsWith(post)) {
+                String sin = s.substring(pre.length(), s.indexOf(post));
+                int ind = Integer.parseInt(sin);
+                boolean ok = false;
+                if (rangemin <= ind && rangemax >= ind) {
+                    ok = true;
+                } else if (("," + range + ",").indexOf("," + sin + ",") >= 0) {
+                    ok = true;
+                }
+                if (ok) {
+                    for (int i : areaHM.get(s)) {
+                        aidx.add(i);
+                    }
+                } else {
+                    //
+                }
+
+            }
+        }
+
+
+
+
+        int na = aidx.size();
+        int[] ret = new int[na];
+        for (int i = 0; i < na; i++) {
+            ret[i] = aidx.get(i);
+        }
+        return ret;
+    }
 
 
     public void makeAreaHM() {

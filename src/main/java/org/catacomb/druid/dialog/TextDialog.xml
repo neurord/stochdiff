@@ -1,0 +1,21 @@
+
+<AutonomousDialog title="Text display"  backgroundColor="#f0f0f0"> 
+    
+    <BorderPanel prefWidth="440" prefHeight="280" xspace="2" yspace="6" borderWidth="10">
+	
+	<Center>
+	    <ScrollingHTMLPanel id="text"   borderWidth="6" preformat="false"/> 
+	</Center>
+	
+	
+	<South>
+	    <CenterFlowPanel>
+		<Button label="close" action="close" borderWidth="2" xPadding="6" yPadding="3"/>
+		
+	    </CenterFlowPanel>
+	</South>
+    </BorderPanel>
+    
+    
+</AutonomousDialog>
+

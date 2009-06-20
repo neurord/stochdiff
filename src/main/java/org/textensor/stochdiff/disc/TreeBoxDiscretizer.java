@@ -32,7 +32,6 @@ public class TreeBoxDiscretizer {
         VolumeGrid vgrid = null;
 
         if (geom == VolumeGrid.GEOM_2D) {
-
             LineBoxer lb = new LineBoxer(slicedPoints, d2d);
             vgrid = lb.buildGrid(d, resHM);
 

@@ -1,0 +1,92 @@
+
+   public final void drawButton(Graphics g, double dx0, double dy0, 
+				double dx1, double dy1, Color col) {
+      int x0 = powx(dx0);
+      int y0 = powy(dy0);
+      int x1 = powx(dx1);
+      int y1 = powy(dy1);
+      drawButton (g, (x0+x1)/2, (y0+y1)/2,(x1-x0)/2, (y1-y0)/2, col);
+   }
+				
+
+
+   public final void drawButton (Graphics g, int ix, int iy, 
+				  int hsw, int hh, Color col) { 
+      g.setColor(col);
+      g.fillRect (ix-hsw-2, iy-hh-2, 2*hsw+4, 2 * hh+4);
+      g.setColor(col.brighter());
+      if (BoW) bwOnly(g);
+      g.drawLine (ix-hsw-2, iy-hh-2, ix+hsw+2, iy-hh-2);
+      g.drawLine (ix-hsw-2, iy-hh-2, ix-hsw-2, iy+hh+2);
+      g.setColor(col.darker());
+      if (BoW) bwOnly(g);
+      g.drawLine (ix-hsw-1, iy+hh+2, ix+hsw+2, iy+hh+2);
+      g.drawLine (ix+hsw+2, iy-hh-1, ix+hsw+2, iy+hh+2);
+   }
+
+
+
+   public final void drawLoweredRect(Graphics g, Color c, int border,
+				     double dx0, double dy0,
+				     double dx1, double dy1) {
+      drawEmbossedRect(g, c, c.darker(), c.brighter(), border,
+		       dx0, dy0, dx1, dy1);
+   }
+      
+
+   public final void drawRaisedRect(Graphics g, Color c, int border,
+				    double dx0, double dy0,
+				    double dx1, double dy1) {
+      drawEmbossedRect(g, c, c.brighter(), c.darker(), border,
+		       dx0, dy0, dx1, dy1);
+      
+   }
+
+
+   
+   public final void drawEmbossedRect(Graphics g, 
+				      Color cbg, Color ct, Color cb,
+				      int border,
+				      double dx0, double dy0,
+				      double dx1, double dy1) {
+      
+      
+      int x0 = powx(dx0);
+      int y0 = powy(dy0);
+      int x1 = powx(dx1);
+      int y1 = powy(dy1);      
+      if (x1 < x0) { int tx = x1; x1 = x0; x0 = tx; }
+      if (y1 < y0) { int ty = y1; y1 = y0; y0 = ty; }
+
+      drawIntEmbossedRect(g, cbg, ct, cb, border, x0, y0, x1, y1); 
+   }
+
+
+   public final void drawIntEmbossedRect(Graphics g, 
+					 Color cbg, Color ct, Color cb,
+					 int border,
+					 int x0, int y0,
+					 int x1, int y1) {
+      
+      g.setColor(cbg);
+      g.fillRect(x0, y0, x1-x0, y1-y0);
+      g.setColor(cb);
+      for (int i = 0; i < border; i++) {
+	 g.drawLine(x0-i, y1+i, x1+i, y1+i); 
+	 g.drawLine(x1+i, y0-i, x1+i, y1+i); 
+      }
+      
+      g.setColor(ct);
+      for (int i = 0; i < border; i++) {
+	 g.drawLine(x0-i, y0-i, x1+i, y0-i); 
+	 g.drawLine(x0-i, y0-i, x0-i, y1+i); 
+      }
+   }
+
+
+
+
+
+
+
+

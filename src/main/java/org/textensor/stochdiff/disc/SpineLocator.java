@@ -24,7 +24,7 @@ public class SpineLocator {
 
     MersenneTwister rngen;
 
-    HashMap<SpineProfile, double[][]> profHM;
+    HashMap<SpineProfile, DiscretizedSpine> profHM;
 
     public SpineLocator(int seed, SpineDistribution sd, double delta) {
         spineSeed = seed;
@@ -45,6 +45,11 @@ public class SpineLocator {
 
 
         for (SpinePopulation sp : spineDist.getPopulations()) {
+
+            String popid = sp.getID();
+            if (popid == null) {
+                popid = "";
+            }
 
             double density = sp.getDensity();
             String reg = sp.getTargetRegion();
@@ -75,7 +80,7 @@ public class SpineLocator {
                     eltSA[i] = sum;
                 }
 
-                E.info("total surface area for spine group  " + reg + " is " + sum);
+                E.info("total surface area for spine group  " + popid + " on " + reg + " is " + sum);
 
                 double totalArea = eltSA[eltSA.length - 1];
                 double avgNoSpines = totalArea * density;
@@ -119,7 +124,7 @@ public class SpineLocator {
                     } else {
                         gotSpine.add(ip);
 
-                        ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile());
+                        ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid, ndone);
                         volumeGrid.addElements(elts);
                         ndone += 1;
                     }
@@ -129,15 +134,18 @@ public class SpineLocator {
     }
 
 
-    private ArrayList<VolumeElement> addSpineTo(VolumeElement vedend, SpineProfile prof) {
+    private ArrayList<VolumeElement> addSpineTo(VolumeElement vedend, SpineProfile prof, String popid, int idx) {
         Position[] perim = vedend.getSurfaceBoundary();
         Vector vnorm = Geom.getUnitNormal(perim);
         Position pcen = Geom.cog(perim);
 
-        double[][] xw = getBoundaryWidths(prof, spineDX);
+        DiscretizedSpine xw = getBoundaryWidths(prof, spineDX);
 
-        double[] xp = xw[0];
-        double[] wb = xw[1];
+        double[] xp = xw.getBoundaries();
+        double[] wb = xw.getWidths();
+        String[] lbls = xw.getLabels();
+        String[] rgns = xw.getRegions();
+
         double[] rb = new double[wb.length];
         for (int i = 0; i < wb.length; i++) {
             rb[i] = 0.5 * wb[i];
@@ -180,11 +188,14 @@ public class SpineLocator {
 
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
-            /*
-               if (regionLabel != null) {
-                  ve.setRegion(regionLabel);
-               }
-             */
+            if (lbls[i] != null) {
+                String ll = popid + "[" + idx + "]." + lbls[i];
+                ve.setLabel(ll);
+            }
+            if (rgns[i] != null) {
+                ve.setRegion(rgns[i]);
+            }
+
             vprev = ve;
         }
         return ret;
@@ -194,17 +205,19 @@ public class SpineLocator {
 
 
 
-    private double[][] getBoundaryWidths(SpineProfile sp, double dx) {
+    private DiscretizedSpine getBoundaryWidths(SpineProfile sp, double dx) {
         if (profHM == null) {
-            profHM = new HashMap<SpineProfile, double[][]>();
+            profHM = new HashMap<SpineProfile, DiscretizedSpine>();
         }
-        double[][] ret = null;
+        DiscretizedSpine ret = null;
         if (profHM.containsKey(sp)) {
             ret = profHM.get(sp);
 
         } else {
             double[] ax = sp.getXPts();
             double[] aw = sp.getWidths();
+            String[] pl = sp.getLabels();
+            String[] prl = sp.getRegions();
             double ltot = ax[ax.length-1];
             int nel = (int)(ltot / dx + 0.5);
             if (nel < 1) {
@@ -214,9 +227,24 @@ public class SpineLocator {
             double[] xbd = ArrayUtil.span(0., ltot, nel);
             double[] wv = ArrayUtil.interpInAtFor(aw, ax, xbd);
 
-            ret = new double[2][];
-            ret[0] = xbd;
-            ret[1] = wv;
+            String[] lbls = new String[nel];
+            String[] rgns = new String[nel];
+            int ipr = 0;
+            for (int i = 0; i < ax.length; i++) {
+                if (pl[i] != null || prl[i] != null) {
+                    while (true) {
+                        if (ipr == nel - 1 || xbd[ipr+1] > ax[i]) {
+                            break;
+                        }
+                        ipr = ipr + 1;
+                    }
+                    lbls[ipr] = pl[i];
+                    rgns[ipr] = prl[i];
+                }
+            }
+
+
+            ret = new DiscretizedSpine(xbd, wv, lbls, rgns);
         }
 
         return ret;

@@ -101,7 +101,7 @@ public class TreePoint implements Position {
 
 
     public String toString() {
-        return ("zyzr: " + x + " " + y + " " + z + " " + r + " nnbr=" + nnbr);
+        return ("(point x=" + x + ",y=" + y + ",z=" + z + ",r=" + r + ",nnbr=" + nnbr + ")");
     }
 
 

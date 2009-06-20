@@ -1,0 +1,32 @@
+
+<AutonomousDialog title="Progress"  backgroundColor="#f0f0f0"> 
+    
+    <BorderPanel prefWidth="380" prefHeight="380" xspace="2" yspace="6" borderWidth="10">
+	
+	<Center>
+
+	    <BorderPanel>
+		<North>
+		    <InfoPanel id="headInfo" width="340" height="50" borderWidth="6"/>
+		</North>
+		<Center>
+		    <ScrollingInfoPanel id="logInfo" width="340" height="300" borderWidth="6"/>
+		</Center>
+	    </BorderPanel>
+
+	   
+	</Center>
+	
+
+	
+	<South>
+	    <CenterFlowPanel>
+		<Button label="Close" action="close" borderWidth="2" xPadding="6" yPadding="3"/>
+		
+	    </CenterFlowPanel>
+	</South>
+    </BorderPanel>
+    
+    
+</AutonomousDialog>
+

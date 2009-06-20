@@ -1,0 +1,10 @@
+
+<table width="100%">
+  <tr>
+     <td class="timestamp" width="80">TIMESTAMP</td>
+     <td class="level" width="80">LEVEL</td>
+     <td class="context" width="80">CONTEXT</td>
+     <td class="text"><p class="LEVEL">TEXT</p></td>
+   </tr>
+</table>
+

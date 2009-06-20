@@ -1,0 +1,114 @@
+<NumDataSet name="dummy data">
+
+    <stuff>1, 2, 3, 4, 7, 8, 5, 6</stuff>
+
+
+    <VectorSet names="time, model_number, luminosity, temperature">
+	<row>1, 1, 2, 3</row>
+	<row>2, 10, 3, 5</row>
+	<row>3, 34, 3, 6</row>
+	<row>4, 45, 4, 7</row>
+    </VectorSet>
+
+    
+    <model number="10" time="3">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 2</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="20" time="5">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 3</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="30" time="7">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 4</row>
+	    <row>0.2, 4.5</row>
+	    <row>0.3, 5.5</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="20" time="5">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 3</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="30" time="7">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 4</row>
+	    <row>0.2, 4.5</row>
+	    <row>0.3, 5.5</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="20" time="5">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 3</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="30" time="7">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 4</row>
+	    <row>0.2, 4.5</row>
+	    <row>0.3, 5.5</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="20" time="5">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 3</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="30" time="7">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 4</row>
+	    <row>0.2, 4.5</row>
+	    <row>0.3, 5.5</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="20" time="5">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 3</row>
+	    <row>0.2, 3</row>
+	    <row>0.3, 4</row>
+	</VectorSet>
+    </model>
+
+
+    <model number="30" time="7">
+	<VectorSet names="mass, temperature">
+	    <row>0.1, 4</row>
+	    <row>0.2, 4.5</row>
+	    <row>0.3, 5.5</row>
+	</VectorSet>
+    </model>
+
+
+
+</NumDataSet>

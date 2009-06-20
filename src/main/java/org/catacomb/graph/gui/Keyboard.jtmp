@@ -1,0 +1,103 @@
+
+
+   // ************ mouse state *******************
+   // the state of the mouse is kept in mouseState and 
+   // exposed to subclasses through the getMouseXXX methods
+
+   public void keyPressed(KeyEvent e) { 
+      gcKeyDown (e); 
+   }
+
+   public void keyReleased(KeyEvent e) { 
+   }
+
+
+   public void keyTyped(KeyEvent e) {  
+      gcKeyUp(); 
+   } 
+   
+
+
+  public void actionPerformed (ActionEvent ev) {
+     String sarg = ev.getActionCommand();
+  }
+
+
+
+
+
+
+
+  public final void gcKeyDown (KeyEvent e) {
+     int ik = e.getKeyCode();
+
+     //     Sp ("gc key donw " + e + " " + ik + " " + e.VK_NUMPAD1);
+
+     if (ik == e.VK_LEFT) keyPan(-1, 0);
+     else if (ik == e.VK_RIGHT) keyPan(1, 0);
+     else if (ik == e.VK_UP) keyPan(0, 1);
+     else if (ik == e.VK_DOWN) keyPan(0, -1);
+
+     else {
+	String s = e.getKeyText (e.getKeyCode());
+	if (ik == e.VK_NUMPAD1) s = "1";
+	else if (ik == e.VK_NUMPAD2) s = "2";
+	else if (ik == e.VK_NUMPAD3) s = "3";
+	else if (ik == e.VK_NUMPAD5) s = "4";
+
+	letterAction (s);
+     }
+  }
+   
+   
+   public void letterAction(String s) {
+      if (s.equals("F")) {
+	 applyRecordedRange();
+	 repaint();
+      } else if (s.equals("R")) {
+	 repaint();
+      } else if (s.equals("I")) {
+	 worldFixZoom(0.9);
+	 repaint();
+	 
+      } else if (s.equals("O")) {
+	 worldFixZoom(1./0.9);
+	 repaint();
+
+      } else if (s.equals("K")) {
+	 Sys.keepSnapshot(this);
+
+      } else if (s.equals("S")) {
+	Sys.saveImage(this);
+
+      } else if (s.equals("X")) {
+	 saveAsXfig();
+
+      } else if (s.equals("B")) {
+	 boxAxes = !boxAxes;
+	 repaint();
+
+      } else if (s.equals("M")) {
+	 if (!movieRecording) {
+	    startMovieRecording();
+	 } else {
+	    stopMovieRecording();
+	 }
+
+      } else if (s.equals("H")) {
+	if (helper == null) {
+	   helper = new GraphHelper("GraphHelper");
+	   helper.setCanvas(this);
+	}
+	Sys.editObject(helper);
+
+     } else if (myal != null) {
+
+	myal.actionPerformed (new ActionEvent (this, 1001, s));
+     }
+   }
+
+   public void gcKeyUp () { }   
+   public void myKeyDown (KeyEvent e) {};
+   public void myKeyUp () {};
+

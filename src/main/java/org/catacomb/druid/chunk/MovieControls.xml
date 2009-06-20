@@ -1,0 +1,23 @@
+<AutonomousPanel controllerClass="MoviePlayController">
+    <BorderPanel borderWidth="10">
+	<Center>
+	    <Slider id="slider"/>
+	</Center>
+	<West>
+	    <GridPanel nrow="1">
+		<Button label=" f " action="faster"/>
+		<Button label=" s " action="slower"/>
+	    </GridPanel>
+	</West>
+
+	<East>
+	    <GridPanel nrow="1">
+		<Button id="b1" label=" rewind " action="rewind"/>
+		<Button id="PauseButton" label=" pause " action="pause"/>
+		<Button label=" play " action="play"/>
+		<Button label="record" action="record"/>
+	    </GridPanel>
+	</East>
+    </BorderPanel>
+</AutonomousPanel>
+

@@ -1,0 +1,127 @@
+
+body {
+      font-family: Verdana, Arial, sans-serif; 
+      font-size : 11pt; 
+      color : #404040; 
+      margin-top : 0px; 
+      margin-left : 5px;
+   
+}
+
+body.tstbg {
+   background-color : #e8e8e4;
+}
+
+
+h1 {
+  font-size : 14pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+
+h2 {
+  font-size : 12pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+h3 {
+  font-size : 11pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+h3.indent {
+  padding-left : 16px;
+} 
+
+
+
+p.indent0, h2.indent0, h3.indent0 {
+  padding-left : 0px;
+}
+
+
+p.indent1, h2.indent1, h3.indent1 {
+  padding-left : 12px;
+color : #303030;
+}
+
+
+p.indent2, h2.indent2, h3.indent2 {
+  padding-left : 24px;
+color : #606060;
+}
+
+a {
+  color : #0000a0;
+  text-decoration : underline;
+  font-size : 11pt;
+  font-weight : normal;
+}
+
+
+
+p {
+  padding-top : 0px;
+  padding-bottom : 5px;
+}
+
+p.indent {
+  padding-left : 16px;
+  padding-top : 0px;
+  padding-bottom : 5px;
+}
+
+
+
+p.meta {
+  padding-top : 0px;
+  padding-bottom : 5px;
+  color : orange;
+  font-style : italic;
+}
+
+
+p.warning {
+  padding-top : 0px;
+  padding-bottom : 5px;
+  color : #800000;
+}
+
+
+
+a.crumb {
+     font-size : 8pt;
+     color : #808080; 
+}	
+
+
+table.hashmap {
+   border-width: 1px;
+   border-style: solid;
+   border-color: #a0a0a0;
+}
+
+td.hashmapkey { 
+   background-color : #f8f8f8;
+   text-align : left;
+   color : #606060;
+   padding-left : 4px;
+   padding-right : 4px;
+   padding-top : 2px;
+   padding-bottom : 2px;
+}
+
+td.hashmapvalue {
+   background-color : #f8f8f8;
+   text-align : left;
+   padding-left : 4px;
+   padding-right : 4px;
+   padding-top : 2px;
+   padding-bottom : 2px;
+}

@@ -1,0 +1,5 @@
+<DeclaratinReading>
+
+  <Instantiable class="ResourceRole" provides="Role"/>
+
+</DeclaratinReading>

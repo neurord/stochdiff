@@ -1,0 +1,32 @@
+
+<AutonomousDialog title="Name for the new item"  backgroundColor="#f0f0f0">
+
+    <BorderPanel prefWidth="400"  prefHeight="240" xspace="2" yspace="6" borderWidth="10">
+
+	<North>
+	       	<InfoPanel id="info" prefWidth="300" prefHeight="80" borderWidth="6"/>
+      </North>
+
+	<Center>
+	    <CenterFlowPanel>
+		<Label text="New value:">
+		    <info>the name for the new item</info>
+		</Label>
+		<TextField id="nameTF" width="20" action="OK">
+
+		</TextField>
+	    </CenterFlowPanel>
+	</Center>
+
+
+	<South>
+	    <RightFlowPanel>
+		<Button label="OK" action="OK" borderWidth="2" xPadding="6" yPadding="3"/>
+		<Button label="Cancel" action="cancel" borderWidth="2" xPadding="6" yPadding="3"/>
+	    </RightFlowPanel>
+	</South>
+    </BorderPanel>
+
+
+</AutonomousDialog>
+

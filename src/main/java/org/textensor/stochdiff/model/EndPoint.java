@@ -110,15 +110,15 @@ public class EndPoint extends MorphPoint {
         MorphPoint st = tgtSeg.getStart();
         MorphPoint ed = tgtSeg.getEnd();
 
-
-        double cx = 0.5 * (st.x + ed.x);
-        double cy = 0.5 * (st.y + ed.y);
-        double cz = 0.5 * (st.z + ed.z);
-        double cr = 0.5 * (st.r + ed.r);
+        double wf = 1. - f;
+        double cx = wf * st.x + f * ed.x;
+        double cy = wf * st.y + f * ed.y;
+        double cz = wf * st.z + f * ed.z;
+        double cr = wf * st.r + f * ed.r;
 
         //  double rr = (Double.isNaN(r) ? cr : r);
 
-        // the attacheent position should be offset cr towards the end of the
+        // the attachment position should be offset cr towards the end of the
         // new segment;
         double dx = (twds.x -cx);
         double dy = (twds.y -cy);

@@ -1,0 +1,14 @@
+<AutonomousPanel name="DViewPlot"
+                 controllerClass="DViewPlotController">
+
+	<BorderPanel>
+    	<West>
+    		<List id="plots" action="showPlot"/>
+    	</West>
+    	<Center>
+			    <DataDisplay id="dataDisplay" backgroundColor="#606060"   prefWidth="800" prefHeight="600"/>
+		</Center>
+		</BorderPanel>
+
+</AutonomousPanel>
+	

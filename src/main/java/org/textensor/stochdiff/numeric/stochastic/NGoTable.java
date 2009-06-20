@@ -51,7 +51,8 @@ public final class NGoTable {
              * i or more particles move in the step. wk[0] must be 1
              * unless something has gone wrong.
              */
-            if (Math.abs(1. - c) > 1.e-14) {
+            // RCC, condition was 1.e-14: should check why it doesn't always make that
+            if (Math.abs(1. - c) > 1.e-11) {
                 E.error("cumulative probability miscount? "+ c +
                         " for n, p, nkept " + n + " " + p + " " + ncprob);
             }

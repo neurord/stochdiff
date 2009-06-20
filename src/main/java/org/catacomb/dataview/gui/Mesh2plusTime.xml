@@ -1,0 +1,36 @@
+<AutonomousPanel name="Mesh2plusTime"
+                 controllerClass="Mesh2plusTimeController">
+
+    <BorderPanel>
+	<West>
+	    <BorderPanel>
+		<North>
+		    <GridPanel ncolumn="1">
+		   	<Checkbox label="log" action="setLog"/>
+			<FloatSlider id="cmin" min="0" max="100"/>
+			<FloatSlider id="cmax" min="0" max="100"/>
+			<Button label="reset range" action="resetRange"/>
+		    <FloatSlider id="zval" min="-5" max="5" label="Z slice"/>
+
+		    </GridPanel>
+		</North>
+
+		<Center>
+		    <List id="variables" action="setPlot"/>
+		</Center>
+
+	    </BorderPanel>
+	</West>
+
+
+
+	<Center>
+	    <DataDisplay id="dataDisplay" backgroundColor="#606060"/>
+	</Center>
+	<South>
+	    <Insert id="frameController" source="FramePlayer"/>
+	</South>
+    </BorderPanel>
+
+</AutonomousPanel>
+

@@ -1,0 +1,25 @@
+<html>
+
+
+<body>
+
+   <h1>Help Browser</h1>
+
+   <p>
+      Here we need an intro to Catacomb IME
+         (the source file is doc/helpHomeHTML.txt)
+ 
+   </p>
+
+
+   <p>
+       And then a table of contents - links to the most useful
+       pages. - maybe an inline expaiding tree? - better than a 
+       separate jtree on the left - make it look like a normal 
+       website.
+   </p>
+
+  </body>
+
+
+</html>

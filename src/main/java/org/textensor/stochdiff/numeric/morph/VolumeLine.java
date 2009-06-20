@@ -1,3 +1,4 @@
+//9 12 2008: WK added ret /= dr; before the return statement in the overlapFactor function per RC.
 //6 18 2007: WK added "ve.setSubmembrane()" to the lineFill function
 //written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
@@ -216,6 +217,9 @@ public class VolumeLine {
             // upper end of tgt;
             ret = tgt[1] - rng[0];
         }
+//    <--WK
+        ret /= dr;
+//    WK-->
         return ret;
     }
 

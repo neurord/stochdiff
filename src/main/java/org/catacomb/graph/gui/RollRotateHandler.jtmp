@@ -1,0 +1,73 @@
+
+
+package org.enorg.visua.twod;
+
+
+
+package org.enorg.class RollRotateHandler {
+   
+
+
+
+   // used to decide whether it has control
+
+   package void clear() {
+   }
+
+   
+   package boolean init(Mouse m) {
+      return false;
+   }
+   
+   package boolean update(Mouse m) {
+      return false;
+   }      
+
+
+
+      } else if (ms.button == ms.LEFTBUTTON && map3D) {
+	 rollRotate = true;
+
+      } else if (ms.button == ms.MIDDLEBUTTON && map3D) {
+	 zRotate = true;
+
+
+
+
+   package void echo() {
+   }
+   
+   
+
+     } else if (rollRotate) {
+	dragRollRotate (ms.px - ms.px0, ms.py - ms.py0);
+	repaint();
+
+     } else if (zRotate) {
+	dragZRotate (ms.px - ms.px0, ms.py - ms.py0);
+	repaint();	
+
+
+
+   // if handler has won control, then the following are called
+
+   package void applyOnDown() {
+   }
+
+   
+   package void applyOnDrag() {
+   }
+   
+   package void applyOnRelease() {
+   }
+      
+   
+
+   // 3D mappings
+
+ 
+   
+     
+ 
+
+}

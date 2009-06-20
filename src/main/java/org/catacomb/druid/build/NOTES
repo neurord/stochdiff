@@ -1,0 +1,33 @@
+
+
+world has getTypes and getTemplates methods
+
+these return arraylists of Types and Templates, where each isa a java 
+interface. 
+
+But, the underlying data is in a record: if a record uses the Type
+template, then it must have an identifier, type and constraints (poss
+null). A RecordTypifier can wrap such a record to give the syatem a
+slot.
+
+Likewise for templates (records with slots)
+
+Records don't have to have a template - can just be a list of:
+elements, slots, records 
+
+A Slot is a record whoset template is the SlotTemplate
+The Slot template contains a Slot called type of type String with the
+constraint that the values is taken from the types list.
+
+
+Records are lists of elements and/or records 
+
+Records don't necessarily have names
+
+an element is a name + value pair, where the value is a record or a 
+simple type
+
+
+If a record has  template, then it should have an element for each
+slot in the template. The slot identifier spoecifies the name and
+theslot type specifies the type. 

@@ -9,6 +9,8 @@ import org.textensor.stochdiff.numeric.morph.SpinePopulation;
 
 public class SpineAllocation {
 
+    public String id;
+
     public String spineType;
     public String region;
 
@@ -30,6 +32,10 @@ public class SpineAllocation {
     }
 
 
+    public String getID() {
+        return id;
+    }
+
     public SpinePopulation makePopulation() {
         SpinePopulation ret = null;
 
@@ -43,7 +49,7 @@ public class SpineAllocation {
         }
 
         if (r_spineType != null && density > 0) {
-            ret = new SpinePopulation(r_spineType.getProfile(), region, density);
+            ret = new SpinePopulation(id, r_spineType.getProfile(), region, density);
         }
         return ret;
 

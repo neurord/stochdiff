@@ -1,0 +1,527 @@
+
+
+
+
+   // hack for xfig output;
+   boolean              figWriting = false;
+   StringBuffer         figSB1;
+   StringBuffer         figSB2;
+   File                 figFile;
+   int                  figDepth;
+   int                  figColor;
+   int[]                xfigColors;
+   int                  nxfigColors;
+   int                  xfigColor;
+
+
+
+
+
+
+   public final int figowx (double xr) {
+      double f = 30. * dpdwx * (xr - wcx);
+      int ii = (int) (30 * pcx + (int) f);
+      return  ii;
+   }
+
+
+   public final int figowy (double yr) {
+      double f = 30 * dpdwy * (yr - wcy);
+      int ii = (int) (30 * height - (30 * pcy + (int) f));
+     return  ii;
+   }
+
+   public int pixtofig(int np) { return 30 * np; }
+
+
+
+
+
+   public void saveAsXfig() {
+      File f = Sys.getFileToWrite();
+      if (f != null) {
+	 String fnm = f.getAbsolutePath();
+	 if (!fnm.endsWith(".fig")) {
+	    fnm = fnm + ".fig";
+	    f = new File(fnm);
+	 }
+	 
+	 figDepth = 999;
+	 figColor = 32;
+	 nxfigColors = 0;
+	 if (xfigColors == null) xfigColors = new int[800]; //  ****
+	 
+	 figWriting = true;
+	 figFile = f;
+	 figSB1 = new StringBuffer();
+	 figSB2 = new StringBuffer();
+
+	 figSB1.append("#FIG 3.2\n");
+	 figSB1.append("Landscape\n");
+	 figSB1.append("Center\n");
+	 figSB1.append("Metric\n");
+	 figSB1.append("A4      \n");
+	 figSB1.append("100.00\n");
+	 figSB1.append("Single\n");
+	 figSB1.append("-2\n");
+	 figSB1.append("1200 2\n");
+
+	 repaint();
+      }
+   }
+   public final void writeXFigScurve (int icol, double x0, double y0, 
+				      double dx0, double dy0, 
+				      double x1, double y1, int n, int arr) {
+      
+      double vx, vy, vl, dx, dy, dl, f, alp0, alp;
+      
+      double r = 0.03;
+      double alpa = 0.1;
+      double alpb = 0.4;
+
+      double[] xp = new double[n];
+      double[] yp = new double[n];
+
+      xp[0] = x0;
+      yp[0] = y0;
+      dx = dx0;
+      dy = dy0;
+      for (int i = 1; i < n; i++) {
+	 alp0 = alpa + (alpb * i) / (n-1);
+	 vx = x1 - xp[i-1];
+	 vy = y1 - yp[i-1];
+	 vl = Math.sqrt (vx*vx + vy*vy);
+	 alp = (i == 1 ? alp0/2 : ( i == n-1 ? 1. : alp0));
+	 
+	 dl = Math.sqrt (dx*dx + dy*dy);
+	 dx = (1. - alp) * dx/dl + alp * vx/vl;
+	 dy = (1. - alp) * dy/dl + alp * vy/vl;
+	 f = (vl - r) / (n - i);
+	 xp[i] = xp[i-1] + f * dx;
+	 yp[i] = yp[i-1] + f * dy;
+      }
+      writeXFigData (icol, xp, yp, n, arr);
+   }
+
+
+   
+   public void fillXFigPolygon(double[] x, double[] y, int n) {
+      writeXFigPolygon(xfigColor, x, y, n, true);
+   }
+
+   public void drawXFigData(double[] x, double[] y, int np) {
+      writeXFigData(xfigColor, x, y, np, 0);
+   }
+
+
+   public void drawXFigLine(double xa, double ya, double xb, double yb) {
+      writeXFigLine(xfigColor, xa, ya, xb, yb, 0);
+   }
+   
+   public void drawXFigString(String s, int ix, int iy) {
+      // problem here with int coords;
+      Sp("Warning - missing code for xfig string output");
+   }
+   
+   public int nextXFigDepth() { 
+      figDepth--;
+      if (figDepth < 1) figDepth = 1;
+      return figDepth;
+   }
+   
+   public int addXFigColor(int icol) {
+      int[] kcs = {Q.BLACK, Q.BLUE, Q.GREEN, 
+		   Q.CYAN, Q.RED, Q.MAGENTA, 
+		   Q.YELLOW, Q.WHITE};
+      
+      int iret = -1;
+      for (int i = 0; i < kcs.length; i++) {
+	 if (icol == kcs[i]) iret = i;
+      }
+      if (iret >= 0) return iret;
+      
+      
+      for (int i = 0; i < nxfigColors; i++) {
+	 if (xfigColors[2*i+1] == icol) {
+	    iret = xfigColors[2*i];
+	    break;
+	 }
+      }
+      if (iret >= 0) return iret;
+
+      
+      
+      int r = icol / (256*256);
+      int icolgb = icol % (256*256);
+      int g = icolgb / 256;
+      int b = icolgb % 256;
+      if (nxfigColors < xfigColors.length / 2) {
+	 iret = addXFigColor(r, g, b);
+	 S.p("added color for " + r + " " + g + " " + b + "  " + iret);
+	 
+	 xfigColors[2*nxfigColors] = iret;
+	 xfigColors[2*nxfigColors+1] = icol;
+	 nxfigColors++;
+      } else {
+	 S.p("run out of colors - using black instead of " + r + " " + g + 
+	     " " +b);
+	 iret = 0;
+      }
+
+      return iret;
+   }
+
+
+   public void setXFigColor(Color c) {
+      int r = c.getRed();
+      int g = c.getGreen();
+      int b = c.getBlue();
+      int icol = (r << 16) + (g << 8) + b;
+      xfigColor = addXFigColor(icol);
+   }
+
+
+
+   // *********** this hex stuff can be done in one line - 
+   public int addXFigColor(int r, int g, int b) {
+      String[] hexchar = {"0", "1", "2", "3", "4", "5", "6", "7",
+			  "8", "9", "a", "b", "c", "d", "e", "f"};
+      
+      int cfc = figColor;
+      figColor++;
+      figSB1.append("0 " + cfc + " #" + 
+		    hexchar[r/16] + hexchar[r%16] + 
+		    hexchar[g/16] + hexchar[g%16] + 
+		    hexchar[b/16] + hexchar[b%16] + "\n");
+      return cfc;
+   }
+   
+
+
+   public void appendXFigLine(String s) {
+      figSB2.append(s);
+      figSB2.append("\n");
+
+   }
+
+
+
+   public void writeXFigCenteredRect(int icol, double x, double y, 
+				  int rx, int ry,
+				  boolean bfill) {
+      int ix = figowx(x);
+      int iy = figowy(y);
+      rx = pixtofig(rx);
+      ry = pixtofig(ry);
+
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imw)) {
+	 writeXFigRectangle(icol, ix - rx/2, iy - ry/2, rx, ry, bfill);
+      } 
+   }
+
+
+
+   public void writeXFigRect(int icol, double xa, double ya, 
+			     double xb, double yb, boolean bfill) {
+      int ix = figowx(xa);
+      int iy = figowy(ya);
+      int jx = figowx(xb);
+      int jy = figowy(yb);
+      if (iy > jy) { int itmp = iy; iy = jy; jy = itmp; }
+      if (ix > jx) { int itmp = ix; ix = jx; jx = itmp; }
+      
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imw)) {
+	 writeXFigRectangle(icol, ix, iy, jx-ix, jy-iy, bfill);
+      }
+   }
+
+
+
+
+
+   public void writeXFigRectangle(int icol, int ix, int iy, int w, int h,
+				  boolean bfill) {
+      int ic = addXFigColor(icol);
+      int depth = nextXFigDepth();
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imh)) {
+	 String s = ("2 2 0 " + (bfill ? 0 : 1) +  " " +
+		     ic + " " + ic+ " " + depth + " 0 " + (bfill ? 20 : -1) + 
+		     " 0.0 0 0 0 0 0 5");
+	 appendXFigLine(s);
+	 String sd = ("   " + ix + " " + iy + " " + (ix+w) + " " + iy + " " + 
+		      (ix+w) + " " + (iy+h) + " " + ix + " " + (iy+h) + " " + 
+		      ix + " " + iy);
+	 appendXFigLine(sd);
+      }
+   }
+
+
+
+
+   public void writeXFigOval(int icol, double xa, double ya, 
+			     double xb, double yb, boolean bfill) {
+      int ix = figowx(xa);
+      int iy = figowy(ya);
+      int jx = figowx(xb);
+      int jy = figowy(yb);
+      if (iy > jy) { int itmp = iy; iy = jy; jy = itmp; }
+      if (ix > jx) { int itmp = ix; ix = jx; jx = itmp; }
+
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imh)) {
+	 writeXFigOval(icol, (ix+jx)/2, (iy+jy)/2, jx-ix, jy-iy, bfill);
+      }
+   }
+
+
+   
+   public void writeXFigOval(int icol, int ix, int iy, int w, int h,
+				  boolean bfill) {
+      int ic = addXFigColor(icol);
+      int depth = nextXFigDepth();
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imh)) {
+	 String s = ("1 2 0 " + (bfill ? 0 : 1) +  " " +
+		     ic + " " + ic + " " + depth + " 0 " + (bfill ? 20 : -1) + 
+		     " 0.0 1 0.0 " + ix + " "+iy+" " + w/2 + " " + h/2 + " " + 
+		     (ix-w/2) + " " + (iy-h/2) + " " +  
+		     (ix+w/2) + " " + (iy+h/2));
+	 appendXFigLine(s);
+      }
+   }
+
+
+
+
+   public void writeXFigText(int icol, String stxt, int ix, int iy,
+			     int fh, int fl, int ijust) {
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imh)) {
+	 int ic = addXFigColor(icol);
+	 String s = ("4 " + (ijust+1) + " " + ic + " " + nextXFigDepth() + 
+		     " 0 4 18 0.0 0 " + fh + " " + fl +
+		     " " + ix + " " + iy + " " +  stxt + "\\001");
+	 appendXFigLine(s);
+      }
+   }
+
+
+   public void writeXFigBgText(int icbg, int icfg, 
+			       double x, double y, int ixo, int iyo,
+			       double fxj,  double fyj, String s) { 
+      // fxj, fyj are relative positionong 1 means the end of the sstring
+      // coincides with the given point, -1 that the start of string coincides;
+      if (s == null || s.length() <= 0 || fontM == null) return;
+      int ilen = fontM.stringWidth(s) + 4;
+      int ix = figowx(x);
+      int iy = figowy(y)  + pixtofig(6) + (int)(0.5 *fyj*pixtofig((12 + iyo)));
+
+      icfg = 0;
+      if (fxj < -0.9) {
+	 // left justfied
+	 writeXFigText(icfg, s, ix+20,iy-20, pixtofig(10), pixtofig(ilen), -1);
+
+      } else if (fxj > 0.9) {
+	 // rught justified
+	 writeXFigText(icfg, s, ix+20,iy-20, pixtofig(10), pixtofig(ilen), 1);
+
+      } else {
+	 ix -= (int)(0.5 * fxj * pixtofig(((2*ilen)/3 + ixo)));
+	 writeXFigText(icfg, s, ix+20,iy-20, pixtofig(10), pixtofig(ilen), 0);
+      }
+   }
+   
+
+   public void writeXFigPolyline(int icol, int[] ix, int[] iy, 
+				 int np, int arr, boolean bf) {
+      int ic = addXFigColor(icol);
+      String sp = ("2 1 0 2 " + ic + " 0 " + nextXFigDepth() + " 0 " +
+		   (bf ? 20 : -1) + " 0.0 " + 
+		   "0 0 0 " + (arr == 1 ? 1 : 0) + " " + (arr == -1 ? 1 : 0) +
+		   " " + np);
+      appendXFigLine(sp);
+      if (arr == 1) {
+	 appendXFigLine("2 1 2 80 120");
+      }
+
+      if (arr == -1) {
+	 appendXFigLine("2 1 2 80 120");
+      }
+      
+      String sa = " ";
+      for (int i = 0; i < np; i++) {
+	 sa += ix[i] + " " + iy[i] + " ";
+      }
+      appendXFigLine(sa);
+   }
+
+
+   public void writeXFigPolygon(int icol, int[] ix, int[] iy, boolean bf) {
+      int np = ix.length;
+      int ic = addXFigColor(icol);
+      String sp = ("2 3 0 " + (bf ? 0 : 2) + " " + 
+		   + ic + " " + ic + " " + nextXFigDepth() + " 0 " +
+		   (bf ? 20 : -1) + " 0.0 0 0 0 0 0 " + np);
+      appendXFigLine(sp);
+      String sa = " ";
+      for (int i = 0; i < np; i++) {
+	 sa += ix[i] + " " + iy[i] + " ";
+      }
+      appendXFigLine(sa);
+   }
+
+
+
+
+   public void writeXFigData (int icol, double[] x, double[] y) {
+      writeXFigData(icol, x, y, x.length, 0);
+   }
+
+
+   public void writeXFigData (int icol, double[] x, double[] y, 
+			      int np, int arr) {
+      if (np > maxPoints) np = maxPoints;
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      for (int i = 0; i < np; i++) {
+	 ix[i] = figowx(x[i]);
+	 iy[i] = figowy(y[i]);
+      }
+      if (ix[0] > 0 && ix[0] < pixtofig(imw) && 
+	  iy[0] > 0 && iy[0] < pixtofig(imh)) {
+	 writeXFigPolyline (icol, ix, iy, np, arr, false);      
+      }
+   }
+
+
+   public void writeXFigPolygon(int icol, double[] x, double[] y, boolean bf) {
+      writeXFigPolygon(icol, x, y, x.length, bf);
+   }
+
+   public void writeXFigPolygon(int icol, double[] x, double[] y, 
+				int np, boolean bf) {
+      int[] ix = new int[np+1];
+      int[] iy = new int[np+1];
+      for (int i = 0; i < np; i++) {
+	 ix[i] = figowx(x[i]);
+	 iy[i] = figowy(y[i]);
+      }
+      ix[np] = ix[0];
+      iy[np] = iy[0];
+      if (ix[0] > 0 && ix[0] < pixtofig(imw)
+	  && iy[0] > 0 && iy[0] < pixtofig(imh)) {
+	 writeXFigPolygon (icol, ix, iy, bf);      
+      }
+
+   }
+
+
+
+
+
+   public void writeXFigLine(int icol, double xa, double ya, 
+			     double xb, double yb, int arr) {
+      double[] ax = {xa, xb};
+      double[] ay = {ya, yb};
+      writeXFigData(icol, ax, ay, 2, arr);
+   }
+
+
+
+   public void writeXFigPerpOffsetData (int icol, double[] x, double[] y, 
+					int np, int uu, int po) {
+      
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      int xpo = 0;
+      int ypo = 0;
+      
+      double dx = 0.0;
+      double dy = 0.0;
+
+      //------ WARNING - uses dpdwx here;
+      for (int i = 0; i < np; i++) {
+	 if (i < np-1) {
+	    if (i > 0) {
+	       dx = dpdwx * (x[i+1] - x[i-1]);
+	       dy = dpdwy * (y[i+1] - y[i-1]);
+	    } else {
+	       dx = dpdwx * (x[i+1] - x[i]);
+	       dy = dpdwy * (y[i+1] - y[i]);
+	    }
+	    double dl = Math.sqrt (dx*dx + dy*dy);
+	    if (dl > 0.0) {
+	       dx *= po / (dl * dpdwy);
+	       dy *= po / (dl * dpdwx);
+	    }
+	 }
+	 ix[i] =  figowx(x[i] - dy);
+	 iy[i] = figowy(y[i] + dx);
+      }
+      
+      if (ix[0] > 0 && iy[0] > 0 &&
+	  ix[0] < pixtofig(imw) && iy[0] < pixtofig(imh)) {
+	 
+	 writeXFigPolyline (icol, ix, iy, np, 0, false);
+      }
+   }
+
+
+
+   public void writeRaisedXFigRect(int icol, int ib, double xa, double ya,
+				   double xb, double yb) {
+      
+      writeShadedXFigRect(icol, intShift(icol, 30), intShift(icol, -30),
+			  ib, xa, ya, xb, yb);
+   }
+
+   public void writeLoweredXFigRect(int icol, int ib, double xa, double ya,
+				   double xb, double yb) {
+      
+      writeShadedXFigRect(icol, intShift(icol, -30), intShift(icol, 30),
+			  ib, xa, ya, xb, yb);
+   }
+
+   
+   public int intShift(int ic, int ish) {
+      int r = ic / (256*256) + ish;
+      ic = ic % (256*256);
+      int g = (ic / 256) + ish;
+      int b = (ic % 256) + ish;
+      
+      r = (r < 0 ? 0 : (r > 255 ? 255 : r));
+      g = (g < 0 ? 0 : (g > 255 ? 255 : g));
+      b = (b < 0 ? 0 : (b > 255 ? 255 : b));
+      return b + 256 * (g + 256 * r); 
+   }
+
+
+   public void writeShadedXFigRect(int icol, int ict, int icb, int ibdr,
+				   double xa, double ya, 
+				   double xb, double yb) {
+      int ix = figowx(xa);
+      int iy = figowy(ya);
+      int jx = figowx(xb);
+      int jy = figowy(yb);
+      if (iy > jy) { int itmp = iy; iy = jy; jy = itmp; }
+      if (ix > jx) { int itmp = ix; ix = jx; jx = itmp; }
+
+      if (ibdr < 2) ibdr = 2;
+      
+      ibdr = pixtofig(ibdr);
+      int mb = ibdr-1;
+
+      if (ix > 0 && ix < pixtofig(imw) && iy > 0 && iy < pixtofig(imh)) {
+	 writeXFigRectangle(icol, ix, iy, jx-ix, jy-iy, true);
+
+	 int[] pxt = {ix-mb, ix-mb, jx+mb, jx-1, ix+1, ix+1, ix-mb};
+	 int[] pyt = {jy+mb, iy-mb, iy-mb, iy+1, iy+1, jy-1, jy+mb};
+	 writeXFigPolygon(ict, pxt, pyt, true);
+	 
+	 int[] qxt = {jx+mb, jx+mb, ix-mb, ix+1, jx-1, jx-1, jx+mb};
+	 int[] qyt= {iy-mb, jy+mb, jy+mb, jy-1, jy-1, iy+1, iy-mb};
+	 writeXFigPolygon(icb, qxt, qyt, true);
+      }
+
+   }
+
+
+
+

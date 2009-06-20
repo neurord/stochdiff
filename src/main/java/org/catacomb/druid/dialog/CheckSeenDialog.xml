@@ -1,0 +1,25 @@
+
+<AutonomousDialog name="CheckSeenDialog"
+		  title="N.B."
+		  controllerClass="CheckSeenDialog"
+		  backgroundColor="#f0f0f0"> 
+
+    <BorderPanel xspace="10" yspace="10">
+	<Center>
+	    <InfoPanel prefWidth="300" prefHeight="100" id="MessageArea" borderWidth="12"/>
+	</Center>
+	<South>
+	    <GridPanel nrow="2">
+		<LeftFlowPanel>
+		    <Checkbox id="dontShowAgain" 
+			      initial="false" 
+			      label="don't show this message again"/>
+		</LeftFlowPanel>
+		<CenterFlowPanel>
+		    <Button label="OK" action="OK"/>
+		</CenterFlowPanel>
+	    </GridPanel>
+	</South>
+    </BorderPanel>
+</AutonomousDialog>
+

@@ -1,0 +1,21 @@
+<AutonomousPanel name="FramePlayer"
+                 controllerClass="FramePlayerController">
+	    <BorderPanel>
+		<Center>
+		    <Slider id="slider"/>
+		</Center>
+		<East>
+		    <GridPanel nrow="1">
+			<Button id="b1" label=" rewind " action="rewind"/>
+			<Button id="PauseButton" label=" pause " action="pause"/>
+			<Button label=" play " action="play"/>
+		    </GridPanel>
+		</East>
+		<West>
+		    <GridPanel>
+			<Button label=" f " action="faster"/>
+			<Button label=" s " action="slower"/>
+		    </GridPanel>
+		</West>
+	    </BorderPanel>
+</AutonomousPanel>

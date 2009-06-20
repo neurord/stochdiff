@@ -1,0 +1,35 @@
+
+<AutonomousDialog title="Query"  backgroundColor="#f0f0f0"> 
+    
+    <BorderPanel prefWidth="540" prefHeight="240" xspace="2" yspace="6" borderWidth="10">
+	
+	<Center>
+	    <ScrollingInfoPanel id="message" prefWidth="500" prefHeight="200" borderWidth="6"/>
+	</Center>
+	
+	
+	<South>
+	    <BorderPanel>
+		<West>
+		    <Button id="but1" label="1" action="button1" borderWidth="2" xPadding="6" yPadding="3"/>
+		</West>
+		
+		<Center>
+		    <RightFlowPanel>
+			<Button id="but2" label="2" action="button2" borderWidth="2" xPadding="6" yPadding="3"/>
+		    
+			<Button id="but3" label="3" action="button3" borderWidth="2" xPadding="6" yPadding="3"/>
+		    </RightFlowPanel>
+		</Center>
+
+	    </BorderPanel>
+	</South>
+    </BorderPanel>
+    
+    
+</AutonomousDialog>
+
+
+
+
+

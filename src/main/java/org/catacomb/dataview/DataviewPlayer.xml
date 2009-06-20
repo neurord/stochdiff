@@ -1,0 +1,19 @@
+
+<BorderPanel borderwidth="10">
+
+    <center class="Slider" id="Slider"/>
+
+    <east class="GridPanel"
+	  nrow="1">
+	<Button id="b1" label=" rewind " action="rewind"/>
+	<Button id="PauseButton" label=" pause " action="pause"/>
+	<Button label=" play " action="play"/>
+    </east>
+
+
+    <west class="GridPanel">
+	<Button label=" f " action="faster"/>
+	<Button label=" s " action="slower"/>
+
+    </west>
+</BorderPanel>

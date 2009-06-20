@@ -1,0 +1,222 @@
+
+package org.enorg.visua.twod;
+
+
+import java.awt.*;
+
+
+
+
+final class TextPainter {
+
+
+   final int stringWidth (String s) {
+      return (dfm != null ? dfm.stringWidth (s) : s.length() * 8);
+   }
+
+   final void drawString(Graphics g, int x, int y, String s) {
+      g.drawString (s, x, y); 
+   }
+
+   final void drawText (Graphics g, double x, double y, String s) {
+      if (BoW) bwOnly(g);
+      int ix, iy;
+      ix = powx(x);
+      iy = powy(y);
+      iy += 4;
+      ix -= 6 * s.length();
+      g.drawString (s, ix, iy); 
+   }
+
+
+   final void drawText(Graphics g, double x, double y, 
+			      double fj, String s) {
+      if (BoW) bwOnly(g);
+      int ix, iy;
+      ix = powx(x);
+      iy = powy(y);
+      iy += 4;
+      ix -= fj * 6 * s.length();
+      g.drawString (s, ix, iy); 
+   }
+
+
+   final void drawBgText(Graphics g, String s, double x, double y) {
+      drawBgText(g, Color.white, Color.black, x, y, 0, 0, 0., 0., s);
+   }
+   
+
+   final void drawBgText(Graphics g, 
+				Color cbg, Color cfg,
+				double x, double y, int ixo, int iyo,
+				double fxj,  double fyj, String s) { 
+      // fxj, fyj are relative positionong 1 means the end of the sstring
+      // coincides with the given point, -1 that the start of string coincides;
+      
+      try {
+
+      if (s == null || s.length() <= 0) return;
+
+      
+      
+      if (fontM == null)  fontM = g.getFontMetrics();
+
+      if (BoW) bwOnly(g);
+      int ix, iy;
+
+      int ilen = fontM.stringWidth(s) + 4;
+      ix = powx(x) - ilen/2;
+      iy = powy(y) + 6;
+
+
+      ix -= 0.5 * fxj * (ilen + ixo);
+      
+      iy += 0.5 * fyj * (12 + iyo);
+
+      g.setColor(cbg);
+      g.fillRect(ix, iy-12, ilen, 12); 
+
+      g.setColor(cfg);
+      g.drawString (s, ix+2, iy-2); 
+
+      g.setColor(Color.gray);
+      g.drawRect(ix, iy-12, ilen, 12); 
+
+      } catch (Exception e) {
+      }
+   }
+
+
+
+   
+   final void drawCenteredText (Graphics g, double x, double y, 
+				       String s) {
+      if (BoW) bwOnly(g);
+      int ix, iy;
+      ix = powx(x);
+      iy = powy(y);
+      iy += 4;
+      ix -= 3 * s.length() + 1;
+      g.drawString (s, ix, iy); 
+   }
+
+
+
+   final void drawOffsetText (Graphics g, double x, double y, 
+				     String s, int offx, int offy) {
+      if (BoW) bwOnly(g);
+      int ix, iy;
+      ix = powx(x);
+      iy = powy(y);
+      g.drawString (s, ix + offx, iy-offy); 
+   }
+
+
+
+   void wrappedDraw(Graphics g, String stxt, int xoff, int yoff) {
+      FontMetrics fm = g.getFontMetrics();
+      int w = imw;
+      int icx = xoff;
+      int icy = yoff;
+      int nru = 1;
+      StringTokenizer st = new StringTokenizer (stxt, " ", true);
+      while (st.hasMoreTokens()) {
+	 String s = st.nextToken();
+	 int iw = fm.stringWidth (s);
+	 if (icx + iw > w) {
+	    icx = xoff;
+	    icy += fm.getHeight();
+	    nru++;
+	 }
+	 g.drawString (s, icx, icy);
+	 icx += iw;
+      }
+   }
+
+
+   final void drawBoxedText(Graphics g, Color col,
+			    double xp, double yp, String s) {
+   
+      if (dfm == null) dfm = g.getFontMetrics();
+      int hsw = dfm.stringWidth(s) / 2;
+      int hh =dfm.getHeight() / 2;
+      
+      int ix = powx (xp);
+      int iy = powy(yp);
+
+      g.setColor (col);
+      if (BoW) bwOnly(g);
+
+      drawButton (g, ix, iy, hsw, hh, col);
+
+      g.setColor (CcmbColor.black);
+      if (BoW) bwOnly(g);
+      g.drawString (s, ix - hsw, iy + hh-2);
+   }
+
+
+
+   final void drawOvaledText(Graphics g, Color col,
+			    double xp, double yp, String s) {
+      if (dfm == null) dfm = g.getFontMetrics();
+      int hsw = dfm.stringWidth(s) / 2 + 5;
+      int hh = dfm.getHeight() / 2 + 3;
+      
+      int ix = powx(xp);
+      int iy = powy(yp);
+
+      g.setColor (col);
+      if (BoW) bwOnly(g);
+
+      g.setColor (col);
+      g.fillOval(ix-hsw, iy - hh, 2*hsw, 2*hh); 
+
+      g.setColor (CcmbColor.black);
+      if (BoW) bwOnly(g);
+      g.drawString (s, ix - hsw+5, iy + hh-5);
+   }
+
+
+
+   final void drawClickableBoxedText(Graphics g, Color col, 
+				     double xp, double yp, String s,
+				     int p0, int p1, int p2, String sinfo) {
+      if (dfm == null) dfm = g.getFontMetrics();
+      int hsw = dfm.stringWidth(s) / 2;
+      int hh = dfm.getHeight() / 2;
+      
+      int ix = powx(xp);
+      int iy = powy(yp);
+
+      addClickable (g, ix, iy, p0, p1, p2, hsw+3, hh+3, sinfo);
+
+      g.setColor (col);
+      if (BoW) bwOnly(g);
+      drawButton (g, ix, iy, hsw, hh, col);
+
+      g.setColor (CcmbColor.black);
+      if (BoW) bwOnly(g);
+      g.drawString (s, ix - hsw, iy + hh-2);
+   }
+
+
+
+   final void drawCenteredString(Graphics g, String s, 
+				 double xp, double yp) {
+      if (dfm == null) dfm = g.getFontMetrics();
+      int hsw = dfm.stringWidth(s) / 2;
+      int hh = dfm.getHeight() / 2;
+      int ix = powx (xp);
+      int iy = powy(yp);
+      if (BoW) bwOnly(g);
+      g.drawString (s, ix - hsw, iy + hh-2);
+   }
+
+
+
+
+
+
+
+
+}

@@ -35,15 +35,19 @@ public class SpineType implements AddableTo {
         double[] vl = new double[np];
         double[] vw = new double[np];
         String[] lbls = new String[np];
+        String[] regions = new String[np];
         for (int i = 0; i < np; i++) {
             Section sec = sections.get(i);
             vl[i] = sec.at;
             vw[i] = sec.width;
             if (sec.regionClass != null) {
-                lbls[i] = sec.regionClass;
+                regions[i] = sec.regionClass;
+            }
+            if (sec.label != null) {
+                lbls[i] = sec.label;
             }
         }
-        SpineProfile ret = new SpineProfile(id, vl, vw, lbls);
+        SpineProfile ret = new SpineProfile(id, vl, vw, lbls, regions);
         return ret;
     }
 

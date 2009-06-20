@@ -1,0 +1,22 @@
+This is a report on a sales visit to the White research 
+institute, Cambridge, March 05. I met up with Stephen 
+White, the director, who then introduced me to the TAIRDB 
+development team, and I gave them a tailored version of 
+the std presentation. 
+
+
+He suggested a number of features
+which would be necessary for them to purchase - restricted 
+access to the source code, support of the Alcatron A1000 
+sequencer ".seq" file format (he'll email me some sample 
+files), examples of microarray applications (using the 
+MAGE XML format). He also suggested I contact Jim 
+McCormick, tech director of the Brown institute, Texas, 
+another big microarray centre which is about to get a big 
+($10M) NSF grant in July to expand their informatics 
+group. 
+
+
+I also found out that Jim used to be in same 
+Harvard lab as Prof Shona Williams, one of our customers 
+in Glasgow Uni.

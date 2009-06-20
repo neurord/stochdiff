@@ -1,0 +1,17 @@
+<Type id="Drawing" style="assembly">
+
+    <info>
+       About drawings... should allow drawings within drawings.
+    </info>
+
+    <Set id="components"  label="components" saveAs="icon"
+	 contentType="Shape"
+	 exemplars="Circle, Square, Rectangle, Oval, Polygon, Polyline, StraightLine">
+	<tag>components tip</tag>
+	<info>about the components set</info>
+    </Set>
+
+
+
+
+</Type>

@@ -1,0 +1,36 @@
+<Dataview layout="horizontal">
+
+    <dataSource path="view1data" name="dat1"/>
+    
+    <frameSelector source="dat1.model" display="dat1.model.time"/>
+
+
+	
+    <DataPlot title="left panel" width="250" height="400">
+	<xAxis min="0" max="10" label="x axis"/>
+	<yAxis min="0" max="10" label="y axis"/>
+	<Line color="#ff0000" 
+	      x="dat1.temperature(log10)" 
+	      y="dat1.luminosity(log10)"
+	      width="2"/>
+	
+	<Line color="#00ff00" x="{0, 1, 2, 3}" y="{4, 3, 2, 1}" width="4"/>
+	
+	<Disc color="#0000ff" size="8"
+	      x="dat1.model[frame].time"
+	      y="dat1.model[frame].number"/>
+    </DataPlot>
+    
+    
+    
+    <DataPlot title="right panel" width="450" height="400">
+	<xAxis min="0" max="10" label="mass"/>
+	<yAxis min="0" max="10" label="temperature"/>
+	
+	<Line color="#ffff00" 
+	      x="dat1.model[frame].mass" 
+	      y="dat1.model[frame].temperature"
+	      width="3"/>
+    </DataPlot>
+
+</Dataview>

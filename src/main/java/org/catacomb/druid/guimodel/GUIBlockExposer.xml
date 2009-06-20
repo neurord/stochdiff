@@ -1,0 +1,28 @@
+<StateExposer exposes="GUIBlock"
+	      label="GUI State">
+
+
+    <audience>developers</audience>
+
+    <introduction>
+	Items f type GUIState holds the current state of the user interface. 
+	They have elements (numbers, true/false values, text etc)
+	for each component that appears in the user interface.
+    </introduction>
+
+    <body>
+	GUIState items are one of the three ways in which data is stored in the 
+	application. The other two are tables and assemblies. The difference 
+	with tables
+	comes from what is definitive: if you define the user interface first then 
+	the system automatically creates the corresponiding GUIState object ot hold 
+	its state; if you define the data model, then the sytem creates the user 
+	interface for it. (Note, you can't define both yourself).
+    </body>
+
+
+    <HashMapExposer field="items" keyType="String" valueType="Object"/>
+
+
+
+</StateExposer>

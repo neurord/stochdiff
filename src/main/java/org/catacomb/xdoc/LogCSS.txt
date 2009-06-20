@@ -1,0 +1,61 @@
+ 
+body {
+      font-family: Verdana; 
+      font-size : 11pt; 
+      color : #404040; 
+      margin-top : 0px; 
+      margin-left : 5px;
+}
+
+p {
+  padding-bottom : 1px;
+  padding-top : 1px;
+}
+
+p.INFO {
+  padding-bottom : 1px;
+  padding-top : 1px;
+}
+
+p.WARNING {
+  font-weight : bold;
+  padding-bottom : 4px;
+  padding-top : 4px;
+}
+
+p.ERROR {
+  color : red;
+  font-weight : bold;
+  padding-bottom : 4px;
+  padding-top : 4px;
+}
+
+p.FATAL {
+  font-weight : bold;
+  padding-bottom : 4px;
+  padding-top : 4px;
+}
+
+
+td.timestamp {
+  font-size : 9pt;
+}
+
+td.context {
+  font-size : 9pt;
+}
+
+
+td.text {
+   font-size : 11pt;
+   padding-left : 10px;
+}
+
+
+td.level {
+  color : #808080;	     
+  font-size : 9pt;
+}
+
+
+

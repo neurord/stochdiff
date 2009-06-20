@@ -1,0 +1,35 @@
+<Application name="CCViz" controllerClass="CCVizController" 
+	     logging="false" stateExposure="false">
+
+    <Frame id="MainFrame" title="CCViz data vizualization" backgroundColor="#e8e8e4" 
+	   prefWidth="800" prefHeight="740">
+	<Menu label="file" id="FileMenu">
+	    <MenuItem label="open" action="open"/>
+	    <MenuItem label="reload" action="reload"/>
+	    <Separator/>
+	    <MenuItem label="export..." action="export"/>
+	    <MenuItem label="exit" action="requestExit"/>
+	</Menu>
+		
+	<Menu label="view" id="ViewMenu" action="setViewStyle">
+	    <MenuItem label="outline" action="ViewOutline"/>
+	    <MenuItem label="skeleton" action="ViewSkeleton"/>
+	    <MenuItem label="filled" action="ViewFilled"/>
+	</Menu>
+	
+	
+	<TabbedPanel id="cards">
+	    <BorderPanel title="basicPlot">
+		<Center>
+		    <Insert id="basicController" source="BasicPlot"/>
+		</Center>
+	    </BorderPanel>
+	    <BorderPanel title="mesh2plusTime">
+		<Center>
+		    <Insert id="mesh2Controller" source="Mesh2plusTime"/>
+		</Center>
+	    </BorderPanel>
+	</TabbedPanel>
+
+    </Frame>
+</Application>

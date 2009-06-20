@@ -1,0 +1,56 @@
+<StandardColors>
+
+ <ColorDef name="BLACK"          value="#000000"/>
+ <ColorDef name="WHITE"          value="#ffffff"/>
+ <ColorDef name="RED"            value="#ff0000"/>
+ <ColorDef name="GREEN"          value="#00ff00"/>
+ <ColorDef name="BLUE"           value="#0000ff"/>
+ <ColorDef name="YELLOW"         value="#ffff00"/>
+ <ColorDef name="MAGENTA"        value="#ff00ff"/>
+ <ColorDef name="CYAN"           value="#00ffff"/>
+ <ColorDef name="GRAY"           value="#c3c3c3"/>
+ <ColorDef name="NEARGRAY"       value="#b9b9b9"/>
+ <ColorDef name="MEDIUMMAGENTA"  value="#a000a0"/>
+ <ColorDef name="PURPLE"         value="#983aba"/>
+ <ColorDef name="LIGHTBLUE"      value="#3737df"/>
+ <ColorDef name="COCOMACBLUE"    value="#7795c4"/>
+ <ColorDef name="VERYLIGHTBLUE"  value="#9696ff"/>
+ <ColorDef name="PALEYELLOW"     value="#ffffa0"/>
+ <ColorDef name="MIDRED"         value="#d00000"/>
+ <ColorDef name="MIDGREEN"       value="#00d000"/>
+ <ColorDef name="MIDBLUE"        value="#0000d0"/>
+ <ColorDef name="LIGHTGRAY"      value="#dedede"/>
+ <ColorDef name="DARKGRAY"       value="#646464"/>
+ <ColorDef name="MIDGRAY"        value="#969696"/>
+ <ColorDef name="VERYDARKGRAY"   value="#1d1d1d"/>
+ <ColorDef name="FAIRLYDARKGRAY" value="#414141"/>
+ <ColorDef name="MIDYELLOW"      value="#dddd00"/>
+ <ColorDef name="DARKYELLOW"     value="#b8b800"/>
+ <ColorDef name="ORANGE"         value="#ffb400"/>
+ <ColorDef name="DARKORANGE"     value="#dc9600"/>
+ <ColorDef name="BRIGHTORANGE"   value="#ffd200"/>
+ <ColorDef name="DARKGREEN"      value="#0a700a"/>
+ <ColorDef name="LIGHTGREEN"     value="#50ff50"/>
+ <ColorDef name="DARKRED"        value="#700a0a"/>
+ <ColorDef name="DARKBLUE"       value="#0a0a70"/>
+ <ColorDef name="DARKGREEN"      value="#006400"/>
+ <ColorDef name="MIDGREEN"       value="#00b400"/>
+ <ColorDef name="MEDIUMGREEN"    value="#00b400"/>
+ <ColorDef name="MEDIUMRED"      value="#b40000"/>
+ <ColorDef name="MEDIUMBLUE"     value="#0000b4"/>
+ <ColorDef name="STEELBLUE"      value="#a899c8"/>
+ <ColorDef name="PINK"           value="#fa506d"/>
+ <ColorDef name="DARKPINK"       value="#782837"/>
+ <ColorDef name="PALEPINK"       value="#ff9292"/>
+ <ColorDef name="BROWN"          value="#773b17"/>
+ <ColorDef name="DARKBROWN"      value="#4f280f"/>
+ <ColorDef name="BUFF"           value="#b8aa7f"/>
+ <ColorDef name="DARKBUFF"       value="#90825d"/>
+ <ColorDef name="CCMBGREEN"      value="#719874"/>
+ <ColorDef name="DELTACOL"       value="#010101"/>
+ <ColorDef name="SPATCHBG"       value="#d9d9c5"/>
+ <ColorDef name="SPATCHCANVAS"   value="#d4d4c1"/>
+ <ColorDef name="BACKGROUND"     value="-1"/>
+
+</StandardColors>
+

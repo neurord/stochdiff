@@ -1,0 +1,21 @@
+
+<AutonomousDialog title="Name for the new item"  backgroundColor="#f0f0f0"> 
+
+    <BorderPanel prefWidth="260" prefHeight="100" xspace="2" yspace="6" borderWidth="10">
+	
+	<Center>
+	       	<InfoPanel id="info" prefWidth="240" prefHeight="50" borderWidth="6"/>
+      </Center>
+	
+	 
+	
+	<South>
+	    <RightFlowPanel>
+		<Button label="Yes" action="yes" borderWidth="2" xPadding="6" yPadding="3"/>
+		<Button label="Cancel" action="cancel" borderWidth="2" xPadding="6" yPadding="3"/>
+	    </RightFlowPanel>
+	</South>
+    </BorderPanel>
+
+</AutonomousDialog>
+

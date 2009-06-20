@@ -1,0 +1,318 @@
+
+
+
+
+   public final void drawGrid (Graphics g, Color cgrid) {
+      int xx, yy, powten, ii, off, i0, i1;
+      double dx, dy, log;
+      String lab;
+      
+
+      if (boundaryStyle == NONE) {
+
+      } else if (boundaryStyle == LINE) {
+         g.setColor (bgColor.darker());
+         g.drawRect (0, 0, width-1, height-1);
+
+      } else if (boundaryStyle == GROOVE) {
+         g.setColor (bgColor.brighter());
+         if (BoW) bwOnly(g);
+         g.drawRect (0, 0, width-1, height-1);
+         g.drawRect (1, 1, width-3, height-3);
+         g.setColor (bgColor.darker());
+         if (BoW) bwOnly(g);
+         g.drawRect (0, 0, width-2, height-2);
+      }
+
+
+
+      Color axisColor = (grey ? bgColor.brighter() : fgColor);
+      g.setColor (axisColor); 
+      
+      int hmb = height - bottomMargin;
+      int wmr = width - rightMargin;
+
+      if (xVisible) {
+	 if (forceGrid) {
+	    dx = gridDx;
+	 } else {
+	    dx = 1.5 / n_tickx * (2. * hx / dpdwx);
+	    log = Math.log (dx) / Math.log(10.); 
+	    powten = (int) Math.floor(log);
+	    int iiind = (int) (2.999 * (log - powten));
+	    if (iiind < 0 || iiind >= 3) {
+	       Sp ("error gdc, 650: " + log + " " + powten + 
+		    " " + iiind);
+	       iiind = 2;
+	    }
+	    ii = intervals[iiind]; 
+	    dx = Math.pow(10.0, (double) powten) * ii;
+	    dx = dx  / tickGridx;
+	 }
+	 if (dx * dpdwx > 5) {
+	    
+	    g.setColor(cgrid);
+	    i0 = (int) (0.5 + (wcx - hx/dpdwx) / dx); 
+	    i1 = (int) ((wcx + hx/dpdwx) / dx);
+	    for (int i = i0; i <= i1; i++) {
+	       xx = (int) (pcx + (int) (dpdwx * (i * dx - wcx)));
+	       g.drawLine (xx, topMargin, xx, hmb);
+	    }
+	 }
+      }
+      
+
+      if (yVisible) {
+	 if (forceGrid) {
+	    dy = gridDy;
+	 } else {
+	    dy = 1.5 / n_ticky * (2. * hy / dpdwy);
+	    log = Math.log (dy) / Math.log(10.); 
+	    powten = (int) Math.floor(log);
+            int ival = (int) (2.999 * (log - powten));
+            if (ival >= 0 && ival < intervals.length) {
+               ii = intervals[ival];
+               dy = Math.pow(10.0, (double) powten) * ii;
+               dy = dy  / tickGridy;
+            } else {
+               System.out.println("ERROR - grid step out of range. dy=" + dy +
+                                  " hy=" + hy + " dpdwy=" + dpdwy);
+               dy = gridDy;
+            }	    
+	 }
+	 if (dy * dpdwy > 5) {
+	    g.setColor(cgrid);
+	    i0 = (int) (0.5 + (wcy - hy/dpdwy) / dy); 
+	    i1 = (int) ((wcy + hy/dpdwy) / dy);
+	    for (int i = i0; i <= i1; i++) {
+	       yy = (int) (height - (pcy + (int) (dpdwy * (i * dy - wcy))));
+	       g.drawLine (leftMargin, yy, wmr, yy);
+	    }
+	 }
+      }
+      g.setColor (fgColor);      
+   } 
+
+   
+
+
+
+
+   public final static String integerPad (int i, int n) {
+      String s = "00000000" + i;
+      int l = s.length();
+      return s.substring (l-n, l);
+   }
+
+   
+   public final void setAxisLabels(String sx, String sy) {
+      labX = sx;
+      labY = sy;
+   }
+   public final void drawScrollBars(Graphics g) {
+
+      double[] rv = getRange();
+      double[] rd = new double[4];
+      rd[0] = vxmin;
+      rd[1] = vxmax;
+      rd[2] = vymin;
+      rd[3] = vymax;
+      
+      double[] re = new double[4];
+      for (int i = 0; i < 4; i++) re[i] = rd[i];
+      if (rv[0] < re[0]) re[0] = rv[0];
+      if (rv[1] > re[1]) re[1] = rv[1];
+      if (rv[2] < re[2]) re[2] = rv[2];
+      if (rv[3] > re[3]) re[3] = rv[3];
+
+      Color c = Color.gray;
+      // data relative to max relavent space;
+      double fa = (rd[0] - re[0]) / (re[1] - re[0]);
+      double fb = (rd[1] - re[0]) / (re[1] - re[0]);
+      isbpos[0] = 10 + (int) (fa * (imw-10));
+      isbpos[1] = 10 + (int) (fb * (imw-10));
+      //      oneScrollBar (g, c, isbpos[0], imh-5, isbpos[1] - isbpos[0], 5);
+
+
+      fa = (rd[2] - re[2]) / (re[3] - re[2]);
+      fb = (rd[3] - re[2]) / (re[3] - re[2]);
+      isbpos[4] = imh - 10 - (int) (fb * (imh-10));
+      isbpos[5] = imh - 10 - (int) (fa * (imh-10));
+      //      oneScrollBar (g, c, 0, isbpos[4], 5, isbpos[5]- isbpos[4]); 
+
+
+      fa = (rv[0] - re[0]) / (re[1] - re[0]);
+      fb = (rv[1] - re[0]) / (re[1] - re[0]);
+      isbpos[2] = 10 + (int) (fa * (imw-10));
+      isbpos[3] = 10 + (int) (fb * (imw-10));
+      oneScrollBar (g, c, isbpos[2], imh-9, isbpos[3] - isbpos[2], 8); 
+
+
+      fa = (rv[2] - re[2]) / (re[3] - re[2]);
+      fb = (rv[3] - re[2]) / (re[3] - re[2]);
+      isbpos[6] = imh - 11 - (int) (fb * (imh-11));
+      isbpos[7] = imh - 11 - (int) (fa * (imh-11));
+      oneScrollBar (g, c, 0, isbpos[6], 8, isbpos[7] - isbpos[6]); 
+
+      sbviews[0] = rd;
+      sbviews[1] = rv;
+      sbviews[2] = re;
+
+   }
+
+
+   private final boolean scrollBarOn() {
+      int x = ms.px;
+      int y = ms.py;
+      // see if we are near enough any scroll bar to care.
+      int[] ii = isbpos;
+      int io = 0;
+      int id = -1;
+      int p = 10;
+      if (y > imh-12 && y < imh-3) {
+	 if      (x > ii[2]+p && x < ii[3]-p) {id = 4; io=x-(ii[2]+ii[3])/2;} 
+	 else if (x < ii[2]+p && x > ii[2]-p) {id = 3; io = x - ii[2]; }
+	 else if (x > ii[3]-p && x < ii[3]+p) {id = 5; io = x - ii[3]; }
+
+      } else if (y > imh - 7) {
+	/*
+	 if      (x > ii[0]+p && x < ii[1]-p) {id = 1; io=x-(ii[0]+ii[1])/2; }
+	 else if (x < ii[0]+p && x > ii[0]-p) {id = 0; io = x - ii[0]; }
+	 else if (x > ii[1]-p && x < ii[1]+p) {id = 2; io = x- ii[1]; }
+        */
+      } else if (x > 3 && x < 12) {
+	 if      (y > ii[6]+p && y < ii[7]-p) {id = 10;io=y-(ii[6]+ii[7])/2;} 
+	 else if (y < ii[6]+p && y > ii[6]-p) {id = 9; io = y-ii[6]; }
+	 else if (y > ii[7]-p && y < ii[7]+p) {id = 11;io = y-ii[7]; }
+
+      } else if (x < 7) {
+	/*
+	 if      (y > ii[4]+p && y < ii[5]-p) {id = 7; io=y-(ii[4]+ii[5])/2;} 
+	 else if (y < ii[4]+p && y > ii[4]-p) {id = 6; io = y-ii[4]; }
+	 else if (y > ii[5]-p && y < ii[5]+p) {id = 8; io = y-ii[5]; }
+	 */
+      }	 
+      
+      isbdrag = id;
+      isboff = io;
+      return (isbdrag >= 0);
+   }
+
+
+   public final void scrollBarDrag() {
+      int x = ms.px;
+      int y = ms.py;
+      if (isbdrag < 0) return;
+      double fx = (x - isboff - 10.) / (imw - 10.);      
+      double fyd = (y + isboff - 10.) / (imh - 10.);
+      double fy = 1. - fyd;
+
+      double[] rd = sbviews0[0];
+      double[] rv = sbviews0[1];
+      double[] re = sbviews0[2];
+      
+      if (isbdrag == 0) setXrange (rd[0] + fx * (rv[0] - rd[0]), rv[1]);
+      if (isbdrag == 1) {
+	 double xc = re[1] + fx * (re[0]-re[1]);
+	 double dx = rv[1] - rv[0];
+	 setXrange (xc - 0.5 * dx, xc + 0.5 * dx);
+      }
+      if (isbdrag == 2) setXrange (rv[0], rv[1] + fx * (rd[1] - rv[1]));
+
+
+
+      if (isbdrag == 3) setXrange (re[0] + fx * (re[1] - re[0]), rv[1]);
+      if (isbdrag == 4) {
+	 double xc = re[0] + fx * (re[1]-re[0]);
+	 double dx = rv[1] - rv[0];
+	 setXrange (xc - 0.5 * dx, xc + 0.5 * dx);
+      }
+      if (isbdrag == 5) setXrange (rv[0], re[0] + fx * (re[1] - re[0]));
+
+
+
+      if (isbdrag == 6) setYrange (rv[2], rv[3] + fy * (rd[3] - rv[3]));
+      if (isbdrag == 7) {
+	 double yc = re[3] + fy * (re[2]-re[3]);
+	 double dy = rv[3] - rv[2];
+	 setYrange (yc - 0.5 * dy, yc + 0.5 * dy);
+      }
+      if (isbdrag == 8) setYrange (rd[2] + fy * (rv[2] - rd[2]), rv[3]);
+
+
+
+
+      if (isbdrag == 9) setYrange (rv[2], re[2] + fy * (re[3] - re[2]));
+      if (isbdrag == 10) {
+	 double yc = re[2] + fy * (re[3]-re[2]);
+	 double dy = rv[3] - rv[2];
+	 setYrange (yc - 0.5 * dy, yc + 0.5 * dy);
+      }
+      if (isbdrag == 11) setYrange (re[2] + fy * (re[3] - re[2]), rv[3]);
+
+
+
+   }
+
+
+
+
+   private final void oneScrollBar(Graphics g, Color c, 
+				   int ix, int iy, int w, int h) {
+
+      if (ix + w > imw-2) w = imw-2 - ix;
+      if (iy < 1) iy = 1;
+      if (h > imh - 11) h = imh-11;
+      if (w < 2 || h  < 2) return;
+
+      g.setColor (c);
+      g.fillRect (ix, iy, w, h);
+
+      g.setColor(c.brighter());
+      g.drawLine (ix, iy, ix+w, iy);
+      g.drawLine (ix, iy, ix, iy+h);
+      
+      g.setColor(c.darker());
+      g.drawLine (ix+w, iy, ix+w, iy+h);
+      g.drawLine (ix, iy+h, ix+w, iy+h);
+   }
+
+
+
+  public final double[] getGridSpacing() {
+     double[] dd = {gridDx, gridDy};
+     if (!forceGrid) {
+	double dx = 1.5 / n_tickx * (2. * hx / dpdwx);
+	double log = Math.log (dx) / Math.log(10.); 
+	int powten = (int) Math.floor(log);
+	int ii = intervals[(int) (2.999 * (log - powten))]; 
+	dx = Math.pow(10.0, (double) powten) * ii;
+	double gx = dx  / tickGridx;
+	
+	double dy = 1.5 / n_ticky * (2. * hy / dpdwy);
+	log = Math.log (dy) / Math.log(10.); 
+	powten = (int) Math.floor(log);
+	ii = intervals[(int) (2.999 * (log - powten))]; 
+	dy = Math.pow(10.0, (double) powten) * ii;
+	double gy = dy  / tickGridy;
+	dd[0] = gx;
+	dd[1] = gy;
+     }
+     return dd;
+  }
+
+
+
+
+   public final void drawRule (Graphics g, int ix, int iy, 
+				  int w, int h, Color col) { 
+      g.setColor(col);
+      if (BoW) bwOnly(g);
+      for (int i = 0; i < h; i++) g.drawLine (ix, iy+i, ix+w, iy+i);
+      g.setColor(col.darker());
+      if (BoW) bwOnly(g);
+      g.drawLine (ix, iy+h, ix+w, iy+h);
+      g.setColor(col.brighter());
+      if (BoW) bwOnly(g);
+      g.drawLine (ix, iy-1, ix+w, iy-1);
+   }

@@ -1,0 +1,5 @@
+<Type id="Shape" 
+      peer="Shape">
+    <info>about shape type - ref to class shape</info>
+
+</Type>

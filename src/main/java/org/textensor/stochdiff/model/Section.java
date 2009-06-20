@@ -8,5 +8,6 @@ public class Section {
 
     public String regionClass;
 
+    public String label;
 
 }

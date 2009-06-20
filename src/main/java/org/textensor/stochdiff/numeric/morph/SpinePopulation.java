@@ -3,13 +3,15 @@ package org.textensor.stochdiff.numeric.morph;
 
 public class SpinePopulation {
 
+    String id;
     SpineProfile profile;
     String targetRegion;
     double density;
 
 
 
-    public SpinePopulation(SpineProfile sp, String tgt, double d) {
+    public SpinePopulation(String sid, SpineProfile sp, String tgt, double d) {
+        id = sid;
         profile = sp;
         targetRegion = tgt;
         density = d;
@@ -28,5 +30,8 @@ public class SpinePopulation {
         return density;
     }
 
+    public String getID() {
+        return id;
+    }
 
 }

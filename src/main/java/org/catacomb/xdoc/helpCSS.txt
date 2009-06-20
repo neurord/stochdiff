@@ -1,0 +1,102 @@
+
+body {
+      font-family: Verdana, Arial, sans-serif; 
+      font-size : 11pt; 
+      color : #404040; 
+      margin-top : 0px; 
+      margin-left : 5px;
+      background-color : #f8f8f8;
+}
+
+
+h1 {
+  font-size : 14pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+
+h2 {
+  font-size : 12pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+h3 {
+  font-size : 11pt;
+  font-weight : bold;
+  padding-top : 2px;
+  padding-bottom : 2px;
+} 
+
+h3.indent {
+  padding-left : 16px;
+} 
+
+
+
+p {
+  padding-top : 0px;
+  padding-bottom : 5px;
+}
+
+p.indent {
+  padding-left : 16px;
+  padding-top : 0px;
+  padding-bottom : 5px;
+}
+
+
+
+p.meta {
+  padding-top : 0px;
+  padding-bottom : 5px;
+  color : orange;
+  font-style : italic;
+}
+
+
+p.warning {
+  padding-top : 0px;
+  padding-bottom : 5px;
+  color : #800000;
+}
+
+
+a {
+  color : #0000f0;
+  text-decoration : underline;
+}
+
+a.crumb {
+     font-size : 8pt;
+     color : #808080; 
+}	
+
+
+table.hashmap {
+   border-width: 1px;
+   border-style: solid;
+   border-color: #a0a0a0;
+}
+
+td.hashmapkey { 
+   background-color : #f8f8f8;
+   text-align : left;
+   color : #606060;
+   padding-left : 4px;
+   padding-right : 4px;
+   padding-top : 2px;
+   padding-bottom : 2px;
+}
+
+td.hashmapvalue {
+   background-color : #f8f8f8;
+   text-align : left;
+   padding-left : 4px;
+   padding-right : 4px;
+   padding-top : 2px;
+   padding-bottom : 2px;
+}

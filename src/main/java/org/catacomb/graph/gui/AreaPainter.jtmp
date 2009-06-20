@@ -1,0 +1,650 @@
+package org.enorg.visua.twod;
+
+
+
+
+import java.awt.*;
+
+
+final class AreaPainter {
+
+
+
+   
+
+   private boolean myDimError (double[][] d2, int npoint) {
+      boolean err = false;
+      if (npoint > d2[0].length) {
+	 Sp ("gdc error: array overrun in drawXYZRPtree " + 
+			     " npoint=" + npoint + "  data length= " 
+			     + d2[0].length);
+	 err = true;
+      }
+      return err;
+   }
+
+   private void fillTaperedArea(Graphics g, double x0, double y0,
+				double x1, double y1,
+				double r0, double r1) {
+      double[] xol = new double[5];
+      double[] yol = new double[5];
+
+      double vy = x1 - x0;
+      double vx = -(y1 - y0);
+      double vl = Math.sqrt (vx * vx + vy * vy);
+      if (vl <= 0.0) vl = 1.e-6;
+      vx /= vl;
+      vy /= vl;
+
+      xol[0] = x0 - r0 * vx;  yol[0] = y0 - r0 * vy;
+      xol[1] = x1 - r1 * vx;  yol[1] = y1 - r1 * vy;  
+      xol[2] = x1 + r1 * vx;  yol[2] = y1 + r1 * vy;  
+      xol[3] = x0 + r0 * vx;  yol[3] = y0 + r0 * vy;  
+      xol[4] = xol[0]; yol[4] = yol[0];
+      fillPolygon (g, xol, yol, 5);
+   }
+
+
+
+
+
+   final void drawXYZRPtreeDGA (Graphics g, int npoint, double[][] d2) {
+     double[] x = d2[0];
+     double[] y = d2[1];
+     double[] r = d2[3];
+     double[] dip = d2[4];
+     if (myDimError (d2, npoint)) return;
+
+     // draw as a dendrogram;
+     for (int i = 0; i < npoint; i++) {
+	int ip = (int) (dip[i] + 0.01);
+	if (ip >= 0 && ip < npoint) {
+	   drawLine (g, x[ip], y[ip], x[ip], y[i]);
+	   fillTaperedArea (g, x[ip], y[i], x[i], y[i], r[i], r[i]);
+	}
+     }
+  }
+
+
+
+
+
+   final void drawXYZRPtreeDG (Graphics g, int npoint, double[][] d2) {
+     double[] x = d2[0];
+     double[] y = d2[1];
+     double[] dip = d2[4];
+     if (myDimError (d2, npoint)) return;
+
+     for (int i = 0; i < npoint; i++) {
+	int ip = (int) (dip[i] + 0.01);
+	if (ip >= 0 && ip < npoint) {
+	   drawLine (g, x[ip], y[ip], x[ip], y[i]);
+	   drawLine (g, x[ip], y[i], x[i], y[i]);
+	}
+     }
+  }
+
+
+   final void drawXYZRPtree (Graphics g, int npoint, double[][] d2) {
+     double[] x = d2[0];
+     double[] y = d2[1];
+     double[] dip = d2[4];
+     if (myDimError (d2, npoint)) return;
+
+     for (int i = 0; i < npoint; i++) {
+	int ip = (int) (dip[i] + 0.01);
+	if (ip >= 0 && ip < npoint) {
+	   drawLine (g, x[ip], y[ip], x[i], y[i]);
+	}
+     }
+  }
+
+
+   final void drawXYZRPtreeA (Graphics g, int npoint, double[][] d2) {
+    double[] x = d2[0];
+    double[] y = d2[1];
+    double[] r = d2[3];
+    double[] dip = d2[4];
+    if (myDimError (d2, npoint)) return;
+    
+    // draw as a dendrogram;
+    for (int i = 0; i < npoint; i++) {
+      int ip = (int) (dip[i] + 0.01);
+      if (ip >= 0 && ip < npoint) {
+	fillTaperedArea (g, x[ip], y[ip], x[i], y[i], r[ip], r[i]);
+      }
+    }
+  }
+						     
+						     
+						     
+						     
+
+   // stuff to do with info messages  - see also addClickablePoint 
+    final void setInfoText (String s) {  infoText = s; }
+   
+    final String getInfoText () { return infoText; }
+   
+
+
+
+
+
+    final void fillTriangle (Graphics g, double xa, double ya, 
+				   double xb, double yb, 
+				   double xc, double yc) {
+      int[] ix = new int[3];
+      int[] iy = new int[3];
+      
+      ix[0] = powx(xa);
+      iy[0] = powy(ya);
+      ix[1] = powx(xb);
+      iy[1] = powy(yb);
+      ix[2] = powx(xc);
+      iy[2] = powy(yc);
+
+      int wp = width + 200;
+      int hp = height + 200;
+
+      for (int i = 0; i < 3; i++) {
+	 ix[i] = (ix[i] < -200 ? -200 : ix[i]); 
+	 ix[i] = (ix[i] > wp   ?   wp : ix[i]); 
+	 iy[i] = (iy[i] < -200 ? -200 : iy[i]); 
+	 iy[i] = (iy[i] > hp   ?   hp : iy[i]); 
+      }
+      if (BoW) bwOnly(g);
+      g.fillPolygon (ix, iy, 3);
+   }
+
+
+
+
+
+
+
+    final void fillRect (Graphics g, double x0, double y0,
+			       double x1, double y1) {
+      int ix, iy, w, h;
+      ix = powx (x0);
+      iy = powy (y1);
+      w = powx(x1) - ix;
+      h = powy (y0) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+
+      if (BoW) bwOnly(g);
+      g.fillRect (ix, iy, w, h);
+   }
+
+    final void drawRect (Graphics g, double x0, double y0,
+			       double x1, double y1) {
+      int ix, iy, w, h; 
+      ix = powx (x0); iy = powy (y1); w = powx(x1) - ix; h = powy (y0) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.drawRect (ix, iy, w, h);
+   }
+
+    final void drawRect (Graphics g, double[] xyxy) {
+      int ix, iy, w, h; 
+      ix = powx (xyxy[0]); iy = powy (xyxy[3]); 
+      w = powx(xyxy[2]) - ix; h = powy (xyxy[1]) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.drawRect (ix, iy, w, h);
+   }
+
+
+    final void drawPaddedRect (Graphics g, double[] xyxy, 
+				     int padx, int pady) {
+      int ix, iy, w, h; 
+      ix = powx (xyxy[0]); iy = powy (xyxy[3]); 
+      w = powx(xyxy[2]) - ix; h = powy (xyxy[1]) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.drawRect (ix-padx, iy-pady, w+2*padx, h+2*pady);
+   }
+
+
+
+
+    final void drawOval (Graphics g, double x0,double y0,
+			       double x1,double y1) {
+      int ix, iy, w, h; 
+      ix = powx (x0); iy = powy (y1); w = powx(x1) - ix; h = powy (y0) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.drawOval (ix, iy, w, h);
+   }
+    final void fillOval (Graphics g, double x0,double y0,
+			       double x1,double y1) {
+      int ix, iy, w, h; 
+      ix = powx (x0); iy = powy (y1); w = powx(x1) - ix; h = powy (y0) - iy;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.fillOval (ix, iy, w, h);
+   }
+
+
+    final void fillOval (Graphics g, double x0,double y0, 
+			       int hw, int hh) {
+      int ix, iy, w, h; 
+      ix = powx (x0) - hw; iy = powy (y0)-hh; 
+      if (BoW) bwOnly(g);
+      g.fillOval (ix, iy, 2*hw, 2*hh);
+   }
+
+    final void drawOval (Graphics g, double x0,double y0, 
+			       int hw, int hh) {
+      int ix, iy, w, h; 
+      ix = powx (x0) - hw; iy = powy (y0)-hh; 
+      if (BoW) bwOnly(g);
+      g.drawOval (ix, iy, 2*hw, 2*hh);
+   }
+
+
+
+    final void drawCircle (Graphics g, double x0, double y0, double r) {
+
+      int   px0, py0, px1, py1;
+      px0 = powx(x0-r);
+      px1 = powx(x0+r);
+      py0 = powy(y0+r);
+      py1 = powy(y0-r);
+      if (BoW) bwOnly(g);
+      g.drawOval (px0, py0, px1-px0, py1-py0);  
+   }
+
+
+    final void fillCircle (Graphics g, double x0, double y0, double r) {
+
+      int   px0, py0, px1, py1;
+      px0 = powx(x0-r);
+      px1 = powx(x0+r);
+      py0 = powy(y0+r);
+      py1 = powy(y0-r);
+      if (BoW) bwOnly(g);
+      g.fillOval (px0, py0, px1-px0, py1-py0);  
+   }
+
+
+
+
+
+    final void drawRoundRect (Graphics g, double x0,double y0,
+			      double x1,double y1, double x2, double y2) {
+      int ix, iy, w, h, irx, iry; 
+      ix = powx (x0); iy = powy (y1); 
+      w = powx(x1) - ix; h = powy (y0) - iy;
+      irx = powx(x2) - ix; iry = powy (y2) - powy(y0);
+      if (irx < 0) irx = -irx;
+      if (iry < 0) iry = -iry;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.drawRoundRect (ix, iy, w, h, irx, iry);
+   }
+
+    final void fillRoundRect (Graphics g, double x0,double y0,
+			      double x1,double y1, double x2, double y2) {
+      int ix, iy, w, h, irx, iry; 
+      ix = powx (x0); iy = powy (y1); 
+      w = powx(x1) - ix; h = powy (y0) - iy;
+      irx = powx(x2) - ix; iry = powy (y2) - powy(y0);
+      if (irx < 0) irx = -irx;
+      if (iry < 0) iry = -iry;
+      if (w < 0) ix -= (w = -w); if (h < 0) iy -= (h = -h); 
+      if (BoW) bwOnly(g);
+      g.fillRoundRect (ix, iy, w, h, irx, iry);
+   }
+
+
+
+
+   
+    final void fill3DRect (Graphics g, double x0,double y0,
+			   double x1,double y1, int idepth) {
+      int ix, iy, w, h;
+      ix = powx (x0);
+      iy = powy (y1);
+      w = powx(x1) - ix;
+      h = powy (y0) - iy;
+      g.fillRect (ix, iy, w, h);
+      if (h > idepth) {
+	 g.setColor (g.getColor().darker());
+	if (BoW) bwOnly(g);
+	 for (int i = 0; i < idepth; i++) {
+	    g.drawLine (ix+w+i, iy+i, ix+w+i, iy+h-1);
+	 }
+      }
+   }
+
+
+
+
+    final void fillCenteredOval (Graphics g, double xc, double yc, 
+				double rx, double ry) {
+      int ix = powx(xc-rx);
+      int iy = powy(yc+ry);
+      int w = powx(xc+rx) - ix;
+      int h = powy(yc-ry) - iy;
+      if (w < 0) w = -w;
+      if (h < 0) h = -h;
+      if (BoW) bwOnly(g);
+      g.fillOval (ix, iy, w, h);
+   }
+
+
+    final void drawCenteredOval (Graphics g, double xc, double yc, 
+				double rx, double ry) {
+      int ix = powx(xc-rx);
+      int iy = powy(yc+ry);
+      int w = powx(xc+rx) - ix;
+      int h = powy(yc-ry) - iy;
+      if (w < 0) w = -w;
+      if (h < 0) h = -h;
+      if (BoW) bwOnly(g);
+      g.drawOval (ix, iy, w, h);
+   }
+
+
+
+
+
+
+    final void fillCenteredOval (Graphics g, double xc, double yc,
+				 int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+	if (BoW) bwOnly(g);
+      g.fillOval (ix-w/2, iy-h/2, w, h);
+   }
+   
+   
+
+    final void fillCenteredRect (Graphics g, double xc, double yc,
+				       double w, double h) {
+      int ix, iy;
+      int ixa = powx(xc-0.5*w);
+      int ixb = powx(xc+0.5*w);
+      int iya = powy(yc+0.5*h);
+      int iyb = powy(yc-0.5*h);
+      
+	if (BoW) bwOnly(g);
+      g.fillRect (ixa, iya, ixb-ixa, iyb-iya);
+   }
+
+
+    final void drawCenteredRect (Graphics g, double xc, double yc,
+				       double w, double h) {
+      int ix, iy;
+      int ixa = powx(xc-0.5*w);
+      int ixb = powx(xc+0.5*w);
+      int iya = powy(yc+0.5*h);
+      int iyb = powy(yc-0.5*h);
+      
+	if (BoW) bwOnly(g);
+      g.drawRect (ixa, iya, ixb-ixa, iyb-iya);
+   }
+
+
+
+
+
+    final void fillCenteredRect (Graphics g, double xc, double yc,
+				 int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+	if (BoW) bwOnly(g);
+      g.fillRect (ix-w/2, iy-h/2, w, h);
+   }
+   
+   
+    final void fillOffsetCenteredOval (Graphics g, double xc, double yc,
+				       int ox, int oy, int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+	if (BoW) bwOnly(g);
+      g.fillOval (ix-w/2 + ox, iy-h/2 + oy, w, h);
+   }
+
+    final void fillOffsetCenteredRect (Graphics g, double xc, double yc,
+				       int ox, int oy, int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+	if (BoW) bwOnly(g);
+      g.fillRect (ix-w/2 + ox, iy-h/2 + oy, w, h);
+   }
+
+
+    final void fillVectorOffsetOval (Graphics g, double xc, double yc,
+				     double dx, double dy, int d, int r) {
+      int ix, iy, ix1, iy1;
+      ix = powx(xc);
+      iy = powy(yc);
+      ix1 = powx(xc + dx);
+      iy1 = powy(yc + dy);
+      
+      double dl = Math.sqrt ((ix1-ix)*(ix1-ix) + (iy1-iy)*(iy1-iy));
+      double f = (dl > 0.0 ? d / dl : 0.0);
+      ix = powx(xc + f * dx);
+      iy = powy(yc + f * dy);
+
+      if (BoW) bwOnly(g);
+      g.fillOval (ix-r/2, iy-r/2, r, r);
+   }
+   
+   
+   
+    final void drawCenteredOval (Graphics g, double xc, double yc,
+				 int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+      if (BoW) bwOnly(g);
+      g.drawOval (ix-w/2, iy-h/2, w, h);
+   }
+   
+    final void drawCenteredRect (Graphics g, double xc, double yc,
+				 int w, int h) {
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+      if (BoW) bwOnly(g);
+      g.drawRect (ix-w/2, iy-h/2, w, h);
+   }
+   
+
+
+    final void drawIntegerLineAt (Graphics g, double xc, double yc,
+				  int[] ixa, int[] iya, int n) {
+      
+      int ix, iy;
+      ix = powx(xc);
+      iy = powy(yc);
+      int[] ixt = new int[n];
+      int[] iyt = new int[n];
+      for (int i = 0; i < n; i++) {
+	 ixt[i] = ix + ixa[i];
+	 iyt[i] = iy - iya[i];
+      }
+
+      if (BoW) bwOnly(g);
+      g.drawPolyline (ixt, iyt, n);
+   }
+
+
+
+  final void fillRect (Graphics g, int px0, int py0, 
+			      int px1, int py1) { 
+     py0 = imh - py0;
+     py1 = imh - py1;
+      if (BoW) bwOnly(g);
+     g.fillRect (px0, py0, px1-px0, py1-py0);
+  }
+
+
+
+
+
+    final void fillPolygon (Graphics g, double[] x, double[] y) {
+      fillPolygon(g, x, y, x.length);
+   }
+
+    final void fillPolygon (Graphics g, double[] x, double[] y, int np) {
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      
+      for (int i = 0; i < np; i++) {
+	 ix[i] = powx(x[i]);
+	 iy[i] = powy (y[i]);
+      }
+      if (BoW) bwOnly(g);
+      g.fillPolygon (ix, iy, np);
+   }
+
+
+
+    final void fillOffsetScaledPolygon (Graphics g, 
+					      double xoff, double yoff,
+					      double xscl, double yscl, 
+					      double[] x, double[] y) {
+      fillScaledOffsetPolygon(g, xoff, yoff, xscl, yscl, x, y, x.length);
+   }
+
+    final void fillScaledOffsetPolygon (Graphics g, 
+					      double xoff, double yoff,
+					      double xscl, double yscl,
+					      double[] x, double[] y, int np) {
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      
+      for (int i = 0; i < np; i++) {
+	 ix[i] = powx(xoff + xscl * x[i]);
+	 iy[i] = powy(yoff + yscl * y[i]);
+      }
+      if (BoW) bwOnly(g);
+      g.fillPolygon (ix, iy, np);
+   }
+
+
+
+
+    final void drawPolygon (Graphics g, double[] x, double[] y) {
+      drawPolygon(g, x, y, x.length);
+   }
+
+
+
+
+    final void drawPolygon (Graphics g, double[] x, double[] y, int np) {
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      
+      int xa = -200;
+      int xb = imw + 200;
+      int ya = -200;
+      int yb = imh + 200;
+
+      for (int i = 0; i < np; i++) {
+	 int px = powx(x[i]);
+	 int py = powy(y[i]);
+
+	 ix[i] = (px < xa ? xa : (px > xb ? xb : px));
+	 iy[i] = (py < ya ? ya : (py > yb ? yb : py));
+	 
+      }
+      if (BoW) bwOnly(g);
+      g.drawPolygon (ix, iy, np);
+
+      //      g.drawLine(ix[0], iy[0], ix[np-1], iy[np-1]);
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    final void fillOffsetPolygon (Graphics g, double xoff, double yoff, 
+				 double[] x, double[] y, int np) {
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      
+      for (int i = 0; i < np; i++) {
+	 ix[i] = powx(x[i] + xoff);
+	 ix[i] = (ix[i] < 0      ? 0     : ix[i]); 
+	 ix[i] = (ix[i] > width  ? width : ix[i]); 
+	 
+	 iy[i] = powy (y[i] + yoff);
+	 iy[i] = (iy[i] < 0       ? 0        : iy[i]); 
+	 iy[i] = (iy[i] > height  ? height   : iy[i]); 
+      }
+      if (BoW) bwOnly(g);
+
+      g.fillPolygon (ix, iy, np);
+   }
+
+
+
+
+
+
+    final void fillOffsetScaledPolygon (Graphics g, double fx, double xoff, 
+				       double fy, double yoff, 
+				       double[] x, double[] y, 
+				       int np) {
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      
+      for (int i = 0; i < np; i++) {
+	 ix[i] = powx(fx * x[i] + xoff);
+	 ix[i] = (ix[i] < 0      ? 0     : ix[i]); 
+	 ix[i] = (ix[i] > width  ? width : ix[i]); 
+	 
+	 iy[i] = powy (fy * y[i] + yoff);
+	 iy[i] = (iy[i] < 0       ? 0        : iy[i]); 
+	 iy[i] = (iy[i] > height  ? height   : iy[i]); 
+      }
+      if (BoW) bwOnly(g);
+
+      g.fillPolygon (ix, iy, np);
+   }
+
+
+
+
+
+
+
+
+
+    final void drawSymbol (Graphics g, double x, double y, int[] sx, int[] sy){
+      if (BoW) bwOnly(g);
+      int np = sx.length;
+      
+      int[] ix = new int[np];
+      int[] iy = new int[np];
+      int ox = powx(x);
+      int oy = powy(y);
+      
+      for (int i = 0; i < np; i++) {
+	 ix[i] = ox + sx[i];
+	 iy[i] = oy - sy[i];
+      }
+      g.drawPolyline (ix, iy, np);
+   }
+
+
+
+
+
+}

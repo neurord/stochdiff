@@ -105,9 +105,20 @@ public class SegmentSlicer {
 
                         double distance_over_delta = dab/localDelta; //wk
                         int nadd = (int)distance_over_delta - 1; //wk
+
+                        // RCC  - can resolve bug 2 (23 Feb 09) with round as in
+                        // original - not sure what else it changes
+                        // 	   int nadd = (int)Math.round(distance_over_delta) - 1;
                         /*
                         int nadd = (int)(Math.round(dab / localDelta)) - 1;
                          */
+
+                        if (nadd < 0) {
+                            E.warning("distance between points is smaller than the desired element size " + dab + " " + localDelta + " " +
+                                      cpa + " " + cpb);
+                            nadd = 0;
+                        }
+
 
                         double[] dpos = new double[nadd];
                         if (nadd > 0) {
@@ -223,7 +234,7 @@ public class SegmentSlicer {
         // dont do them in the loop above because it could mess up the search for
         // later ones
         for (TreePoint[] tpa : cns) {
-            E.info("patching in " + tpa[0] + " at " + tpa[1]);
+            E.info("patching in " + tpa[1] + " as child of nearest in parent segment: " + tpa[0]);
             TreePoint.neighborize(tpa[0], tpa[1]);
         }
         outPoints = pr;

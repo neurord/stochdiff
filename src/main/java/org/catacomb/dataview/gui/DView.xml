@@ -1,0 +1,29 @@
+<Application name="DView" controllerClass="DViewController" 
+	     logging="false" stateExposure="false">
+
+    <Frame id="MainFrame" title="DView data vizualization" backgroundColor="#e8e8e4">
+	 
+	<Menu label="file" id="FileMenu">
+	    <MenuItem label="open" action="open"/>
+	    <MenuItem label="reload" action="reload"/>
+	    <Separator/>
+	    <MenuItem label="export..." action="export"/>
+	    <MenuItem label="exit" action="requestExit"/>
+	</Menu>
+		
+	<Menu label="view" id="ViewMenu" action="setViewStyle">
+	    <MenuItem label="outline" action="ViewOutline"/>
+	    <MenuItem label="skeleton" action="ViewSkeleton"/>
+	    <MenuItem label="filled" action="ViewFilled"/>
+	</Menu>
+	
+
+	    <BorderPanel title="basicPlot">
+		<Center>
+		    <Insert id="plotController" source="DViewPlot"/>
+		</Center>
+	    </BorderPanel>
+	    
+
+    </Frame>
+</Application>

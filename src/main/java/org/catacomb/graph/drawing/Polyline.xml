@@ -1,0 +1,5 @@
+ 
+    <Shape xpts="{-1., 0.,  1.}" ypts="{-0.5, 0.5, -0.5}" 
+        curviness="0"
+        closure="open"/>
+  

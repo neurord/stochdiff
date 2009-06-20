@@ -143,6 +143,7 @@ public class DeterministicGridCalc extends BaseCalc {
         while (time < runtime) {
             time += advance(time);
 
+
             iwr += 1;
             if (iwr % 5 == 0) {
                 if (resultWriter != null) {

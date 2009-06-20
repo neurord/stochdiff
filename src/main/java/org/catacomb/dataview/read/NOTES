@@ -1,0 +1,24 @@
+
+
+things to consider:
+
+
+variety of types determined by magic numbers
+"FileType" is wrong because not necesarily files - urls etc and 
+also zips contain multiple types
+zips/jars need a recursive read
+
+read-relative applies to anything
+
+write-relative for files
+
+
+for zips, ok to read whole byte stream at open? - for now: maybe new
+type later for real archives (dont want all in one go)
+
+basic entity is a byte array or a stream?
+
+
+this si all about external resources - what about stuff read from the
+cp?
+

@@ -1,0 +1,19 @@
+<html>
+  <head></head>
+
+  <body>
+
+   <h1>Help Browser</h1>
+
+   <p>
+     If you are seeing this, then something probably 
+     isn't working - this page ought to be replaced 
+     with a more informative one when things start up. 
+
+   </p>
+
+
+
+  </body>
+
+</html>

@@ -1,0 +1,25 @@
+
+<AutonomousDialog title="Note"  backgroundColor="#f0f0f0">
+
+    <BorderPanel prefWidth="300" prefHeight="200" xspace="2" yspace="6" borderWidth="10">
+
+	<North>
+		<Label id="title"/>
+	</North>
+
+	<Center>
+	  <ScrollingInfoPanel id="info" prefWidth="240" prefHeight="200" borderWidth="6"/>
+	</Center>
+
+
+	<South>
+	    <CenterFlowPanel>
+		<Button label="OK" action="OK" borderWidth="2" xPadding="6" yPadding="3"/>
+
+	    </CenterFlowPanel>
+	</South>
+    </BorderPanel>
+
+
+</AutonomousDialog>
+

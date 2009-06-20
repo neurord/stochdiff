@@ -1,0 +1,9 @@
+<AutonomousPanel name="BasicPlot"
+                 controllerClass="BasicPlotController">
+
+    
+    <DataDisplay id="dataDisplay" backgroundColor="#606060"/>
+
+
+</AutonomousPanel>
+	

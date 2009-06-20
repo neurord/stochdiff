@@ -1,0 +1,611 @@
+
+package org.enorg.structure;
+
+public interface AddableTo {
+
+   public void add(Object obj);
+
+}
+
+
+
+package org.enorg.structure;
+
+public interface AttributeAddableTo {
+
+   public void addAttribute(String sn, String sv);
+
+}
+
+
+
+package org.enorg.structure;
+
+public interface Attributed {
+
+   public TypedSet getAttributes();
+
+}
+
+package org.enorg.structure;
+
+
+public interface ChangeNotifiable {
+
+   public void changed(Object src);
+
+}
+
+
+
+package org.enorg.structure;
+
+
+public interface ChangeNotifier {
+
+   
+   public void addChangeNotifiable(ChangeNotifiable cnf);
+
+}
+
+
+
+package org.enorg.structure;
+
+import java.util.*;
+
+public interface DataModelFactory {
+
+
+   public Object newDataModel(String roottype, ArrayList types);
+
+   public Object newType(String id, String[][] saa, ArrayList fields);
+
+   public Object newExternalType(String id, String[][] saa, String src);
+
+   public Object newChoice(String label, String applieswhen, String[] options);
+
+   // hash map for params?
+   public Object newFloat(String label, String applieswhen, 
+			  double initial, double min, double max, String scale, 
+			  String unit, String about);
+
+   
+   
+   public Object newTextLine(String label, String applieswhen);
+
+
+   public Object newSet(String label, String applieswhen, String content, 
+			String sinfo);
+
+
+   public Object newInstance(String label, String applieswhen, String content, 
+			     String sinfo);
+
+
+   public Object newReference(String label, String applieswhen, String target);
+
+
+
+}
+package org.enorg.structure;
+
+public interface DataModelSource {
+
+   /*
+     A datamodel source can create a mirror of itself in some other 
+     set of classes via the mirror method and supplied factory.
+     This lets storage-only data models be decoupled from, say, gui-aware
+     ones.
+   */
+
+   public Object mirror(DataModelFactory dmf);
+
+
+}
+
+package org.enorg.structure;
+
+public interface Elemented {
+
+   public TypedSet getElements();
+
+}
+
+package org.enorg.structure;
+
+public interface FieldValueProvider {
+
+   public Object getFieldValue(String fieldname);
+
+}
+
+
+package org.enorg.structure;
+
+
+public interface GridDataSource {
+
+   public String getName();
+
+   public String[] getLineNames();
+
+   public int getNPoint();
+
+   public int getNLine();
+
+   public double[][] getLines();
+
+   public int getHighlightIndex();
+}
+
+
+package org.enorg.structure;
+
+/** For objects which can contain help text to be presented to the user on 
+ * request. 
+ * The interface includes both get and set methods, although non-mutable
+ * objets, such as self-documenting code modules, will ignore the 
+ * setHelpText call.
+ */
+public interface Helpable {
+
+   public String getHelpText();
+
+   public void setHelpText(String s);
+
+}
+package org.enorg.structure;
+
+
+public interface Increment {
+
+
+}
+
+package org.enorg.structure;
+
+
+public interface Instantiator {
+
+   public final static int HARD = 1;
+   public final static int SOFT = 2;
+
+
+   public void addSearchPackage(String s);
+
+   public Object newInstance(String s);
+
+   public boolean setField(Object parent, String fieldName, Object child);
+ 
+   public Object getField(Object parent, String fieldName);
+
+}
+package org.enorg.structure;
+
+import java.util.*;
+
+
+public interface Iterable {
+
+   public Iterator iterator();
+   
+}
+package org.enorg.structure;
+
+
+public interface MeshBuilder {
+
+
+   public void startMesh();
+
+   public Object newPoint(double x, double y, double z, double r, Object peer);
+
+   public void connectToPeer(Object mp1, Object peer2);
+
+   public Mesh getMesh();
+
+}
+
+package org.enorg.structure;
+
+public interface Mesh {
+
+
+}
+
+package org.enorg.structure;
+
+
+public interface MultiChanneled {
+
+   public int[] getChannels();
+
+}
+
+
+package org.enorg.structure;
+
+
+public interface MultiNamed {
+
+   public String[] getNames();
+}
+
+
+package org.enorg.structure;
+
+
+public interface MultiTimed {
+
+   public double[] getTimes();
+
+}
+
+
+package org.enorg.structure;
+
+public interface Namable extends Named {
+
+   public void setName(String s);
+
+}
+
+
+package org.enorg.structure;
+
+public interface Named {
+
+   public String getName();
+
+}
+package org.enorg.structure;
+
+public interface NameValuePairOnly {
+
+
+   public String getName();
+   
+   public String getValue(); 
+
+
+}
+
+package org.enorg.structure;
+
+public interface PreSaveValidable {
+
+   public void preSaveValidate();
+
+}
+
+package org.enorg.structure;
+
+public interface Primary {
+
+
+}
+
+package org.enorg.structure;
+
+
+
+public interface Progressed {
+
+
+
+   public double getProgress();
+
+
+
+}
+package org.enorg.structure;
+
+
+public interface ProgressReport {
+
+   public void setStarted();
+
+   public void setFraction(double f);
+
+   public void setText(String txt);
+
+
+   public double getFraction();
+
+   public String getText();
+
+   public void update();
+
+   public void setFinished();
+
+}
+package org.enorg.structure;
+
+
+public interface Related {
+
+
+   public Relationship[] getRelationships();
+
+
+}
+package org.enorg.structure;
+
+
+public final class Relationship {
+
+   String type;
+   Related target;
+
+
+   public Relationship(Related tgt, String typ) {
+      type = typ;
+      target = tgt;
+   }
+
+
+   public String getType() {
+      return type;
+   }
+   
+   public Related getTarget() {
+      return target;
+   }
+
+}
+package org.enorg.structure;
+
+
+
+public interface RunTask extends Named, Progressed, Statused {
+
+
+   public Object getTaskSpec();
+
+   
+   public boolean isReady();
+   
+   public boolean isRunning();
+   
+   public boolean isStopped();
+
+   public boolean isFinished();
+
+   public boolean isError();
+
+
+
+   public void start();
+
+}
+package org.enorg.structure;
+
+
+// should be deprecated ***************
+
+public interface SandSet extends AddableTo, Iterable {
+
+
+
+
+}
+package org.enorg.structure;
+
+
+import org.enorg.sand.data.*; //*************************
+
+
+public interface Selector {
+
+   public void setNSelectable(int n);
+
+   public void setSelectionArray(DoubleArray da);
+
+   public int getSelected();
+   
+}
+
+package org.enorg.structure;
+
+public interface SelfSummarizer {
+
+   public String getSummary();
+   
+}
+
+package org.enorg.structure;
+
+
+public interface SettableStructure extends Structure {
+
+   public void set(String s, Object val);
+   
+
+}
+package org.enorg.structure;
+
+
+import java.util.*;
+
+
+public interface SingleParent extends Related {
+
+
+   public ArrayList getChildren();
+
+}
+
+package org.enorg.structure;
+
+
+public interface Standalone {
+
+}
+
+
+package org.enorg.structure;
+
+
+public interface Stateless {
+
+}
+
+package org.enorg.structure;
+
+public interface StateQueryable {
+
+   public boolean hasStateInformation();
+
+}
+
+package org.enorg.structure;
+
+
+
+public interface Statused {
+
+
+
+   public final static int UNKNOWN = 0;
+   public final static int READY = 1;
+   public final static int RUNNING = 2;
+   public final static int STOPPED = 3;
+   public final static int FINISHED = 4;
+   public final static int ERROR = 5;
+
+
+
+   public int getStatus();
+
+   
+   public void setStatus(int istat);
+
+
+
+
+}
+package org.enorg.structure;
+
+
+public interface Structure {
+
+
+   public String getTypeName();
+
+   public Object get(String s);
+
+   public Object getStatic(String s);
+
+}
+
+package org.enorg.structure;
+
+
+public interface Subselectable {
+
+   public int getNSelectable();
+
+   public Object subselect(int n);
+   
+
+}
+
+
+package org.enorg.structure;
+
+
+public interface Synchronizee {
+
+   public void synchronizeTo(Object obj);
+
+}
+
+package org.enorg.structure;
+
+public interface Synchronizer {
+   
+   public void addSynchronizee(Synchronizee se);
+
+}
+
+package org.enorg.structure;
+
+
+
+
+public interface Targeted {
+
+   
+   public Object getTarget();
+
+   public void setTarget(Object obj);
+
+
+}
+// CCWS-LICENSE
+package org.enorg.structure;
+
+
+import java.util.*;
+
+public class TypedSet implements AddableTo, Iterable {
+   
+   ArrayList contents;
+   String contentType;
+   
+   
+   public TypedSet(String s) {
+      contentType = s;
+      contents = new ArrayList();
+   }
+   
+   
+   public void add(Object obj) {
+      contents.add(obj);
+   }
+   
+   
+   public Iterator iterator() {
+      return contents.iterator();
+   }
+
+
+    public int size() {
+	return contents.size();
+    }
+
+
+    public Object get(int i) {
+	return contents.get(i);
+    }
+}
+
+
+package org.enorg.structure;
+
+
+public interface Updatable {
+
+   public void update(int type);
+
+}
+
+
+package org.enorg.structure;
+
+public interface Updater {
+
+   public void addUpdatable(Updatable updatable);
+
+}
+
+package org.enorg.structure;
+
+
+public interface Viewer {
+
+   public void viewObjectChanged(Object obj);
+
+}
+

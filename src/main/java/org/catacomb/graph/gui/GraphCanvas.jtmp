@@ -1,0 +1,891 @@
+
+
+
+
+
+public final class GraphCanvas extends BasePanel 
+
+
+   public final static int REVEAL = 1;
+   public final static int CONCEAL = 2;
+   long zeroTime;
+
+   //   double freveal = 1.;
+
+   int                     prefWidth;
+   int                     prefHeight;
+
+   transient Image         bufim;
+   transient Image         spareIm;
+
+   boolean                 bufimUTD = false;
+   public boolean          doubleClick = false;
+   int                     dtpress = 0;
+   Font                    defaultFont;
+   FontMetrics             dfm;
+   boolean                 dragupdate = false;
+   boolean                 dropEmptyClick = false;
+
+
+   int                     n_tickx;
+   int                     n_ticky;
+   boolean                 xVisible;
+   boolean                 yVisible;
+   boolean                 boxAxes;
+
+   // ************** shouldnt be public
+
+
+
+   int                    hx;
+   int                    hy;
+
+   public int             leftMargin;
+   public int             rightMargin;
+   public int             bottomMargin;
+   public int             topMargin;
+   boolean                xRescalable;
+   boolean                yRescalable;
+   int                    tickGridx;
+   int                    tickGridy;  
+   public Color           bgColor;
+   public Color           fgColor;
+   Color                  echoColor;
+   Color                  gridColor;
+   Color                  dataColor;
+   Color                  butColor;
+   boolean                grey = false;
+
+   int                    cursorcp = -1;
+   boolean                fixRangeOnResize = false;
+   double[]               lastLimits = {0., 1., 0., 1.};
+   String                 mySI = "gdc";
+   double                 aspectRatio = 1.0;
+   boolean                constantAspectRatio = false;
+   int[]                  intervals = {1, 2, 5};
+   boolean                BoW = false;
+
+   public boolean         scrollbars = false;
+
+   boolean                forceGrid = false;
+   double                 gridDx;
+   double                 gridDy;
+   
+   int                    maxPoints = 20000;
+
+   boolean                mouseRescale = true;
+
+   String                 infoText;
+   int                    nInfoDSearch = 5;
+   static double          reclogten = 0.434294;
+
+   boolean                map3D = false;
+   boolean                rollRotate = false;
+   boolean                zRotate = false;
+   double                 x3c = 0.;
+   double                 y3c = 0.;
+   double                 z3c = 0.;
+   double                 x2c = 0.;
+   double                 y2c = 0.;
+   double                 z2c = 0.;
+   double                 m3xx = 1., m3xy = 0., m3xz = 0.;
+   double                 m3yx = 0., m3yy = 1., m3yz = 0.;
+   double                 m3zx = 0., m3zy = 0., m3zz = 1.;
+   double[][]             m3B;
+
+   Color[]                cbuf;
+ 
+   double                 vxmin;
+   double                 vxmax;
+   double                 vymin;
+   double                 vymax; 
+
+   int[]                  isbpos = new int[8];
+   double[][]             sbviews = new double[3][];
+   double[][]             sbviews0 = new double[3][4];
+   int                    isbdrag = -1;
+   int                    isboff = -1;
+   boolean                scrollDrag = false;
+   boolean                suppressAxes = false;
+   
+   JPopupMenu             mymenu;
+   ActionListener         myal;
+
+
+   String                labX;
+   String                labY;
+
+   boolean               movieRecording = false;
+   int                   movieFrame;
+   GIFWriter             gifW;
+
+   long                  lastPress;
+   long                  dtPress;
+   
+   GraphHelper           helper;
+
+   boolean               applicationDoesBackground;
+
+
+   CanvasActor           cac;
+   int                   canvasIndex;
+
+   String[]              labelActions;
+   LabelActor            bac;
+
+   int                   xInfoText = 10;
+   int                   yInfoText = 70;
+
+   int                   rh0; 
+   int                   rh1; 
+   int                   rh2;
+   int                   replayX;
+   int                   replayY;
+
+   boolean               mouseIsDown = false;
+
+   String                IDTag;
+   boolean               grid = true;
+
+   boolean               compressOnTheFly = true;
+
+
+   int                  snapTo = 0;
+   CcmbPrefs            prefs;
+   FontMetrics          fontM;
+
+   boolean              smartReframe = false; // ********** true;
+   long                 smartReframeTime;
+
+   boolean              drawnInXRange;
+   boolean              drawnInYRange;
+
+
+   
+   boolean showMenu = true;
+
+   int boundaryStyle;
+   public final static int NONE = -1;
+   public final static int LINE = 0;
+   public final static int GROOVE = 1;
+
+
+   public GraphCanvas (int w, int h) {
+
+      setFont(new Font ("sansserif", Font.PLAIN, 12));
+      prefWidth = w;
+      prefHeight = h;
+      imw = w;
+      imh = h;
+      Qvisited = new boolean[4];
+      gdcSetSize (w, h);
+      
+
+      
+      n_tickx      = 5;
+      n_ticky      = 4;
+      wcx = 0.0;
+      wcy = 0.0;
+      dpdwx = dpdwy = 50.0;
+      leftMargin   = 40;
+      rightMargin  = 25;
+      bottomMargin = 30;
+      topMargin    = 20;
+      xRescalable  = true;
+      yRescalable  = true;
+      xVisible     = true;
+      yVisible     = true;
+      boxAxes = false;
+      tickGridx    = 2;
+      tickGridy    = 2;    
+      
+      setBackground (CcmbColor.black);
+      setForeground (CcmbColor.white);
+
+
+      boxc = new double[4];
+      applicationDoesBackground = false;
+
+      mymenu = new JPopupMenu ();
+      this.add (mymenu);
+      setMenuOptions(null, null);
+      
+      echoColor = Color.white;
+      clearReplayHighlight();
+
+   }
+   
+   
+   public void setShowMenu(boolean b) {
+      showMenu = b;
+   }
+
+   public void setBoundaryStyle(int ibs) {
+      boundaryStyle = ibs;
+   }
+
+
+   public Image getSpareImage() {
+      if (spareIm != null) {
+	 if (spareIm.getWidth(null) != imw || 
+	     spareIm.getHeight(null) != imh) spareIm = null;
+      }
+      if (spareIm == null) spareIm = createImage(imw, imh); 
+      return spareIm;
+   }
+
+
+   public void setRangeRecording(boolean b) {
+       recordRange = b;
+   }
+
+   public void setSnapping(int isnap) { 
+      snapTo = isnap; 
+   }
+
+   public void setSmartReframe(boolean b) { 
+      smartReframe = b; 
+   }
+
+
+   public void setCompressOnTheFly(boolean b) {
+      compressOnTheFly = b;
+   }
+
+
+
+   public void setCanvasActor(CanvasActor cac) {
+      setCanvasActor(cac, 0);
+   }
+
+   public void setGrid(boolean b) { 
+      grid = b; 
+   }
+
+   public void setCanvasActor(CanvasActor cac, int ican) {
+      this.cac = cac;
+      this.canvasIndex = ican;
+      //      if (cac != null) cac.canvasInit(ican, this);
+   }
+
+   public void setIDTag(String s) { 
+      IDTag = s; 
+   }
+
+   public String getIDTag() { 
+      return (IDTag != null ? IDTag : "Gcanvas");
+   }
+
+
+   public void setReplayHighlight(int i0, int i1, int i2) {
+      rh0 = i0;
+      rh1 = i1;
+      rh2 = i2;
+   }
+
+   public void clearReplayHighlight() { 
+      rh0 = -99999; 
+   }
+
+
+   public void setEchoColor(Color c) { 
+      echoColor = c; 
+   }
+
+
+   public void setApplicationDoesBackground(boolean b) {
+      applicationDoesBackground = b;
+   }
+   
+
+   public int getWidth() { 
+      return imw; 
+   }
+
+   public int getHeight() { 
+      return imh;
+   }
+
+   public int[] getMargins() {
+      int[] mm = {topMargin, rightMargin, bottomMargin, leftMargin};
+      return mm;
+   }
+
+   public double getGridDx() { 
+      return gridDx; 
+   }
+
+   public double getGridDy() { 
+      return gridDy;
+   }
+
+
+   public void paintComponent (Graphics g) {
+      drawnInXRange = false;
+      drawnInYRange = false;
+
+      replayX = -100;
+      
+      Dimension d = getSize();
+      if (imw != d.width || imh != d.height) {
+	 imw = d.width;
+	 imh = d.height; 
+	 if (imw > 0 && imh > 0) {
+	    gdcSetSize (imw, imh);
+	    myReshape();
+	 }
+      }
+
+      emptyClickable();
+      if (selectBox) {
+	 if (!bufimUTD) {
+	    bufim = createImage(imw, imh);
+	    S.p("made new image ");
+	    
+	    realPaint(bufim.getGraphics());
+	    bufimUTD = true;
+	 }
+	 g.drawImage(bufim, 0, 0, this);
+	 g.setColor (CcmbColor.red);
+	 g.drawRect (Math.min(ms.px0, ms.px), 
+		     Math.min(ms.py0, ms.py),
+		     Math.abs(ms.px0 - ms.px), 
+		     Math.abs(ms.py0 - ms.py)); 
+	 
+      } else {
+	 realPaint(g);
+	 bufimUTD = false;
+      }
+
+      if (movieRecording) {
+	 bufim = createImage(imw, imh);
+	 realPaint(bufim.getGraphics());
+
+	 int[][] intim = Sys.getIntegerImage(bufim, 1.);
+	 if (gifW != null) gifW.addIntegerImage(intim, movieFrame++);
+	 /*
+	 File fdir = new File(movieDir);
+	 File f = new File(fdir, 
+			   movieRoot + integerPad(movieFrame++, 4) + ".png");
+	 ImageIO.saveIntegerImage (intim, f);
+	 */
+      }
+      
+      if (figWriting) {
+	 String s = figSB1.toString() + figSB2.toString();
+	 FileTools.writeStringToFile(s, figFile);
+	 Sys.showInfoMessage("written xfig file " + figFile.getName());
+	 figWriting = false;
+	 repaint();
+	 return;
+      }
+
+      if (cursorcp >= 0 && clickSs[cursorcp] != null) {
+	//	 setToolTipText(clickSs[cursorcp]);
+      }
+
+      if (replayX > 0) {
+	 int[] ix = {0, -9, -6, -10, -7, -3, -0};
+	 int[] iy = {0,  12, 12, 24,  25, 13, 15};
+	 
+	 for (int i = 0; i < ix.length; i++) {
+	    ix[i] += replayX;
+	    iy[i] += replayY;
+	 }	
+	 g.setColor(Color.yellow);
+	 g.fillPolygon(ix, iy, ix.length);
+	 g.setColor(Color.black);
+	 g.drawPolygon(ix, iy, ix.length);
+      }
+
+
+      if (smartReframe && 
+	  !(drawnInXRange && drawnInYRange) &&
+	  !selectBox && 
+	  System.currentTimeMillis() - smartReframeTime > 2000) {
+	 smartReframeTime = System.currentTimeMillis();
+	 //	 S.p("failed to show anything - reframing");
+	 letterAction("F");
+      }
+   }
+
+
+
+
+   
+
+
+
+   public void setInfoLocation(int x, int y) {
+      xInfoText = x;
+      yInfoText = y;
+   }
+
+
+
+
+
+
+   public final void realPaint (Graphics g) {
+     //      long tstart = System.currentTimeMillis();
+
+      suppressAxes = false;
+
+      if (!applicationDoesBackground) {
+	 if (bgColor == null) { setBackground (getBackground()); } 
+	 fillBackground (g, bgColor);
+	 
+	 if (grid) drawGrid(g, gridColor);
+
+	 startRangeRecording();
+      }
+
+      g.setClip(leftMargin, topMargin, 
+		imw - leftMargin - rightMargin, 
+		imh - topMargin - bottomMargin);
+      myPaint (g);
+
+      g.setClip(0, 0, imw, imh);
+
+      // suppress axes is only set if myPaint had a problem and 
+      // painted an error message
+      if (!suppressAxes) {
+	 if (scrollbars) drawScrollBars(g);
+	 drawAxes (g);
+      }
+
+      if (clickableEcho && cursorcp >= 0) {
+
+	 int[] cp = clickPs[cursorcp];
+	 if (cp[0] > 0) {
+	    int rx = cp[5];
+	    int ry = cp[6];
+	    int ixc = cp[0];
+	    int iyc = cp[1];
+
+	    g.setColor (echoColor);	    
+	    g.drawRect(ixc - rx, iyc - ry, 2*rx, 2*ry);
+	    
+	    String stxt = clickSs[cursorcp];
+	    if (stxt != null) {
+	       if (fontM == null) fontM = g.getFontMetrics();
+	       
+	       int ilen = fontM.stringWidth(stxt) + 4;
+	       
+	       if (ixc + rx + ilen > imw) {
+                  ixc = ixc - ilen - 2 * rx;
+               }               
+
+               if (ixc + rx < 0) {
+                  ixc = cp[0] - rx - ilen/2;
+                  iyc -= (ry + 8);
+               }
+
+
+	       g.setColor(Color.white);
+	       g.fillRect(ixc+rx, iyc-6, ilen, 12);
+
+	       g.setColor(Color.black);
+	       g.drawString(Translat.getDisplayText(stxt), 
+			    ixc + rx + 2, iyc+4);
+
+	       g.setColor(Color.gray);
+	       g.drawRect(ixc+rx, iyc-6, ilen, 12);
+	    }
+
+	 } else if (cp[5] == -999) {
+	    double[] xb = clickRs[2 * cp[1]];
+	    double[] yb = clickRs[2 * cp[1]+1];
+	    drawPolygon(g, xb, yb, xb.length);
+	    int n = xb.length;
+	    
+	    double xcen = 0.;
+	    double ycen = 0.;
+	    for (int i = 0; i < n; i++) {
+	       xcen += xb[i];
+	       ycen += yb[i];
+	    }
+	    String stxt = clickSs[cursorcp];
+	    if (stxt != null) drawBgText(g, stxt, xcen/n, ycen/n);
+
+	 }
+
+	 //	 g.drawRect(ixc - rx+1, iyc - ry+1, 2*rx-2, 2*ry-2);
+
+      }
+
+
+      if (showMenu) {
+         int iw = 20;
+         g.setColor (butColor.darker());
+         g.drawLine (imw-iw, 12, imw-2, 12);
+         g.drawLine (imw-2, 1, imw-2, 12);
+         
+         g.setColor (butColor.brighter());
+         g.drawLine (imw-iw, 1, imw-iw, 12);
+         g.drawLine (imw-iw, 1, imw-2, 1);
+      }
+
+      //      long tend = System.currentTimeMillis();
+      //      S.p("gc paint took " + (tend - tstart) + "   " + this);
+   }
+
+
+
+
+
+  public void myReshape() {
+     if (fixRangeOnResize) {
+	forceLimits (lastLimits);
+     }
+  }
+   
+
+
+   public String getStringIdentifier () { 
+      return mySI; 
+   }
+
+   public final void setStringIdentifier (String s) { 
+      mySI = s; 
+   }
+
+
+
+
+   public void Sp(String s) { 
+      System.out.println(s); 
+   }
+
+
+   public final void setCursorcp (int icp) {
+      cursorcp = icp;
+      if (cursorcp >= 0 && clickSs[cursorcp] != null) {
+	 // dont understand - this doesnt show up if done her not in paint;
+	 //	 setToolTipText(clickSs[cursorcp]);
+      }
+   }
+   
+   
+   public void setGrid(double dx, double dy) {
+      forceGrid = true;
+      boolean nrp = false;
+      if (Math.abs((gridDx-dx) / (0.0001 + gridDx+dx)) +
+	  Math.abs((gridDy-dy) / (0.0001 + gridDy+dy)) > 0.001) nrp = true;
+      gridDx = dx;
+      gridDy = dy;
+      if (nrp) {
+	 repaint();
+      }
+   }
+
+
+
+
+   public final int getMaxPoints() { 
+      return maxPoints; 
+   }
+
+   public final void setMaxPoints (int i) { 
+      maxPoints = i; 
+   }
+
+   public final boolean getMouseRescale() { 
+      return mouseRescale; 
+   }
+
+   public final void setMouseRescale (boolean b) { 
+      mouseRescale = b; 
+   }
+
+   public final void setScrollbars(boolean b) { 
+      scrollbars = b; 
+   }
+
+   
+   
+
+   
+
+
+
+
+
+   public long getDtPress() { return dtPress; }
+  // shouldnt need these *************************
+   public int getImw() { return imw; }
+   public int getImh() { return imh; }
+
+
+
+   
+
+
+
+
+
+
+   public final void setClickableEcho (boolean b) {
+      clickableEcho = b;
+   }
+   
+
+   public final void setZoomOnBox (boolean b) { 
+      zoomOnBox = b; 
+   }
+
+   public final void setPanZoomable (boolean b) { 
+      panZoomable = b; 
+   }
+
+   public final void setDragUpdate (boolean b) { 
+      dragupdate = b; 
+   }
+
+   public final void dropOneEmptyClick() { 
+      dropEmptyClick = true; 
+   }
+
+   public Dimension getPreferredSize () {
+      return (new Dimension (prefWidth, prefHeight));
+   }
+
+   public final void setPreferredSize (int w, int h) {
+      prefWidth = w;
+      prefHeight = h;
+   }
+
+   public final void setPreferredSize (Dimension d) {
+      prefWidth = d.width;
+      prefHeight = d.height;
+   }
+
+   public final void setFixRangeOnResize (boolean b) { 
+      fixRangeOnResize = b; 
+   }
+
+   public final double[] boxLimits () {
+      return boxc;
+   }
+
+
+
+   
+  
+
+
+
+
+
+
+   public boolean isFigWriting() { 
+      return figWriting; 
+   }
+   
+
+   public void startMovieRecording() {
+     // should do this via the graph helper **********;
+     //      String[] sa = Sys.getDirAndFileName("w", null, null);
+      movieFrame = 0;
+      movieRecording = true;
+      gifW = new GIFWriter();
+      gifW.setCompressOnTheFly(compressOnTheFly);
+      Sys.showInfoMessage("Started movie recording\n - press m to finish");
+   }
+
+
+   public void stopMovieRecording() {
+      movieRecording = false;
+      
+      if (gifW != null) {      
+	 File f = Sys.getFileToWrite();
+	 if (f != null) gifW.terminate(f);
+      }
+   }
+
+
+
+
+   
+   private void myPaint (Graphics g) { 
+      if (cac != null) cac.canvasPaint(canvasIndex, this, g);
+   }
+
+   public void deliverZonePress(int canvasIndex, MouseState ms) {
+      if (cac != null) cac.zonePressed(canvasIndex, ms);
+   }
+   public void deliverZoneDrag(int canvasIndex, MouseState ms) {
+      if (cac != null) cac.zoneDragged(canvasIndex, ms);
+   }
+   public void deliverZoneRelease(int canvasIndex, MouseState ms) {
+      if (cac != null) cac.zoneReleased(canvasIndex, ms);
+   }
+
+
+   private void myMouseDown(MouseState ms) {
+      deliverZonePress(canvasIndex, ms);
+   }
+   
+   private void myMouseDrag(MouseState ms) {
+      deliverZoneDrag(canvasIndex, ms);
+   }
+   
+   private void myMouseUp(MouseState ms) {
+      deliverZoneRelease(canvasIndex, ms);
+   }
+
+
+   public void setBackground(int ic) {  setBackground(new Color(ic)); }
+   public void setForeground(int ic) {  setForeground(new Color(ic)); }
+
+
+   public void setBackground (Color c) {
+      super.setBackground(c);
+      bgColor = c;
+      int ctot = bgColor.getGreen() + bgColor.getRed() + bgColor.getBlue();
+      if (ctot > 150) {
+	 butColor = bgColor;
+	 gridColor = new Color (bgColor.getRGB() - 0x00080820);
+      } else {
+	 gridColor = new Color (bgColor.getRGB() + 0x001f2f1f);
+	 butColor = Color.gray;
+      }
+      
+      
+   }
+   
+   public int getIntBackgroundColor() { 
+      return bgColor.getRGB(); 
+   }
+
+   public int getIntForegroundColor() { 
+      return fgColor.getRGB(); 
+   }
+
+
+   public Color getBackgroundColor() { return bgColor; }
+
+   
+   public final void setGray (boolean b) { grey = b; }
+   public void setForeground (Color c) { 
+      super.setForeground (c);
+      fgColor = c; 
+   }
+   public final void setDataColor (Color c) { dataColor = c; }
+   
+
+  public final void setBlackOnWhite (boolean b) { setBoW (b); }
+
+  public final void setBoW (boolean b) { 
+    BoW = b;
+    if (b) {
+      if (cbuf == null) {
+	Color[] cc = {bgColor, fgColor, gridColor, dataColor};
+	cbuf = cc;
+      }
+      setForeground (CcmbColor.black);
+      setBackground (CcmbColor.white);
+      gridColor = Color.white;
+    } else {
+      if (cbuf != null) {
+	setBackground (cbuf[0]);
+	setForeground (cbuf[1]);
+	gridColor = cbuf[2];
+	dataColor = cbuf[3];
+      }
+    }
+    repaint();
+  } 
+
+						     
+  private final void bwOnly (Graphics g) {
+    Color c = g.getColor();
+    int ic = c.getRed() + c.getGreen() + c.getBlue();
+    g.setColor (ic < 100 ? Color.white : Color.black);
+  }
+
+						     
+
+   public final void clip (Graphics g) {
+      g.clipRect (leftMargin, topMargin, width - leftMargin - rightMargin,
+		  height - topMargin - bottomMargin);
+   }
+   
+   
+
+   
+   public final void setRescalable (boolean x, boolean y) {
+      xRescalable = x;
+      yRescalable = y;
+   }
+
+   
+   
+   public final void setAspectRatio (double f, boolean b) {
+      aspectRatio = f;
+      enforceAspectRatioY();
+      constantAspectRatio = b;
+   }
+
+
+   private final void keyPan(int ix, int iy) {
+      double [] d = limits();
+      double f = 0.02;
+      double dx = f * ix * (d[1] - d[0]);
+      double dy = f * iy * (d[3] - d[2]);
+      d[0] += dx;
+      d[1] += dx;
+      d[2] += dy;
+      d[3] += dy;
+      setLimits (d[0], d[1], d[2], d[3]);
+      repaint();
+   }
+
+
+
+
+      
+
+// ********* preceeding section contains only occurences of dpdwx 
+//           except in axis routine *********
+
+
+
+
+   public final void fillBackground (Graphics g, Color bgColor) {
+      g.setColor(bgColor);
+      g.fillRect(0,0, imw, imh);
+   }
+
+
+
+
+
+   public double[] copyBox() { 
+      double[] dd = new double[4];
+      for (int i = 0; i < 4; i++) dd[i] = boxc[i];
+      return dd;
+   }
+
+   public final double[] xSpanningArray (int np) {
+      double v0 = wxLeft();
+      double v1 = wxRight();
+
+      double[] va = new double[np];
+      for (int i = 0; i < np; i++) va[i] = v0 + i * (v1 - v0) / (np - 1);
+      return va;
+   }
+
+
+   public final double[] ySpanningArray (int np) {
+      double v0 = wyBottom();
+      double v1 = wyTop();
+
+      double[] va = new double[np];
+      for (int i = 0; i < np; i++) va[i] = v0 + i * (v1 - v0) / (np - 1);
+      return va;
+   }
+
+
+
+

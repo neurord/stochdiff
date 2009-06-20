@@ -31,12 +31,16 @@ public abstract class StepGenerator {
     }
 
     //<--WK
-    //based on RC's email on 5-17-2007
-    public static int gaussianStep(int n, double p, double grv, double urv, double prv)
+    // based on RC's email on 5-17-2007
+    //<--RO & WK
+    // changed gaussianStep to accept another argument ",
+    // int np)"; before it was hardcoded as 10 (on 7 11 2008)
+    //RO & WK-->
+    public static int gaussianStep(int n, double p, double grv, double urv, double prv, int np)
     {
         double rngo = 0.0;
 
-        if (n*p < 10)
+        if (n*p < np)
         {
             rngo = prv;
         }
