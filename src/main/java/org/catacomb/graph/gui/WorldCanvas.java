@@ -176,7 +176,6 @@ public class WorldCanvas extends BaseCanvas implements ModeSettable {
     }
 
 
-    @SuppressWarnings("unused")
     public void setMode(int imode) {
         E.missing();
     }
@@ -372,12 +371,10 @@ public class WorldCanvas extends BaseCanvas implements ModeSettable {
     }
 
 
-    @SuppressWarnings("unused")
     public void prePaint(Graphics2D g) {
 
     }
 
-    @SuppressWarnings("unused")
     public void postPaint(Graphics2D g) {
 
     }

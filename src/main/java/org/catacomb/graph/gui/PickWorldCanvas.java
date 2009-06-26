@@ -145,12 +145,18 @@ public class PickWorldCanvas extends WorldCanvas {
 
 
     public void reframe() {
-        if (buildPaintInstructor == null) {
-            E.shortWarning("no paint instructor?");
-        } else {
+        if (buildPaintInstructor != null) {
             Box box = buildPaintInstructor.getLimitBox(painter);
             frameToBox(box);
+
+        } else if (paintInstructor != null) {
+            Box box = paintInstructor.getLimitBox();
+            frameToBox(box);
+
+        } else {
+            E.shortWarning("no paint instructor?");
         }
+
     }
 
 

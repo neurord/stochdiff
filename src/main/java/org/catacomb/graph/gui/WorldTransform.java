@@ -160,7 +160,6 @@ public final class WorldTransform {
         notifyRangeChange(RangeListener.BOTH);
     }
 
-    @SuppressWarnings("unused")
     public void rangeChange(int axis) {
         // notifyRangeChange(axis);
     }
@@ -1013,7 +1012,6 @@ public final class WorldTransform {
         E.info("        " + m3zx + " " + m3zy + " " + m3zz);
     }
 
-    @SuppressWarnings("unused")
     public void dragZRotate(int idx, int idy) {
         if (m3B == null) return;
         double theta = idy / 60.; // ***

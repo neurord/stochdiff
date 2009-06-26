@@ -48,7 +48,6 @@ abstract class MouseHandler {
     boolean motionAware() {
         return false;
     }
-    @SuppressWarnings("unused")
     boolean motionChange(Mouse m) {
         return false;
     }
@@ -107,15 +106,12 @@ abstract class MouseHandler {
     void clear() {
     }
 
-    @SuppressWarnings("unused")
     void init(Mouse m) {
     }
 
-    @SuppressWarnings("unused")
     void advance(Mouse m) {
     }
 
-    @SuppressWarnings("unused")
     void release(Mouse m) {
     }
 
@@ -123,7 +119,6 @@ abstract class MouseHandler {
 
 
 
-    @SuppressWarnings("unused")
     void echoPaint(Graphics2D g) {
     }
 
@@ -131,18 +126,14 @@ abstract class MouseHandler {
 
 
     // if handler has won control, then the following are called
-    @SuppressWarnings("unused")
     void missedPress(Mouse m) {
 
     }
-    @SuppressWarnings("unused")
     void applyOnDown(Mouse m) {
     }
 
-    @SuppressWarnings("unused")
     void applyOnDrag(Mouse m) {
     }
-    @SuppressWarnings("unused")
     void applyOnRelease(Mouse m) {
     }
 

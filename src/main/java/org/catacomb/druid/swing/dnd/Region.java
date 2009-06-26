@@ -27,7 +27,6 @@ public class Region {
     int p_action;
 
 
-    @SuppressWarnings("unused")
     public Region(int x, int y, int w, int h, String string, Object object, int a) {
         p_x = x;
         p_y = y;

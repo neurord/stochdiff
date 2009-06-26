@@ -93,15 +93,22 @@ public class Mesh2plusTimeDisplay implements DataHandler {
                 xcen = x;
             }
         }
+
         mask = new boolean[nel];
-        for (int i = 0; i < nel; i++) {
-            if (Math.abs(d[i] - xcen) < 0.5 * zrange) {
-                mask[i] = true;
-            } else {
+        if (md > zrange) {
+            // nearest point still more than zrange from the desired z
+            for (int i = 0; i < nel; i++) {
                 mask[i] = false;
             }
+        } else {
+            for (int i = 0; i < nel; i++) {
+                if (Math.abs(d[i] - xcen) < 0.5 * zrange) {
+                    mask[i] = true;
+                } else {
+                    mask[i] = false;
+                }
+            }
         }
-
         zMask = zval;
     }
 
@@ -248,7 +255,7 @@ public class Mesh2plusTimeDisplay implements DataHandler {
         if (frameIdx >= 0 && frameIdx < data.length && varIdx >= 0 && varIdx < data[frameIdx].length) {
             double[] dat = data[frameIdx][varIdx];
 
-            p.drawColoredCells(mesh, dat);
+            p.drawColoredCells(mesh, dat, mask);
             //E.missing("check prior change to add mask");
             // p.drawColoredCells(mesh, dat, mask);
         }

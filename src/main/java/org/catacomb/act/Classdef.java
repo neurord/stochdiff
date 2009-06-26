@@ -155,7 +155,6 @@ public class Classdef {
         return ms;
     }
 
-    @SuppressWarnings("unused")
     public MethodSignature newReadMethod(String rtype, String mnm, String atype) {
         MethodSignature ms = new MethodSignature(mnm, MethodSignature.READ);
         ms.setReturnType(rtype);

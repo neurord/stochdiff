@@ -36,7 +36,6 @@ public class DruToggleButton extends DruButton implements GroupContingent {
         return toggleButton;
     }
 
-    @SuppressWarnings("unused")
     public void setToggle(String gr, String va) {
         // group = gr;
         value = va;

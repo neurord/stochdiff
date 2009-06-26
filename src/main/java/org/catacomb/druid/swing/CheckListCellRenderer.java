@@ -30,7 +30,7 @@ public class CheckListCellRenderer extends JPanel implements ListCellRenderer {
     JPanel colorPanel;
 
 
-    @SuppressWarnings("unused")
+
     public CheckListCellRenderer(ListCellRenderer renderer) {
         //  mainRenderer = renderer;
         setLayout(new BorderLayout(2, 2));

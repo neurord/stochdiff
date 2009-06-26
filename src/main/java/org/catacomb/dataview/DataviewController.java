@@ -114,7 +114,6 @@ public class DataviewController implements Controller {
 
     }
 
-    @SuppressWarnings("unused")
     public void cacheData(File fcache, String cnm) {
 
     }
@@ -227,7 +226,6 @@ public class DataviewController implements Controller {
     }
 
 
-    @SuppressWarnings("unused")
     public void setMode(String dom, String mod) {
         E.missing("cant set mode from here");
         for (int i = 0; i < ndisplay; i++) {

@@ -102,7 +102,6 @@ public class MoviePlayController implements Controller, MovieController {
         int ifr = slider.getValue();
         moperator.showFrame(ifr);
     }
-    @SuppressWarnings("unused")
     public void sliderMoved(String s) {
         sliderMoved();
     }

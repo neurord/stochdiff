@@ -41,7 +41,6 @@ public abstract class DialogController implements Controller {
     private boolean isShowing() {
         return druid.isShowing();
     }
-    @SuppressWarnings("unused")
     public void show(Object obj) {
     }
 

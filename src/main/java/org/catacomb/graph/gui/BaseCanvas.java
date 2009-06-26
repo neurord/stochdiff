@@ -97,8 +97,7 @@ public class BaseCanvas extends BasePanel implements Repaintable {
     }
 
 
-    public void paint2D(@SuppressWarnings("unused")
-                        Graphics2D g) {
+    public void paint2D(Graphics2D g) {
 
     }
 

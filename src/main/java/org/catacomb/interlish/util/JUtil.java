@@ -118,7 +118,6 @@ public class JUtil {
     }
 
 
-    @SuppressWarnings("unused")
     private static String readInputStream(Logger logger, InputStream fis)
     throws NullPointerException, IOException {
         String sret = null;

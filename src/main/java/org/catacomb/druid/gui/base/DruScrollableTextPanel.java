@@ -24,7 +24,6 @@ public class DruScrollableTextPanel extends DruScrollPanel {
         canvas.setBackground(c);
         super.setBg(c);
     }
-    @SuppressWarnings("unused")
     public void labelAction(String s, boolean b) {
 
     }

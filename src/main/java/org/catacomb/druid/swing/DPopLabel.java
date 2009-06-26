@@ -45,7 +45,6 @@ public class DPopLabel extends JPanel implements LabelActor {
         this(s, s);
     }
 
-    @SuppressWarnings("unused")
     public DPopLabel(String s, String itxt) {
         popB = new DButton(itxt);
         popB.setActionCommand(SHOW_MENU);

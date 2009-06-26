@@ -155,7 +155,6 @@ public class DTree extends JTree
     }
 
 
-    @SuppressWarnings("unused")
     public void ensureVisible(String sfc) {
     }
 

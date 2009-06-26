@@ -181,7 +181,6 @@ public class DruCheckboxListPanel extends DruGCPanel implements ListDisplay, Lab
 
 
 
-    @SuppressWarnings("unused")
     public void setCellRenderer(DruListCellRenderer obj) {
         E.error("cant set renderer for a checkbox list...");
         //  dList.setCellRenderer(obj.getGUIPeer());

@@ -13,7 +13,6 @@ public class DruButtonGroup {
     DButtonGroup dButtonGroup;
 
 
-    @SuppressWarnings("unused")
     public DruButtonGroup(String s) {
         dButtonGroup = new DButtonGroup();
     }

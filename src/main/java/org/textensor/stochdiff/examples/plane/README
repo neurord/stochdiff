@@ -1,0 +1,11 @@
+This example shows a very short parent segment with a fine discretization
+joined to two daughter segments 
+In the morphology, the daughters are specified as starting from the end 
+of the parent segment each with their own radius but not with an exact 
+position. 
+When discretized, the daughters should be offset so as not to overlap, 
+and should connect to the right parts of the parent disk. 
+Initially, the only non-zero concentrations are in one of the daughter
+segments, but these should diffuse into the disk and thin into the other 
+daughter.
+ 

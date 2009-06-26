@@ -131,7 +131,6 @@ public class DPlainTextEditor extends DFrame implements LabelActor {
         setVisible(true);
     }
 
-    @SuppressWarnings("unused")
     public void setText(String s) {
 
     }

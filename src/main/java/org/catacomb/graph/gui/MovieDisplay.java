@@ -289,7 +289,6 @@ public class MovieDisplay extends BasePanel
 
 
 
-    @SuppressWarnings("unused")
     public BufferedImage getBufferedImage(int ithick) {
 
         // see DataviewController for original intention

@@ -91,7 +91,6 @@ public class FramePlayerController implements Controller {
     }
 
 
-    @SuppressWarnings("unused")
     public void show(Object obj) {
     }
 

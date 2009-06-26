@@ -243,4 +243,11 @@ public class E {
     }
 
 
+    public static void dump(String s, double[][] regcon) {
+        for (int i = 0; i < regcon.length; i++) {
+            dump(s + "-" + i, regcon[i]);
+        }
+    }
+
+
 }

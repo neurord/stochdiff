@@ -49,7 +49,7 @@ public class InfoAggregator implements InfoReceiver, InfoExporter {
             bufText = text;
 
             if (nbuf == 0) {
-                E.oneLineWarning("gui info is being dropped since there is no display for it");
+                // E.oneLineWarning("gui info is being dropped since there is no display for it");
                 nbuf = 1;
             }
             //          checkNbuf();

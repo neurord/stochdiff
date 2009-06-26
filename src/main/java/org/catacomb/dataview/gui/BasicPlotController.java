@@ -22,7 +22,7 @@ public class BasicPlotController implements Controller {
 
 
     public void setDataHandler(DataHandler dh) {
-        E.info("bpc set handler " + dh);
+        // E.info("bpc set handler " + dh);
         dataDisplay.attachGraphicsController(dh);
     }
 

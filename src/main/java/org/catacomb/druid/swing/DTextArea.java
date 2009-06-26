@@ -121,7 +121,6 @@ public class DTextArea extends DPanel implements DocumentListener, FocusListener
     }
 
 
-    @SuppressWarnings("unused")
     public void setLabelActor(LabelActor lact) {
         System.out.println("NB label actor in text are is unused");
         (new Exception()).printStackTrace();
@@ -267,7 +266,6 @@ public class DTextArea extends DPanel implements DocumentListener, FocusListener
 
 
 
-    @SuppressWarnings("unused") // TODO
     public void setPadding(int padding) {
         // TODO Auto-generated method stub
 

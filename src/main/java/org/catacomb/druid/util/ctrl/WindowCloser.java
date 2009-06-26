@@ -22,7 +22,6 @@ public class WindowCloser implements Controller, GUISourced {
     public void attached() {
     }
 
-    @SuppressWarnings("unused")
     public void show(Object obj) {
     }
 

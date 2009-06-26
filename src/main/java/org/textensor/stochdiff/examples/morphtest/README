@@ -1,0 +1,4 @@
+Supplied examples illustrating problems with spines defined with atFraction
+in version 1. This method of spine allocation is no longer required as 
+spines defined with SpineType and SpineAllocation elements can now be 
+addressed directly.

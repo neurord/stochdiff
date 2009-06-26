@@ -504,7 +504,6 @@ public class Shape extends Polypoint
         p_rotating = false;
     }
 
-    @SuppressWarnings("unused")
     public void pointPressed(ShapePoint sp) {
         p_rotating = false;
         cachePositions();
@@ -587,7 +586,6 @@ public class Shape extends Polypoint
                 p_symmetry == ShapeSymmetry.SQUARE);
     }
 
-    @SuppressWarnings("unused")
     public boolean overlaps(Shape shape) {
         // TODO - should work it out!!!
         return true;

@@ -7,7 +7,6 @@ public class BranchTest {
 
     public static void main(String[] argv) {
         String snm = BranchTest.class.getPackage().getName();
-        System.out.println("pnm is " + snm);
         String srt = "src/" + snm.replaceAll("\\.", "/") + "/";
 
         String[] args = {srt + "BranchModelRad1a.xml"};

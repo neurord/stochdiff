@@ -230,7 +230,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         nreaction = rtab.getNReaction();
         rates = rtab.getRates();
 
-        Debug.dump("rates", rates);
+        // Debug.dump("rates", rates);
 
         lnrates = ArrayUtil.log(rates, -999.);
 
@@ -412,7 +412,21 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
             lnpSharedOut = new double[nel][nspec];
             pSharedOut = new double[nel][nspec];
-            fSharedExit = new double[nel][nspec][12];
+            fSharedExit = new double[nel][nspec][];
+
+            int maxnn = 0;
+            for (int iel = 0; iel < nel; iel++) {
+                for (int k = 0; k < nspec; k++) {
+                    int nn = neighbors[iel].length;
+                    fSharedExit[iel][k] = new double[nn];
+                    if (nn > maxnn) {
+                        maxnn = nn;
+                    }
+                }
+            }
+            E.info("max no of neighbors for a single element is " + maxnn);
+
+
             for (int iel = 0; iel < nel; iel++) {
                 for (int k = 0; k < nspec; k++) {
                     int inbr[] = neighbors[iel];

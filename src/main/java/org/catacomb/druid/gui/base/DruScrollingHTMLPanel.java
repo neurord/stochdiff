@@ -111,7 +111,6 @@ public class DruScrollingHTMLPanel extends DruPanel
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
-    @SuppressWarnings("unused")
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }
@@ -123,7 +122,6 @@ public class DruScrollingHTMLPanel extends DruPanel
     public boolean getScrollableTracksViewportWidth() {
         return true;
     }
-    @SuppressWarnings("unused")
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }

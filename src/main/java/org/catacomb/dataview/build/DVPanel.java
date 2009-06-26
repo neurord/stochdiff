@@ -15,7 +15,6 @@ public class DVPanel {
     public int height;
 
 
-    @SuppressWarnings("unused")
     public DruPanel makePanel(Context ctxt) {
         E.error("override needed in " + this);
         return null;

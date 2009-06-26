@@ -38,7 +38,6 @@ public class CheckSeenDialogController  implements Controller {
     public void attached() {
     }
 
-    @SuppressWarnings("unused")
     public void show(Object obj) {
     }
 

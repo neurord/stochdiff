@@ -18,7 +18,6 @@ final class AboveBelowSplitAxisPanelUI extends BasicSplitPaneUI {
 
     }
 
-    @SuppressWarnings("unused")
     public static ComponentUI createUI(JComponent jcomponent, GraphColors gc) {
         return (new AboveBelowSplitAxisPanelUI(gc));
     }

@@ -271,7 +271,6 @@ public class DSplitterBar extends JPanel implements DComponent {
             alreadyDrawn = true;
         }
     }
-    @SuppressWarnings("unused")
     void mouseEnter(MouseEvent e) {
         if (SplitterLayout.dragee!=null) return;
         setCursor((orientation==SplitterLayout.VERTICAL) ? VERT_CURSOR : HORIZ_CURSOR);
@@ -280,7 +279,6 @@ public class DSplitterBar extends JPanel implements DComponent {
         validate();
         repaint();
     }
-    @SuppressWarnings("unused")
     void mouseExit(MouseEvent e) {
         if (SplitterLayout.dragee!=null) return;
         setCursor(DEF_CURSOR);

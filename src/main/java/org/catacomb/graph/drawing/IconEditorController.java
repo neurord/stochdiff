@@ -26,12 +26,10 @@ public class IconEditorController implements Controller {
 
 
 
-    @SuppressWarnings("unused")
     public void addChildController(Controller ctrl) {
         E.missing();
     }
 
-    @SuppressWarnings("unused")
     public void show(Object obj) {
         // MISSING
     }
@@ -43,7 +41,6 @@ public class IconEditorController implements Controller {
     public void attached() {
     }
 
-    @SuppressWarnings("unused")
     public void loadFile(File f) {
         E.missing();
         /*
@@ -57,7 +54,6 @@ public class IconEditorController implements Controller {
     }
 
 
-    @SuppressWarnings("unused")
     public void saveToFile(File f) {
         //      Table table = dmEditor.getDocument();
 

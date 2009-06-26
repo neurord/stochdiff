@@ -179,7 +179,6 @@ public class RegionBoard implements FocusListener, RegionListener {
         crStore.unecho(reg);
     }
 
-    @SuppressWarnings("unused")
     public void dropGeneral(Object dropee) {
         E.override();
 

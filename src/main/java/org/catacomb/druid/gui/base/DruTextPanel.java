@@ -23,7 +23,6 @@ public class DruTextPanel extends DruPanel {
         super.setBg(c);
     }
 
-    @SuppressWarnings("unused")
     public void labelAction(String s, boolean b) {
 
     }

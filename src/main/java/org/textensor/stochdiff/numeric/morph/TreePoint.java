@@ -20,7 +20,11 @@ public class TreePoint implements Position {
 
     public TreePoint[] nbr;
     public int nnbr;
+    public TreePoint parent;
 
+    // this is set for a point which is at the same place as its
+    // parent but starts a new segment with a different radius
+    public TreePoint subAreaPeer = null;
 
     public String label;
 
@@ -42,6 +46,9 @@ public class TreePoint implements Position {
 
     public String name; // not sure about this POSERR;
 
+    // work field used while setting up child branches
+    public double partBranchOffset = 0.;
+
 
     public TreePoint() {
         nbr = new TreePoint[6];
@@ -58,6 +65,7 @@ public class TreePoint implements Position {
         this.y = y;
         this.z = z;
         this.r = r;
+
     }
 
 
@@ -82,6 +90,10 @@ public class TreePoint implements Position {
 
     public String getLabel() {
         return label;
+    }
+
+    public TreePoint getParent() {
+        return parent;
     }
 
 
@@ -121,6 +133,7 @@ public class TreePoint implements Position {
         y = f * cpb.y + wf * cpa.y;
         z = f * cpb.z + wf * cpa.z;
         r = f * cpb.r + wf * cpa.r;
+
     }
 
 
@@ -326,6 +339,50 @@ public class TreePoint implements Position {
         String ret = null;
         if (segidHM != null && segidHM.containsKey(tp)) {
             ret = segidHM.get(tp);
+        }
+        return ret;
+    }
+
+
+
+    public void setSubAreaOf(TreePoint cpa) {
+        subAreaPeer = cpa;
+    }
+
+
+
+    public void alignTop(TreePoint tpon, TreePoint tpdir, double offset) {
+        // align the "top" of this point ofset below the top of tpon
+        // in the direction perpendicular to the line to tpdir
+        // in genearl the structure will be:
+        // tpir ---- tpon - this     where "this" is the beginning of
+        // a smaller branch at the same position as tpon but with smaller
+        // radius
+
+        // E.info("top alignment " + tpdir + " " + tpon + " " + this + " offset=" +offset);
+
+        double dx = tpon.getX() - tpdir.getX();
+        double dy = tpon.getY() - tpdir.getY();
+        double l = Math.sqrt(dx * dx + dy * dy);
+        double vx = -dy / l;
+        double vy = dx / l;
+
+        double dist = offset - (tpon.getRadius() - getRadius());
+
+        x = tpon.getX() + dist * vx;
+        y = tpon.getY() + dist * vy;
+        z = tpon.getZ();
+    }
+
+
+
+    public TreePoint largestNeighborNot(TreePoint cpb) {
+        TreePoint ret = null;
+        for (int i = 0; i < nnbr; i++) {
+            if ((ret == null && nbr[i] != cpb) ||
+                    (ret != null && nbr[i].r > ret.r)) {
+                ret = nbr[i];
+            }
         }
         return ret;
     }

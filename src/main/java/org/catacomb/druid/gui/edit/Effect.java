@@ -35,12 +35,10 @@ public class Effect implements Viewer, TargetStoreUser {
         return targetID;
     }
 
-    @SuppressWarnings("unused")
     public void apply(boolean b) {
         E.override();
     }
 
-    @SuppressWarnings("unused")
     public void apply(String s) {
         E.override();
     }

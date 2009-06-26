@@ -3,6 +3,9 @@ package org.catacomb.util;
 
 /*
  * $Log: DiffPrint.java,v $
+ * Revision 1.1  2009-06-23 03:37:27  rcc
+ * first commit
+ *
  * Revision 1.2  2007-08-31 20:01:54  rcc
  * misc
  *

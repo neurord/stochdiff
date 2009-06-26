@@ -22,7 +22,17 @@ public class TreeBoxDiscretizer {
 
     public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, int geom,
                                 double d2d) {
+
+
+        TreePoint base = srcPoints[0];
+        // TODO - could be better to check if we need to start from a different point,
+        // but probably best to require model specification to start with the
+        // main segment
+        TreeUtil.parentizeFrom(base, srcPoints);
+        TreeUtil.orientAC(base, srcPoints);
+
         SegmentSlicer ss = new SegmentSlicer(srcPoints);
+
 
         TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
 

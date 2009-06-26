@@ -59,7 +59,7 @@ public class SegmentSlicer {
 
         resolution = new Resolution(dx, resHM);
 
-        maxnp = 20000; // should know waht your doing if set dx;
+        maxnp = 20000; // should know what your doing if set dx;
         discretize();
         return getSlices();
     }
@@ -113,9 +113,21 @@ public class SegmentSlicer {
                         int nadd = (int)(Math.round(dab / localDelta)) - 1;
                          */
 
+
+
                         if (nadd < 0) {
-                            E.warning("distance between points is smaller than the desired element size " + dab + " " + localDelta + " " +
-                                      cpa + " " + cpb);
+                            if (dab < 0.01) {
+                                // presumably cpb is the start point of a new
+                                // segment positioned at cpa but with a different radius
+                                cpb.setSubAreaOf(cpa);
+
+                                cpb.alignTop(cpa, cpa.largestNeighborNot(cpb), cpa.partBranchOffset);
+                                cpa.partBranchOffset += 2 * cpb.r;
+
+                            } else {
+                                E.warning("distance between points is smaller than the desired element size " + dab + " " + localDelta + " " +
+                                          cpa + " " + cpb);
+                            }
                             nadd = 0;
                         }
 
@@ -135,11 +147,19 @@ public class SegmentSlicer {
                         //<--WK: change the coordinates of cpb to make all volume elements
                         //be localDelta-by-localDelta-squares.  The distance between cpa and modified cpb
                         //now becomes localDelta*(floor(dab/localDelta)).
+
+                        /*
+                        // RCC temporarily removed - for daughter branches, the daughter
+                        // points would have to be moved too or you get extra segments you
+                        // don't want
+
                         TreePoint cp = new TreePoint();
                         cp.locateBetween(cpa, cpb, (nadd+1)/distance_over_delta);
                         cpb.x = cp.x;
                         cpb.y = cp.y;
                         cpb.z = cp.z;
+                        */
+
 
                         //System.out.println("start and end points " + cpa.x + " " + cpa.y + " " + cpb.x + " " + cpb.y); //wk
                         //System.out.println("distance delta nadd " + dab + " " + localDelta + " " + nadd); //wk

@@ -38,7 +38,6 @@ public class DruDrawingCanvas extends DruPanel implements GraphicsView {
         drawingCanvas.setAxisColor(c);
     }
 
-    @SuppressWarnings("unused")
     public void setMode(int imode) {
     }
 

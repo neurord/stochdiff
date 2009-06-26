@@ -9,7 +9,6 @@ public class TextSplitter {
 
     //String sourceText;
 
-    @SuppressWarnings("unused")
     public TextSplitter(String txt) {
         //  sourceText = txt;
     }

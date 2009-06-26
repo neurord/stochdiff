@@ -30,7 +30,7 @@ public class DCheckbox extends JCheckBox implements DComponent, ActionListener {
 
     }
 
-    public DCheckbox(String lab, @SuppressWarnings("unused")
+    public DCheckbox(String lab,
                      String action) {
         super(lab);
         label = lab;

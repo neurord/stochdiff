@@ -86,23 +86,18 @@ public class MouseModeController implements Controller, ModeController {
         exportMode("mouse", s);
     }
 
-    @SuppressWarnings("unused")
     public void setPan(boolean b) {
         exportMode("mouse", "pan");
     }
-    @SuppressWarnings("unused")
     public void setZoomIn(boolean b) {
         exportMode("mouse", "zoomIn");
     }
-    @SuppressWarnings("unused")
     public void setZoomOut(boolean b) {
         exportMode("mouse", "zoomOut");
     }
-    @SuppressWarnings("unused")
     public void setBox(boolean b) {
         exportMode("mouse", "box");
     }
-    @SuppressWarnings("unused")
     public void setMulti(boolean b) {
         exportMode("mouse", "all");
     }

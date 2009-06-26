@@ -181,7 +181,6 @@ public abstract class ProducerConsumerBoard {
         return ret;
     }
 
-    @SuppressWarnings("unused")
     public void connect(Producer producer, Consumer consumer) {
         E.override();
     }
@@ -195,7 +194,6 @@ public abstract class ProducerConsumerBoard {
 
     }
 
-    @SuppressWarnings("unused")
     private void logUnresolved(HashMap<?, ?> hm, String s, String boardID) {
         /* TODO reinstate log and report some other way
         if (hm != null) {
@@ -249,7 +247,6 @@ public abstract class ProducerConsumerBoard {
         }
     }
 
-    @SuppressWarnings("unused")
     public void connectVisibleViewer(Visible vbl, Viewer vwr) {
         E.override();
     }

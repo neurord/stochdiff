@@ -62,7 +62,6 @@ public abstract class DBaseButton extends JButton implements DComponent {
     public abstract void setFg(Color c);
 
 
-    @SuppressWarnings("unused")
     public void setRolloverPolicy(int inorm, int ihover) {
         E.missing();
     }
@@ -72,7 +71,6 @@ public abstract class DBaseButton extends JButton implements DComponent {
 
     }
 
-    @SuppressWarnings("unused")
     public void setPadding(int pl, int pr, int pt, int pb) {
         E.missing();
     }

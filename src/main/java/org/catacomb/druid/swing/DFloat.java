@@ -127,7 +127,6 @@ public class DFloat extends JPanel
         setValue(d, null);
     }
 
-    @SuppressWarnings("unused")
     public void setValue(double d, Object src) {
         value = d;
         dFloatSlider.setValue(d);

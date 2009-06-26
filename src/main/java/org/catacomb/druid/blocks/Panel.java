@@ -128,7 +128,6 @@ public abstract class Panel implements Realizer, IDd {
     }
 
 
-    @SuppressWarnings("unused")
     private final void applyBorder(DruPanel drup, Context ctx) {
 
         int[] bds = { paddingLeft, paddingRight, paddingTop, paddingBottom };

@@ -94,7 +94,6 @@ public class DInt extends JPanel implements DComponent, LabelActor, TextActor {
         }
     }
 
-    @SuppressWarnings("unused")
     public void setLabel(String s) {
         // dFloatSlider.setLabel(s);
     }
@@ -115,7 +114,6 @@ public class DInt extends JPanel implements DComponent, LabelActor, TextActor {
         setValue(i, null);
     }
 
-    @SuppressWarnings("unused")
     public void setValue(int i, Object src) {
         value = i;
         // dFloatSlider.setValue(i);

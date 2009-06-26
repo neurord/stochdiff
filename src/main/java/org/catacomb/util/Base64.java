@@ -2,7 +2,7 @@ package org.catacomb.util;
 
 /*
 
-* $Id: Base64.java,v 1.1 2007-08-13 13:20:39 rcc Exp $
+* $Id: Base64.java,v 1.1 2009-06-23 03:37:27 rcc Exp $
 *
 * Copyright (c) 2000-2002 by Russell Gold
 *

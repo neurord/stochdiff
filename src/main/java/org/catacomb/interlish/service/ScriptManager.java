@@ -105,7 +105,6 @@ public class ScriptManager {
         sourceHM.put(hcnm, p);
     }
 
-    @SuppressWarnings("unused")
     private ScriptSource getScriptSource(Object host, int role) {
         ScriptSource ss = null;
         String hcl = host.getClass().getName();

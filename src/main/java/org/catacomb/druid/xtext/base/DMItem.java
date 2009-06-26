@@ -28,7 +28,6 @@ public class DMItem {
         parent = dmi;
     }
 
-    @SuppressWarnings("unused")
     public void childChanged(Object src) {
 
     }

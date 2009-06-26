@@ -12,12 +12,10 @@ public class XRelation {
     public XRelation(XRelationType xrt) {
         type = xrt;
     }
-    @SuppressWarnings("unused")
     public void setA(String atxt, Object asrc) {
         aText = atxt;
 
     }
-    @SuppressWarnings("unused")
     public void setB(String btxt, Object bsrc) {
         bText = btxt;
     }

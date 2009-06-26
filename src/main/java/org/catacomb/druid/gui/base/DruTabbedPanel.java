@@ -33,7 +33,6 @@ public class DruTabbedPanel extends DruPanel implements PanelListener {
     }
 
 
-    @SuppressWarnings("unused")
     public DruTabbedPanel(String s) {
         this();
     }

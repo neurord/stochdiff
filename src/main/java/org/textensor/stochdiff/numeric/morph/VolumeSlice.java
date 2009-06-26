@@ -11,8 +11,7 @@ public class VolumeSlice {
     int ny;
     double boxSize;
     double radius;
-    double xSize;
-    double ySize;
+
 
     int icenter;
     int jcenter;
@@ -51,7 +50,7 @@ public class VolumeSlice {
                 }
             }
         }
-        E.info("created a volume slice " + nx + " by " + ny + " filling " + nt + " of " + (nt + nf));
+        // E.info("created a volume slice " + nx + " by " + ny + " filling " + nt + " of " + (nt + nf));
     }
 
 
@@ -73,7 +72,7 @@ public class VolumeSlice {
 
         // center of the box at 0,0
         double x0 = -1 * icenter * boxSize;
-        double y0 = -1 * icenter * boxSize;
+        double y0 = -1 * jcenter * boxSize;
 
 
         // this is a little confusing. X and Y axes are used within the slice, but when these are
@@ -267,6 +266,140 @@ public class VolumeSlice {
         }
         return ave;
     }
+
+
+    public void subPlaneConnect(TreePoint tp, TreePoint tpn, VolumeSlice vg,
+                                double pborel) {
+        double pbo = 1 * (pborel - (radius - vg.radius));
+
+        E.info("connecting to a subplane size " + vg.radius + " np=" + vg.nx +
+               " offset by " + pbo);
+        E.info("boxes and dims: " + boxSize + ", " + vg.boxSize + " " +
+               nx + "," + vg.nx + "  rads " + radius + ", " + vg.radius);
+        // pbo is the offset in y to be applied to the target slice, vg
+
+        /* we have nx, ny, xsize and radius
+         * the target slice, vg has the same things
+         *
+         * need to couple our elements with the target slice elements where
+         * they overlap with weight proportional to the fraction of our side
+         * area that overlaps.
+         *
+         * compute target corners for all our elements
+         * compute target corners for all elts in target slice, apply shift
+         *
+         * option 1: loop over target elts for each one of ours, compute overlap
+         * if any, join.  - simple to implement, but slow
+         *
+         * option 2: for each target element, find the sorce elements in which
+         * its corners lie and itereate over them only
+         *
+         *
+         */
+
+
+        double xtg0 = -1 * vg.icenter * vg.boxSize;
+        double ytg0 = -1 * vg.jcenter * vg.boxSize + pbo;
+
+        int ncpld = 0;
+
+        for (int itg = 0; itg < vg.nx; itg++) {
+            for (int jtg = 0; jtg < vg.ny; jtg++) {
+                if (vg.hasElement(itg, jtg)) {
+                    double cxtg = xtg0 + itg * vg.boxSize;
+                    double cytg = ytg0 + jtg * vg.boxSize;
+
+                    int ilmin = getIBox(cxtg);
+                    int jlmin = getJBox(cytg);
+
+                    int ilmax = getIBox(cxtg + vg.boxSize);
+                    int jlmax = getJBox(cytg + vg.boxSize);
+
+                    for (int il = ilmin; il <= ilmax; il++) {
+                        for (int jl = jlmin; jl <= jlmax; jl++) {
+                            if (hasElement(il, jl)) {
+
+                                double ovlp = overlapFactor(getX(il), getY(il), boxSize,
+                                                            cxtg, cytg, vg.boxSize);
+                                if (ovlp > 0.) {
+
+                                    getElement(il,jl).coupleTo(vg.getElement(itg, jtg),
+                                                               ovlp * boxSize * boxSize);
+                                    ncpld += 1;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+        }
+        E.info("coupled " + ncpld + " elements ");
+    }
+
+    private double overlapFactor(double mex, double mey, double med,
+                                 double tgtx, double tgty, double tgtd) {
+
+        double fx = ovlp1D(mex, med, tgtx, tgtd);
+        double fy = ovlp1D(mey, med, tgty, tgtd);
+        double ret = fx * fy;
+        return ret;
+    }
+
+
+    private double ovlp1D(double mex, double med, double tgtx, double tgtd) {
+        double ret = 0.;
+        if (mex <= tgtx) {
+            if (mex + med > tgtx + tgtd) {
+                ret = tgtd;
+            } else {
+                ret = mex + med - tgtx;
+            }
+
+        } else {
+            if (mex + med > tgtx + tgtd) {
+                ret = med;
+            } else {
+                ret = tgtx + tgtd - mex;
+            }
+        }
+        return ret / med;
+    }
+
+
+    public double getX(int i) {
+        double ret = (-nx/2. + i) * boxSize;
+        return ret;
+    }
+
+
+    public double getY(int j) {
+        double ret = (-ny/2. + j) * boxSize;
+        return ret;
+    }
+
+
+    public boolean hasElement(int i, int j) {
+        boolean ret = false;
+        if (i >= 0 && i < nx && j >= 0 && j < ny) {
+            ret = present[i][j];
+        }
+        return ret;
+    }
+
+
+    public int getIBox(double x) {
+        int ret = (int)(x / boxSize + nx / 2.);
+        return ret;
+    }
+
+    public int getJBox(double y) {
+        int ret = (int)(y / boxSize + ny / 2.);
+        return ret;
+    }
+
+
 
 
 }

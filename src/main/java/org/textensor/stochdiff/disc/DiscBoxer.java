@@ -3,6 +3,7 @@ package org.textensor.stochdiff.disc;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
@@ -52,6 +53,7 @@ public class DiscBoxer {
                 firstpt = tp;
             }
         }
+        TreeUtil.parentizeFrom(firstpt, srcPoints);
 
         gridAL = new ArrayList<VolumeSlice>();
         VolumeSlice vg0 = null;
@@ -71,6 +73,10 @@ public class DiscBoxer {
 
     private void recAdd(VolumeSlice pGrid, TreePoint tp) {
         String lbl = tp.getLabel();
+
+        tp.partBranchOffset = 0.;
+
+
         for (TreePoint tpn : tp.getNeighbors()) {
             if (wkpHS.contains(tpn)) {
                 wkpHS.remove(tpn);
@@ -80,33 +86,51 @@ public class DiscBoxer {
                     lbl = tpn.getLabel();
                 }
 
-                VolumeSlice vg = nextVolumeSlice(pGrid, tp, tpn, lbl);
-                lbl = null;
-                gridAL.add(vg);
-                recAdd(vg, tpn);
+                VolumeSlice vg = null;
+                if (tpn.subAreaPeer == tp) {
+                    // nothing to do for now - put line in when we
+                    // do the first child of tpn
+                    // E.info("skipping pt with peer " + tpn);
+
+                } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
+                    // E.info("first pt after branch " + tpn);
+                    TreePoint par = tp.parent;
+                    E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
+
+                    vg = baseGrid(tp, tpn, lbl);
+                    pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
+                    par.partBranchOffset += 2 * tpn.r;
+
+                } else {
+                    // normal case: make a new one or add a slice and connect
+                    // it up with the centres aligned
+                    if (pGrid == null) {
+                        vg = baseGrid(tp, tpn, lbl);
+
+                    } else {
+                        // TODO - probably not what we want
+                        // too much mumerical diffusion if boxes can have gradually changing
+                        // sizes? restrict to a few dicrete multiples?
+                        vg = baseGrid(tp, tpn, lbl);
+                        pGrid.planeConnect(vg);
+                    }
+
+                }
+
+                lbl = null; // only use it once
+                if (vg != null) {
+                    gridAL.add(vg);
+                    recAdd(vg, tpn);
+                } else {
+                    // skipped the point that is the start of a new segment
+                    // of different radius
+                    recAdd(pGrid, tpn);
+                }
             }
         }
     }
 
 
-
-
-    public VolumeSlice nextVolumeSlice(VolumeSlice parentGrid,
-                                       TreePoint tpa, TreePoint tpb, String lbl) {
-
-        VolumeSlice ret = null;
-        if (parentGrid == null) {
-            ret = baseGrid(tpa, tpb, lbl);
-
-        } else {
-            // TODO - probably not what we want
-            // too much mumerical diffusion if boxes can have gradually changing
-            // sizes? restrict to a few dicrete multiples?
-            ret = baseGrid(tpa, tpb, lbl);
-            parentGrid.planeConnect(ret);
-        }
-        return ret;
-    }
 
 
     public VolumeSlice baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
@@ -116,7 +140,7 @@ public class DiscBoxer {
         double delta = resolution.getLocalDelta(tpa, tpb);
 
 
-        VolumeSlice ret = new VolumeSlice(delta, 2. * r);
+        VolumeSlice ret = new VolumeSlice(delta, r);
         ret.discFill(tpa, tpb, lbl, rgn);
 
         return ret;

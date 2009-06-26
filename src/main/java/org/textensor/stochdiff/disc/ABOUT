@@ -1,9 +1,9 @@
 
 
 These are various ways of turning a morphology into a set of elements of constrained volume. 
-The output is a set of boxes each with a volume and coupling constats to its neighbors.
+The output is a set of boxes each with a volume and coupling constants to its neighbors.
 
-The SegmentSlicer cuts segments along their axis but doesn't slicek them up 
+The SegmentSlicer cuts segments along their axis but doesn't slice them up 
 longitudionally (that is, it 'segments' as in segments of a dendrite, not segments of 
 an orange)
 

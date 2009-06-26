@@ -30,12 +30,11 @@ public class DruScrollingCheckboxListPanel extends DruCheckboxListPanel {
         dList.setToggleAction();
     }
 
-    @SuppressWarnings("unused")
     public void addClickAction(DruListClickActor actor) {
         E.missing();
     }
 
-    @SuppressWarnings("unused")
+
     public void setOrder(int reverse_order) {
         E.missing();
     }

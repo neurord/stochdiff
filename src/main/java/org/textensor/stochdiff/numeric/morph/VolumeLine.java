@@ -10,6 +10,7 @@ package org.textensor.stochdiff.numeric.morph;
 
 
 
+import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 
 import java.util.ArrayList;
@@ -156,6 +157,65 @@ public class VolumeLine {
         }
     }
 
+
+    public void subPlaneConnect(TreePoint tp, TreePoint tpl, VolumeLine tgt,
+                                double offset) {
+
+        E.info("segment junction: " + nl + " points across " + lSize +
+               " being connected to " + tgt.nl + " across " + tgt.lSize);
+
+        double[][] rngme = makeRanges(lSize, nl);
+        double[][] rngtgt = makeRanges(tgt.lSize, tgt.nl);
+
+        // these are centered on 0, so we need to shift the smaller one
+        // back so the edges line up and then move it by the current
+        // offset
+        // -1 here because we measure from the "bottom" of the parent segment
+        double offeff = -1 * (offset - 0.5 * (lSize - tgt.lSize));
+        E.info("shifting child branch " + offeff + " relative to parent center");
+
+        // E.info("effoff " + offset + " " + lSize + " " + tgt.lSize + " " + offeff);
+        for (int i = 0; i < rngtgt.length; i++) {
+            rngtgt[i][0] += offeff;
+            rngtgt[i][1] += offeff;
+        }
+
+        /*
+        for (int i = 0; i < rngme.length; i++) {
+           E.info("rngme " + rngme[i][0] + " to " + rngme[i][1]);
+        }
+        for (int i = 0; i < rngtgt.length; i++) {
+           E.info("rngtgt " + rngtgt[i][0] + " to " + rngtgt[i][1]);
+        }
+        */
+
+        for (int i = 0; i < tgt.nl; i++) {
+            VolumeElement vtgt = tgt.getElement(i);
+
+            for (int jme = 0; jme < nl; jme++) {
+                double fol = overlapFactor(rngme[jme], rngtgt[i]);
+                if (fol > 0.001) {
+                    VolumeElement vme = getElement(jme);
+                    vme.coupleTo(vtgt, fol * vme.getSideArea());
+                    E.info("coupled parent element " + jme + " to child element " + i + " overlap factor = " + fol);
+                }
+            }
+        }
+
+        // NB this is second order in the number of elements across a segment,
+        // which could get slow if there are lots (hundreds). Then it could be
+        // worth being a bit smarter and walking through keeping track of the
+        // position and moving relative to that.
+        // But this method is also only used on branches to smaller elements
+        // so it doesn't get called a lot.
+
+    }
+
+
+
+
+
+
     private void smallBigMatchConnect(VolumeLine tgt) {
         // always have dlme <= dltgt, so at most two components in tgt
         // for one in me
@@ -192,6 +252,8 @@ public class VolumeLine {
     }
 
 
+
+
     public int getFirstOverlap(double[] rng, double[][] tgts) {
         int iol = 0;
         while (iol < tgts.length-1 && (rng[1] <= tgts[iol][0] || rng[0] >= tgts[iol][1])) {
@@ -204,7 +266,7 @@ public class VolumeLine {
         double dr = rng[1] - rng[0];
         double ret = 0.;
         if (rng[0] >= tgt[0] && rng[1] <= tgt[1]) {
-            // fully enclosed;
+            // fully enclosed: rng is within tgt;
             ret = dr;
         } else if (rng[1] <= tgt[0] || rng[0] >= tgt[1]) {
             // no overlap
@@ -214,8 +276,13 @@ public class VolumeLine {
             ret = rng[1] - tgt[0];
 
         } else if (rng[1] >= tgt[1]) {
-            // upper end of tgt;
-            ret = tgt[1] - rng[0];
+            if (rng[0] < tgt[0]) {
+                // fully enclosed: tgt is within rng;
+                ret = tgt[1] - tgt[0];
+            } else {
+                // upper end of tgt;
+                ret = tgt[1] - rng[0];
+            }
         }
 //    <--WK
         ret /= dr;

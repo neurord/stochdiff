@@ -14,7 +14,6 @@ public class DSimpleSlider extends JSlider implements DComponent, ChangeListener
 
     LabelActor labelActor;
 
-    @SuppressWarnings("unused")
     public DSimpleSlider(int min, int max, String label) {
         super(min, max);
         addChangeListener(this);

@@ -42,7 +42,6 @@ public abstract class DruSubcontainerPanel extends DruPanel {
         E.missing();
     }
 
-    @SuppressWarnings("unused")
     public void addPanel(String pos, DruPanel drup) {
         E.missing();
     }

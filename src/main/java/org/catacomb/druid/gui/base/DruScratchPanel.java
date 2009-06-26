@@ -28,7 +28,6 @@ public class DruScratchPanel extends DruPanel {
     }
 
 
-    @SuppressWarnings("unused")
     public void labelAction(String s, boolean b) {
 
     }

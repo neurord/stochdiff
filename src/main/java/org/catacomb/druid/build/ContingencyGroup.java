@@ -10,7 +10,6 @@ public class ContingencyGroup {
 
     ArrayList<GroupContingent> contingents;
 
-    @SuppressWarnings("unused")
     public ContingencyGroup(String s) {
         contingents = new ArrayList<GroupContingent>();
     }

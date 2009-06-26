@@ -228,7 +228,6 @@ public class TextBoard extends RegionBoard
         }
         repaint();
     }
-    @SuppressWarnings("unused")
     public void dropOn(Object src, String txt, Object tgt, String tag) {
 
     }

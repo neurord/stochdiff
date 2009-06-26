@@ -282,7 +282,6 @@ public class DSlider extends JPanel implements DComponent, MouseSource, MouseLis
     }
 
 
-    @SuppressWarnings("unused")
     public void rsfMouseDown(int x, int y, long when, int button) {
 
         state = NONE;
@@ -299,12 +298,10 @@ public class DSlider extends JPanel implements DComponent, MouseSource, MouseLis
     }
 
 
-    @SuppressWarnings("unused")
     public void rsfMouseUp(int x, int y) {
     }
 
 
-    @SuppressWarnings("unused")
     public void rsfMouseDrag(int x, int y) {
         if (state == DRAG) {
             moveTo(x);

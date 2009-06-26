@@ -26,7 +26,6 @@ public class DruAssemblyPanel extends DruBorderPanel implements AssemblyEditor {
     ModeController modeController;
 
 
-    @SuppressWarnings("unused")
     public DruAssemblyPanel(int w, int h, String bsName) {
         super();
         prefw = w;

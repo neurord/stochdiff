@@ -46,7 +46,6 @@ public class Labeller {
 
 
 
-    @SuppressWarnings("unused")
     public void adjustLabels(Box b) {
 
     }

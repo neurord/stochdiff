@@ -335,7 +335,6 @@ public class DFloatSlider extends JPanel
     }
 
 
-    @SuppressWarnings("unused")
     public void rsfMouseDown(int x, int y, long when, int button) {
         // requestFocus();
 
@@ -361,7 +360,6 @@ public class DFloatSlider extends JPanel
     }
 
 
-    @SuppressWarnings("unused")
     public void rsfMouseUp(int x, int y) {
     }
 

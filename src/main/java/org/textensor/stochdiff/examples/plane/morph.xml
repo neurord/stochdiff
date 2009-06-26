@@ -1,0 +1,24 @@
+<Morphology>
+
+    <Segment id="seg1" region="dendrite">
+	<start x="1.0" y="1.0" z="0.0" r="0.5"/>
+	<end   x="3.0" y="1.0" z="0.0" r="0.5"/>
+    </Segment>
+
+    <Segment id="seg2" region="branch1">
+    <start on="seg1" at="end" r = "0.3"/>
+    <end   x="4.0" y="1.5" z="0.0" r="0.1"/>
+    </Segment>
+
+	<Segment id="seg4" region="branch4">
+    <start on="seg2" at="end"/>
+    <end   x="5.0" y="1.5" z="0.0" r="0.1"/>
+    </Segment>
+
+
+    <Segment id="seg3" region="branch2">
+	<start on="seg1" at="end" r="0.2"/>
+	<end   x="6.0"   y="0.5" z="0.0"  r="0.1"/>
+    </Segment>
+
+</Morphology>

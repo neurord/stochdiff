@@ -1,11 +1,14 @@
 package org.textensor.stochdiff.disc;
 
 import java.util.HashSet;
+import java.util.Queue;
 
 import java.util.HashMap;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
@@ -25,6 +28,8 @@ import org.textensor.stochdiff.numeric.morph.VolumeLine;
 
 
 
+// TODO - make a subclass of Boxer, share with VolumeBoxer, pull
+// various things up
 public class LineBoxer {
 
     TreePoint[] srcPoints;
@@ -59,6 +64,9 @@ public class LineBoxer {
             }
         }
 
+        TreeUtil.parentizeFrom(firstpt, srcPoints);
+
+
         gridAL = new ArrayList<VolumeLine>();
         VolumeLine vg0 = null;
         wkpHS.remove(firstpt);
@@ -74,9 +82,12 @@ public class LineBoxer {
 
 
 
-
     private void recAdd(VolumeLine pGrid, TreePoint tp) {
         String lbl = tp.getLabel();
+
+        tp.partBranchOffset = 0.;
+
+        //  E.info("processing " + tp);
 
         for (TreePoint tpn : tp.getNeighbors()) {
             if (wkpHS.contains(tpn)) {
@@ -87,33 +98,50 @@ public class LineBoxer {
                     lbl = tpn.getLabel();
                 }
 
-                VolumeLine vg = nextVolumeLine(pGrid, tp, tpn, lbl);
-                lbl = null; // unly use it once
-                gridAL.add(vg);
-                recAdd(vg, tpn);
+                VolumeLine vg = null;
+                if (tpn.subAreaPeer == tp) {
+                    // nothing to do for now - put line in when we
+                    // do the first child of tpn
+                    // E.info("skipping pt with peer " + tpn);
+
+                } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
+                    // E.info("first pt after branch " + tpn);
+                    TreePoint par = tp.parent;
+                    E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
+
+                    vg = baseGrid(tp, tpn, lbl);
+                    pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
+                    par.partBranchOffset += 2 * tpn.r;
+
+                } else {
+                    if (pGrid == null) {
+                        vg = baseGrid(tp, tpn, lbl);
+
+                    } else {
+                        // TODO - probably not what we want
+                        // too much mumerical diffusion if boxes can have gradually changing
+                        // sizes? restrict to a few dicrete multiples?
+                        vg = baseGrid(tp, tpn, lbl);
+                        pGrid.planeConnect(vg);
+                    }
+
+                }
+
+                lbl = null; // only use it once
+                if (vg != null) {
+                    gridAL.add(vg);
+                    recAdd(vg, tpn);
+                } else {
+                    // skipped the point that is the start of a new segment
+                    // of different radius
+                    recAdd(pGrid, tpn);
+                }
             }
         }
     }
 
 
 
-
-    public VolumeLine nextVolumeLine(VolumeLine parentGrid,
-                                     TreePoint tpa, TreePoint tpb, String lbl) {
-
-        VolumeLine ret = null;
-        if (parentGrid == null) {
-            ret = baseGrid(tpa, tpb, lbl);
-
-        } else {
-            // TODO - probably not what we want
-            // too much mumerical diffusion if boxes can have gradually changing
-            // sizes? restrict to a few dicrete multiples?
-            ret = baseGrid(tpa, tpb, lbl);
-            parentGrid.planeConnect(ret);
-        }
-        return ret;
-    }
 
 
     public VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {

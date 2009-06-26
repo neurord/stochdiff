@@ -121,7 +121,6 @@ public class FrameController implements Controller, GUISourced {
         return "*";
     }
 
-    @SuppressWarnings("unused")
     public void show(Object obj) {
     }
 

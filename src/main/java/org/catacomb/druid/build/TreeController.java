@@ -48,7 +48,6 @@ public class TreeController implements Controller, GUISourced, SelectionActor {
         }
     }
 
-    @SuppressWarnings("unused")
     public void repivot(String s) {
         E.missing();
     }

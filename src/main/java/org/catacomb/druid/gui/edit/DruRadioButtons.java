@@ -20,7 +20,6 @@ public class DruRadioButtons extends DruGCPanel implements LabelActor, Ablable, 
 
     StringValue stringValue;
 
-    @SuppressWarnings("unused")
     public DruRadioButtons(String lab, String act, String layout) {
 
         setActionMethod(act);

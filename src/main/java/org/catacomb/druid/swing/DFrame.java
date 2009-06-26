@@ -188,7 +188,6 @@ public class DFrame extends JFrame implements WindowListener, ComponentListener 
     public void componentShown(ComponentEvent e) {
     }; // dce(e); }
 
-    @SuppressWarnings("unused")
     private void dce(ComponentEvent e) {
         if (isVisible()) {
             Rectangle r = getBounds();

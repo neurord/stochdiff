@@ -13,7 +13,6 @@ public class DTreePanel extends JPanel {
 
     JTree jTree;
 
-    @SuppressWarnings("unused")
     public DTreePanel(String s) {
         super();
 

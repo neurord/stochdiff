@@ -33,7 +33,6 @@ public class DruLogPanel extends DruGCPanel implements LogNotificand, Consumer, 
     boolean pendingEntry = false;
 
 
-    @SuppressWarnings("unused")
     public DruLogPanel(int h) {
         super();
 

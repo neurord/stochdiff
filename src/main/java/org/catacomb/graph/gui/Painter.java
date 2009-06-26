@@ -181,7 +181,6 @@ public final class Painter {
             g.setStroke(new BasicStroke((float)w));
         }
     }
-    @SuppressWarnings("unused")  // TODO
     void setDashedStroke(double w) {
         if (dashedStroke == null) {
             float[] dashes= {8, 4, 8, 4};
@@ -220,7 +219,6 @@ public final class Painter {
         g.drawPolyline(worldTransform.intDeviceX(xp), worldTransform.intDeviceY(yp), np);
     }
 
-    @SuppressWarnings("unused")
     public void drawPolyline(double[] xp, double[] yp, int np, Color col, double width,
                              boolean widthIsPixels) {
         setBasicStroke(width);
@@ -274,7 +272,6 @@ public final class Painter {
         g.drawPolygon(worldTransform.intDeviceX(xp), worldTransform.intDeviceY(yp), np);
     }
 
-    @SuppressWarnings("unused")
     public void drawPolygon(double[] xp, double[] yp, int np, Color col, double width,
                             boolean widthIsPixels) {
         setBasicStroke(width);
@@ -361,7 +358,6 @@ public final class Painter {
         g.setColor(Color.darkGray);
     }
 
-    @SuppressWarnings("unused")
     public void drawWhiteLine(double width, double[] xp, double[] yp) {
         setColor(Color.white);
         setBasicStroke(3.);
@@ -393,7 +389,6 @@ public final class Painter {
 
 
 
-    @SuppressWarnings("unused")
     public void drawLine(double x0, double y0, double x1, double y1, Color col, double width,
                          boolean widthIsPixels) {
         setBasicStroke(width);
@@ -539,7 +534,6 @@ public final class Painter {
 
 
 
-    @SuppressWarnings("unused")
     public void fillCenteredRectangle(double x, double y, double rx, double ry) {
         E.missing();
     }
@@ -607,7 +601,6 @@ public final class Painter {
 
 
 
-    @SuppressWarnings("unused")
     public void drawCenteredOval(double cx, double cy, double rx, double ry,
                                  Color clin, double width, boolean widthIsPixels) {
 
@@ -637,7 +630,6 @@ public final class Painter {
     }
 
 
-    @SuppressWarnings("unused")
     public void drawFilledOval(double cx, double cy, double rx, double ry, Color cfill,
                                Color cborder, double width, boolean widthIsPixels) {
 
@@ -669,7 +661,6 @@ public final class Painter {
         g.fillRect(ix - w/2, iy - h/2, w, h);
     }
 
-    @SuppressWarnings("unused")
     public void drawFilledRectangle(double cx, double cy, double rx, double ry, Color cfill,
                                     Color cborder, double width, boolean widthIsPixels) {
 
@@ -690,7 +681,6 @@ public final class Painter {
         }
     }
 
-    @SuppressWarnings("unused")
     public void drawRectangle(double cx, double cy, double rx, double ry,
                               Color cborder, double width, boolean widthIsPixels) {
 
@@ -731,7 +721,6 @@ public final class Painter {
         setNormalStroke();
     }
 
-    @SuppressWarnings("unused")
     public void drawOval(double cx, double cy, double rx, double ry, Color cborder, double width,
                          boolean widthIsPixels) {
 
@@ -1022,6 +1011,46 @@ public final class Painter {
     }
 
 
+
+    public void drawColoredCells(double[][][] mesh, double[] dat, boolean[] mask) {
+        int nel = dat.length;
+
+        if (colorTable == null) {
+            setDefaultColorTable();
+        }
+
+        double dc = ctMax - ctMin;
+        if (dc <= 0.) {
+            dc = 1.;
+        }
+        for (int i = 0; i < nel; i++) {
+            if (mask[i]) {
+                double[] xb = mesh[i][0];
+                double[] yb = mesh[i][1];
+
+
+                double fc = (dat[i] - ctMin) / dc;
+                if (fc < 0.) {
+                    fc = 0.;
+                }
+                int ic = (int)(255 * fc);
+                if (ic > 255) {
+                    ic = 255;
+                }
+                if (ic < 0) {
+                    ic = 0;
+                }
+                fillPolygon(xb, yb, xb.length, colorTable[ic]);
+            }
+        }
+    }
+
+
+
+
+
+
+
     public void paintLegend(int ileg, String s) {
         int w = worldTransform.getCanvasWidth();
         g.drawString(s, w-80, 30 + 20 * ileg);
@@ -1114,7 +1143,6 @@ public final class Painter {
     }
 
 
-    @SuppressWarnings("unused")
     public final void draw3DMark(double x, double y, double z, int ityp, int isize) {
         int ix = powx(xProj(x, y, z));
         int iy = powy(yProj(x, y, z));

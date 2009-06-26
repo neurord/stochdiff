@@ -286,7 +286,6 @@ public class DChoice extends JButton implements DComponent,
         // menu.show(this, 0, 18);
     }
 
-    @SuppressWarnings("unused")
     public void stateChanged(ChangeEvent cev) {
 
     }

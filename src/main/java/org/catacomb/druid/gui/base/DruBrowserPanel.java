@@ -136,7 +136,6 @@ public class DruBrowserPanel extends DruPanel implements PageDisplay {
 
 
 
-    @SuppressWarnings("unused")
     public void labelAction(String s,  boolean b) {
 
     }
@@ -151,7 +150,6 @@ public class DruBrowserPanel extends DruPanel implements PageDisplay {
     }
 
 
-    @SuppressWarnings("unused")
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }
@@ -164,7 +162,6 @@ public class DruBrowserPanel extends DruPanel implements PageDisplay {
         return true;
     }
 
-    @SuppressWarnings("unused")
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         return 10;
     }

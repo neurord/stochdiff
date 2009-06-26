@@ -42,21 +42,17 @@ public class FUImportContext implements ImportContext {
         return null;
     }
 
-    @SuppressWarnings("unused")
     public boolean hasRelative(String sr) {
         return false;
     }
 
-    @SuppressWarnings("unused")
     public ContentReader getRelativeReader(String sr) {
         return null;
     }
-    @SuppressWarnings("unused")
     public File getRelativeFile(String sr) {
         return null;
     }
 
-    @SuppressWarnings("unused")
     public String getExtensionRelativeName(String ext) {
         return null;
     }
