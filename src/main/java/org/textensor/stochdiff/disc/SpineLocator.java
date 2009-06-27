@@ -218,6 +218,7 @@ public class SpineLocator {
             double[] aw = sp.getWidths();
             String[] pl = sp.getLabels();
             String[] prl = sp.getRegions();
+
             double ltot = ax[ax.length-1];
             int nel = (int)(ltot / dx + 0.5);
             if (nel < 1) {
@@ -230,16 +231,33 @@ public class SpineLocator {
             String[] lbls = new String[nel];
             String[] rgns = new String[nel];
             int ipr = 0;
+
+            for (int i = 0; i < nel; i++) {
+                while (ipr < ax.length - 2 && ax[ipr+1] < xbd[i]) {
+                    ipr += 1;
+                }
+                double db = xbd[i] - ax[ipr];
+                double df = ax[ipr+1] - xbd[i];
+
+                if (db < df) {
+                    rgns[i] = prl[ipr];
+                } else {
+                    rgns[i] = prl[ipr + 1];
+                }
+            }
+
             for (int i = 0; i < ax.length; i++) {
-                if (pl[i] != null || prl[i] != null) {
-                    while (true) {
-                        if (ipr == nel - 1 || xbd[ipr+1] > ax[i]) {
-                            break;
+                if (pl[i] != null) {
+                    double dmin = 1.e6;
+                    int imin = 0;
+                    for (int j = 0; j < nel; j++) {
+                        double d = Math.abs(xbd[j] - ax[i]);
+                        if (d < dmin) {
+                            dmin = d;
+                            imin = j;
                         }
-                        ipr = ipr + 1;
                     }
-                    lbls[ipr] = pl[i];
-                    rgns[ipr] = prl[i];
+                    lbls[imin] = pl[i];
                 }
             }
 

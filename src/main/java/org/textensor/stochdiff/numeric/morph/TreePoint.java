@@ -43,6 +43,7 @@ public class TreePoint implements Position {
 
     private HashMap<TreePoint, String> segidHM;
     private HashMap<TreePoint, String> regionHM;
+    private String firstRegion = null;
 
     public String name; // not sure about this POSERR;
 
@@ -322,6 +323,7 @@ public class TreePoint implements Position {
     public void setRegionWith(TreePoint point, String s) {
         if (regionHM == null) {
             regionHM = new HashMap<TreePoint, String>();
+            firstRegion = s;
         }
         regionHM.put(point, s);
     }
@@ -331,6 +333,22 @@ public class TreePoint implements Position {
         String ret = null;
         if (regionHM != null && regionHM.containsKey(tp)) {
             ret = regionHM.get(tp);
+        }
+        // June 2009: this could change a lot of things: previously
+        // we required both ends to be in the same region. Now it is
+        // enough to have the first point of a slice as long as there isn't
+        // a potential ambiguity (eg this point in two regions, but its
+        // neighbor in neither of them)
+        if (ret == null) {
+            ret = soleRegion();
+        }
+        return ret;
+    }
+
+    public String soleRegion() {
+        String ret = null;
+        if (regionHM != null && regionHM.size() == 1) {
+            ret = firstRegion;
         }
         return ret;
     }

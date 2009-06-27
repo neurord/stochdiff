@@ -604,6 +604,9 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     {
                         sb.append("_cytosol");
                     }
+                    if (vgrid.getLabel(i) != null) {
+                        sb.append("_" + vgrid.getLabel(i));
+                    }
                     //WK-->
 
                     sb.append("_Spc_" + specieIDs[speciesIndexOutfm[filenum][j]]);
