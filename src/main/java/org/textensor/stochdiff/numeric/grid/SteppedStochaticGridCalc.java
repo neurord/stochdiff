@@ -606,6 +606,10 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     }
                     if (vgrid.getLabel(i) != null) {
                         sb.append("_" + vgrid.getLabel(i));
+
+                        // RCC - propagating ids for all elements on a spine
+                    } else if (vgrid.getGroupID(i) != null) {
+                        sb.append("_" + vgrid.getGroupID(i));
                     }
                     //WK-->
 

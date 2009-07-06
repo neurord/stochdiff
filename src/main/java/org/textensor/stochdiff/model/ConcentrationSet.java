@@ -51,6 +51,8 @@ public class ConcentrationSet implements AddableTo {
         for (int i = 0; i < ids.length; i++) {
             if (chm.containsKey(ids[i])) {
                 ret[i] = chm.get(ids[i]).getNanoMolarConcentration();
+            } else {
+                ret[i] = -1.;
             }
         }
 

@@ -25,7 +25,7 @@ public class VolumeGrid {
 
     int nelement;
     String[] eltLabels;
-
+    String[] eltGroupIDs;
     String[] regionLabels;
     int[] eltRegions;
 
@@ -125,6 +125,7 @@ public class VolumeGrid {
         exposedAreas = new double[nelement];
         positions = new double[nelement][3];
         eltLabels = new String[nelement];
+        eltGroupIDs = new String[nelement];
         eltRegions = new int[nelement];
         //<--WK
         submembranes = new boolean[nelement];
@@ -138,6 +139,7 @@ public class VolumeGrid {
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
             eltLabels[i] = ve.getLabel();
+            eltGroupIDs[i] = ve.getGroupID();
             //<--WK
             submembranes[i] = ve.getSubmembrane();
             //WK-->
@@ -288,6 +290,9 @@ public class VolumeGrid {
         return eltLabels[i];
     }
 
+    public String getGroupID(int i) {
+        return eltGroupIDs[i];
+    }
 
     public int[][] getAreaIndexes(String[] targetIDs) {
         int[][] ret = new int[targetIDs.length][];

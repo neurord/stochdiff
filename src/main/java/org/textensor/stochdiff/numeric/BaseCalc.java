@@ -233,7 +233,6 @@ public abstract class BaseCalc {
         double d = disc.defaultMaxElementSide;
         if (d <= 0) {
             d = 1.;
-
         }
 
         //<--WK 6 22 2007
@@ -345,14 +344,19 @@ public abstract class BaseCalc {
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
         for (int i = 0; i < sra.length; i++) {
-            if (icons.hasConcentrationsFor(sra[i])) {
-                ret[i] = icons.getRegionConcentrations(sra[i], speciesList);
-            } else {
+            // RCC now we get the base concentrations everywhere, and just override
+            // those values that are explicitly set elsewhere
+            ret[i] = new double[baseConcentrations.length];
+            for (int j = 0; j < nc; j++) {
+                ret[i][j] = baseConcentrations[j];
+            }
 
-                // could also leave at zero?
-                ret[i] = new double[baseConcentrations.length];
+            if (icons.hasConcentrationsFor(sra[i])) {
+                double[] wk = icons.getRegionConcentrations(sra[i], speciesList);
                 for (int j = 0; j < nc; j++) {
-                    ret[i][j] = baseConcentrations[j];
+                    if (wk[j] >= 0.) {
+                        ret[i][j] = wk[j];
+                    }
                 }
             }
         }

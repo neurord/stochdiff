@@ -41,7 +41,7 @@ results (also, 3D may not work yet...)  -->
     <!-- interval at which stuff should be saved to the output file(s) -->
 	<outputInterval>1.0</outputInterval>
 
-	<outputSpecies>a,b</outputSpecies>
+	<outputSpecies>a,b,c</outputSpecies>
 
     <!-- the tolerance is not used yet -->
     <tolerance>0.001</tolerance>

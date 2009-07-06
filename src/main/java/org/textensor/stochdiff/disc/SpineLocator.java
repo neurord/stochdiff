@@ -188,9 +188,12 @@ public class SpineLocator {
 
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
+            String lroot = popid + "[" + idx + "]";
             if (lbls[i] != null) {
-                String ll = popid + "[" + idx + "]." + lbls[i];
+                String ll = lroot + "." + lbls[i];
                 ve.setLabel(ll);
+            } else {
+                ve.setGroupID(lroot);
             }
             if (rgns[i] != null) {
                 ve.setRegion(rgns[i]);

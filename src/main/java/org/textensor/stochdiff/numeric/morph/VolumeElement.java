@@ -33,6 +33,8 @@ public class VolumeElement {
     boolean submembrane; //true ifn this volume element lies on submembrane
     //WK-->
 
+    String groupID = null;
+
 
     // these are for caching connection areas to neighbors for
     // cuboid volumes only
@@ -230,4 +232,14 @@ public class VolumeElement {
     public double getTopArea() {
         return topArea;
     }
+
+    public void setGroupID(String lroot) {
+        groupID = lroot;
+
+    }
+
+    public String getGroupID() {
+        return groupID;
+    }
+
 }

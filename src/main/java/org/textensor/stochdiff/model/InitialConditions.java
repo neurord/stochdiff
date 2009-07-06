@@ -66,6 +66,12 @@ public class InitialConditions implements AddableTo {
         } else {
             ret = new double[spl.length];
         }
+        // set to zero where previously undefined (indicated by negative return from getNanoMolarConcentrations)
+        for (int i = 0; i < ret.length; i++) {
+            if (ret[i] < 0.) {
+                ret[i] = 0.;
+            }
+        }
         return ret;
     }
 
