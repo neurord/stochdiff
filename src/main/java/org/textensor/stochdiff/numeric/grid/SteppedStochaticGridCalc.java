@@ -939,8 +939,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     int rs1 = rs[1];
 
                     int navail = nend[ri0] / rs[0];
-                    //AB changed navail > nend[ri1] / rs1 to navail < nend[ri1] / rs1
-                    if (ri1 >= 0 && navail > nend[ri1] / rs1) {
+                    if (ri1 >= 0 && navail < nend[ri1] / rs1) {
                         navail = nend[ri1] / rs1;
                     }
                     if (ngo > navail) {
@@ -981,16 +980,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         if (ri1 >= 0) {
                             nend[ri1] -= ngo * rs1;
                         }
-                        //<--WK 3/16/2010
-                        if (nend[ri0] <0)
-                        {
-                            System.out.println("nend[ri0] is NEGATIVE!");
-                        }
-                        if (ri1 >= 0 && nend[ri1] < 0)
-                        {
-                            System.out.println("nend[ri1] is NEGATIVE!");
-                        }
-                        //WK-->
+
                         int pi0 = pi[0];
                         int pi1 = pi[1];
 
@@ -1161,12 +1151,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             ngo = ngo_total - num_molecules_diffused_so_far;
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length-1]][k] += ngo;
-            //<--WK 3/16/2010
-            if (wkB[iel][k] < 0)
-            {
-                System.out.println("In INDEPENDENT DIFFUSION, wkB[iel][k] NEGATIVE!!!");
-            }
-            //-->
         }
     }
     //WK-->
