@@ -108,6 +108,7 @@ public class VolumeLine {
 
 
             ve.setVolume(dl * sl * depth);
+            ve.setDeltaZ(depth);
             elements[i][0] = ve;
         }
 

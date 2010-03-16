@@ -309,6 +309,7 @@ public class VolumeGrid {
 
 
                 } else {
+                    ret[i] = new int[0];
                     E.warning("There are no matches for target: " + sti);
                 }
 

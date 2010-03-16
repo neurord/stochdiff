@@ -94,6 +94,7 @@ public class VolumeSlice {
                         ve.setRegion(regionLabel);
                     }
                     ve.setVolume(boxSize * boxSize * sl);
+                    ve.setDeltaZ(boxSize);
 
                     Position cp = Geom.position(vcx, vcy, 0.);
                     Position pr = rot.getRotatedPosition(cp);

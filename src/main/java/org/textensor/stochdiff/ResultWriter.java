@@ -93,6 +93,11 @@ public class ResultWriter {
         return ret;
     }
 
+    public void writeToSiblingFileAndClose(String txt, String extn) {
+        ResultWriter rw = getSibling(TEXT, extn, null);
+        rw.writeString(txt);
+        rw.close();
+    }
 
 
     public void writeToSiblingFile(String txt, String extn) {

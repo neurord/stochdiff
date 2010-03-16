@@ -17,6 +17,7 @@ public class VolumeElement {
     double cy;
     double cz;
     double volume;
+    double deltaZ;
     double exposedArea;
 
     private int icache;
@@ -94,6 +95,10 @@ public class VolumeElement {
 
     public void setVolume(double v) {
         volume = v;
+    }
+
+    public void setDeltaZ(double d) {
+        deltaZ = d;
     }
 
     public void setExposedArea(double ea) {
@@ -180,12 +185,12 @@ public class VolumeElement {
         // export boundary if have it, ow just the center point;
         if (boundary != null) {
             for (Position p : boundary) {
-                sb.append(String.format(" %.5g %.5g %.5g ", p.getX(), p.getY(), p.getZ()));
+                sb.append(String.format(" %.5g %.5g %.5g", p.getX(), p.getY(), p.getZ()));
             }
         } else {
-            sb.append(String.format(" %.5g %.5g %.5g  ", cx, cy, cz));
-
+            sb.append(String.format(" %.5g %.5g %.5g", cx, cy, cz));
         }
+        sb.append(String.format(" %.5g %.5g", volume, deltaZ));
         return sb.toString();
     }
 
@@ -203,6 +208,7 @@ public class VolumeElement {
             sb.append(" cx cy cz");
 
         }
+        sb.append(" volume deltaZ");
         return sb.toString();
     }
 

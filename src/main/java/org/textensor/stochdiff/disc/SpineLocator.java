@@ -163,8 +163,18 @@ public class SpineLocator {
             double dx = xp[i+1] - xp[i];
             double vol = Math.PI * dx * (rb[i]*rb[i] + rb[i+1]*rb[i+1] + rb[i]*rb[i+1]) / 3.;
 
-            double baseArea = Math.PI * (rb[i] * rb[i]);
+            /*
+              The above gives the volume of a fustrum radius rb[i] at one end and rb[i+1] at the other:
+              calling the radii a and b,  and scaling x to 1, then
+              the volume is
+                     integral_0,1  pi (a + (b-a)x)^2 dx
+              = PI * integral_0,1 a^2 + 2 a (b-a)x + (b-a)^2 x^2
+              = pi * (a^2 +  2 (a b - a^2)/2 + (b^2 + a^2 - 2ab)/3
+              = pi * (a*2 + b^2 + a b) / 3
+             */
 
+
+            double baseArea = Math.PI * (rb[i] * rb[i]);
 
             VolumeElement ve = new VolumeElement();
 
@@ -185,6 +195,7 @@ public class SpineLocator {
 
             ve.setBoundary(pbdry);
             ve.setVolume(vol);
+            ve.setDeltaZ(0.5 * (rb[i] + rb[i+1]));
 
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
