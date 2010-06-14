@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
+import org.textensor.stochdiff.inter.XMLContainer;
 
 
 
@@ -42,8 +43,12 @@ public class ReflectionInstantiator {
 
 
     public void appendContent(Object obj, String s) {
-        E.error(" - reflection instantiator doesn't do appendContent on " +
-                obj + "(" + obj.getClass() +  ") while trying to append " + s);
+        if (obj instanceof XMLContainer) {
+            ((XMLContainer)obj).appendContent(s);
+        } else {
+            E.error(" - reflection instantiator doesn't do appendContent on " +
+                    obj + "(" + obj.getClass() +  ") while trying to append " + s);
+        }
     }
 
 
@@ -80,6 +85,12 @@ public class ReflectionInstantiator {
     public Object newInstance(String scl) {
         Object oret = null;
         Class<?> c = null;
+
+        // TODO this is for the neuroml meta namespace - genralize
+        if (scl.indexOf(":") > 0) {
+            scl = scl.substring(0, scl.indexOf(":"));
+        }
+
         if (scl.indexOf(".") > 0) {
             try {
                 c = Class.forName(scl);

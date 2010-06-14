@@ -18,6 +18,12 @@ public class SDRun {
     // ------------------------
     //RO-->
 
+
+    public String initialStateFile;
+    public double stateSaveInterval;
+    public String stateSavePrefix;
+
+
     public String geometry;
     public double depth2D;
 
@@ -38,6 +44,8 @@ public class SDRun {
     public double outputInterval;
 
     public String outputSpecies;
+
+    public String outputQuantity; // either "NUMBER" or "CONCENTRATION"
 
     // accepted tolerance for adaptive calculations (delta f / f  for an algorithm dependent function f);
     public double tolerance;
@@ -109,6 +117,13 @@ public class SDRun {
     public int getAlgorithmID() {
         return algorithmID;
     }
+
+
+    public double getStateSaveInterval() {
+        return stateSaveInterval;
+    }
+
+
 
     //<--RO
     // -------------------------

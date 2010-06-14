@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.*;
+import org.textensor.stochdiff.neuroml.NeuroMLBase;
 import org.textensor.util.FileUtil;
 import org.textensor.xml.ReflectionInstantiator;
 import org.textensor.xml.XMLReader;
@@ -17,6 +18,8 @@ public class ModelReader {
 
         ReflectionInstantiator rin = new ReflectionInstantiator();
         rin.checkAddPackage(new ModelBase());
+        rin.checkAddPackage(new NeuroMLBase());
+
         XMLReader xmlr = new XMLReader(rin);
 
 
@@ -35,7 +38,11 @@ public class ModelReader {
 
 
         sdm.setReactionScheme((ReactionScheme)readFile(freact, xmlr));
-        sdm.setMorphology((Morphology)readFile(fmorph, xmlr));
+        Object ob = readFile(fmorph, xmlr);
+        if (ob instanceof Transitional) {
+            ob = ((Transitional)ob).getFinal();
+        }
+        sdm.setMorphology((Morphology)ob);
         sdm.setStimulationSet((StimulationSet)readFile(fstim, xmlr));
         sdm.setInitialConditions((InitialConditions)readFile(finitc, xmlr));
         //<--RO

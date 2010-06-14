@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.numeric.math;
 
+import org.textensor.report.E;
+
 
 public final class Matrix extends Object implements Cloneable {
 
@@ -12,6 +14,9 @@ public final class Matrix extends Object implements Cloneable {
     int n1 = 0;
     int n2 = 0;
 
+    public static int ROW = 1;
+    public static int COLUMN = 2;
+
 
     public Matrix(int nnn) {
         n1 = n2 = n = nnn;
@@ -20,13 +25,56 @@ public final class Matrix extends Object implements Cloneable {
         ws = new double[n];
     }
 
+    public Matrix(int nr, int nc) {
+        n1 = nr;
+        n2 = nc;
+        a = new double[n1][n2];
+        if (n1 == n2) {
+            n = n1;
+            perm = new int[n];
+            ws = new double[n];
+        } else {
+            n = -1;
+        }
+    }
+
 
     public Matrix(double[][] a) {
         this.a = a;
-        n1 = n2 = n = a.length;
-        perm = new int[n];
-        ws = new double[n];
+        n1 = a.length;
+        n2 = a[0].length;
+        if (n1 == n2) {
+            n = a.length;
+            perm = new int[n];
+            ws = new double[n];
+        } else {
+            n = -1;
+        }
     }
+
+
+    public Matrix(int rowcol, double[] x) {
+        if (rowcol == ROW) {
+            n1 = 1;
+            n2 = x.length;
+            a = new double[n1][n2];
+            for (int i = 0; i < n2; i++) {
+                a[0][i] = x[i];
+            }
+        } else if (rowcol == COLUMN) {
+            n1 = x.length;
+            n2 = 1;
+            a = new double[n1][n2];
+            for (int i = 0; i < n1; i++) {
+                a[i][0] = x[i];
+            }
+
+
+        } else {
+            System.out.println("ERROR - matrix constructor must specify Matrix.ROW, or Matrix.COLUMN");
+        }
+    }
+
 
 
     public double[] flatten() {
@@ -51,17 +99,16 @@ public final class Matrix extends Object implements Cloneable {
 
 
     public Matrix copy() {
-        Matrix m = new Matrix(n);
+        Matrix m = new Matrix(n1, n2);
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < n1; i++) {
+            for (int j = 0; j < n2; j++) {
                 m.a[i][j] = a[i][j];
             }
             m.perm[i] = perm[i];
         }
 
         m.sign = sign;
-        m.setDims(n1, n2);
         return m;
     }
 
@@ -195,17 +242,25 @@ public final class Matrix extends Object implements Cloneable {
     }
 
 
+    public Matrix times(Matrix m) {
+        return prod(m);
+    }
+
+    public String stringDims() {
+        return " " + n1 + "x" + n2;
+    }
+
     public Matrix prod(Matrix m) {
-        Matrix mr = copy();
+        Matrix mr = new Matrix(n1, m.n2);
         mr.zero();
 
-        if (m.n != n) {
-            Sp("incompativle dims in Matrix.mplyBy " + n + " " + m.n);
+        if (n2 != m.n1) {
+            E.error("incompatible dims in Matrix.prod: A: " + n1 + " " + n2 + "   B: " + m.n1 + " " + m.n2);
 
         } else {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n1; i++) {
+                for (int j = 0; j < m.n2; j++) {
+                    for (int k = 0; k < n2; k++) {
                         mr.a[i][j] += a[i][k] * m.a[k][j];
                     }
                 }
@@ -213,6 +268,42 @@ public final class Matrix extends Object implements Cloneable {
         }
         return mr;
     }
+
+
+    public Matrix subtract(Matrix m) {
+        Matrix mr = new Matrix(n1, n2);
+        mr.zero();
+
+        if (n1 != m.n1 || n2 != m.n2) {
+            Sp("incompatible dims in Matrix.subtract " + n1 + " " + n2 + " " + m.n1 + " "  +m.n2);
+        } else {
+            for (int i = 0; i < n1; i++) {
+                for (int j = 0; j < n2; j++) {
+                    mr.a[i][j] = a[i][j] - m.a[i][j];
+                }
+            }
+        }
+
+
+        return mr;
+    }
+
+
+
+    public double[] getColumnData() {
+        double[] ret = new double[n1];
+
+        if (n2 == 1) {
+            for (int i = 0; i < n1; i++) {
+                ret[i] = a[i][0];
+            }
+
+        } else {
+            Sp("ERROR - getColumnData called on matrix with n2 != 1 "  + n2);
+        }
+        return ret;
+    }
+
 
 
     public double[] lvprod(double[] v) {
@@ -296,10 +387,10 @@ public final class Matrix extends Object implements Cloneable {
 
 
     public Matrix transpose() {
-        Matrix m = copy();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                m.a[i][j] = a[j][i];
+        Matrix m = new Matrix(n2, n1);
+        for (int i = 0; i < n1; i++) {
+            for (int j = 0; j < n2; j++) {
+                m.a[j][i] = a[i][j];
             }
         }
         return m;
@@ -495,11 +586,10 @@ public final class Matrix extends Object implements Cloneable {
 
 
     public void print() {
-
-        String[] sa = new String[n];
-        for (int i = 0; i < n; i++) {
+        String[] sa = new String[n1];
+        for (int i = 0; i < n1; i++) {
             sa[i] = " ";
-            for (int j = 0; j < n; j++) {
+            for (int j = 0; j < n2; j++) {
                 sa[i] += (" " + a[i][j]);
             }
         }
@@ -611,9 +701,17 @@ public final class Matrix extends Object implements Cloneable {
 
 
     // should bufer this ***;
-    public final double[] getColumn(int ic) {
+    public final double[] getRow(int ic) {
         double[] c = new double[n2];
         for (int i = 0; i < n2; i++) {
+            c[i] = a[ic][i];
+        }
+        return c;
+    }
+
+    public final double[] getColumn(int ic) {
+        double[] c = new double[n1];
+        for (int i = 0; i < n1; i++) {
             c[i] = a[i][ic];
         }
         return c;

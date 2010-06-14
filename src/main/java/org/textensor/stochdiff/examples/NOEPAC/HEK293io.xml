@@ -1,0 +1,63 @@
+<OutputScheme>
+<!--
+     Each file will have a set of concentrations in compartments
+     sampled according to a specific dt
+-->
+
+<!--
+    Every Output block must have in its definition one (and only)
+    instance of:
+     * filename
+    And might have one (and only) instance of:
+     * region or
+     * dt
+    If "region" is ommited then the concs for the whole system will be
+    saved.
+    If "dt" is ommited than the concs will be written at each time step.
+    So th "io file" will be dependent on information stated in the
+    "morph" (regions) and "model" (dt).
+-->
+
+    <OutputSet filename = "cell0"  dt="200.0">
+
+        <OutputSpecie       name="EPAccAMP"             />
+        <OutputSpecie       name="EPAc"                 />
+        <OutputSpecie       name="PKAcamp1"             />
+        <OutputSpecie       name="PKAcamp2"             />
+        <OutputSpecie       name="PKAc"                 />
+        <OutputSpecie       name="PKAr"                 />
+        <OutputSpecie       name="PKArc"                />
+
+        <OutputSpecie       name="AC"                   />
+        <OutputSpecie       name="ATP"                  />
+        <OutputSpecie       name="GaGTP"                />
+        <OutputSpecie       name="E"                    />
+        <OutputSpecie       name="EATP"                 />
+
+        <OutputSpecie       name="AMP"                  />
+        <OutputSpecie       name="cAMP"                 />
+
+        <OutputSpecie       name="PDE4DcAMP"            />
+        <OutputSpecie       name="PDE4D"                />
+        <OutputSpecie       name="pPDE4D"               />
+        <OutputSpecie       name="pPDE4DcAMP"           />
+        <OutputSpecie       name="PDE4BcAMP"            />
+        <OutputSpecie       name="PDE4B"                />
+        <OutputSpecie       name="pPDE4B"               />
+        <OutputSpecie       name="pPDE4BcAMP"           />
+        <OutputSpecie       name="PKAcPDE4D"            />
+        <OutputSpecie       name="PKAcPDE4B"            />
+        <OutputSpecie       name="PKAcPDE4DcAMP"        />
+        <OutputSpecie       name="PKAcPDE4BcAMP"        />
+
+   </OutputSet>
+   <!--
+
+
+   <OutputSet filename = "cell1"  dt="200.0">
+
+        <OutputSpecie       name="cAMP"                 />
+
+   </OutputSet>
+   -->
+</OutputScheme>

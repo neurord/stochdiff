@@ -1,0 +1,21 @@
+This package is for a utility that maps a saved state to a new initial conditions file.
+
+The task is to find values for the concentrations in a template initial conditions file that most closely
+reproduce a particular saved state under certain constraints.
+
+
+Process:
+
+1) read the target state - concentrations for nspec species in each of nel elements.
+
+2) read the ic template 
+     for each value in it vary the value and compute resulting concenctrations (nel * nspec) to get 
+     the derivative of concs with respect to ic values.
+     
+3) these derivatives provide a matrix for taking ic values to end concentrations
+      generalized inverse gives us hte ic values
+      
+      
+Applying constraints:  - todo
+
+

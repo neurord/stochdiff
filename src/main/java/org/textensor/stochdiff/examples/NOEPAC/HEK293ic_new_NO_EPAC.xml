@@ -1,0 +1,89 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+<!--
+        Rich, T.C.; Fagan, K.A. et al. (2001) A uniform extracellular
+        stimulus triggers distinct cAMP signals in different compartments
+        of a simple cell ............................(Total PDE=0.8 uM)
+        Lynch, M.J. et al. (2005) RNA Silencing Identifies PDE4D5 as
+        the Functionally Relevant cAMP Phosphodiesterase.............
+        ........................PDE4A ~ 5%; PDE4B ~ 30%; PDE4D ~ 65%
+-->
+        <NanoMolarity specieID="GaGTP"           value="    3.509"     />  <!-- less than AC/10 -->
+        <NanoMolarity specieID="AC"              value="        0"     />
+        <NanoMolarity specieID="E"               value="        0"     />
+        <NanoMolarity specieID="ATP"             value="1.905e+06"     />
+        <NanoMolarity specieID="EATP"            value="        0"     />
+
+        <NanoMolarity specieID="cAMP"            value="    541.8"     />  <!--500 nM = 0.5uM -->
+        <NanoMolarity specieID="AMP"             value="1.073e+05"     />
+
+        <NanoMolarity specieID="PKArc"           value="    173.6"     />  <!--100 nM = 0.1uM -->
+        <NanoMolarity specieID="PKAcamp1"        value="    370.5"     />
+        <NanoMolarity specieID="PKAcamp2"        value="    115.6"     />
+        <NanoMolarity specieID="PKAc"            value="    23.61"     />
+        <NanoMolarity specieID="PKAr"            value="    47.59"     />
+
+        <NanoMolarity specieID="PDE4B"           value="        0"     />  <!--240 nM = 0.24uM -->
+        <NanoMolarity specieID="PDE4BcAMP"       value="        0"     />
+        <NanoMolarity specieID="pPDE4B"          value="        0"     />
+        <NanoMolarity specieID="pPDE4BcAMP"      value="        0"     />
+        <NanoMolarity specieID="PKAcPDE4B"       value="        0"     />
+        <NanoMolarity specieID="PKAcPDE4BcAMP"   value="        0"     />
+
+        <NanoMolarity specieID="PDE4D"           value="     2196"     />
+        <NanoMolarity specieID="PDE4DcAMP"       value="    191.5"     />
+        <NanoMolarity specieID="pPDE4DcAMP"      value="    108.1"     />
+        <NanoMolarity specieID="pPDE4D"          value="     1219"     />
+        <NanoMolarity specieID="PKAcPDE4D"       value="    43.84"     />
+        <NanoMolarity specieID="PKAcPDE4DcAMP"   value="    3.755"     />
+
+        <NanoMolarity specieID="EPAc"            value="        0"     /> <!--272.72 -->
+        <NanoMolarity specieID="EPAccAMP"        value="        0"     />
+    </ConcentrationSet>
+
+
+    <!-- number densities are in particles per cubic micron. You
+         get about one particles per cubic micron in a 1.6 nM solution -->
+
+    <!-- surface concentrations for membrane-bound species. The value attribute for
+         a PicoSD element is the number of picomoles per square metre. For comparison
+         with the volume concentrations, a surface density of 1 picomole/m^2, if spread
+         over a layer 1 micron deep, gives a 1 nanoMolar solution, so to average one
+         particle per square micron you need a PicoSD value of about 1.6. -->
+
+    <SurfaceDensitySet region="dendrite">
+        <PicoSD        specieID="GaGTP"           value="     3.33"    /> <!-- less than AC/10 -->
+        <PicoSD        specieID="AC"              value=" 2.52e+04"    />
+        <PicoSD        specieID="E"               value="    338.3"    />
+        <PicoSD        specieID="ATP"             value="1.777e+06"    />
+        <PicoSD        specieID="EATP"            value="     2866"    />
+
+        <PicoSD        specieID="cAMP"            value="  1154.79"    />
+        <PicoSD        specieID="AMP"             value="1.002e+05"    />
+
+        <PicoSD        specieID="PKArc"           value="    285.1"    /> <!-- 1200 uM -->
+        <PicoSD        specieID="PKAcamp1"        value="     1411"    />
+        <PicoSD        specieID="PKAcamp2"        value="    921.6"    />
+        <PicoSD        specieID="PKAc"            value="    21.94"    />
+        <PicoSD        specieID="PKAr"            value="      377"    />
+
+        <PicoSD        specieID="PDE4B"           value="    267.2"    /> <!-- 240 nM = 0.24uM -->
+        <PicoSD        specieID="PDE4BcAMP"       value="    93.34"    />
+        <PicoSD        specieID="pPDE4BcAMP"      value="    61.22"    />
+        <PicoSD        specieID="pPDE4B"          value="    175.6"    />
+        <PicoSD        specieID="PKAcPDE4B"       value="    5.309"    />
+        <PicoSD        specieID="PKAcPDE4BcAMP"   value="    1.719"    />
+
+        <PicoSD        specieID="PDE4D"           value="        0"    /> <!-- 240 nM = 0.24uM -->
+        <PicoSD        specieID="PDE4DcAMP"       value="        0"    />
+        <PicoSD        specieID="pPDE4DcAMP"      value="        0"    />
+        <PicoSD        specieID="pPDE4D"          value="        0"    />
+        <PicoSD        specieID="PKAcPDE4D"       value="        0"    />
+        <PicoSD        specieID="PKAcPDE4DcAMP"   value="        0"    />
+
+        <PicoSD        specieID="EPAc"            value="        0"    />
+        <PicoSD        specieID="EPAccAMP"        value="        0"    />
+    </SurfaceDensitySet>
+</InitialConditions>

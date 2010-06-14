@@ -1,0 +1,39 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+	<NanoMolarity specieID="a" value="0"/>
+	<NanoMolarity specieID="b" value="0"/>
+	<NanoMolarity specieID="c" value="100"/>
+	<NanoMolarity specieID="d" value="0"/>
+    </ConcentrationSet>
+
+
+    <!-- number densities are in particles per cubic micron. You 
+	 get about one particles per cubic micron in a 1.6 nM solution -->
+
+    
+    <!-- should also be able to set 'region="abc"' to have a concentration
+	set apply only to a certain region -->
+    <ConcentrationSet region="neck">
+	<NanoMolarity specieID="a" value="200"/>
+    </ConcentrationSet>
+    <!-- 
+    <ConcentrationSet region="region1">
+	<NanoMolarity specieID="b" value="100"/>
+    </ConcentrationSet>
+     -->
+
+
+<!--  FitConstraint elements are only used with the Reduce utility to determine new 
+values for the initial conditions that match a target state as closely as possible.
+With no fit constraints it does a least squares fit on the concentrations. With the fit constraints,
+you can require it to match the total quantities for particular species.
+ -->
+   <FitConstraints>
+   		<PreserveTotal specieID="a"/>
+   </FitConstraints>
+
+
+</InitialConditions>
+

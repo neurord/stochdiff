@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
+import org.textensor.stochdiff.inter.FloatValued;
 
 public class SurfaceDensitySet implements AddableTo {
 
@@ -66,6 +67,12 @@ public class SurfaceDensitySet implements AddableTo {
 
     public String getRegion() {
         return region;
+    }
+
+
+
+    public void addFloatValued(ArrayList<FloatValued> afv) {
+        afv.addAll(sds);
     }
 
 }

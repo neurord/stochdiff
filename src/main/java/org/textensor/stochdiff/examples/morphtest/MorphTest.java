@@ -10,12 +10,14 @@ public class MorphTest {
         System.out.println("pnm is " + snm);
         String srt = "src/" + snm.replaceAll("\\.", "/") + "/";
 
-        String[] args = {srt + "Model_xaxis1_5.xml"};
+        String mfnm = "model_morphml_1";
+
+        String[] args = {srt + mfnm + ".xml"};
 
 
         StochDiff.main(args);
 
-        String[] sa = {srt + "Model_xaxis1_5.out"};
+        String[] sa = {srt + mfnm + ".out"};
         CCViz.main(sa);
     }
 

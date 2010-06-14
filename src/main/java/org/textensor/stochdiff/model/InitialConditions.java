@@ -3,6 +3,7 @@ package org.textensor.stochdiff.model;
 import java.util.ArrayList;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
+import org.textensor.stochdiff.inter.FloatValued;
 
 import java.util.HashMap;
 
@@ -16,6 +17,8 @@ public class InitialConditions implements AddableTo {
     public ArrayList<SurfaceDensitySet> sdSets;
     public HashMap<String, SurfaceDensitySet> sdSetHM;
 
+
+    public FitConstraints fitConstraints;
 
     ConcentrationSet defaultConcs;
 
@@ -53,9 +56,29 @@ public class InitialConditions implements AddableTo {
                 sdSetHM.put(sdset.getRegion(), sdset);
             }
 
+        } else if (obj instanceof FitConstraints) {
+            fitConstraints = (FitConstraints)obj;
+
         } else {
             E.error("cant add " + obj);
         }
+    }
+
+
+    public ArrayList<FloatValued> getFloatValuedElements() {
+        ArrayList<FloatValued> afv = new ArrayList<FloatValued>();
+        if (concentrationSets != null) {
+            for (ConcentrationSet cs : concentrationSets) {
+                cs.addFloatValued(afv);
+            }
+        }
+
+        if (sdSets != null) {
+            for (SurfaceDensitySet sdSet : sdSets) {
+                sdSet.addFloatValued(afv);
+            }
+        }
+        return afv;
     }
 
 
@@ -107,5 +130,53 @@ public class InitialConditions implements AddableTo {
         }
         return ret;
     }
+
+
+    public String xmlSerialize() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<InitialConditions>\n");
+
+
+        for (ConcentrationSet cset : concentrationSets) {
+            sb.append("<ConcentrationSet");
+            if (cset.hasRegion()) {
+                sb.append("region=\"" + cset.getRegion() + "\">\n");
+            } else {
+                sb.append(">\n");
+            }
+            for (Concentration c : cset.concentrations) {
+                sb.append("   " + c.makeXMLLine() + "\n");
+            }
+            sb.append("</ConcentrationSet>\n");
+        }
+
+        for (SurfaceDensitySet sdset : sdSets) {
+            sb.append("<SurfaceDensitySet");
+            if (sdset.hasRegion()) {
+                sb.append("region=\"" + sdset.getRegion() + "\">\n");
+            } else {
+                sb.append(">\n");
+            }
+            for (SurfaceDensity sd : sdset.sds) {
+                sb.append("   " + sd.makeXMLLine() + "\n");
+            }
+            sb.append("</SurfaceDensitySet>\n");
+        }
+
+
+
+        sb.append("</InitialConditions>\n");
+        return sb.toString();
+    }
+
+
+    public String[] getTotalPreserved() {
+        String[] ret = new String[0];
+        if (fitConstraints != null) {
+            ret = fitConstraints.getTotalPreserved();
+        }
+        return ret;
+    }
+
 
 }

@@ -3,6 +3,9 @@ package org.catacomb.util;
 
 /*
  * $Log: Diff.java,v $
+ * Revision 1.2  2010-05-31 11:01:45  rcc
+ * rodrigos version
+ *
  * Revision 1.1  2009-06-23 03:37:26  rcc
  * first commit
  *

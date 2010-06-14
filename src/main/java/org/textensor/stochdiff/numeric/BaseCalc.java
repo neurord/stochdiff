@@ -14,22 +14,22 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.ResultWriter;
 import org.textensor.stochdiff.disc.SpineLocator;
 import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
+import org.textensor.stochdiff.inter.SDState;
+import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.stochdiff.model.*;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
-
+import org.textensor.util.ArrayUtil;
 
 public abstract class BaseCalc {
-
 
     public SDRun sdRun;
 
     ReactionTable reactionTable;
     VolumeGrid volumeGrid;
     StimulationTable stimulationTable;
-
 
     double[] baseConcentrations;
 
@@ -43,7 +43,6 @@ public abstract class BaseCalc {
     // indices of output species
     public int[] ispecout;
 
-
     public static final int BINOMIAL = 0;
     public static final int POISSON = 1;
 
@@ -54,94 +53,46 @@ public abstract class BaseCalc {
     int distID = BINOMIAL;
     protected int algoID = INDEPENDENT;
 
-    //<--WK
+    public boolean writeConcentration = false;
+
+    // <--WK
     public String n_list, dt_list, filename_list, specie_names_list;
-    //6 18 2007
+    // 6 18 2007
     public String region_list;
-    //WK-->
+    // WK-->
+
+
+    protected int[][] specIndexesOut;
+    protected String[] regionsOut;
+    protected double[] dtsOut;
+    protected String[] fnmsOut;
+    protected String[][] specNamesOut;
 
     public BaseCalc(SDRun sdr) {
         sdRun = sdr;
     }
 
-    //<--WK
-    public void extractOutputScheme()
-    {
-        n_list = new String();
-        dt_list = new String();
-        filename_list = new String();
-        specie_names_list = new String();
-        region_list = new String();
 
-        OutputScheme os = sdRun.outputScheme;
 
-        for (int i = 0; i < os.outputSets.size()-1; i++)
-        {
-            OutputSet current_oset = (os.outputSets).get(i);
-            n_list += current_oset.getNumberOfOutputSpecies();
-            n_list += " ";
 
-            if (current_oset.hasdt())
-                dt_list += current_oset.getdt();
-            else
-                dt_list += sdRun.fixedStepDt;
-            dt_list += " ";
-            filename_list += current_oset.getFname();
-            filename_list += " ";
-            specie_names_list += current_oset.getNamesOfOutputSpecies();
-            specie_names_list += " ";
-            if (current_oset.hasRegion())
-                region_list += current_oset.getRegion();
-            else
-                region_list += "default"; //RC uses "default" as default value
-            region_list += " ";
+
+    protected String stringd(double d) {
+        if (d == 0.0) {
+            return "0.0 ";
+        } else {
+            return String.format("%.5g ", new Double(d));
         }
-        OutputSet current_oset = (os.outputSets).get(os.outputSets.size()-1);
-        n_list += current_oset.getNumberOfOutputSpecies();
-        if (current_oset.hasdt())
-            dt_list += current_oset.getdt();
-        else
-            dt_list += sdRun.fixedStepDt;
-        filename_list += current_oset.getFname();
-        specie_names_list += current_oset.getNamesOfOutputSpecies();
-        if (current_oset.hasRegion())
-            region_list += current_oset.getRegion();
-        else
-            region_list += "default";
-
-        //System.out.print(n_list);
-        //System.out.print(dt_list);
-        //System.out.print(filename_list);
-        //System.out.print(specie_names_list);
-        //System.out.println(region_list);
     }
 
-    public String get_nlist()
-    {
-        return n_list;
+    // <--RO 7 02 2008
+    // Saves as integers; used to save particles instead of concentrations
+    protected String stringi(int d) {
+        if (d == 0) {
+            return "00 ";
+        } else {
+            return String.format("%d ", new Integer(d));
+        }
     }
-
-    public String get_dtlist()
-    {
-        return dt_list;
-    }
-
-    public String get_filenamelist()
-    {
-        return filename_list;
-    }
-
-    public String get_specienameslist()
-    {
-        return specie_names_list;
-    }
-
-    public String get_regionlist()
-    {
-        return region_list;
-    }
-    //WK-->
-
 
     public void extractTables() {
         distID = sdRun.getDistributionID();
@@ -149,7 +100,7 @@ public abstract class BaseCalc {
 
         ReactionScheme rsch = sdRun.getReactionScheme();
 
-        reactionTable= rsch.makeReactionTable();
+        reactionTable = rsch.makeReactionTable();
 
         StimulationSet stim = sdRun.getStimulationSet();
         stimulationTable = stim.makeStimulationTable(reactionTable);
@@ -161,7 +112,6 @@ public abstract class BaseCalc {
         // -------------------------
         // double vol = sdRun.poolVolume;
         baseConcentrations = icons.getDefaultNanoMolarConcentrations(speciesList);
-
 
         String specout = sdRun.outputSpecies;
         if (specout == null || specout.equals("all")) {
@@ -176,30 +126,30 @@ public abstract class BaseCalc {
         } else {
             ispecout = getIndices(specout, speciesList);
         }
-        /* RCC - not sure restricting the output regions is useful for the
-         * ccviz file?
-        String regout = sdRun.outputRegions;
-        if (regout == null || regout.equals("all")) {
-        	iregout = null;
+        /*
+         * RCC - not sure restricting the output regions is useful for the ccviz
+         * file? String regout = sdRun.outputRegions; if (regout == null ||
+         * regout.equals("all")) { iregout = null;
+         *
+         * } else if (regout.length() == 0 || regout.equals("none")) { iregout =
+         * new int[0];
+         *
+         * } else { iregout = getIndices(regout, speciesList); }
+         */
 
-        } else if (regout.length() == 0 || regout.equals("none")) {
-        	iregout = new int[0];
+        String oq = sdRun.outputQuantity;
+        if (oq != null) {
+            if (oq.equals("NUMBER")) {
+                writeConcentration = false;
+            } else if (oq.equals("CONCENTRATION")) {
 
-        } else {
-        	iregout = getIndices(regout, speciesList);
+                writeConcentration = true;
+            } else {
+
+                E.warning("Unrecognized output quantity: " + oq + " - need either NUMBER or CONCENTRATION");
+            }
         }
-        */
-
-
-
     }
-
-
-
-
-
-
-
 
     public int[] getIndices(String matchString, String[] idlist) {
         HashMap<String, Integer> isdhm = new HashMap<String, Integer>();
@@ -225,6 +175,58 @@ public abstract class BaseCalc {
 
 
 
+
+
+    public void extractOutputScheme(ReactionTable rtab) {
+        OutputScheme os = sdRun.getOutputScheme();
+
+        int nos = os.outputSets.size();
+        regionsOut = new String[nos];
+        dtsOut = new double[nos];
+        fnmsOut = new String[nos];
+        specNamesOut = new String[nos][];
+        specIndexesOut = new int[nos][];
+
+        String[] specieIDs = rtab.getSpeciesIDs();
+        int nspec = specieIDs.length;
+
+        E.info("extracting output scheme " + os.outputSets.size() + " " + nspec);
+
+
+        for (int i = 0; i < os.outputSets.size(); i++) {
+            OutputSet oset = (os.outputSets).get(i);
+
+            if (oset.hasdt()) {
+                dtsOut[i] = oset.getdt();
+            } else {
+                dtsOut[i] += sdRun.fixedStepDt;
+            }
+            fnmsOut[i] = oset.getFname();
+            specNamesOut[i] = oset.getNamesOfOutputSpecies();
+
+            if (oset.hasRegion()) {
+                regionsOut[i] = oset.getRegion();
+            } else {
+                regionsOut[i] = "default"; // RC uses "default" as default value
+            }
+            specIndexesOut[i] = new int[specNamesOut[i].length];
+
+            for (int k = 0; k < specNamesOut[i].length; k++) {
+                for (int kq = 0; kq < nspec; kq++) {
+
+                    if (specNamesOut[i][k].equalsIgnoreCase(specieIDs[kq])) {
+                        specIndexesOut[i][k] = kq;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
     public void extractGrid() {
         Morphology morph = sdRun.getMorphology();
         TreePoint[] tpa = morph.getTreePoints();
@@ -235,35 +237,30 @@ public abstract class BaseCalc {
             d = 1.;
         }
 
-        //<--WK 6 22 2007
-        //(1) iterate through all endpoints and their associated radii.
-        //(2) divide each radius by successively increasing odd numbers until
-        //the divided value becomes less than the defaultMaxElementSide.
-        //(3) select the smallest among the divided radii values as d.
+        // <--WK 6 22 2007
+        // (1) iterate through all endpoints and their associated radii.
+        // (2) divide each radius by successively increasing odd numbers until
+        // the divided value becomes less than the defaultMaxElementSide.
+        // (3) select the smallest among the divided radii values as d.
         double[] candidate_grid_sizes = new double[tpa.length];
-        for (int i = 0; i < tpa.length; i++)
-        {
-            double diameter = tpa[i].r*2.0;
+        for (int i = 0; i < tpa.length; i++) {
+            double diameter = tpa[i].r * 2.0;
             double denominator = 1.0;
-            while ((diameter/denominator) > d)
-            {
-                denominator += 2.0; //divide by successive odd numbers
+            while ((diameter / denominator) > d) {
+                denominator += 2.0; // divide by successive odd numbers
             }
-            candidate_grid_sizes[i] = diameter/denominator;
+            candidate_grid_sizes[i] = diameter / denominator;
         }
 
         double min_grid_size = d;
-        for (int i = 0; i < tpa.length; i++)
-        {
+        for (int i = 0; i < tpa.length; i++) {
             if (candidate_grid_sizes[i] < min_grid_size)
                 min_grid_size = candidate_grid_sizes[i];
         }
 
         d = min_grid_size;
-        System.out.println("****************************");
-        System.out.println("subvolume grid size is: " + min_grid_size);
-        System.out.println("****************************");
-        //WK-->
+
+        E.info("subvolume grid size is: " + min_grid_size);
 
         TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
 
@@ -289,9 +286,7 @@ public abstract class BaseCalc {
 
         volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
 
-
-        SpineLocator spineloc = new SpineLocator(sdRun.spineSeed,
-                morph.getSpineDistribution(), disc.spineDeltaX);
+        SpineLocator spineloc = new SpineLocator(sdRun.spineSeed, morph.getSpineDistribution(), disc.spineDeltaX);
 
         spineloc.addSpinesTo(volumeGrid);
 
@@ -301,7 +296,6 @@ public abstract class BaseCalc {
         makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
 
     }
-
 
     public final boolean useBinomial() {
         return (distID == BINOMIAL);
@@ -339,12 +333,30 @@ public abstract class BaseCalc {
     }
 
 
+    public double[][] getRevisedRegionConcentrations() {
+        if (regionConcentrations == null) {
+            extractGrid();
+        }
+        makeRegionConcentrations(volumeGrid.getRegionLabels());
+        return regionConcentrations;
+    }
+
+
+    public double[][] getRevisedRegionSurfaceDensities() {
+        makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
+        return regionSurfaceDensities;
+    }
+
+
+
+
     private void makeRegionConcentrations(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
         for (int i = 0; i < sra.length; i++) {
-            // RCC now we get the base concentrations everywhere, and just override
+            // RCC now we get the base concentrations everywhere, and just
+            // override
             // those values that are explicitly set elsewhere
             ret[i] = new double[baseConcentrations.length];
             for (int j = 0; j < nc; j++) {
@@ -363,7 +375,6 @@ public abstract class BaseCalc {
         regionConcentrations = ret;
     }
 
-
     private void makeRegionSurfaceDensities(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
         double[][] ret = new double[sra.length][];
@@ -377,7 +388,6 @@ public abstract class BaseCalc {
         regionSurfaceDensities = ret;
     }
 
-
     public long getCalculationSeed() {
         long ret = sdRun.simulationSeed;
         if (ret <= 0) {
@@ -385,7 +395,6 @@ public abstract class BaseCalc {
         }
         return ret;
     }
-
 
     public ReactionTable getReactionTable() {
         if (reactionTable == null) {
@@ -401,8 +410,6 @@ public abstract class BaseCalc {
         return stimulationTable;
     }
 
-
-
     public VolumeGrid getVolumeGrid() {
         if (volumeGrid == null) {
             extractGrid();
@@ -410,16 +417,39 @@ public abstract class BaseCalc {
         return volumeGrid;
     }
 
-
     public void setResultWriter(ResultWriter rw) {
         resultWriter = rw;
         resultWriter.init("cctdif2d", ResultWriter.TEXT); // others....
     }
 
-
     public abstract void run();
 
-
     public abstract long getParticleCount();
+
+
+    public double[][] readInitialState(String fnm, int nel, int nspec, String[] specids) {
+        String sdata = resultWriter.readSibling(fnm);
+        SDState sds = StateReader.readStateString(sdata);
+
+        double[][] ret = null;
+        if (sds.nel == nel && sds.nspec == nspec) {
+            if (ArrayUtil.arraysMatch(sds.specids, specids)) {
+                ret = sds.getData();
+            } else {
+                E.error("initial conditions species mismatch ");
+                for (int i = 0; i < specids.length; i++) {
+                    E.info("species " + i + " " + specids[i] + " " + sds.specids[i]);
+                }
+            }
+        } else {
+            E.error("initial conditions file does not match model: elements " + nel + ", " + sds.nel +
+                    "  species: " + nspec + ", " + sds.nspec);
+        }
+
+
+        return ret;
+
+    }
+
 
 }

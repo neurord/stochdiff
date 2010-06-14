@@ -26,4 +26,21 @@ public class NumberDensity extends Concentration {
 
     }
 
+
+
+    public String makeXMLLine() {
+        return "<NumberDensity specieID=\"" + specieID + "\" number=\"" + number + "\"/>";
+
+    }
+
+
+    public double getValue() {
+        return number;
+    }
+
+
+    public void setValue(double d) {
+        number = d;
+    }
+
 }

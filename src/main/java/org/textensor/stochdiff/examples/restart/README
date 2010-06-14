@@ -1,0 +1,8 @@
+The main files are model1.xml and model2.xml
+
+Both use stim1.xml which specifies an injection into a subset of the spines.
+
+Separate initial conditions are applied to the spine necks. All spines based 
+in SpineType spineA have their necks in the "neck" region, but the labelled
+points coming from pointA in that SpineType can be addressed independently
+for different spines.

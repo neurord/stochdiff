@@ -84,4 +84,21 @@ public class ArrayUtil {
 
     }
 
+    public static boolean arraysMatch(String[] a, String[] b) {
+        boolean ret = false;
+        if (a.length == b.length) {
+            ret = true;
+            for (int i = 0; i < a.length; i++) {
+                if (a[i].equals(b[i])) {
+                    // ok
+                } else {
+                    ret = false;
+                }
+            }
+
+        }
+
+        return ret;
+    }
+
 }

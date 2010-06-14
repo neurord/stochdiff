@@ -22,6 +22,12 @@ public class EndPoint extends MorphPoint {
 
 
 
+    public EndPoint(String id, double x, double y, double z, double r) {
+        super(id, x, y, z, r);
+    }
+
+
+
     public void resolve(HashMap<String, Segment> segmentHM, MorphPoint ep) {
         if (on != null) {
             if (segmentHM.containsKey(on)) {

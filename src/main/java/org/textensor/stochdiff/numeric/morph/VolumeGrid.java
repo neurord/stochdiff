@@ -127,9 +127,7 @@ public class VolumeGrid {
         eltLabels = new String[nelement];
         eltGroupIDs = new String[nelement];
         eltRegions = new int[nelement];
-        //<--WK
         submembranes = new boolean[nelement];
-        //WK-->
 
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
@@ -140,14 +138,15 @@ public class VolumeGrid {
             positions[i][2] = ve.getZ();
             eltLabels[i] = ve.getLabel();
             eltGroupIDs[i] = ve.getGroupID();
-            //<--WK
             submembranes[i] = ve.getSubmembrane();
-            //WK-->
+
             String sr = ve.getRegion();
             if (sr == null || sr.length() == 0) {
                 eltRegions[i] = 0;
+
             } else if (rA.contains(sr)) {
                 eltRegions[i] = rA.indexOf(sr);
+
             } else {
                 int nn = rA.size();
                 eltRegions[i] = nn;

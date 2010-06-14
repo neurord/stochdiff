@@ -2,6 +2,7 @@ package org.textensor.stochdiff;
 
 import java.io.File;
 
+import org.catacomb.util.FileUtil;
 import org.textensor.report.E;
 
 import java.io.*;
@@ -16,6 +17,7 @@ public class ResultWriter {
     public final static int BINARY = 2;
 
     OutputStreamWriter writer;
+    String fnroot = "";
 
     boolean ready;
 
@@ -25,6 +27,16 @@ public class ResultWriter {
     public ResultWriter(File outFile) {
         outputFile = outFile;
         ready = false;
+
+        String fnm = outFile.getName();
+        int idot = fnm.lastIndexOf(".");
+        if (idot > 0) {
+            fnroot = fnm.substring(0, idot);
+        } else {
+            fnroot = fnm;
+        }
+
+
     }
 
 
@@ -83,7 +95,7 @@ public class ResultWriter {
             ret = siblings.get(extn);
 
         } else {
-            String fnm = outputFile.getName() + extn;
+            String fnm = fnroot + extn;
             File f = new File(outputFile.getParentFile(), fnm);
             ret = new ResultWriter(f);
             siblings.put(extn, ret);
@@ -109,5 +121,16 @@ public class ResultWriter {
         rw.writeString(txt);
     }
 
+
+    public String readSibling(String fnm) {
+        String ret = null;
+        File fin = new File(outputFile.getParentFile(), fnm);
+        if (fin.exists()) {
+            ret = FileUtil.readStringFromFile(fin);
+        } else {
+            E.error("No such file " + fin.getAbsolutePath());
+        }
+        return ret;
+    }
 
 }

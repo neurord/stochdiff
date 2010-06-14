@@ -43,12 +43,21 @@ public class MorphPoint {
 
     }
 
+    public MorphPoint(String id, double ax, double ay, double az, double ar) {
+        this();
+        label = id;
+        x = ax;
+        y = ay;
+        z = az;
+        r = ar;
+    }
+
+
+
     public void setSegment(Segment seg) {
         r_segment = seg;
 
     }
-
-
 
 
     protected void addNeighbor(MorphPoint p) {
