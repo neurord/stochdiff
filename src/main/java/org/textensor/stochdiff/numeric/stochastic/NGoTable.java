@@ -22,8 +22,7 @@ public final class NGoTable {
         double q = 1. - p;
         double lnq = Math.log(q);
 
-        //pnTable[i][j] = new NGoTable(j, lnp, mode);
-        //double rna = pnTable[ia][n].rnGo(r);
+
 
 
         if (mode == StepGenerator.BINOMIAL) {

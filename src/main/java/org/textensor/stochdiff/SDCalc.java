@@ -1,5 +1,7 @@
 package org.textensor.stochdiff;
 
+import java.io.File;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
@@ -17,9 +19,19 @@ public class SDCalc {
 
     BaseCalc bCalc;
 
-    public SDCalc(SDRun sdr) {
+    public SDCalc(SDRun sdr, File outputFile) {
         sdRun = sdr;
         String sr = sdRun.calculation;
+
+        if (sdRun.continueOutput() && outputFile.exists() && sdRun.getStartTime() > 0) {
+            resultWriter = new ResultWriter(outputFile);
+            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
+
+
+        } else {
+            resultWriter = new ResultWriter(outputFile);
+        }
+
 
         for (SDCalcType  sdct : SDCalcType.values()) {
             if (sdct.hasLabel(sr)) {
@@ -32,9 +44,6 @@ public class SDCalc {
     }
 
 
-    public void setResultWriter(ResultWriter rw) {
-        resultWriter = rw;
-    }
 
     public void run() {
         bCalc = calculationType.getCalc(sdRun);

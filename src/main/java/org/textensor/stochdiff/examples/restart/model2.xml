@@ -15,13 +15,29 @@ results (also, 3D may not work yet...)  -->
     <geometry>2D</geometry>
 
     <!-- run time for the calculation, milliseconds -->
-    <runtime>41</runtime>
+     <!--  this is the time to run for: if starttime is set, then it will run from starttime to starttime + runtime -->
+    <!-- 
+    <runtime>101</runtime>
+     -->
+
+   <starttime>40</starttime>
+   <initialStateFile>model2-state-40.nrds</initialStateFile>
+
+    <!--  as an alternative to runtime, you can set endtime. If starttime is also set, then the actual runtime
+    will be endtime - starttime     -->
+	<endtime>100</endtime>
+
+	<!--  output can be "continue" or "new". With "continue" it will remove any content in the output file before
+	starttime and append from there on. If starttime is absent or zero, then everything is overwritten so 
+	"continue" and "new" have the same effect -->
+	<output>continue</output>
+
+
 
     <!-- set the seed to get the same spines each time testing -->
     <spineSeed>123</spineSeed>
 
 
-   <initialStateFile>model2-state-40.nrds</initialStateFile>
  
 
 	<stateSaveInterval>10</stateSaveInterval>

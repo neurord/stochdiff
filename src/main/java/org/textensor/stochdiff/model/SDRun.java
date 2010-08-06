@@ -28,6 +28,11 @@ public class SDRun {
     public double depth2D;
 
     public double runtime;
+    public double starttime;
+    public double endtime;
+
+    public String output;
+
 
     public int spineSeed;
     public int simulationSeed;
@@ -175,6 +180,49 @@ public class SDRun {
     public InitialConditions getInitialConditions() {
         return initialConditions;
     }
+
+
+    public double getStartTime() {
+        double ret = 0;
+        if (starttime > 0) {
+            ret = starttime;
+        } else {
+            // leave it at 0;
+        }
+        return ret;
+    }
+
+
+    public double getEndTime() {
+        double ret = 0;
+        if (endtime > 0) {
+            ret = endtime;
+        } else if (runtime > 0) {
+            ret = runtime - getStartTime();
+        } else {
+            E.error("Either runtime or endtime must be specified in the model file");
+        }
+        return ret;
+    }
+
+
+    public boolean continueOutput() {
+        boolean ret = false;
+        if (output == null) {
+            // fine - not specified
+        } else {
+            String lco = output.toLowerCase().trim();
+            if (lco.equals("continue")) {
+                ret = true;
+            } else if (lco.equals("new")) {
+                ret = false;
+            } else {
+                E.warning("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
+            }
+        }
+        return ret;
+    }
+
 
 
 

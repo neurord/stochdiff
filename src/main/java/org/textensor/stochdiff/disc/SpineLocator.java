@@ -1,12 +1,10 @@
 package org.textensor.stochdiff.disc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
-import org.textensor.stochdiff.geom.Geom;
-import org.textensor.stochdiff.geom.Position;
-import org.textensor.stochdiff.geom.Vector;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.math.RandomMath;
 import org.textensor.stochdiff.numeric.morph.*;
@@ -38,11 +36,7 @@ public class SpineLocator {
         rngen.setSeed(spineSeed);
     }
 
-
-
-
     public void addSpinesTo(VolumeGrid volumeGrid) {
-
 
         for (SpinePopulation sp : spineDist.getPopulations()) {
 
@@ -57,7 +51,6 @@ public class SpineLocator {
             ArrayList<VolumeElement> surfVE = new ArrayList<VolumeElement>();
             ArrayList<Double> surfA = new ArrayList<Double>();
 
-
             for (VolumeElement ve : volumeGrid.getElementsInRegion(reg)) {
                 Position[] sbdry = ve.getSurfaceBoundary();
                 if (sbdry != null) {
@@ -66,10 +59,8 @@ public class SpineLocator {
                 }
             }
 
-
             if (surfA.size() <= 0) {
-                E.warning("there no elements labelled with " + reg +
-                          " but it is referenced from spine allocation");
+                E.warning("there no elements labelled with " + reg + " but it is referenced from spine allocation");
 
             } else {
                 double[] eltSA = new double[surfA.size()];
@@ -85,16 +76,16 @@ public class SpineLocator {
                 double totalArea = eltSA[eltSA.length - 1];
                 double avgNoSpines = totalArea * density;
 
+                // double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
+                double nspines = avgNoSpines;
 
-                double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
-
-                // the above might take a variable number of random nos off rngen
-                // for certain small variations in avgNoSpines so reseed rngen now
+                // the above might take a variable number of random nos off
+                // rngen
+                // for certain small variations in avgNoSpines so reseed rngen
+                // now
                 // to get reliable spine position repeats;
 
                 rngen.setSeed(spineSeed);
-
-
 
                 if (nspines > 0.5 * eltSA.length) {
                     E.error("too many spines (need more than one per segment");
@@ -105,17 +96,18 @@ public class SpineLocator {
                 int ndone = 0;
 
                 if (avgNoSpines > 0. && nspines == 0) {
-                    E.info("spines : although the density is non-zero, random allocation " +
-                           "gives no spines for region " + reg + " (avg=" + avgNoSpines + ")");
+                    E.info("spines : although the density is non-zero, random allocation "
+                           + "gives no spines for region " + reg + " (avg=" + avgNoSpines + ")");
                 }
 
+                ArrayList<Integer> positionA = new ArrayList<Integer>();
                 while (ndone < nspines) {
                     double abelow = rngen.random() * totalArea;
                     int posInArray = ArrayUtil.findBracket(eltSA, abelow);
 
                     if (posInArray < 0) {
                         E.info("tot area " + totalArea);
-                        E.dump("cant get pos " + abelow,  eltSA);
+                        E.dump("cant get pos " + abelow, eltSA);
                     }
 
                     Integer ip = new Integer(posInArray);
@@ -123,16 +115,20 @@ public class SpineLocator {
                         // already got a spine - go round again;
                     } else {
                         gotSpine.add(ip);
-
-                        ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid, ndone);
-                        volumeGrid.addElements(elts);
+                        positionA.add(ip);
                         ndone += 1;
                     }
+                }
+                Collections.sort(positionA);
+
+                for (int posInArray : positionA) {
+                    ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid,
+                                                    ndone);
+                    volumeGrid.addElements(elts);
                 }
             }
         }
     }
-
 
     private ArrayList<VolumeElement> addSpineTo(VolumeElement vedend, SpineProfile prof, String popid, int idx) {
         Position[] perim = vedend.getSurfaceBoundary();
@@ -159,34 +155,29 @@ public class SpineLocator {
 
         VolumeElement vprev = vedend;
 
-        for (int i = 0; i < xp.length-1; i++) {
-            double dx = xp[i+1] - xp[i];
-            double vol = Math.PI * dx * (rb[i]*rb[i] + rb[i+1]*rb[i+1] + rb[i]*rb[i+1]) / 3.;
+        for (int i = 0; i < xp.length - 1; i++) {
+            double dx = xp[i + 1] - xp[i];
+            double vol = Math.PI * dx * (rb[i] * rb[i] + rb[i + 1] * rb[i + 1] + rb[i] * rb[i + 1]) / 3.;
 
             /*
-              The above gives the volume of a fustrum radius rb[i] at one end and rb[i+1] at the other:
-              calling the radii a and b,  and scaling x to 1, then
-              the volume is
-                     integral_0,1  pi (a + (b-a)x)^2 dx
-              = PI * integral_0,1 a^2 + 2 a (b-a)x + (b-a)^2 x^2
-              = pi * (a^2 +  2 (a b - a^2)/2 + (b^2 + a^2 - 2ab)/3
-              = pi * (a*2 + b^2 + a b) / 3
+             * The above gives the volume of a fustrum radius rb[i] at one end
+             * and rb[i+1] at the other: calling the radii a and b, and scaling
+             * x to 1, then the volume is integral_0,1 pi (a + (b-a)x)^2 dx = PI
+             * * integral_0,1 a^2 + 2 a (b-a)x + (b-a)^2 x^2 = pi * (a^2 + 2 (a
+             * b - a^2)/2 + (b^2 + a^2 - 2ab)/3 = pi * (a*2 + b^2 + a b) / 3
              */
-
 
             double baseArea = Math.PI * (rb[i] * rb[i]);
 
             VolumeElement ve = new VolumeElement();
 
-            Position cp = Geom.position(0.5 * (xp[i] + xp[i+1]), 0., 0.);
+            Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
             Position pr = rot.getRotatedPosition(cp);
             Position pc = trans.getTranslated(pr);
             ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
-            Position[] pbdry = {Geom.position(xp[i+1], rb[i+1], 0),
-                                Geom.position(xp[i], rb[i], 0),
-                                Geom.position(xp[i], -rb[i], 0),
-                                Geom.position(xp[i+1], -rb[i+1], 0)
+            Position[] pbdry = { Geom.position(xp[i + 1], rb[i + 1], 0), Geom.position(xp[i], rb[i], 0),
+                                 Geom.position(xp[i], -rb[i], 0), Geom.position(xp[i + 1], -rb[i + 1], 0)
                                };
 
             for (int ib = 0; ib < pbdry.length; ib++) {
@@ -195,7 +186,7 @@ public class SpineLocator {
 
             ve.setBoundary(pbdry);
             ve.setVolume(vol);
-            ve.setDeltaZ(0.5 * (rb[i] + rb[i+1]));
+            ve.setDeltaZ(0.5 * (rb[i] + rb[i + 1]));
 
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
@@ -215,10 +206,6 @@ public class SpineLocator {
         return ret;
     }
 
-
-
-
-
     private DiscretizedSpine getBoundaryWidths(SpineProfile sp, double dx) {
         if (profHM == null) {
             profHM = new HashMap<SpineProfile, DiscretizedSpine>();
@@ -233,7 +220,7 @@ public class SpineLocator {
             String[] pl = sp.getLabels();
             String[] prl = sp.getRegions();
 
-            double ltot = ax[ax.length-1];
+            double ltot = ax[ax.length - 1];
             int nel = (int)(ltot / dx + 0.5);
             if (nel < 1) {
                 nel = 1;
@@ -247,11 +234,11 @@ public class SpineLocator {
             int ipr = 0;
 
             for (int i = 0; i < nel; i++) {
-                while (ipr < ax.length - 2 && ax[ipr+1] < xbd[i]) {
+                while (ipr < ax.length - 2 && ax[ipr + 1] < xbd[i]) {
                     ipr += 1;
                 }
                 double db = xbd[i] - ax[ipr];
-                double df = ax[ipr+1] - xbd[i];
+                double df = ax[ipr + 1] - xbd[i];
 
                 if (db < df) {
                     rgns[i] = prl[ipr];
@@ -275,14 +262,10 @@ public class SpineLocator {
                 }
             }
 
-
             ret = new DiscretizedSpine(xbd, wv, lbls, rgns);
         }
 
         return ret;
     }
-
-
-
 
 }

@@ -14,6 +14,11 @@ public class Discretization implements AddableTo {
 
     public double defaultMaxElementSide;
 
+
+    public String elementShape = "Cuboid";
+    public double surfaceLayer = 0;
+    public double maxAspectRatio= 0;
+
     public HashMap<String, Double> maxSideHM;
 
 
@@ -46,5 +51,28 @@ public class Discretization implements AddableTo {
     public HashMap<String, Double> getResolutionHM() {
         return maxSideHM;
     }
+
+    public boolean curvedElements() {
+        boolean ret = false;
+        String eslc = elementShape.toLowerCase();
+        if (eslc.equals("curved")) {
+            ret = true;
+        } else if (eslc.equals("cuboid")) {
+            ret = false;
+        } else {
+            E.error("unrecognized element shape (need 'curved' or 'cuboid'): " + elementShape);
+        }
+        return ret;
+    }
+
+
+    public double getMaxAspectRatio() {
+        return maxAspectRatio;
+    }
+
+    public double getSurfaceLayer() {
+        return surfaceLayer;
+    }
+
 
 }

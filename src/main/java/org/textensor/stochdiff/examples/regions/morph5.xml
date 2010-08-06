@@ -23,7 +23,7 @@
 
 
     <!-- lengthDensity means you set the number per micron along the segment -->
-    <SpineAllocation id="sa1" spineType="spineA" region="region1" lengthDensity="0.5"/>
+    <SpineAllocation id="sa1" spineType="spineA" region="region1" lengthDensity="1.0"/>
     
     <!-- areaDensity is the number per unit area -->   
     <!--SpineAllocation spineType="spineB" region="region1" areaDensity="0.01"/-->

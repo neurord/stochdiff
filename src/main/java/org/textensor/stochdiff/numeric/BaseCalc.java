@@ -14,6 +14,7 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.ResultWriter;
 import org.textensor.stochdiff.disc.SpineLocator;
 import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
+import org.textensor.stochdiff.disc.TreeCurvedElementDiscretizer;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.stochdiff.model.*;
@@ -262,7 +263,6 @@ public abstract class BaseCalc {
 
         E.info("subvolume grid size is: " + min_grid_size);
 
-        TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
 
         int vgg = VolumeGrid.GEOM_2D;
 
@@ -284,7 +284,15 @@ public abstract class BaseCalc {
             d2d = 0.5;
         }
 
-        volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
+
+        if (disc.curvedElements()) {
+            TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);
+            volumeGrid = tced.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayer(), disc.getMaxAspectRatio());
+
+        } else {
+            TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
+            volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
+        }
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed, morph.getSpineDistribution(), disc.spineDeltaX);
 

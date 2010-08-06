@@ -46,12 +46,12 @@ public class StochDiff {
 
 
 
-            ResultWriter rw = new ResultWriter(outputFile);
+
             SDRun sdModel = ModelReader.read(modelFile);
             sdModel.resolve();
 
-            SDCalc sdCalc = new SDCalc(sdModel);
-            sdCalc.setResultWriter(rw);
+            SDCalc sdCalc = new SDCalc(sdModel, outputFile);
+
             sdCalc.run();
 
             E.info("total number of particles at the end: " + sdCalc.getParticleCount());

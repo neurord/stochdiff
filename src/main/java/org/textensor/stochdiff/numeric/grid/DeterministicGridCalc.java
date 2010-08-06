@@ -295,8 +295,12 @@ public class DeterministicGridCalc extends BaseCalc {
             }
         }
 
-        double time = 0.;
-        double runtime = sdRun.runtime;
+
+        double time = sdRun.getStartTime();
+        double endtime = sdRun.getEndTime();
+
+
+        E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
 
         double tlog = 5.;
 
@@ -317,7 +321,7 @@ public class DeterministicGridCalc extends BaseCalc {
         }
         int iwr = 0;
         // RO
-        while (time < runtime) {
+        while (time < endtime) {
 
             // RO 5 13 2010: follows template in SteppedStochaticGridCalc
             if (time >= writeTime) {
