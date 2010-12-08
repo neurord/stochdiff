@@ -136,8 +136,15 @@ public class ResultWriter {
 
 
 
+    public File getSiblingFile(String extn) {
+        ResultWriter rw = getSibling(TEXT, extn, null);
+        return rw.getFile();
+    }
 
 
+    private File getFile() {
+        return outputFile;
+    }
 
     public void writeToSiblingFileAndClose(String txt, String extn) {
         ResultWriter rw = getSibling(TEXT, extn, null);

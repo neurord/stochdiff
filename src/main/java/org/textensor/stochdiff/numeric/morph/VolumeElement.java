@@ -8,14 +8,14 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Position;
 
 
-public class VolumeElement {
+public abstract class VolumeElement {
+    double cx;
+    double cy;
+    double cz;
 
     String label;
     String region;
 
-    double cx;
-    double cy;
-    double cz;
     double volume;
     double deltaZ;
     double exposedArea;
@@ -37,19 +37,30 @@ public class VolumeElement {
     String groupID = null;
 
 
-    // these are for caching connection areas to neighbors for
-    // cuboid volumes only
-    double alongArea;
-    double sideArea;
-    double topArea;
-
-
-
-
     public VolumeElement() {
         connections = new ArrayList<ElementConnection>();
         submembrane = false;
     }
+
+
+    public void setCenterPosition(double x, double y, double z) {
+        cx = x;
+        cy = y;
+        cz = z;
+    }
+
+    public double getX() {
+        return cx;
+    }
+
+    public double getY() {
+        return cy;
+    }
+
+    public double getZ() {
+        return cz;
+    }
+
 
     //<--WK
     public boolean isSubmembrane()
@@ -57,8 +68,7 @@ public class VolumeElement {
         return (submembrane == true);
     }
 
-    public void setSubmembrane()
-    {
+    public void setSubmembrane() {
         submembrane = true;
     }
     //WK-->
@@ -86,12 +96,6 @@ public class VolumeElement {
 
     }
 
-
-    public void setCenterPosition(double x, double y, double z) {
-        cx = x;
-        cy = y;
-        cz = z;
-    }
 
     public void setVolume(double v) {
         volume = v;
@@ -124,21 +128,8 @@ public class VolumeElement {
     }
 
 
-    public double getX() {
-        return cx;
-    }
-
-    public double getY() {
-        return cy;
-    }
-
-    public double getZ() {
-        return cz;
-    }
-
     //<--WK
-    public boolean getSubmembrane()
-    {
+    public boolean getSubmembrane() {
         return submembrane;
     }
     //WK-->
@@ -164,80 +155,18 @@ public class VolumeElement {
     }
 
 
-    @SuppressWarnings("boxing")
-    public String getAsText() {
-        StringBuffer sb = new StringBuffer();
-        // export boundary if have it, ow just the center point;
-        if (boundary != null) {
-            for (Position p : boundary) {
-                sb.append(String.format(" (%.5g %.5g %.5g) ", p.getX(), p.getY(), p.getZ()));
-            }
-        } else {
-            sb.append(String.format(" (%.5g %.5g %.5g) ", cx, cy, cz));
 
-        }
-        return sb.toString();
-    }
-
-    @SuppressWarnings("boxing")
-    public String getAsPlainText() {
-        StringBuffer sb = new StringBuffer();
-        // export boundary if have it, ow just the center point;
-        if (boundary != null) {
-            for (Position p : boundary) {
-                sb.append(String.format(" %.5g %.5g %.5g", p.getX(), p.getY(), p.getZ()));
-            }
-        } else {
-            sb.append(String.format(" %.5g %.5g %.5g", cx, cy, cz));
-        }
-        sb.append(String.format(" %.5g %.5g", volume, deltaZ));
-        return sb.toString();
-    }
+    public abstract String getAsText();
 
 
-    @SuppressWarnings("boxing")
-    public String getHeadings() {
-        StringBuffer sb = new StringBuffer();
-        // export boundary if have it, ow just the center point;
-        if (boundary != null) {
-            for (int i = 0; i < boundary.length; i++) {
-                sb.append(" x" + i + " y" + i + " z" + i);
+    public abstract String getAsPlainText();
 
-            }
-        } else {
-            sb.append(" cx cy cz");
 
-        }
-        sb.append(" volume deltaZ");
-        return sb.toString();
-    }
+    public abstract String getHeadings();
 
 
 
-    public void setAlongArea(double d) {
-        alongArea = d;
 
-    }
-
-    public double getAlongArea() {
-        return alongArea;
-    }
-
-    public void setSideArea(double d) {
-        sideArea = d;
-    }
-    public double getSideArea() {
-        return sideArea;
-    }
-
-
-    public void setTopArea(double d) {
-        topArea = d;
-    }
-
-    public double getTopArea() {
-        return topArea;
-    }
 
     public void setGroupID(String lroot) {
         groupID = lroot;

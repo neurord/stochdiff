@@ -101,7 +101,7 @@ public class Icing3DViewer implements Visualizer {
             SceneGraphBuilder sgb  = new SceneGraphBuilder();
             sgb.buildTree(points, resolution, scaleFactor);
             sceneGraphViewer.removeAllDecoration();
-            sceneGraphViewer.setSceneGraph(sgb.getSceneGraph());
+            sceneGraphViewer.setSceneGraph(sgb.getSceneGraph(), null);
 
         } else {
             E.error("cant build viewable from " + obj);
@@ -141,7 +141,7 @@ public class Icing3DViewer implements Visualizer {
             if (cachedPoints != null) {
                 SceneGraphBuilder sgb  = new SceneGraphBuilder();
                 sgb.buildTree(cachedPoints, resolution, scaleFactor);
-                sceneGraphViewer.setSceneGraph(sgb.getSceneGraph());
+                sceneGraphViewer.setSceneGraph(sgb.getSceneGraph(), null);
             }
 
 

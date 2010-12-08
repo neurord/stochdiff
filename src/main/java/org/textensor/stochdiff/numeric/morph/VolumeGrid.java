@@ -47,6 +47,10 @@ public class VolumeGrid {
 
     HashMap<String, int[]> areaHM;
 
+    boolean hasCuboids = false;
+    boolean hasCurveds = false;
+
+
     public VolumeGrid() {
         elements = new ArrayList<VolumeElement>();
 
@@ -55,12 +59,24 @@ public class VolumeGrid {
 
 
     public void importSlices(ArrayList<VolumeSlice> gridAL) {
+        hasCuboids = true;
         for (VolumeSlice vs : gridAL) {
             for (VolumeElement ve : vs.getElements()) {
                 addVolumeElement(ve);
             }
         }
     }
+
+    public void importSmoothSlices(ArrayList<CurvedVolumeSlice> gridAL) {
+        hasCurveds = true;
+        for (CurvedVolumeSlice vs : gridAL) {
+            for (VolumeElement ve : vs.getElements()) {
+                addVolumeElement(ve);
+            }
+        }
+    }
+
+
 
     public void importLines(ArrayList<VolumeLine> gridAL) {
         for (VolumeLine vs : gridAL) {
@@ -133,9 +149,13 @@ public class VolumeGrid {
             VolumeElement ve = elements.get(i);
             volumes[i] = ve.getVolume();
             exposedAreas[i] = ve.getExposedArea();
+
+
             positions[i][0] = ve.getX();
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
+
+
             eltLabels[i] = ve.getLabel();
             eltGroupIDs[i] = ve.getGroupID();
             submembranes[i] = ve.getSubmembrane();
@@ -415,6 +435,41 @@ public class VolumeGrid {
             areaHM.put(s, ia);
         }
     }
+
+
+    public boolean isCuboid() {
+        boolean ret = false;
+        if (hasCuboids && !hasCurveds) {
+            ret = true;
+        }
+        return ret;
+    }
+
+    public boolean isCurved() {
+        boolean ret = false;
+        if (hasCurveds && !hasCuboids) {
+            ret = true;
+        }
+        return ret;
+    }
+
+
+    public String getAsElementsText() {
+        StringBuffer sb = new StringBuffer();
+        int ielt = 0;
+        for (VolumeElement ve : elements) {
+            if (ve instanceof CurvedVolumeElement) {
+                sb.append("" + ielt + " ");
+                sb.append(((CurvedVolumeElement)ve).getText3D());
+
+            } else {
+                E.error("cant handle " + ve + " in element export");
+            }
+            ielt += 1;
+        }
+        return sb.toString();
+    }
+
 
 
 

@@ -63,6 +63,10 @@ public abstract class BaseCalc {
     // WK-->
 
 
+    public final static int VISUALIZE = 1;
+    public int runAction = 0;
+
+
     protected int[][] specIndexesOut;
     protected String[] regionsOut;
     protected double[] dtsOut;
@@ -71,6 +75,15 @@ public abstract class BaseCalc {
 
     public BaseCalc(SDRun sdr) {
         sdRun = sdr;
+
+        if (sdr.action == null) {
+
+        } else if (sdr.action.startsWith("vis")) {
+            runAction = VISUALIZE;
+        } else {
+            E.error("Unrecognized action: only 'visualize' is supported");
+        }
+
     }
 
 
@@ -430,7 +443,7 @@ public abstract class BaseCalc {
         resultWriter.init("cctdif2d", ResultWriter.TEXT); // others....
     }
 
-    public abstract void run();
+    public abstract int run();
 
     public abstract long getParticleCount();
 

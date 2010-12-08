@@ -49,7 +49,7 @@ public class VolumeLine {
         double dl = lSize / nl;
         for (int i = 0; i < nl; i++) {
             double vcl = -0.5 * lSize + (i + 0.5) * dl;
-            VolumeElement ve = new VolumeElement();
+            CuboidVolumeElement ve = new CuboidVolumeElement();
 
             ve.setAlongArea(depth * sl);
             ve.setSideArea(depth * dl);
@@ -123,14 +123,14 @@ public class VolumeLine {
 
     public void neighborize() {
         for (int i = 0; i < nl; i++) {
-            VolumeElement v = elements[i][0];
-            VolumeElement vx = null;
+            CuboidVolumeElement cv = (CuboidVolumeElement)elements[i][0];
+            CuboidVolumeElement cvx = null;
             if (i+1 < nl) {
-                vx = elements[i+1][0];
+                cvx = (CuboidVolumeElement)elements[i+1][0];
             }
 
-            if (v != null && vx != null) {
-                v.coupleTo(vx, v.getAlongArea());
+            if (cv != null && cvx != null) {
+                cv.coupleTo(cvx, cv.getAlongArea());
             }
         }
     }
@@ -141,8 +141,8 @@ public class VolumeLine {
         if (tgt.nl == nl) {
             // the easy case;
             for (int i = 0; i < nl; i++) {
-                VolumeElement va = getElement(i);
-                VolumeElement vb = tgt.getElement(i);
+                CuboidVolumeElement va = (CuboidVolumeElement)getElement(i);
+                CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(i);
                 if (va != null && vb != null) {
                     va.coupleTo(vb, va.getSideArea());
                 }
@@ -196,7 +196,7 @@ public class VolumeLine {
             for (int jme = 0; jme < nl; jme++) {
                 double fol = overlapFactor(rngme[jme], rngtgt[i]);
                 if (fol > 0.001) {
-                    VolumeElement vme = getElement(jme);
+                    CuboidVolumeElement vme = (CuboidVolumeElement)getElement(jme);
                     vme.coupleTo(vtgt, fol * vme.getSideArea());
                     E.info("coupled parent element " + jme + " to child element " + i + " overlap factor = " + fol);
                 }
@@ -226,12 +226,12 @@ public class VolumeLine {
 
 
         for (int i = 0; i < nl; i++) {
-            VolumeElement va = getElement(i);
+            CuboidVolumeElement va = (CuboidVolumeElement)getElement(i);
             int ifol = getFirstOverlap(rngme[i], rngtgt);
 
             double fol1 = overlapFactor(rngme[i], rngtgt[ifol]);
             if (fol1 > 0.001) {
-                VolumeElement vb = tgt.getElement(ifol);
+                CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(ifol);
 
                 va.coupleTo(vb, fol1 * va.getSideArea());
 

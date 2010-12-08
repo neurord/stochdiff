@@ -283,7 +283,7 @@ public class DeterministicGridCalc extends BaseCalc {
 
 
 
-    public final void run() {
+    public final int run() {
         init();
 
         if (resultWriter != null) {
@@ -363,6 +363,8 @@ public class DeterministicGridCalc extends BaseCalc {
         // }
         // }
         // RO
+
+        return 0;
     }
 
     public double advance(double time) {

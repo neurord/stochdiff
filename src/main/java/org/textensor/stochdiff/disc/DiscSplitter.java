@@ -14,20 +14,17 @@ import java.util.ArrayList;
 
 /*
  * Take a structure expressed as TreePoints each of which knows their
- * neighbors, and split it into cuboid boxes. The structure should already
+ * neighbors, and split it into radially and tangentially separated elements. The structure should already
  * have been segment-sliced so that here we just subdivide the segments
  * sideways.
- * The output will be the boxes (positions, volumes etc) and coupling
+ * The output will be the elements (positions, volumes etc) and coupling
  * constants.
  */
 
 
 
 public class DiscSplitter {
-
     TreePoint[] srcPoints;
-
-
     ArrayList<CurvedVolumeSlice> gridAL;
     HashSet<TreePoint> wkpHS;
 
@@ -36,7 +33,7 @@ public class DiscSplitter {
     boolean hasSurfaceLayer = false;
     double slDepth = 0;
 
-    double maxAR = 3;
+    double maxAR = 3; // maximum aspect ratio for an element
 
     public DiscSplitter(TreePoint[] pts, double d, HashMap<String, Double> resHM, double sl, double mar) {
         srcPoints = pts;
@@ -46,8 +43,9 @@ public class DiscSplitter {
             slDepth = sl;
         }
 
-        if (mar > 1) {
+        if (mar > 0.5) {
             maxAR = mar;
+            E.info("set max aspect ratio " + maxAR);
         }
     }
 
@@ -73,8 +71,8 @@ public class DiscSplitter {
         recAdd(vg0, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();
-        //MUSTDO - reinstate
-        //  vgr.importSlices(gridAL);
+
+        vgr.importSmoothSlices(gridAL);
         return vgr;
 
     }
@@ -126,7 +124,6 @@ public class DiscSplitter {
                         vg = baseGrid(tp, tpn, lbl);
                         pGrid.planeConnect(vg);
                     }
-
                 }
 
                 lbl = null; // only use it once
@@ -149,7 +146,6 @@ public class DiscSplitter {
 
         String rgn = tpa.regionClassWith(tpb);
         double delta = resolution.getLocalDelta(tpa, tpb);
-
 
         CurvedVolumeSlice ret = new CurvedVolumeSlice(delta, tpa.getRadius(), tpb.getRadius());
         ret.discFill(tpa, tpb, lbl, rgn, hasSurfaceLayer, slDepth, maxAR);

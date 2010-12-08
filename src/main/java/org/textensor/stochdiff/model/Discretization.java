@@ -41,6 +41,8 @@ public class Discretization implements AddableTo {
                     }
                 }
             }
+        } else if (obj instanceof MaxAspectRatio) {
+            maxAspectRatio = ((MaxAspectRatio)obj).value;
 
         } else {
             E.warning("unrecognized object " + obj);

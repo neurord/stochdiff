@@ -87,15 +87,9 @@ public class SpineLocator {
 
                 rngen.setSeed(spineSeed);
 
-                /*			****		AB: 0.5 produces too few spines
                 if (nspines > 0.5 * eltSA.length) {
-                	E.error("too many spines (need more than one per segment");
-                	nspines = (int) (0.5 * eltSA.length);
-                }
-                */
-                if (nspines > eltSA.length) {
                     E.error("too many spines (need more than one per segment");
-                    nspines = (int)(eltSA.length);
+                    nspines = (int)(0.5 * eltSA.length);
                 }
 
                 HashSet<Integer> gotSpine = new HashSet<Integer>();
@@ -126,15 +120,11 @@ public class SpineLocator {
                     }
                 }
                 Collections.sort(positionA);
-                /* AB Jan 11, 2012
-                 * need to repeat loop through ndone, else spines are numbered incorrectly
-                 */
-                ndone=0;
+
                 for (int posInArray : positionA) {
                     ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid,
                                                     ndone);
                     volumeGrid.addElements(elts);
-                    ndone +=1;
                 }
             }
         }
@@ -179,7 +169,7 @@ public class SpineLocator {
 
             double baseArea = Math.PI * (rb[i] * rb[i]);
 
-            VolumeElement ve = new VolumeElement();
+            CuboidVolumeElement ve = new CuboidVolumeElement();
 
             Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
             Position pr = rot.getRotatedPosition(cp);

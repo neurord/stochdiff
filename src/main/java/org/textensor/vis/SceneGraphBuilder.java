@@ -1,7 +1,9 @@
 package org.textensor.vis;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.BranchGroup;
@@ -10,6 +12,7 @@ import javax.media.j3d.Material;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.media.j3d.TransparencyAttributes;
 import javax.media.j3d.TriangleStripArray;
 import javax.vecmath.Color3f;
 import javax.vecmath.Vector3d;
@@ -24,9 +27,14 @@ public class SceneGraphBuilder {
 
     Appearance defaultAppearance;
 
+    Appearance[] randomAppearances;
+
+    ArrayList<Shape3D> shapes;
+
 
     public SceneGraphBuilder() {
         defaultAppearance = makeDefaultAppearance();
+        randomAppearances = makeRandomAppearances(20);
     }
 
 
@@ -43,6 +51,75 @@ public class SceneGraphBuilder {
         a.setMaterial(m);
         return a;
     }
+
+    private Appearance[] makeRandomAppearances(int n) {
+        Random random = new Random();
+        ArrayList<Appearance> ala = new ArrayList<Appearance>();
+        for (int i = 0; i < n; i++) {
+            Color3f aColor  = randomColor(random, 0.3); // ambient
+            Color3f eColor  = new Color3f(0.0f, 0.0f, 0.0f);  // emmissive
+            Color3f dColor  =  rescale(aColor, 0.6); //randomColor(random, 0.6);// diffuse
+            Color3f sColor  = rescale(aColor, 0.8); // randomColor(random, 0.8); // specular
+
+            Material m = new Material(aColor, eColor, dColor, sColor, 70.0f);
+            // specularity is on a range form 0 to 128
+            Appearance a = new Appearance();
+            m.setLightingEnable(true);
+            a.setMaterial(m);
+            /*
+            TransparencyAttributes ta = new TransparencyAttributes();
+            ta.setTransparencyMode (TransparencyAttributes.SCREEN_DOOR);
+            ta.setTransparency(0.1f);
+            a.setTransparencyAttributes(ta);
+             */
+            ala.add(a);
+        }
+        return ala.toArray(new Appearance[ala.size()]);
+    }
+
+
+    private Color3f rescale(Color3f c, double d) {
+        Color col = c.get();
+        double fr = col.getRed() / 256.;
+        double fg = col.getGreen() / 256.;
+        double fb = col.getBlue() / 256.;
+        double f = (fr + fg + fb) / 3;
+        Color3f ret = new Color3f(flimit(d * fr / f), flimit(d * fg / f), flimit(d * fb / f));
+        return ret;
+    }
+
+    private float flimit(double x) {
+        double y = x;
+        if (y < 0.) {
+            y = 0.;
+        }
+        if (y > 1.) {
+            y = 1;
+        }
+        return (float)y;
+    }
+
+    private Color3f randomColor(Random r, double d) {
+        double red = rcol(r, d);
+        double green = rcol(r, d);
+        double blue = rcol(r, d);
+
+        Color3f ret  = new Color3f((float)red, (float)green, (float)blue);
+        return ret;
+    }
+
+
+    private double rcol(Random r, double d) {
+        double v = d + 0.3 * r.nextGaussian();
+        if (v > 1.0) {
+            v = 1.0;
+        }
+        if (v < 0.0) {
+            v = 0.0;
+        }
+        return v;
+    }
+
 
 
     private Appearance getAppearance(Color c) {
@@ -325,14 +402,6 @@ public class SceneGraphBuilder {
 
 
 
-
-
-
-
-
-
-
-
     private void vnStrip(float[] datv, float[] datn, int koff, int nside, double ra, double rb, double da, double db, double s0, double c0, double s1, double c1, double[][] incs, double[][] outcs) {
 
         for (int i = 0; i < nside; i++) {
@@ -356,6 +425,56 @@ public class SceneGraphBuilder {
 
     public  BranchGroup getSceneGraph() {
         return baseGroup;
+    }
+
+
+    public void loadElements(ArrayList<VolElt> elements) {
+        baseGroup = new BranchGroup();
+
+        shapes = new ArrayList<Shape3D>();
+
+        int iel = 0;
+        for (VolElt ve : elements) {
+
+            ve.centroidize();
+
+            TransformGroup ctrans = new TransformGroup();
+            Transform3D cpos = new Transform3D();
+            cpos.setTranslation(new Vector3d(ve.getCX(), ve.getCY(), ve.getCZ()));
+            ctrans.setTransform(cpos);
+
+            Shape3D s = new Shape3D();
+            shapes.add(s);
+
+            s.setAppearance(defaultAppearance);
+
+            int ira = (int)(Math.random() * (randomAppearances.length - 0.01));
+            Appearance app = randomAppearances[ira];
+            Appearance apc = (Appearance)(app.cloneNodeComponent(true));
+            apc.setCapability(Appearance.ALLOW_RENDERING_ATTRIBUTES_WRITE);
+            s.setAppearance(apc);
+
+
+            TriangleStripArray tsa = new TriangleStripArray(ve.getNvert(),
+                    GeometryArray.COORDINATES | GeometryArray.NORMALS, ve.getLens());
+            tsa.setCoordinates(0, ve.getVerts());
+            tsa.setNormals(0, ve.getNorms());
+
+
+            s.setGeometry(tsa);
+
+            ctrans.addChild(s);
+
+            baseGroup.addChild(ctrans);
+
+            iel += 1;
+
+        }
+    }
+
+
+    public ArrayList<Shape3D> getShapes() {
+        return shapes;
     }
 
 }

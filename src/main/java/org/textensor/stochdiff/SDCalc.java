@@ -45,17 +45,18 @@ public class SDCalc {
 
 
 
-    public void run() {
+    public int run() {
+        int ret = 0;
         bCalc = calculationType.getCalc(sdRun);
         if (resultWriter != null) {
             bCalc.setResultWriter(resultWriter);
         }
-        bCalc.run();
+        ret = bCalc.run();
 
         if (resultWriter != null) {
             resultWriter.close();
         }
-
+        return ret;
     }
 
 

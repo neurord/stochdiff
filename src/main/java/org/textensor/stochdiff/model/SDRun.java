@@ -24,6 +24,8 @@ public class SDRun {
     public String stateSavePrefix;
 
 
+    public String action;
+
     public String geometry;
     public double depth2D;
 

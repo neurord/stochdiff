@@ -6,12 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -23,6 +25,7 @@ import javax.media.j3d.DirectionalLight;
 import javax.media.j3d.GraphicsConfigTemplate3D;
 import javax.media.j3d.Light;
 import javax.media.j3d.Locale;
+import javax.media.j3d.Node;
 import javax.media.j3d.PhysicalBody;
 import javax.media.j3d.PhysicalEnvironment;
 import javax.media.j3d.PickConeRay;
@@ -30,14 +33,21 @@ import javax.media.j3d.PickCylinderRay;
 import javax.media.j3d.PickInfo;
 import javax.media.j3d.PickRay;
 import javax.media.j3d.PickShape;
+import javax.media.j3d.RenderingAttributes;
+import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.View;
 import javax.media.j3d.ViewPlatform;
 import javax.media.j3d.VirtualUniverse;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Color3f;
 import javax.vecmath.Matrix4d;
@@ -52,7 +62,7 @@ import com.sun.j3d.utils.geometry.Sphere;
 
 
 
-public class SceneGraphViewer implements ActionListener, MouseListener, MouseMotionListener {
+public class SceneGraphViewer implements ActionListener, MouseListener, MouseMotionListener, ChangeListener {
 
     JPanel panel;
 
@@ -69,6 +79,7 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
     public final static int PAN = 0;
     public final static int ZOOM = 1;
     public final static int ROLL = 2;
+    public final static int HIDE = 3;
     int mode = PAN;
 
 
@@ -83,13 +94,16 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
 
     TransformGroup decTransformGroup;
 
+    PickInfo[] lastPickInfos;
+
     BranchGroup baseGroup;
+    ArrayList<Shape3D> shapes;
 
 
     HashMap<String, SceneItem> sceneItemHM = new HashMap<String, SceneItem>();
 
 
-    float scale = 1.f;
+    float scale = 1.0f;
     Transform3D downTransform;
     Point3d wcdown;
 
@@ -114,11 +128,14 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
     AmbientLight ambientLight;
 
 
+    int nshowing = 0;
+
+
     public SceneGraphViewer() {
 
         GraphicsConfiguration config = getPreferredConfiguration();
         canvas = new Canvas3D(config);
-        canvas.setPreferredSize(new Dimension(400, 400));
+        canvas.setPreferredSize(new Dimension(800, 600));
         canvas.setFocusable(true);
 
 
@@ -141,17 +158,58 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
         broll.setActionCommand("roll");
         broll.addActionListener(this);
 
+        JRadioButton bhide = new JRadioButton("hide");
+        bhide.setActionCommand("hide");
+        bhide.addActionListener(this);
+
+
+
         ButtonGroup g = new ButtonGroup();
         g.add(bpan);
         g.add(bzoom);
         g.add(broll);
+        g.add(bhide);
 
         jp.add(bpan);
         jp.add(bzoom);
         jp.add(broll);
+        jp.add(bhide);
+
+        JButton jbsa = new JButton("Show all");
+        jbsa.setActionCommand("showall");
+        jbsa.addActionListener(this);
+        jp.add(jbsa);
 
 
-        panel.add(jp, BorderLayout.NORTH);
+        JCheckBox jcb = new JCheckBox("Smooth", false);
+        jcb.addActionListener(this);
+        jcb.setActionCommand("antialias");
+        jp.add(jcb);
+
+        JButton jbb = new JButton("+");
+        jbb.setActionCommand("brighter");
+        jbb.addActionListener(this);
+        jp.add(jbb);
+
+        JButton jbd = new JButton("-");
+        jbd.setActionCommand("darker");
+        jbd.addActionListener(this);
+        jp.add(jbd);
+
+
+        JPanel ptop = new JPanel();
+        ptop.setLayout(new GridLayout(2, 1, 2, 2));
+        ptop.add(jp);
+
+
+        JSlider slider = new JSlider(0, 1000, 1000);
+        slider.addChangeListener(this);
+        ptop.add(slider);
+
+
+        panel.add(ptop, BorderLayout.NORTH);
+
+
 
         panel.add(canvas, BorderLayout.CENTER);
 
@@ -193,7 +251,7 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
 
         BranchGroup scene = createDummySceneGraph();
 
-        setSceneGraph(scene);
+        setSceneGraph(scene, null);
 
         canvas.addMouseListener(this);
         canvas.addMouseMotionListener(this);
@@ -236,15 +294,21 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
 
 
 
-    public void setSceneGraph(BranchGroup bg) {
+    public void setSceneGraph(BranchGroup bg, ArrayList<Shape3D> sha) {
         if (baseGroup != null) {
             locale.removeBranchGraph(baseGroup);
+        }
+        shapes = sha;
+        if (shapes != null) {
+            nshowing = shapes.size();
+        } else {
+            nshowing = 0;
         }
 
         if (rootTransform == null) {
             rootTransform= new Transform3D();
             rootTransform.setTranslation(new Vector3d(0., 0., 0.));
-            rootTransform.setScale(5.f);
+            rootTransform.setScale(0.1f);
         }
 
         rootTransformGroup = new TransformGroup();
@@ -339,9 +403,73 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
         } else if (s.equals("roll")) {
             mode = ROLL;
 
+        } else if (s.equals("hide")) {
+            mode = HIDE;
+
+        } else if (s.equals("antialias")) {
+            boolean b = ((JCheckBox)e.getSource()).isSelected();
+            setAA(b);
+
+        } else if (s.equals("brighter")) {
+            deltaLights(0.07);
+
+        } else if (s.equals("darker")) {
+            deltaLights(-0.07);
+
+        } else if (s.equals("showall")) {
+            showAll();
+
         } else {
             E.error("unhandled " + s);
         }
+    }
+
+
+
+
+    void showFraction(double f) {
+        if (shapes == null) {
+            return;
+        }
+        RenderingAttributes rashow = new RenderingAttributes();
+        RenderingAttributes rahide = new RenderingAttributes();
+        rahide.setVisible(false);
+
+        int nch = shapes.size();
+        int nshow = (int)(f * nch);
+
+        if (nshowing < nshow) {
+            for (int i = nshowing; i < nshow; i++) {
+                (shapes.get(i)).getAppearance().setRenderingAttributes(rashow);
+            }
+
+        } else {
+            for (int i = nshow; i < nshowing; i++) {
+                (shapes.get(i)).getAppearance().setRenderingAttributes(rahide);
+            }
+        }
+
+        nshowing = nshow;
+    }
+
+
+    void showAll() {
+        if (shapes == null) {
+            return;
+        }
+        RenderingAttributes rashow = new RenderingAttributes();
+        RenderingAttributes rahide = new RenderingAttributes();
+        rahide.setVisible(false);
+
+        int nch = shapes.size();
+
+        for (int i = 0; i < nch; i++) {
+            Shape3D s = shapes.get(i);
+            s.getAppearance().setRenderingAttributes(rashow);
+            s.setUserData(new Integer(1));
+        }
+
+        nshowing = nch;
     }
 
 
@@ -407,6 +535,10 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
             fwrcTrans.setTranslation(vp);
 
 
+            if (mode == HIDE) {
+                toggleHide();
+            }
+
         } else {
             // best guess for rotation center is point in z=0 plane under mouse
             fwrcTrans = fwTrans;
@@ -435,12 +567,74 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
 
 
 
+    private void toggleHide() {
+        if (lastPickInfos != null) {
+            int npi = lastPickInfos.length;
+            // for (int ipi = npi - 1; ipi >= 0; ipi--) {
+            for (int ipi = 0; ipi < npi; ipi++) {
+                PickInfo pi = lastPickInfos[ipi];
+                Node node = pi.getNode();
+                if (node instanceof Shape3D) {
+                    Shape3D s3d = (Shape3D)node;
+                    boolean hid = hideShape(s3d);
+                    if (hid) {
+                        break;
+                    }
+
+                } else {
+                    // E.info("no node " + node);
+                }
+            }
+        }
+    }
+
+
+
+    private void toggleHideShape(Shape3D s3d) {
+        if (!(s3d.getUserData() instanceof Integer)) {
+            s3d.setUserData(new Integer(1));
+        }
+        int ival = ((Integer)(s3d.getUserData())).intValue();
+        if (ival == 1) {
+            hideShape(s3d);
+        } else {
+            showShape(s3d);
+        }
+    }
+
+
+    boolean hideShape(Shape3D s) {
+        boolean hid = false;
+        if (!(s.getUserData() instanceof Integer)) {
+            s.setUserData(new Integer(1));
+        }
+
+        int ival = ((Integer)(s.getUserData())).intValue();
+        if (ival == 1) {
+            hid = true;
+            RenderingAttributes rahide = new RenderingAttributes();
+            rahide.setVisible(false);
+            s.setUserData(new Integer(0));
+            s.getAppearance().setRenderingAttributes(rahide);
+        }
+        return hid;
+    }
+
+    void showShape(Shape3D s) {
+        RenderingAttributes rashow = new RenderingAttributes();
+        s.setUserData(new Integer(1));
+        s.getAppearance().setRenderingAttributes(rashow);
+    }
+
+
     public void mouseReleased(MouseEvent e) {
 
         if (dragging) {
 
         } else if (mode == ZOOM) {
             // no click actions for zoom;
+        } else if (mode == HIDE) {
+            // done toggle hide already
 
         } else {
             if (button == LEFT) {
@@ -626,12 +820,14 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
         }
 
 
-        PickInfo pickInfo = baseGroup.pickClosest(PickInfo.PICK_BOUNDS, PickInfo.LOCAL_TO_VWORLD, pickShape);
-
+        PickInfo pickInfo = baseGroup.pickClosest(PickInfo.PICK_GEOMETRY, PickInfo.LOCAL_TO_VWORLD, pickShape);
         Transform3D ret = null;
         if (pickInfo != null) {
             ret = pickInfo.getLocalToVWorld();
         }
+
+        lastPickInfos = baseGroup.pickAllSorted(PickInfo.PICK_GEOMETRY, PickInfo.NODE, pickShape);
+
         return ret;
     }
 
@@ -742,6 +938,16 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
         double[] mtx = new double[16];
         rootTransform.get(mtx);
         return mtx;
+    }
+
+
+
+
+    public void stateChanged(ChangeEvent e) {
+        JSlider js = (JSlider)e.getSource();
+        int val = js.getValue();
+        double fval = val / 1000.;
+        showFraction(fval);
     }
 
 

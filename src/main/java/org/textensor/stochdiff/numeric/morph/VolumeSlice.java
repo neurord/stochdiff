@@ -88,7 +88,7 @@ public class VolumeSlice {
                     double vcx = x0 + i * boxSize;
                     double vcy =  y0 + j * boxSize;
 
-                    VolumeElement ve = new VolumeElement();
+                    CuboidVolumeElement ve = new CuboidVolumeElement();
                     elements[i][j] = ve;
                     if (regionLabel != null) {
                         ve.setRegion(regionLabel);
@@ -190,21 +190,21 @@ public class VolumeSlice {
     public void neighborize() {
         for (int i = 0; i < nx; i++) {
             for (int j = 0; j < ny; j++) {
-                VolumeElement v = elements[i][j];
-                VolumeElement vx = null;
-                VolumeElement vy = null;
+                CuboidVolumeElement cv = (CuboidVolumeElement)elements[i][j];
+                CuboidVolumeElement cvx = null;
+                CuboidVolumeElement cvy = null;
                 if (i+1 < nx) {
-                    vx = elements[i+1][j];
+                    cvx = (CuboidVolumeElement)elements[i+1][j];
                 }
                 if (j+1 < ny) {
-                    vy = elements[i][j+1];
+                    cvy = (CuboidVolumeElement)elements[i][j+1];
                 }
 
-                if (v != null && vx != null) {
-                    v.coupleTo(vx, v.getAlongArea());
+                if (cv != null && cvx != null) {
+                    cv.coupleTo(cvx, cv.getAlongArea());
                 }
-                if (v != null && vy != null) {
-                    v.coupleTo(vy, v.getTopArea());
+                if (cv != null && cvy != null) {
+                    cv.coupleTo(cvy, cv.getTopArea());
                 }
             }
         }
@@ -220,8 +220,8 @@ public class VolumeSlice {
             // the easy case;
             for (int i = 0; i < nx; i++) {
                 for (int j = 0; j < ny; j++) {
-                    VolumeElement va = getElement(i, j);
-                    VolumeElement vb = tgt.getElement(i, j);
+                    CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
+                    CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(i, j);
                     if (va != null && vb != null) {
                         va.coupleTo(vb, va.getSideArea());
                     }
@@ -245,8 +245,8 @@ public class VolumeSlice {
 
         for (int i = 0; i < nx; i++) {
             for (int j = 0; j < ny; j++) {
-                VolumeElement va = getElement(i, j);
-                VolumeElement vb = tgt.getElement(io + i, jo + j);
+                CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
+                CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(io + i, jo + j);
                 if (va != null && vb != null) {
                     va.coupleTo(vb, va.getSideArea());
                 }

@@ -36,7 +36,7 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
     }
 
 
-    public final void run() {
+    public final int run() {
         init();
 
         mconc.print();
@@ -49,6 +49,7 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
         while (time < runtime) {
             time += advance();
         }
+        return 0;
     }
 
 

@@ -1,0 +1,14 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+		<NanoMolarity specieID="cAMP" value="0"/>
+    </ConcentrationSet>
+ 
+ 
+    <ConcentrationSet region="branch2">
+		<NanoMolarity specieID="cAMP" value="20000"/>
+    </ConcentrationSet>
+    
+</InitialConditions>
+

@@ -25,6 +25,8 @@ results (also, 3D may not work yet...)  -->
     <spineSeed>123</spineSeed>
 
  <discretization>
+		
+
         <!-- default largest size for elements in bulk volumes (dendrites), microns -->
         <defaultMaxElementSide> 0.2  </defaultMaxElementSide>
 

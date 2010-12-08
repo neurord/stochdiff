@@ -36,8 +36,8 @@ public class TreeCurvedElementDiscretizer {
 
         VolumeGrid vgrid = null;
 
-        DiscSplitter db = new DiscSplitter(slicedPoints, d, resHM, sl, mar);
-        vgrid = db.buildGrid();
+        DiscSplitter dsplit = new DiscSplitter(slicedPoints, d, resHM, sl, mar);
+        vgrid = dsplit.buildGrid();
 
         return vgrid;
     }
