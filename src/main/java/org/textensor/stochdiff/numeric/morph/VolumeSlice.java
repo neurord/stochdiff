@@ -166,7 +166,6 @@ public class VolumeSlice {
 
                     if (surf) {
                         ve.setSubmembrane();
-
                         for (int ib = 0; ib < psb.length; ib++) {
                             psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
                         }
@@ -174,7 +173,6 @@ public class VolumeSlice {
                         ve.setExposedArea(sl * boxSize);
                     }
                 }
-
             }
         }
 
@@ -273,10 +271,13 @@ public class VolumeSlice {
                                 double pborel) {
         double pbo = 1 * (pborel - (radius - vg.radius));
 
+        /*
         E.info("connecting to a subplane size " + vg.radius + " np=" + vg.nx +
-               " offset by " + pbo);
+        		" offset by " + pbo);
         E.info("boxes and dims: " + boxSize + ", " + vg.boxSize + " " +
-               nx + "," + vg.nx + "  rads " + radius + ", " + vg.radius);
+        		nx + "," + vg.nx + "  rads " + radius + ", " + vg.radius);
+        */
+
         // pbo is the offset in y to be applied to the target slice, vg
 
         /* we have nx, ny, xsize and radius
@@ -336,7 +337,7 @@ public class VolumeSlice {
 
             }
         }
-        E.info("coupled " + ncpld + " elements ");
+        // E.info("coupled " + ncpld + " elements ");
     }
 
     private double overlapFactor(double mex, double mey, double med,

@@ -14,8 +14,8 @@ public class SmoothVolumeTest {
 
         StochDiff.main(args);
 
-        // String[] sa = {srt + "model.out"};
-        // CCViz.main(sa);
+        String[] sa = {srt + "model.out"};
+        CCViz.main(sa);
     }
 
 

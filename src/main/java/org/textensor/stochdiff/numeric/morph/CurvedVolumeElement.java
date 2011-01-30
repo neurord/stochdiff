@@ -18,6 +18,11 @@ public class CurvedVolumeElement extends VolumeElement {
     float[][] norms;
 
 
+    public CurvedVolumeElement() {
+        super();
+    }
+
+
     public void setAlongArea(double d) {
         alongArea = d;
 

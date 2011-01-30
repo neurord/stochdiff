@@ -41,7 +41,7 @@ public class SpineAllocation {
 
         double density = 0.;
         if (lengthDensity > 0) {
-            E.info("TODO - need area factor");
+            E.warning("'lengthDensity' is an erroneous name: it get treated like 'areaDensity'");
             density = lengthDensity;
 
         } else if (areaDensity > 0) {

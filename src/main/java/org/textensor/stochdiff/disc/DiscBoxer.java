@@ -32,10 +32,14 @@ public class DiscBoxer {
 
     Resolution resolution;
 
+    double[] surfaceLayers;
 
-
-    public DiscBoxer(TreePoint[] pts) {
+    public DiscBoxer(TreePoint[] pts, double[] sl) {
         srcPoints = pts;
+        surfaceLayers = sl;
+        if (sl != null && sl.length > 0) {
+            E.missing("3d cuboid mesh doesn't handle surface layers yet");
+        }
     }
 
 
@@ -95,7 +99,7 @@ public class DiscBoxer {
                 } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
                     // E.info("first pt after branch " + tpn);
                     TreePoint par = tp.parent;
-                    E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
+                    //  E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
 
                     vg = baseGrid(tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);

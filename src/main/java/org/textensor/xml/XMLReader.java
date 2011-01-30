@@ -147,7 +147,7 @@ public class XMLReader {
                 child = new ArrayList();
 
             } else if (child instanceof String) {
-                // in this case, set its length to 0. Subseqnet parts of the
+                // in this case, set its length to 0. Subsequent parts of the
                 // string will get appended to the current value, so want to
                 // keep track of the fact that it is a string, without keeping
                 // the default that may have come from above;
@@ -156,7 +156,7 @@ public class XMLReader {
 
             } else if (child.getClass().isArray()) {
                 // make it an array list for the time being, then
-                // give the lsit to teh instantiator to make into theright sort of
+                // give the list to the instantiator to make into the right sort of
                 // array;
                 child = new ArrayList();
             }

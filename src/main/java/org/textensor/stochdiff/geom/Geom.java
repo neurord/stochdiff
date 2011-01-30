@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.geom;
 
+import org.textensor.report.E;
+
 
 public final class Geom {
 
@@ -38,11 +40,18 @@ public final class Geom {
         return new GVector(v.getDX(), v.getDY(), 0.);
     }
 
+    public static Vector xProjection(Vector v) {
+        return new GVector(0, v.getDY(), v.getDZ());
+    }
 
+    public static Vector zProjection(Vector v) {
+        return new GVector(v.getDX(), v.getDY(), 0.);
+    }
 
 
 
     public static Rotation fromZRotation(Vector v) {
+        E.missing("untested - probably wrong");
         Vector v1 = unitZ();
         double phi = angleBetween(v1, v);
         GRotation gr1 = aboutYRotation(phi);
@@ -66,6 +75,10 @@ public final class Geom {
         return gr;
     }
 
+    public static GRotation aboutXRotation(double angle) {
+        GRotation gr = new GRotation(GRotation.X_AXIS, angle);
+        return gr;
+    }
 
 
     public static double length(Vector v) {
@@ -101,6 +114,32 @@ public final class Geom {
         return phi;
     }
 
+    // the rotation angle that will move the x projection of v1 onto v2;
+    public static double xRotationAngle(Vector v1, Vector v2) {
+        double ca = v1.getDY() * v2.getDY() + v1.getDZ() * v2.getDZ();
+        double cb = -1 * v1.getDY() * v2.getDZ() + v1.getDZ() * v2.getDZ();
+        double phi = Math.atan2(cb, ca);
+        return phi;
+    }
+
+// the rotation angle that will move the x projection of v1 onto v2;
+    public static double zElevation(Vector v) {
+        double dy = v.getDY();
+        double dx = v.getDX();
+        double lxy = Math.sqrt(dx * dx + dy * dy);
+        double phi = Math.atan2(v.getDZ(), lxy);
+        return phi;
+    }
+
+    public static double yzRotationAngle(Vector v) {
+        double phi = Math.atan2(-v.getDX(), v.getDY());
+        return phi;
+    }
+
+    public static double xzRotationAngle(Vector v) {
+        double phi = Math.atan2(v.getDY(), v.getDX());
+        return phi;
+    }
 
     public static Vector vector(double x, double y, double z) {
         return new GVector(x, y, z);

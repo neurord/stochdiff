@@ -20,7 +20,7 @@ public class TreeBoxDiscretizer {
     }
 
 
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, int geom,
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, double[] surfaceLayers, int geom,
                                 double d2d) {
 
 
@@ -42,11 +42,11 @@ public class TreeBoxDiscretizer {
         VolumeGrid vgrid = null;
 
         if (geom == VolumeGrid.GEOM_2D) {
-            LineBoxer lb = new LineBoxer(slicedPoints, d2d);
+            LineBoxer lb = new LineBoxer(slicedPoints, surfaceLayers, d2d);
             vgrid = lb.buildGrid(d, resHM);
 
         } else if (geom == VolumeGrid.GEOM_3D) {
-            DiscBoxer db = new DiscBoxer(slicedPoints);
+            DiscBoxer db = new DiscBoxer(slicedPoints, surfaceLayers);
             vgrid = db.buildGrid(d, resHM);
 
         } else {

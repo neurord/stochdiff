@@ -5,8 +5,9 @@ import org.textensor.report.E;
 
 public class GRotation implements Rotation {
 
-    public static final String Z_AXIS = "zaxis";
-    public static final String Y_AXIS = "yaxis";
+    public static final int X_AXIS = 1;
+    public static final int Y_AXIS = 2;
+    public static final int Z_AXIS = 3;
     double[][] mtx;
 
 
@@ -18,22 +19,29 @@ public class GRotation implements Rotation {
     }
 
 
-    public GRotation(String axis, double angle) {
+    public GRotation(int axis, double angle) {
         this();
         double ca = Math.cos(angle);
         double sa = Math.sin(angle);
 
-        if (axis.equals(Z_AXIS)) {
+        if (axis == X_AXIS) {
+            mtx[1][1] = ca;
+            mtx[1][2] = -sa;
+            mtx[2][1] = sa;
+            mtx[2][2] = ca;
+
+        } else if (axis == Y_AXIS) {
+            mtx[0][0] = ca;
+            mtx[0][2] = sa;
+            mtx[2][0] = -sa;
+            mtx[2][2] = ca;
+
+        } else if (axis == Z_AXIS) {
             mtx[0][0] = ca;
             mtx[0][1] = -sa;
             mtx[1][0] = sa;
             mtx[1][1] = ca;
 
-        } else if (axis.equals(Y_AXIS)) {
-            mtx[0][0] = ca;
-            mtx[0][2] = -sa;
-            mtx[2][0] = sa;
-            mtx[2][2] = ca;
 
 
         } else {

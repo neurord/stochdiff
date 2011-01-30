@@ -38,14 +38,16 @@ public class LineBoxer {
     ArrayList<VolumeLine> gridAL;
     HashSet<TreePoint> wkpHS;
 
+    double[] surfaceLayers;
 
     double depth;
 
     Resolution resolution;
 
 
-    public LineBoxer(TreePoint[] pts, double d2d) {
+    public LineBoxer(TreePoint[] pts, double[] sl, double d2d) {
         srcPoints = pts;
+        surfaceLayers = sl;
         depth = d2d;
     }
 
@@ -119,8 +121,8 @@ public class LineBoxer {
 
                     } else {
                         // TODO - probably not what we want
-                        // too much mumerical diffusion if boxes can have gradually changing
-                        // sizes? restrict to a few dicrete multiples?
+                        // too much numerical diffusion if boxes can have gradually changing
+                        // sizes? restrict to a few discrete multiples?
                         vg = baseGrid(tp, tpn, lbl);
                         pGrid.planeConnect(vg);
                     }
@@ -166,11 +168,23 @@ public class LineBoxer {
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
 
 
+        double dsl = 0;
+        int nsl = 0;
 
-        // number of boxes across the diameter;
-        int nd = 1 + 2 * ((int)(r / delta));
+        if (surfaceLayers != null && surfaceLayers.length > 0) {
+            while (nsl < surfaceLayers.length && dsl + surfaceLayers[nsl] < r) {
+                dsl += surfaceLayers[nsl];
+                nsl += 1;
+            }
+        }
+        double dleft = 2 * (r - dsl);
 
-        VolumeLine ret = new VolumeLine(nd, nd * delta, depth);
+
+        // number of regular boxes across the inner part once nsl put on each end
+        int nreg = 1 + 2 * ((int)(dleft / delta));
+
+        double dtot = 2 * dsl + nreg * delta;
+        VolumeLine ret = new VolumeLine(nsl, nreg, surfaceLayers, dtot, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
 
         return ret;
@@ -179,10 +193,12 @@ public class LineBoxer {
 
     public VolumeLine baseSoftGrid(TreePoint tpa, TreePoint tpb, String lbl,
                                    String rgn, double delta) {
+        if (surfaceLayers != null && surfaceLayers.length > 0) {
+            E.warning("surface layers are incompatible with soft grid - ignoring");
+        }
+
         // allows the cells to grow or shrink a little to fill the line;
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
-
-
 
         // number of boxes across the diameter;
         int nd = (int)(2 * r / delta + 0.5);
@@ -190,7 +206,7 @@ public class LineBoxer {
             nd = 1;
         }
 
-        VolumeLine ret = new VolumeLine(nd, 2. * r, depth);
+        VolumeLine ret = new VolumeLine(0, nd, null, 2. * r, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
 
         return ret;

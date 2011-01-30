@@ -37,7 +37,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
-import org.textensor.vis.StandaloneViewer;
+import org.textensor.vis.CCViz3D;
 
 /*
  * Approximate stochastic calculation with a fixed timestep where
@@ -467,14 +467,17 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
             if (vgrid.isCuboid()) {
                 resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
+
             } else if (vgrid.isCurved()) {
+                resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
+
                 resultWriter.writeToSiblingFileAndClose(vgrid.getAsElementsText(), "-elements.tri");
                 E.info("Written elements mesh file");
 
                 File ftri = resultWriter.getSiblingFile("-elements.tri");
 
                 if (runAction == VISUALIZE) {
-                    StandaloneViewer sdv = new StandaloneViewer();
+                    CCViz3D sdv = new CCViz3D();
                     sdv.loadElements(ftri);
                     E.info("loaded mesh in standalone viewer");
                     sdv.show();

@@ -64,6 +64,8 @@ public abstract class BaseCalc {
 
 
     public final static int VISUALIZE = 1;
+    public final static int RUN = 0;
+
     public int runAction = 0;
 
 
@@ -80,6 +82,9 @@ public abstract class BaseCalc {
 
         } else if (sdr.action.startsWith("vis")) {
             runAction = VISUALIZE;
+        } else if (sdr.action.startsWith("run")) {
+            runAction = RUN;
+
         } else {
             E.error("Unrecognized action: only 'visualize' is supported");
         }
@@ -94,17 +99,17 @@ public abstract class BaseCalc {
         if (d == 0.0) {
             return "0.0 ";
         } else {
-            return String.format("%.5g ", new Double(d));
+            return String.format("%.5g ", d);
         }
     }
 
     // <--RO 7 02 2008
     // Saves as integers; used to save particles instead of concentrations
-    protected String stringi(int d) {
-        if (d == 0) {
+    protected String stringi(int id) {
+        if (id == 0) {
             return "00 ";
         } else {
-            return String.format("%d ", new Integer(d));
+            return String.format("%d ", id);
         }
     }
 
@@ -155,9 +160,12 @@ public abstract class BaseCalc {
         if (oq != null) {
             if (oq.equals("NUMBER")) {
                 writeConcentration = false;
-            } else if (oq.equals("CONCENTRATION")) {
+                E.info("Output will contain particle numbers");
 
+            } else if (oq.equals("CONCENTRATION")) {
                 writeConcentration = true;
+                E.info("Output will contain concentrations");
+
             } else {
 
                 E.warning("Unrecognized output quantity: " + oq + " - need either NUMBER or CONCENTRATION");
@@ -274,7 +282,7 @@ public abstract class BaseCalc {
 
         d = min_grid_size;
 
-        E.info("subvolume grid size is: " + min_grid_size);
+        // E.info("subvolume grid size is: " + min_grid_size);
 
 
         int vgg = VolumeGrid.GEOM_2D;
@@ -300,11 +308,11 @@ public abstract class BaseCalc {
 
         if (disc.curvedElements()) {
             TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);
-            volumeGrid = tced.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayer(), disc.getMaxAspectRatio());
+            volumeGrid = tced.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(), disc.getMaxAspectRatio());
 
         } else {
             TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
-            volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), vgg, d2d);
+            volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),  vgg, d2d);
         }
 
         SpineLocator spineloc = new SpineLocator(sdRun.spineSeed, morph.getSpineDistribution(), disc.spineDeltaX);

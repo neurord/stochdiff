@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.textensor.report.E;
+import org.textensor.stochdiff.disc.CurvedVolumeSlice;
 import org.textensor.stochdiff.geom.Geom;
 //  import org.textensor.stochdiff.geom.Position;
 
@@ -370,6 +371,8 @@ public class VolumeGrid {
         }
 
         for (String s : areaHM.keySet()) {
+            E.info("area key " + s);
+
             if (s.startsWith(pre) && s.endsWith(post)) {
                 String sin = s.substring(pre.length(), s.indexOf(post));
                 int ind = Integer.parseInt(sin);
@@ -463,7 +466,8 @@ public class VolumeGrid {
                 sb.append(((CurvedVolumeElement)ve).getText3D());
 
             } else {
-                E.error("cant handle " + ve + " in element export");
+                String msg = ("cant handle " + ve + " in element export");
+                throw new RuntimeException(msg);
             }
             ielt += 1;
         }

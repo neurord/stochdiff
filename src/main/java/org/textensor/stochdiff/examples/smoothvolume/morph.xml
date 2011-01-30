@@ -7,12 +7,12 @@
 
     <Segment id="seg2" region="branch1">
     <start on="seg1" at="end" r = "0.3"/>
-    <end   x="4.0" y="1.5" z="0.0" r="0.1"/>
+    <end   x="4.0" y="1.4" z="0.4" r="0.1"/>
     </Segment>
 
 	<Segment id="seg4" region="branch4">
     <start on="seg2" at="end"/>
-    <end   x="5.0" y="1.5" z="0.0" r="0.1"/>
+    <end   x="5.0" y="1.0" z="0.80" r="0.1"/>
     </Segment>
 
 
@@ -20,5 +20,38 @@
 	<start on="seg1" at="end" r="0.2"/>
 	<end   x="6.0"   y="0.5" z="0.0"  r="0.1"/>
     </Segment>
+   
+   
+   
+    <SpineType id="spineA">
+	<Section width="0.1" at="0.0"/>
+	<Section width="0.1" at="0.3" regionClass="neck"/>
+	<Section width="0.2" at="0.5"/>
+	<Section width="0.2" at="0.6" regionClass="PSD"/>
+	<Section width="0.05" at="0.65" label="pointA"/>
+    </SpineType>
+
+    <!-- regionClass labels can apply to sections or segments and label regions for applying initial conditaions etc -->
+
+
+    <!-- cylindrical spine -->
+    <SpineType id="spineB">
+	<Section width="0.1" at="0.0"/>
+	<Section width="0.1" at="0.2"/>
+	<Section width="0.1" at="0.6"/>
+    </SpineType>
+
+
+    <!-- lengthDensity means you set the number per micron along the segment -->
+    <SpineAllocation id="sa1" spineType="spineA" region="dendrite" areaDensity="1.1"/>
+
+    <!-- areaDensity is the number per unit area -->   
+    <SpineAllocation spineType="spineB" region="dendrite" areaDensity="1.1"/>
+   
+   
+   
+   
+   
+   
    
 </Morphology>

@@ -1,8 +1,9 @@
 <StimulationSet>
 
-  
- 
-
-
+   <InjectionStim specieID="cAMP" injectionSite="sa1[1].pointA">
+	  <onset>1.0</onset>
+   	  <duration>2.0</duration>
+	  <rate>200</rate>
+   </InjectionStim>
 
 </StimulationSet>

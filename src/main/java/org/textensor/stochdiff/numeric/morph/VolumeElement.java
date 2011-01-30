@@ -30,16 +30,15 @@ public abstract class VolumeElement {
 
     boolean fixcon = false;
 
-    //<--WK
-    boolean submembrane; //true ifn this volume element lies on submembrane
-    //WK-->
+
+    boolean submembrane = false; //true ifn this volume element lies on submembrane
+
 
     String groupID = null;
 
 
     public VolumeElement() {
         connections = new ArrayList<ElementConnection>();
-        submembrane = false;
     }
 
 
@@ -62,16 +61,14 @@ public abstract class VolumeElement {
     }
 
 
-    //<--WK
-    public boolean isSubmembrane()
-    {
-        return (submembrane == true);
+    public boolean isSubmembrane() {
+        return submembrane;
     }
 
     public void setSubmembrane() {
         submembrane = true;
     }
-    //WK-->
+
 
     public void setLabel(String s) {
         label = s;

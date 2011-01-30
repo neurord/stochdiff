@@ -37,8 +37,13 @@ public class SpineLocator {
     }
 
     public void addSpinesTo(VolumeGrid volumeGrid) {
+        HashSet<VolumeElement> spineVEs = new HashSet<VolumeElement>();
 
+        int nblocked = 0;
+
+        int ipop = 0;
         for (SpinePopulation sp : spineDist.getPopulations()) {
+            ipop += 1;
 
             String popid = sp.getID();
             if (popid == null) {
@@ -51,11 +56,13 @@ public class SpineLocator {
             ArrayList<VolumeElement> surfVE = new ArrayList<VolumeElement>();
             ArrayList<Double> surfA = new ArrayList<Double>();
 
+
             for (VolumeElement ve : volumeGrid.getElementsInRegion(reg)) {
                 Position[] sbdry = ve.getSurfaceBoundary();
                 if (sbdry != null) {
                     surfVE.add(ve);
-                    surfA.add(new Double(Geom.getArea(sbdry)));
+                    surfA.add(new Double(ve.getExposedArea()));
+//					surfA.add(new Double(Geom.getArea(sbdry)));
                 }
             }
 
@@ -71,7 +78,6 @@ public class SpineLocator {
                     eltSA[i] = sum;
                 }
 
-                E.info("total surface area for spine group  " + popid + " on " + reg + " is " + sum);
 
                 double totalArea = eltSA[eltSA.length - 1];
                 double avgNoSpines = totalArea * density;
@@ -85,14 +91,15 @@ public class SpineLocator {
                 // now
                 // to get reliable spine position repeats;
 
-                rngen.setSeed(spineSeed);
+                rngen.setSeed(spineSeed + ipop);
 
                 if (nspines > 0.5 * eltSA.length) {
                     E.error("too many spines (need more than one per segment");
                     nspines = (int)(0.5 * eltSA.length);
                 }
 
-                HashSet<Integer> gotSpine = new HashSet<Integer>();
+                E.info("Surface area for spine group  " + popid + " on " + reg + " is " + sum + ". nspines=" + nspines);
+
                 int ndone = 0;
 
                 if (avgNoSpines > 0. && nspines == 0) {
@@ -110,21 +117,27 @@ public class SpineLocator {
                         E.dump("cant get pos " + abelow, eltSA);
                     }
 
-                    Integer ip = new Integer(posInArray);
-                    if (gotSpine.contains(ip)) {
+
+                    if (spineVEs.contains(surfVE.get(posInArray))) {
                         // already got a spine - go round again;
+                        nblocked += 1;
+
                     } else {
-                        gotSpine.add(ip);
-                        positionA.add(ip);
+                        positionA.add(posInArray);
                         ndone += 1;
+                    }
+                    if (nblocked > 100) {
+                        throw new RuntimeException("Can't fine any vacant elements to add a spine to");
                     }
                 }
                 Collections.sort(positionA);
 
+                ndone = 0;
                 for (int posInArray : positionA) {
                     ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid,
                                                     ndone);
                     volumeGrid.addElements(elts);
+                    ndone += 1;
                 }
             }
         }
@@ -132,8 +145,16 @@ public class SpineLocator {
 
     private ArrayList<VolumeElement> addSpineTo(VolumeElement vedend, SpineProfile prof, String popid, int idx) {
         Position[] perim = vedend.getSurfaceBoundary();
+
+
+        //	for (int i = 0; i < perim.length; i++) {
+        //		E.info("peri elt " + i + " " + perim[i]);
+        //	}
+
+
         Vector vnorm = Geom.getUnitNormal(perim);
         Position pcen = Geom.cog(perim);
+
 
         DiscretizedSpine xw = getBoundaryWidths(prof, spineDX);
 
@@ -147,11 +168,33 @@ public class SpineLocator {
             rb[i] = 0.5 * wb[i];
         }
 
+        // E.info("vnomr is " + vnorm);
+
         ArrayList<VolumeElement> ret = new ArrayList<VolumeElement>();
 
         Translation trans = Geom.translation(pcen);
-        double theta = Geom.zRotationAngle(Geom.unitX(), vnorm);
-        Rotation rot = Geom.aboutZRotation(theta);
+
+        double aroty = -Geom.zElevation(vnorm);
+
+        double arotz = Geom.xzRotationAngle(vnorm);
+
+        GRotation rotx = Geom.aboutYRotation(aroty);
+        GRotation rotz = Geom.aboutZRotation(arotz);
+        Rotation rot = rotz.times(rotx);
+
+
+
+        Vector vx = Geom.unitX();
+        Position prot = rot.getRotatedPosition(Geom.endPosition(vx));
+        double da = Geom.angleBetween(vnorm, Geom.getToVector(prot));
+
+
+        if (Math.abs(da) > 1.e-6) {
+            throw new RuntimeException("rotation angle miscalculation: residual angle is " + da);
+        }
+
+
+
 
         VolumeElement vprev = vedend;
 
@@ -169,12 +212,8 @@ public class SpineLocator {
 
             double baseArea = Math.PI * (rb[i] * rb[i]);
 
-            CuboidVolumeElement ve = new CuboidVolumeElement();
 
-            Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
-            Position pr = rot.getRotatedPosition(cp);
-            Position pc = trans.getTranslated(pr);
-            ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
+            VolumeElement ve = null;
 
             Position[] pbdry = { Geom.position(xp[i + 1], rb[i + 1], 0), Geom.position(xp[i], rb[i], 0),
                                  Geom.position(xp[i], -rb[i], 0), Geom.position(xp[i + 1], -rb[i + 1], 0)
@@ -184,12 +223,43 @@ public class SpineLocator {
                 pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
             }
 
-            ve.setBoundary(pbdry);
+
+
+            if (vedend instanceof CuboidVolumeElement) {
+                ve = new CuboidVolumeElement();
+                ve.setBoundary(pbdry);
+
+            } else if (vedend instanceof CurvedVolumeElement) {
+                CurvedVolumeElement cve = new CurvedVolumeElement();
+                ve = cve;
+                TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
+                ts.rotate(rot);
+                ts.translate(trans);
+
+                cve.setTriangles(ts.getStripLengths(), ts.getPositions(), ts.getNormals());
+                cve.setBoundary(pbdry);
+
+
+            } else {
+                throw new RuntimeException("unknown element type " + vedend);
+            }
+
+
+
+
+
+
+
             ve.setVolume(vol);
             ve.setDeltaZ(0.5 * (rb[i] + rb[i + 1]));
 
+            Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
+            Position pr = rot.getRotatedPosition(cp);
+            Position pc = trans.getTranslated(pr);
+            ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
+
             String lroot = popid + "[" + idx + "]";
             if (lbls[i] != null) {
                 String ll = lroot + "." + lbls[i];
@@ -205,6 +275,9 @@ public class SpineLocator {
         }
         return ret;
     }
+
+
+
 
     private DiscretizedSpine getBoundaryWidths(SpineProfile sp, double dx) {
         if (profHM == null) {
@@ -267,5 +340,84 @@ public class SpineLocator {
 
         return ret;
     }
+
+
+
+
+    private TrianglesSet makeTriangles(double xa, double xb, double ra, double rb) {
+        // spines are built lying along the x axis
+
+        TrianglesSet ret = new TrianglesSet();
+
+        int nseg = 12;
+
+
+        TriangleStrip tss = makeEnd(xa, ra, nseg, -1);
+        ret.add(tss);
+
+        TriangleStrip tst = makeEnd(xb, rb, nseg, 1);
+        ret.add(tst);
+
+        TriangleStrip tsin = makeOuter(xa, xb, ra, rb, nseg, -1);
+        ret.add(tsin);
+
+        return ret;
+    }
+
+
+    private TriangleStrip makeEnd(double xa, double ra, int nseg, int idir) {
+        TriangleStrip ret = new TriangleStrip();
+        double eps = 1.e-6;
+        for (int i = 0; i < nseg + 1; i++) {
+            double theta = (2. * Math.PI * i) / nseg;
+            double ct = Math.cos(theta);
+            double st = Math.sin(theta);
+
+            ret.addPoint(xa, eps * ct, eps * st, idir, 0, 0);
+            ret.addPoint(xa, ra * ct, ra * st, idir, 0, 0);
+        }
+
+        if (idir < 0) {
+            ret.flip();
+        }
+        return ret;
+    }
+
+
+
+
+
+
+    private TriangleStrip makeOuter(double xa, double xb, double ra, double rb, int nseg, int idir) {
+        TriangleStrip ret = new TriangleStrip();
+
+        double ayz = Math.atan2(rb - ra, xb - xa);
+        double fyz = Math.sin(ayz);
+        double fx = Math.cos(ayz);
+
+
+        for (int i = 0; i < nseg + 1; i++) {
+            double a = (2.0 * Math.PI * i) / nseg;
+
+            double ca = Math.cos(a);
+            double sa = Math.sin(a);
+
+            double xn = fyz * idir;  // TODO check sign
+            double yn = -fx * idir * ca;
+            double zn = -fx * idir * sa;
+
+            ret.addPoint(xa, ra * ca, ra* sa,  xn, yn, zn);
+            ret.addPoint(xb, rb * ca, rb* sa,  xn, yn, zn);
+        }
+        if (idir < 0) {
+            ret.flip();
+        }
+
+        return ret;
+    }
+
+
+
+
 
 }

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.numeric.morph.CurvedVolumeSlice;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
@@ -30,17 +29,15 @@ public class DiscSplitter {
 
     Resolution resolution;
 
-    boolean hasSurfaceLayer = false;
-    double slDepth = 0;
+    double[] surfaceLayers = new double[0];
 
     double maxAR = 3; // maximum aspect ratio for an element
 
-    public DiscSplitter(TreePoint[] pts, double d, HashMap<String, Double> resHM, double sl, double mar) {
+    public DiscSplitter(TreePoint[] pts, double d, HashMap<String, Double> resHM, double[] sl, double mar) {
         srcPoints = pts;
         resolution = new Resolution(d, resHM);
-        if (sl > 0) {
-            hasSurfaceLayer = true;
-            slDepth = sl;
+        if (sl != null && sl.length > 0) {
+            surfaceLayers = sl;
         }
 
         if (mar > 0.5) {
@@ -148,7 +145,7 @@ public class DiscSplitter {
         double delta = resolution.getLocalDelta(tpa, tpb);
 
         CurvedVolumeSlice ret = new CurvedVolumeSlice(delta, tpa.getRadius(), tpb.getRadius());
-        ret.discFill(tpa, tpb, lbl, rgn, hasSurfaceLayer, slDepth, maxAR);
+        ret.discFill(tpa, tpb, lbl, rgn, surfaceLayers, maxAR);
 
         return ret;
     }

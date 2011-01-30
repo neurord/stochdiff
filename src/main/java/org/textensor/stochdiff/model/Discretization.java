@@ -16,8 +16,16 @@ public class Discretization implements AddableTo {
 
 
     public String elementShape = "Cuboid";
+
     public double surfaceLayer = 0;
     public double maxAspectRatio= 0;
+
+//    public double[] surfaceLayers = null;
+
+
+
+    public SurfaceLayers surfaceLayers;
+
 
     public HashMap<String, Double> maxSideHM;
 
@@ -41,9 +49,14 @@ public class Discretization implements AddableTo {
                     }
                 }
             }
-        } else if (obj instanceof MaxAspectRatio) {
-            maxAspectRatio = ((MaxAspectRatio)obj).value;
 
+            /*
+            else if (obj instanceof MaxAspectRatio) {
+            	maxAspectRatio = ((MaxAspectRatio)obj).value;
+
+            } else if (obj instanceof SurfaceLayers) {
+            	surfaceLayers = ((SurfaceLayers)obj).getValues();
+            	*/
         } else {
             E.warning("unrecognized object " + obj);
         }
@@ -72,8 +85,15 @@ public class Discretization implements AddableTo {
         return maxAspectRatio;
     }
 
-    public double getSurfaceLayer() {
-        return surfaceLayer;
+    public double[] getSurfaceLayers() {
+        double[] ret = new double[0];
+        if (surfaceLayers != null) {
+            ret = surfaceLayers.getValues();
+        } else if (surfaceLayer > 0) {
+            ret = new double[1];
+            ret[0] = surfaceLayer;
+        }
+        return ret;
     }
 
 

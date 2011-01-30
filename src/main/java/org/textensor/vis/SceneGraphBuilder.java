@@ -101,7 +101,7 @@ public class SceneGraphBuilder {
 
     private Color3f randomColor(Random r, double d) {
         double red = rcol(r, d);
-        double green = rcol(r, d);
+        double green = rcol(r, 1.5 * d);
         double blue = rcol(r, d);
 
         Color3f ret  = new Color3f((float)red, (float)green, (float)blue);
@@ -110,7 +110,7 @@ public class SceneGraphBuilder {
 
 
     private double rcol(Random r, double d) {
-        double v = d + 0.3 * r.nextGaussian();
+        double v = d + 0.15 * r.nextGaussian();
         if (v > 1.0) {
             v = 1.0;
         }

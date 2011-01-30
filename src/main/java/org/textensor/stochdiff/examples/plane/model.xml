@@ -9,6 +9,8 @@
     <initialConditionsFile>initial</initialConditionsFile>
     <outputSchemeFile>io</outputSchemeFile>
 
+	<outputQuantity>CONCENTRATION</outputQuantity>
+
     <!--2D means the morphology is interpreted like a flatworm, 3D for
 roundworms. The 2D case is good for testing as it is easy to visualize the
 results (also, 3D may not work yet...)  -->
@@ -27,7 +29,9 @@ results (also, 3D may not work yet...)  -->
  <discretization>
         <!-- default largest size for elements in bulk volumes (dendrites), microns -->
         <defaultMaxElementSide> 0.2  </defaultMaxElementSide>
-
+	
+		<surfaceLayers>0.04</surfaceLayers>
+		
         <!-- discretization for spines, microns -->
         <spineDeltaX>           0.1  </spineDeltaX>
 

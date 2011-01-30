@@ -17,16 +17,29 @@ import java.util.ArrayList;
 
 public class VolumeLine {
 
-    int nl;
+    int nsl;
+    int nreg;
+    double[] slw;
     double lSize;
     double depth;
 
+    double dsl;
+
+    int nl;
+
     VolumeElement[][] elements;
 
-    public VolumeLine(int n, double w, double d) {
-        nl = n;
+    public VolumeLine(int ns, int nr, double[] sl, double w, double d) {
+        nsl = ns;
+        nreg = nr;
+        slw = sl;
         lSize = w;
         depth = d;
+        dsl = 0;
+        for (int i = 0; i < nsl; i++) {
+            dsl += slw[i];
+        }
+        nl = 2 * nsl + nreg;
     }
 
 
@@ -46,9 +59,14 @@ public class VolumeLine {
 
         elements = new VolumeElement[nl][1];
 
-        double dl = lSize / nl;
+
+        double[][] regs = makeRanges();
+
         for (int i = 0; i < nl; i++) {
-            double vcl = -0.5 * lSize + (i + 0.5) * dl;
+            double[] areg = regs[i];
+            double dl = areg[1] - areg[0];
+            double vcl = 0.5 * (areg[0] + areg[1]);
+
             CuboidVolumeElement ve = new CuboidVolumeElement();
 
             ve.setAlongArea(depth * sl);
@@ -59,10 +77,9 @@ public class VolumeLine {
             Position pc = trans.getTranslated(pr);
             ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
-            //<--WK
+
             if ((i == 0) || (i == (nl-1)))
                 ve.setSubmembrane();
-            //WK-->
 
             Position[] pbdry = {Geom.position(vcl - 0.5 * dl, -0.5 * sl, 0),
                                 Geom.position(vcl - 0.5 * dl, 0.5 * sl, 0),
@@ -165,8 +182,8 @@ public class VolumeLine {
         E.info("segment junction: " + nl + " points across " + lSize +
                " being connected to " + tgt.nl + " across " + tgt.lSize);
 
-        double[][] rngme = makeRanges(lSize, nl);
-        double[][] rngtgt = makeRanges(tgt.lSize, tgt.nl);
+        double[][] rngme = makeRanges();
+        double[][] rngtgt = tgt.makeRanges();
 
         // these are centered on 0, so we need to shift the smaller one
         // back so the edges line up and then move it by the current
@@ -221,8 +238,8 @@ public class VolumeLine {
         // always have dlme <= dltgt, so at most two components in tgt
         // for one in me
 
-        double[][] rngme = makeRanges(lSize, nl);
-        double[][] rngtgt = makeRanges(tgt.lSize, tgt.nl);
+        double[][] rngme = makeRanges();
+        double[][] rngtgt = tgt.makeRanges();
 
 
         for (int i = 0; i < nl; i++) {
@@ -303,6 +320,42 @@ public class VolumeLine {
         }
         return ret;
     }
+
+
+    public double[][] makeRanges() {
+        double[][] ret = new double[nl][2];
+        double wk = -0.5 * lSize;
+        double dreg = (lSize - 2 * dsl) / nreg;
+        for (int i = 0; i < nl; i++) {
+            double dl = 0.;
+            if (i < nsl) {
+                dl = slw[i];
+            } else if (i >= nl - nsl) {
+                dl = slw[nl - 1 - i];
+            } else {
+                dl = dreg;
+            }
+            ret[i][0] = wk;
+            ret[i][1] = wk + dl;
+            wk += dl;
+        }
+
+        /*
+        String sr = "";
+        for (int i = 0; i < ret.length; i++) {
+           sr += "(" + ret[i][0] + ", " + ret[i][1] + ") ";
+        }
+        E.info("ranges: " + sr);
+        */
+
+        if (Math.abs(wk - 0.5 * lSize) / lSize > 1.e-5) {
+            E.info("nl=" + nl + " nsl=" + nsl + " nr=" + nreg + " dreg=" + dreg + " dsl=" + dsl);
+            E.error("range miscount : " + wk + " " + lSize);
+        }
+        return ret;
+    }
+
+
 
 
 

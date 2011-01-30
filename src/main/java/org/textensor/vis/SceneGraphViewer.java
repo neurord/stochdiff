@@ -440,12 +440,16 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
 
         if (nshowing < nshow) {
             for (int i = nshowing; i < nshow; i++) {
-                (shapes.get(i)).getAppearance().setRenderingAttributes(rashow);
+                Shape3D s = shapes.get(i);
+                s.getAppearance().setRenderingAttributes(rashow);
+                s.setUserData(new Integer(1));
             }
 
         } else {
             for (int i = nshow; i < nshowing; i++) {
-                (shapes.get(i)).getAppearance().setRenderingAttributes(rahide);
+                Shape3D s = shapes.get(i);
+                s.getAppearance().setRenderingAttributes(rahide);
+                s.setUserData(new Integer(0));
             }
         }
 

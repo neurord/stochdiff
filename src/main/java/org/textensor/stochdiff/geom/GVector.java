@@ -14,6 +14,12 @@ public class GVector implements Vector {
         z = az;
     }
 
+
+    public String toString() {
+        return "GVector " + x + "," + y + "," + z;
+    }
+
+
     public GVector(Position p) {
         this(p.getX(), p.getY(), p.getZ());
     }

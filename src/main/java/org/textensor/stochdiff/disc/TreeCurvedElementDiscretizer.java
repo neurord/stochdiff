@@ -20,7 +20,7 @@ public class TreeCurvedElementDiscretizer {
     }
 
 
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, double sl, double mar) {
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, double[] surfaceLayers, double mar) {
 
         TreePoint base = srcPoints[0];
         TreeUtil.parentizeFrom(base, srcPoints);
@@ -36,7 +36,7 @@ public class TreeCurvedElementDiscretizer {
 
         VolumeGrid vgrid = null;
 
-        DiscSplitter dsplit = new DiscSplitter(slicedPoints, d, resHM, sl, mar);
+        DiscSplitter dsplit = new DiscSplitter(slicedPoints, d, resHM, surfaceLayers, mar);
         vgrid = dsplit.buildGrid();
 
         return vgrid;
