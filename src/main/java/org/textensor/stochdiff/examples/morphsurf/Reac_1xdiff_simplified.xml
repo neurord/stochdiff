@@ -1,0 +1,103 @@
+<ReactionScheme>
+    <!-- You can specify the units of the diffusion constant. If they are not
+	 specified they are assumed to be micron^2/second, (microns written "mu" here).
+	 It should understand microns, mm, and m for distances and seconds and ms for times. -->
+
+    <!-- This code is implemented CaMKII_bimols Rxns -0.44, 0.28, 0.088
+         Fix 3 products 2rxns break down to 2nd order rxn : LRG/Ip35P1P2 -->
+    <!-- Last rxn of Ip35p1p2 was wrong reactant: fixed on Aug 8th 2008
+         Chosen katp=1 sec (not 10 sec) is enough.  -->
+    <!-- Suggested by Avrama Ca kdiff=600 for helping fast decay on Feb 24th 2009 -->
+
+    <Specie name="Ca" id="Ca" kdiff="174.3" kdiffunit="mu2/s"/>
+    <Specie name="CaOut" id="CaOut" kdiff="174.3" kdiffunit="mu2/s"/>
+    <Specie name="CaOutLeak" id="CaOutLeak" kdiff="0" kdiffunit="mu2/s"/>
+    <Specie name="Leak" id="Leak" kdiff="0" kdiffunit="mu2/s"/>
+    <Specie name="Calbin" id="Calbin" kdiff="9.3" kdiffunit="mu2/s"/>
+    <Specie name="CalbinC" id="CalbinC" kdiff="9.3" kdiffunit="mu2/s"/>
+
+    <Specie name="pmca" id="pmca" kdiff="0" kdiffunit="mu2/s"/>
+    <Specie name="ncx" id="ncx" kdiff="0" kdiffunit="mu2/s"/>
+    <Specie name="pmcaCa" id="pmcaCa" kdiff="0" kdiffunit="mu2/s"/>
+    <Specie name="ncxCa" id="ncxCa" kdiff="0" kdiffunit="mu2/s"/>
+
+<!-- Ca pump high affinity -    Ca + pmca <-> pmcaCa -->
+    <Reaction name = "Ca_pump1a" id="Ca_pump1a">
+	<Reactant specieID="Ca"/>
+	<Reactant specieID="pmca"/>
+	<Product specieID="pmcaCa"/>
+
+	<forwardRate>0.5e-4</forwardRate>
+	<reverseRate>0.007</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca pump high affinity -    pmcaCa <-> pmca + CaOut -->
+    <Reaction name = "Ca_pump1b" id="Ca_pump1b">
+	<Reactant specieID="pmcaCa"/>
+	<Product specieID="pmca"/>
+	<Product specieID="CaOut"/>
+
+	<forwardRate>0.0035</forwardRate>
+	<reverseRate>0</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca pump low affinity -    Ca + ncx <-> ncxCa -->
+    <Reaction name = "Ca_pump2a" id="Ca_pump2a">
+	<Reactant specieID="Ca"/>
+	<Reactant specieID="ncx"/>
+	<Product specieID="ncxCa"/>
+
+	<forwardRate>1.68e-5</forwardRate>
+	<reverseRate>0.0112</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca pump low affinity -    ncxCa <-> ncx + CaOut -->
+    <Reaction name = "Ca_pump2b" id="Ca_pump2b">
+	<Reactant specieID="ncxCa"/>
+	<Product specieID="ncx"/>
+	<Product specieID="CaOut"/>
+
+	<forwardRate>0.0056</forwardRate>
+	<reverseRate>0</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca leak -    CaOut + Leak <-> CaOutLeak -->
+    <Reaction name = "Ca_leak" id="Ca_leak">
+	<Reactant specieID="CaOut"/>
+	<Reactant specieID="Leak"/>
+	<Product specieID="CaOutLeak"/>
+
+        <forwardRate>1.5e-6</forwardRate>
+	<reverseRate>1.1e-3</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca leak -    CaOutLeak <-> Ca + Leak -->
+    <Reaction name = "Ca_leak" id="Ca_leak">
+	<Reactant specieID="CaOutLeak"/>
+	<Product specieID="Ca"/>
+	<Product specieID="Leak"/>
+
+        <forwardRate>1.1e-3</forwardRate>
+	<reverseRate>0</reverseRate>
+	<Q10>0.2</Q10>
+    </Reaction>
+
+<!-- Ca Buffer    Ca + Calbindin <-> calbinCa -->
+    <Reaction name = "Ca_buffer" id="Ca_Buffer">
+        <Reactant specieID="Ca"/>
+        <Reactant specieID="Calbin"/>
+        <Product specieID="CalbinC"/>
+
+        <forwardRate>2.8e-5</forwardRate>
+        <reverseRate>0.0196</reverseRate>
+        <Q10>0.2</Q10>
+    </Reaction>
+
+
+</ReactionScheme>
+

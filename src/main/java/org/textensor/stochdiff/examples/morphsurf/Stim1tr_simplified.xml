@@ -1,0 +1,36 @@
+<StimulationSet>
+
+    <!-- the injectionSite must match a regionLabel deefined in the morphology -->
+   
+<!-- Ca2+ stim, First rate -->
+
+<InjectionStim specieID="Ca" injectionSite="sa1[0].pointA">
+        <onset>5000</onset>
+	<duration>1000</duration>
+	<rate>5.0</rate>
+        <end>6000</end> 
+       
+  </InjectionStim>
+
+<InjectionStim specieID="Ca" injectionSite="sa1[1].pointA">
+        <onset>10000</onset>
+	<duration>3</duration>
+	<rate>125</rate>
+	<period>10</period>
+        <end>11000</end>
+       
+  </InjectionStim>
+
+<InjectionStim specieID="Ca" injectionSite="sa1[2].pointA">
+        <onset>20000</onset>
+	<duration>20000</duration>
+	<rate>5.0</rate>
+        <end>40000</end> 
+       
+  </InjectionStim>
+
+
+    <!-- onset and duration are times measured in milliseconds. The rate is in numbers of particles 
+	 per millisecond -->
+
+</StimulationSet>

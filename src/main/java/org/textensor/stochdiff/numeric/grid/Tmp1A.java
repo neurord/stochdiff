@@ -1,24 +1,3 @@
-//7 11 2008 RO & WK: IF ( ( NumberofMolecules*(Probablity of diffusion or reaction) ) < NP && using binomial),
-//          THEN calculate ngo from poisson distribution, ELSE calculate ngo from gaussian; NP=20.
-//7 3 2008  RO: if observe negative ngo, ngo=0
-//7 2 2008  WK: In parallelAndSharedDiffusionStep() function, when np0 > NMAX_STOCHASTIC and if n*p < 10,
-//          then use poission to get ngo; otherwise, use gaussian
-//9 25 2007 WK: In advance() function, we set the inc/decrements (i.e., ngo*xxx) to zero explicitly
-//          to avoid floating point error
-//9 11 2007 WK: In parallelAndSharedDiffusionStep(), for the independent diffusion,
-//          (i) the probability to diffuse to a neighboring subvolume is the probability
-//          to diffuse to that neighbor divided by the sum of all the probabilities
-//          to diffuse to all neighbors; (ii) for calculating ngo, we use
-//          binomial variance.
-//8 28 2007 WK: In advance(), for the diffusion step, when algoID is INDEPENDENT,
-//          we call parallelAndSharedDiffusionStep() instead of calling
-//          parallelDiffusionStep().  WK added the parallelAndSharedDiffusionStep()
-//          function and SHARED_DIFF_PARTICLES constant.
-//6 18 2007 WK: The getGridConcsPlainText_dumb() function is modified to (i) flag
-//           a volume element as either on submembrane or on cytosol, and
-//           (ii) identify its region.
-//5 16 2007: modified by RO & WK (modifications within initials ... initials)
-//written by Robert Cannon
 package org.textensor.stochdiff.numeric.grid;
 
 import java.io.File;
@@ -39,28 +18,7 @@ import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
 import org.textensor.vis.CCViz3D;
 
-/*
- * Approximate stochastic calculation with a fixed timestep where
- * the number of reactions orruring in a volume and the number of particles
- * moving to neighbouring volumes are both generated from lookup tables
- * in p (probability of event for one particle)  and
- * n (number of particles of a given type)  for a uniform random number.
- *
- * This is approximate because the effect of the particles on thier new
- * location is note taken into account until the following step.
- *
- *
- * Units: concentrations are expressed in nM and volumes in cubic microns
- * So, in these units , one Litre is 10^15 and a 1M solution is 10^9
- * The conversion factor between concentrations and particle number is
- * therefore
- * nparticles = 6.022^23 * vol/10^15 * conc/10^9
- * ie, nparticles = 0.6022 * conc
- *
- *
- */
-
-public class SteppedStochaticGridCalc extends BaseCalc {
+public class Tmp1A extends BaseCalc {
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.6022;
@@ -150,7 +108,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     double stateSaveTime;
 
-    public SteppedStochaticGridCalc(SDRun sdm) {
+    public Tmp1A(SDRun sdm) {
         super(sdm);
     }
 
@@ -475,8 +433,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     sdv.show();
                     return 1;
                 }
-            } else {
-                E.error("Unrecognized grid - neither cuboid or curved");
             }
 
             for (int i = 0; i < fnmsOut.length; i++) {

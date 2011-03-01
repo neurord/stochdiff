@@ -1,25 +1,4 @@
-//7 11 2008 RO & WK: IF ( ( NumberofMolecules*(Probablity of diffusion or reaction) ) < NP && using binomial),
-//          THEN calculate ngo from poisson distribution, ELSE calculate ngo from gaussian; NP=20.
-//7 3 2008  RO: if observe negative ngo, ngo=0
-//7 2 2008  WK: In parallelAndSharedDiffusionStep() function, when np0 > NMAX_STOCHASTIC and if n*p < 10,
-//          then use poission to get ngo; otherwise, use gaussian
-//9 25 2007 WK: In advance() function, we set the inc/decrements (i.e., ngo*xxx) to zero explicitly
-//          to avoid floating point error
-//9 11 2007 WK: In parallelAndSharedDiffusionStep(), for the independent diffusion,
-//          (i) the probability to diffuse to a neighboring subvolume is the probability
-//          to diffuse to that neighbor divided by the sum of all the probabilities
-//          to diffuse to all neighbors; (ii) for calculating ngo, we use
-//          binomial variance.
-//8 28 2007 WK: In advance(), for the diffusion step, when algoID is INDEPENDENT,
-//          we call parallelAndSharedDiffusionStep() instead of calling
-//          parallelDiffusionStep().  WK added the parallelAndSharedDiffusionStep()
-//          function and SHARED_DIFF_PARTICLES constant.
-//6 18 2007 WK: The getGridConcsPlainText_dumb() function is modified to (i) flag
-//           a volume element as either on submembrane or on cytosol, and
-//           (ii) identify its region.
-//5 16 2007: modified by RO & WK (modifications within initials ... initials)
-//written by Robert Cannon
-package org.textensor.stochdiff.numeric.grid;
+package org.textensor.stochdiff.numeric.tmp;
 
 import java.io.File;
 import java.util.StringTokenizer;
@@ -37,30 +16,8 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
-import org.textensor.vis.CCViz3D;
 
-/*
- * Approximate stochastic calculation with a fixed timestep where
- * the number of reactions orruring in a volume and the number of particles
- * moving to neighbouring volumes are both generated from lookup tables
- * in p (probability of event for one particle)  and
- * n (number of particles of a given type)  for a uniform random number.
- *
- * This is approximate because the effect of the particles on thier new
- * location is note taken into account until the following step.
- *
- *
- * Units: concentrations are expressed in nM and volumes in cubic microns
- * So, in these units , one Litre is 10^15 and a 1M solution is 10^9
- * The conversion factor between concentrations and particle number is
- * therefore
- * nparticles = 6.022^23 * vol/10^15 * conc/10^9
- * ie, nparticles = 0.6022 * conc
- *
- *
- */
-
-public class SteppedStochaticGridCalc extends BaseCalc {
+public class Tmp1A extends BaseCalc {
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.6022;
@@ -150,7 +107,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     double stateSaveTime;
 
-    public SteppedStochaticGridCalc(SDRun sdm) {
+    public Tmp1A(SDRun sdm) {
         super(sdm);
     }
 
@@ -160,7 +117,6 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         if (stateSaveTime <= 0.0) {
             stateSaveTime = 1.e9;
         }
-        stateSaveTime += sdRun.getStartTime();
 
         // something to generate the random nunmbers
         random = new MersenneTwister(getCalculationSeed());
@@ -454,59 +410,26 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         init();
 
         if (resultWriter != null) {
-            if (!resultWriter.isContinuation()) {
-                resultWriter.writeString(vgrid.getAsText());
-            }
-            if (vgrid.isCuboid()) {
-                resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
-
-            } else if (vgrid.isCurved()) {
-                resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
-
-                resultWriter.writeToSiblingFileAndClose(vgrid.getAsElementsText(), "-elements.tri");
-                E.info("Written elements mesh file");
-
-                File ftri = resultWriter.getSiblingFile("-elements.tri");
-
-                if (runAction == VISUALIZE) {
-                    CCViz3D sdv = new CCViz3D();
-                    sdv.loadElements(ftri);
-                    E.info("loaded mesh in standalone viewer");
-                    sdv.show();
-                    return 1;
-                }
-            } else {
-                E.error("Unrecognized grid - neither cuboid or curved");
-            }
-
+            resultWriter.writeString(vgrid.getAsText());
+            resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
             for (int i = 0; i < fnmsOut.length; i++) {
-                String sibsuf = "-" + fnmsOut[i] + "-conc.txt";
-                String shead = getGridConcsHeadings_dumb(i, vgrid);
-                StringTokenizer st = new StringTokenizer(shead);
-                int nt = st.countTokens();
-
-                if (resultWriter.isContinuation()) {
-                    ResultWriter sibrw = resultWriter.getRawSibling(ResultWriter.TEXT, sibsuf, null);
-                    sibrw.pruneFrom("", 0, sdRun.getStartTime());
-                    sibrw.init(null, ResultWriter.TEXT);
-                } else {
-                    resultWriter.writeToSiblingFile(shead, sibsuf);
-                }
+                resultWriter.writeToSiblingFile(getGridConcsHeadings_dumb(i, vgrid), "-" + fnmsOut[i] + "-conc.txt");
             }
         }
 
-        double time = sdRun.getStartTime();
-        double endtime = sdRun.getEndTime();
-
-        E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
+        double time = 0.;
+        double runtime = sdRun.runtime;
 
         double tlog = 5.;
 
         long startTime = System.currentTimeMillis();
 
         // int iwr = 0;
-        double writeTime = time - 1.e-9;
+        double writeTime = -1.e-9;
 
+        // RCC commenting this out to use desired output interval from model
+        // spec.
+        // sdRun.outputInterval = 100.0;
         double[] writeTimeArray;
         writeTimeArray = new double[fnmsOut.length];
         for (int i = 0; i < fnmsOut.length; i++) {
@@ -515,7 +438,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             // writeTimeArray[i]);
         }
 
-        while (time < endtime) {
+        while (time < runtime) {
 
             if (time >= writeTime) {
                 if (resultWriter != null) {
@@ -539,16 +462,15 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
 
             if (time >= stateSaveTime) {
-                resultWriter
-                .writeToFinalSiblingFile(getStateText(), sdRun.stateSavePrefix + Math.round(time) + ".nrds");
+                resultWriter.writeToSiblingFile(getStateText(), sdRun.stateSavePrefix + Math.round(time) + ".nrds");
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }
 
         long endTime = System.currentTimeMillis();
         E.info("total time " + (endTime - startTime) + "ms");
-        return 0;
 
+        return 0;
     }
 
     // NB the following method is one of the only two that need optimizing
@@ -830,7 +752,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         double[] fshare = fSharedExit[iel][k];
 
         int ngo = 0;
-        int ngo_total = 0; // for independent diffusion step
+        int ngo_remaining = 0; // for independent diffusion step
         int num_molecules_diffused_so_far = 0;
 
         if (np0 == 1) {
@@ -839,7 +761,8 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             ngo = interpSG.nGo(np0, Math.log(pSharedOut[iel][k]), random.random());
 
             if (ngo < 0) {
-                System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
+                System.out
+                .println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE from table. Exiting...");
                 System.exit(0);
             }
 
@@ -886,10 +809,13 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
         }
 
-        // WK 7 2 2008: if ngo is negative, exit.
+        // WK 7 2 2008: if ngo is negative, exit. KB if ngo>np0 print message
         if (ngo < 0) {
-            // System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Exiting...");
+            System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Should be impossible");
             // System.exit(0);
+        }
+        if (ngo > np0) {
+            System.out.println("in parallelAndSharedDiffusionStep: nngo is greater than np0. This is bad");
         }
         // WK
         // if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
@@ -909,57 +835,71 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
         } else // INDEPENDENT diffusion
         {
-            ngo_total = ngo;
+            ngo_remaining = ngo;
             // WK 9 11 2007
+            // KTB 02-15-2011, use multi-nomial instead of separate binomials to
+            // calculate lnpgo, and then use ngo_remaining
             double prev = 0;
             for (int j = 0; j < inbr.length - 1; j++) {
-                double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);
+                double lnpgo = Math
+                               .log((fSharedExit[iel][k][j] - prev) / (fSharedExit[iel][k][inbr.length - 1] - prev));
                 prev = fSharedExit[iel][k][j];
                 // RO 7 3 2008: changed from 10 to 20 because observed negative
                 // ngo
-                if (ngo_total * Math.exp(lnpgo) < NP) {
-                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random(),
-                                                     random.poisson(ngo_total * Math.exp(lnpgo)), NP);
+                // Maybe we should use tables instead of guassianStep???
+                // 2011 BHK: Table use cause ArrayIndexOutOfBoundsExceptop
+                // error, recover to gsussianstep.
+                if (ngo_remaining * Math.exp(lnpgo) < NP) {
+                    ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(),
+                                                     random.random(), random.poisson(ngo_remaining * Math.exp(lnpgo)), NP);
                     if (ngo < 0) {
                         ngo = 0;
 
                         System.out
-                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) < "
+                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_remaining*Math.exp(lnpgo) < "
                                  + NP + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " ngo_total: " + ngo_total + " Math.exp(lnpgo): "
+                        System.out.println("ngo: " + ngo + " ngo_remaining: " + ngo_remaining + " Math.exp(lnpgo): "
                                            + Math.exp(lnpgo));
                     }
                 } else {
-                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random());
+                    ngo = StepGenerator
+                          .gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random());
                     if (ngo < 0) {
                         ngo = 0;
 
                         System.out
-                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) >= "
+                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_remaining*Math.exp(lnpgo) >= "
                                  + NP + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " ngo_total: " + ngo_total + " Math.exp(lnpgo): "
+                        System.out.println("ngo: " + ngo + " ngo_remaining: " + ngo_remaining + " Math.exp(lnpgo): "
                                            + Math.exp(lnpgo));
                     }
                 }
                 // WK
 
-                // WK 7 2 2008: if ngo is negative, exit.
+                // WK 7 2 2008: if ngo is negative, print message. KB if ngo>np0
+                // print message
                 if (ngo < 0) {
-                    // System.out.println("in parallelAndSharedDiffusionStep INDEPENDENT: ngo is NEGATIVE. Exiting...");
-                    // System.exit(0);
+                    System.out.println("in parallelAndSharedDiffusionStep INDEPENDENT: ngo is NEGATIVE. .");
+                }
+                if (ngo > ngo_remaining) {
+                    System.out
+                    .println("in parallelAndSharedDiffusionStep: INDEPENDENT: ngo > ngo_remaining, setting ngo=ngo_remaining ");
+                    ngo = ngo_remaining; // BHK 2011
                 }
                 // WK
                 wkB[iel][k] -= ngo;
                 wkB[inbr[j]][k] += ngo;
-                num_molecules_diffused_so_far += ngo;
+                ngo_remaining -= ngo;
             }
 
-            ngo = ngo_total - num_molecules_diffused_so_far;
+            ngo = ngo_remaining;
+
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
             // WK 3/16/2010
             if (wkB[iel][k] < 0) {
                 System.out.println("In INDEPENDENT DIFFUSION, wkB[iel][k] NEGATIVE!!!");
+
             }
             //
 

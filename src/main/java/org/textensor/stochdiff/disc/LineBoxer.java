@@ -165,8 +165,8 @@ public class LineBoxer {
     public VolumeLine baseHardGrid(TreePoint tpa, TreePoint tpb, String lbl,
                                    String rgn, double delta) {
         // odd number of cells, fixed size
-        double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
-
+        double r = 0.5 * (tpa.getRadius() + tpb.getRadius()) - 1.e-7;
+        // subtract 1.e-7 in case user provides exact multiples.
 
         double dsl = 0;
         int nsl = 0;
@@ -181,7 +181,12 @@ public class LineBoxer {
 
 
         // number of regular boxes across the inner part once nsl put on each end
-        int nreg = 1 + 2 * ((int)(dleft / delta));
+        // RCC - old form was lacking a factor of 2 to divide dleft to get the radius:
+        // int nreg = 1 + 2 * ((int)((dleft) / delta));
+
+        int nreg = 1 + 2 * ((int)((dleft/2) / delta));
+
+
 
         double dtot = 2 * dsl + nreg * delta;
         VolumeLine ret = new VolumeLine(nsl, nreg, surfaceLayers, dtot, depth);

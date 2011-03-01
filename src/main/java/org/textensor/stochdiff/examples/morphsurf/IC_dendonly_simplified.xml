@@ -1,0 +1,24 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+   <!-- CaOut need to be half of previous value: due to no CaB -->
+   <!-- CaB reaction does not need for Ca dynamics -->
+    
+ <ConcentrationSet>
+
+      	<NanoMolarity specieID="Ca" value="51"/>
+      	<NanoMolarity specieID="CaOut" value="2015100"/>
+      	<NanoMolarity specieID="Calbin" value="149590"/>
+      	<NanoMolarity specieID="CalbinC" value="11348"/>
+</ConcentrationSet>
+
+
+ <SurfaceDensitySet region="dend">
+	    <PicoSD specieID="pmca" value="65.86"/>
+	    <PicoSD specieID="pmcaCa" value="17.79"/>
+	    <PicoSD specieID="Leak" value="836.5"/>
+	    <PicoSD specieID="CaOutLeak" value="0"/>
+	    <PicoSD specieID="ncx" value="2996"/>
+	    <PicoSD specieID="ncxCa" value="157"/>
+ </SurfaceDensitySet>
+</InitialConditions>

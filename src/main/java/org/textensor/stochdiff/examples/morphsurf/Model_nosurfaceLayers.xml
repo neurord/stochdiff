@@ -1,0 +1,73 @@
+<SDRun>
+    <!-- This file defines a single run of the calculation, using morphology and 
+	 reaction data brought in from other files. --> 
+
+    <reactionSchemeFile>Reac_1xdiff_simplified</reactionSchemeFile>
+    <morphologyFile>morph_dendonly_simplified</morphologyFile>
+    <stimulationFile>Stim1tr_simplified</stimulationFile>
+    <initialConditionsFile>IC_dendonly_simplified</initialConditionsFile>
+    <outputSchemeFile>IO_dt100_simplified</outputSchemeFile>
+
+    <!--2D means the morphology is interpreted like a flatworm, 3D for
+roundworms. The 2D case is good for testing as it is easy to visualize the
+results (also, 3D may not work yet).  -->
+    
+    <geometry>          2D           </geometry>
+    <depth2D>           0.4          </depth2D>
+    <distribution>      BINOMIAL     </distribution>
+    <algorithm>         INDEPENDENT  </algorithm>
+    <simulationSeed>    245          </simulationSeed>
+
+
+    <!-- Run time for the calculation, in milliseconds. -->
+    <runtime>1</runtime>
+
+    <!-- Set the seed to get the same spines each time testing. -->
+    <spineSeed>141</spineSeed>
+
+    <discretization>
+	<!-- Default largest size for elements in bulk volumes (dendrites), in microns. -->	
+	<defaultMaxElementSide>0.2</defaultMaxElementSide>
+       <MaxElementSide region="dend">0.2</MaxElementSide>
+<!--
+       <MaxElementSide region="soma">0.79999</MaxElementSide>
+-->
+
+	<!-- Discretization for spines, in microns. -->
+	<spineDeltaX>0.1</spineDeltaX>
+
+	<!-- Override the default for a particular region. -->
+	<!-- Matches against id or regionClass in the morphology file. -->
+
+<!--
+	<MaxElementSide region="head">0.2</MaxElementSide>
+        <MaxElementSide region="neck">0.2</MaxElementSide>
+-->
+<!--
+        <MaxElementSide region="PSD">0.1</MaxElementSide>
+-->
+    </discretization>
+
+    <!-- The timestep used in fixed step calculations, in milliseconds: to match ca:0.01 ms
+         :slow rxns case OK specially PKA part but Ca basal at dt=0.2 ms is best. -->
+    <fixedStepDt>0.001</fixedStepDt>
+
+
+    <!-- The tolerance is not used yet -->
+    <tolerance>0.001</tolerance>
+
+    <outputInterval>100</outputInterval>
+
+    <!-- This is for restarting the sim from a save point. stateSaveInterval is in milliseconds (ms); -->
+<!--    <stateSaveInterval>50000</stateSaveInterval>
+    <stateSavePrefix>ss_restart</stateSavePrefix>
+    <outputQuantity>NUMBER</outputQuantity>
+    <output>new</output>
+-->
+
+    <!-- Calculation types include GRID_STEPPED_STOCHASTIC and GRID_STEPPED_CONTINUOUS for 
+	 reaction-diffusion systems. Single mixed pool calculations should be listed here too (TODO) -->
+    <calculation>GRID_STEPPED_STOCHASTIC</calculation>
+
+</SDRun>
+

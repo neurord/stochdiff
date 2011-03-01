@@ -80,6 +80,7 @@ public class VolumeGrid {
 
 
     public void importLines(ArrayList<VolumeLine> gridAL) {
+        hasCuboids = true;
         for (VolumeLine vs : gridAL) {
             for (VolumeElement ve : vs.getElements()) {
                 addVolumeElement(ve);
