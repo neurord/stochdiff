@@ -20,8 +20,8 @@ public class StimulationTable {
 
 
     public StimulationTable() {
-        //<--WK/KB increase to 1000
-        int tableSize = 1000;
+        //<--WK
+        int tableSize = 100;
         //WK-->
         sites = new String[tableSize];
         rates = new double[tableSize][];

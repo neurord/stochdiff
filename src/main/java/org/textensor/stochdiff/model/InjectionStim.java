@@ -44,16 +44,16 @@ public class InjectionStim {
         {
             numTrains = 1;
         }
-        //WK 7 25 2007--> **** KB 05/03/2011 remove onset from calculation of onset and end for multiple trains
+        //WK 7 25 2007-->
         for (int i = 0; i < numTrains; i++)
         {
             if (period <= 0) {
                 stab.addSquarePulse(injectionSite, vrate, onset + i*(duration + interTrainInterval), duration);
             } else {
                 stab.addPeriodicSquarePulse(injectionSite, vrate,
-                                            onset + i*((end-onset) + interTrainInterval),
+                                            onset + i*(end + interTrainInterval),
                                             duration, period,
-                                            end + i*((end-onset) + interTrainInterval));
+                                            end + i*(end + interTrainInterval));
             }
             //original if-else block
             /*if (period <= 0) {
