@@ -74,7 +74,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     // we do shared diffusion,
     // (2) otherwise, we do parallel diffusion.
     public static final int SHARED_DIFF_PARTICLES = 4;
-    public static final int NP = 20;
+    public static final int NP = 30; //BHK Changed from 20 to 30. 2011.05.18
     // WK
 
     Column mconc;
