@@ -1,0 +1,7 @@
+Tests of deterministic model
+1. model2seg-cont.xml and  model2seg-stoch.xml
+These have four molecules, two segments, 2 reaction and two injections.  One of the injected molecules diffuses, but does not react, so this tests diffusion alone.  The other injected molecule does not diffuse, but reacts with a molecule that has been initialized non-zero, so this tests reactions.  Mesh size is large, so very few subvolumes.
+2. model1segSM-*.xml
+These have the same four molecules, reactions and injections as above, but only one segment with a smaller mesh.  The purpose is to test the ability to initialize submembrane molecules.  The stochastic reaction and one injection did not match well to the deterministic, so it was repeated with a different seed.  This additional seed matches quite well.
+3. modelSpine-*.xml
+These have the same four molecules and reactions.  The purpose is to test spines, such as injecting into spines and initializing molecules in spine heads.  Several different dt are used for the continuous, because the larger dt, e.g. .002, did not match the stochastic.  dt of 0.0004 matched much better.  This series of tests was used to put a threshold on the ff parameter in the DeterministicGridCalc (similar to the test in StochasticGridCalc).  model1segSM-cont*.xml went unstable unless ff < 1.0, but this test suggests that ff < 0.2 is required.

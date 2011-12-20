@@ -53,14 +53,18 @@ public class DeterministicGridCalc extends BaseCalc {
     double[][] couplingConstants;
 
     int[][] stimtargets;
-    int[] eltstims;
-    double[] eltstimshare;
+//	int[] eltstims;
+//	double[] eltstimshare;
+    //AB Dec 16 2012
+    //make these two arrays 2D to hold info on each stimulation.  Was being overwritten by last stim
+    int[][] eltstims;
+    double[][] eltstimshare;
 
     int[] eltregions;
     double[] surfaceAreas;
 
     double[][] wkA;
-    double[][] wkB;
+    //12/19/11 double[][] wkB;
     double[][] wkC;
 
     int nlog;
@@ -107,29 +111,35 @@ public class DeterministicGridCalc extends BaseCalc {
         stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
-        eltstims = new int[nel];
-        eltstimshare = new double[nel];
-        for (int i = 0; i < eltstims.length; i++) {
-            eltstims[i] = -1;
+        /* AB Dec 16 2011 - eltstims needs to be 2D, determine target element and share for each */
+        int numStim=stimTab.getNStim();
+        eltstims = new int[numStim][nel];
+        eltstimshare = new double[numStim][nel];
+        for (int stimnum = 0; stimnum < numStim; stimnum++) {
+            for (int i = 0; i < eltstims[stimnum].length; i++) {
+                eltstims[stimnum][i] = -1;
+            }
         }
         for (int i = 0; i < stimtargets.length; i++) {
+            //asti are the list of voxels to receive particles
             int[] asti = stimtargets[i];
             double vtot = 0.;
             for (int k = 0; k < asti.length; k++) {
                 vtot += volumes[asti[k]];
             }
-
+//AB 12-19-11: changed volumes[i] to volumes[asti[k]]
             for (int k = 0; k < asti.length; k++) {
-                eltstims[asti[k]] = i;
-                eltstimshare[asti[k]] = volumes[i] / vtot;
+                eltstims[i][asti[k]] = i;
+                eltstimshare[i][asti[k]] = volumes[asti[k]] / vtot;
             }
         }
+
 
         eltregions = vgrid.getRegionIndexes();
         surfaceAreas = vgrid.getExposedAreas();
 
         wkA = new double[nel][nspec];
-        wkB = new double[nel][nspec];
+        //12/19/11	wkB = new double[nel][nspec];
         wkC = new double[nel][nspec];
 
         dt = sdRun.fixedStepDt;
@@ -141,7 +151,7 @@ public class DeterministicGridCalc extends BaseCalc {
             double[] rcs = regcon[eltregions[i]];
             for (int j = 0; j < nspec; j++) {
                 wkA[i][j] = rcs[j];
-                wkB[i][j] = rcs[j];
+                //12/19/11 wkB[i][j] = rcs[j];
                 wkC[i][j] = rcs[j];
             }
 
@@ -163,7 +173,7 @@ public class DeterministicGridCalc extends BaseCalc {
 
                     } else {
                         wkA[i][j] = concfac * scs[j];
-                        wkB[i][j] = concfac * scs[j];
+                        //12/19/11 wkB[i][j] = concfac * scs[j];
                         wkC[i][j] = concfac * scs[j];
                     }
                 }
@@ -177,7 +187,7 @@ public class DeterministicGridCalc extends BaseCalc {
                     for (int j = 0; j < nspec; j++) {
                         double c = cc[i][j];
                         wkA[i][j] = c;
-                        wkB[i][j] = c;
+                        //12/19/11 wkB[i][j] = c;
                     }
                 }
             }
@@ -364,6 +374,7 @@ public class DeterministicGridCalc extends BaseCalc {
     public double advance(double time) {
         // diffusion terms;
         // wkA is time t-1, wkB time t, wkC the next step, t+1
+        //eliminated wkB because numerical integration is 2/3 correct speed
 
         // initialize next step values to zero;
         for (int i = 0; i < nel; i++) {
@@ -395,7 +406,19 @@ public class DeterministicGridCalc extends BaseCalc {
             for (int j = 0; j < nnbr; j++) {
                 for (int k = 0; k < nspec; k++) {
                     double ff = fvol * fdiff[k] * gnbr[j];
-                    zr[k] += ff * (wkB[inbr[j]][k] - 0.5 * wkA[iel][k]);
+                    //in one simulation, ff=1.125 went unstable, but ff=0.5625 was fine.
+                    //threshold of 1.0 might not be sufficient for all cases.
+                    if (ff > 0.2) {
+                        // AB 12-19-11
+                        System.out.println("AB===================================");
+                        System.out.println("In diffusion part of deterministicGridCalc: ff > 0.2!");
+                        System.out.println("Reduce your timestep, and try again...");
+                        System.out.println("AB====================================");
+                        System.exit(0);
+                    }
+                    //12-19-11 Latest fix by AB: eliminate wkB array
+//					zr[k] += ff * (wkB[inbr[j]][k] - 0.5 * wkA[iel][k]);
+                    zr[k] += ff * (wkA[inbr[j]][k] - 0.5 * wkA[iel][k]);
                     zl[k] += 0.5 * ff;
                 }
             }
@@ -406,22 +429,29 @@ public class DeterministicGridCalc extends BaseCalc {
 
         double[][] stims = stimTab.getStimsForInterval(time, dt);
 
-        // reaction step;
         for (int iel = 0; iel < nel; iel++) {
-            if (eltstims[iel] >= 0) {
-                // for the stimulus we need delta Concentration
-                // corresponding to the injection of particles;
-                double[] pinj = stims[eltstims[iel]];
-                double[] concinc = new double[pinj.length];
-                double fconc = NM_PER_PARTICLE_PUV / volumes[iel];
+            double[] concinc=new double[nspec];
+            int concnull=1;
+            for (int k=0; k<nspec; k++) {
+                concinc[k]=0.0;
+            }
+            double fconc = NM_PER_PARTICLE_PUV / volumes[iel];
 
-                for (int i = 0; i < pinj.length; i++) {
-                    concinc[i] = pinj[i] * fconc * eltstimshare[iel];
-                    if (concinc[i] < 0) {
-                        E.error("negative concentration? " + concinc[i]);
+            for (int stimnum=0; stimnum<stims.length; stimnum++) {
+                if (eltstims[stimnum][iel] >= 0) {
+                    concnull=0;
+                    double[] pinj=stims[stimnum];
+                    // for the stimulus we need delta Concentration
+                    // corresponding to the injection of particles;
+                    for (int i = 0; i < pinj.length; i++) {
+                        concinc[i] += pinj[i] * fconc * eltstimshare[stimnum][iel];
+                        if (concinc[i] < 0) {
+                            E.error("negative concentration? " + concinc[i]);
+                        }
                     }
                 }
-
+            }
+            if (concnull==0) {
                 reacStep(wkC[iel], dt, concinc);
             } else {
                 reacStep(wkC[iel], dt, null);
@@ -430,8 +460,10 @@ public class DeterministicGridCalc extends BaseCalc {
 
         // cycle the solution arrays
         double[][] wkT = wkA;
-        wkA = wkB;
-        wkB = wkC;
+        //12/19/11		Latest fix by AB: eliminate wkB - num integration is 2/3 correct speed
+        //wkA = wkB;
+        //wkB = wkC;
+        wkA = wkC;
         wkC = wkT;
 
         return dt;

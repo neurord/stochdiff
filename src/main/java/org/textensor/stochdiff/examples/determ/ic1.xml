@@ -1,0 +1,13 @@
+<InitialConditions>
+
+    <!-- these apply to everything unless overridden -->
+    <ConcentrationSet>
+	<NanoMolarity specieID="a" value="0"/>
+	<NanoMolarity specieID="b" value="100"/>
+	<NanoMolarity specieID="c" value="0"/>
+	<NanoMolarity specieID="d" value="0"/>
+    </ConcentrationSet>
+
+
+</InitialConditions>
+

@@ -97,7 +97,7 @@ public class SpineLocator {
 
 
                 if (nspines > 0.5 * eltSA.length) {
-                    E.error("too many spines (need more than one per segment");
+                    E.error("too many spines (need more than one per segment) nspines=" + nspines);
                     nspines = (int)(0.5 * eltSA.length);
                 }
 
