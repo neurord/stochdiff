@@ -32,23 +32,27 @@ public class ArrayUtil {
 
         int n = v.length;
         int ret = 0;
-        if (x < v[0]) {
-            ret = -1;
+        /*AB: v[0] is cumulative.  Thus, if x < v[0] the spine goes into region 0 (don't exit).
+         * Also, if x > v[n-1] that is bad - exit (don't return n-1) */
+        if (x <= v[0]) {
+            ret = 0;
         } else if (x > v[n-1]) {
-            ret = n-1;
+            ret = -1;
         } else {
 
+            /* this part used x<= v[ic] (num methods uses x>=v[ic], and found the wrong index */
             int ia = 0;
             int ib = n-1;
             while (ib - ia > 1) {
                 int ic = (ia + ib) / 2;
-                if (x <= v[ic]) {
-                    ib = ic;
-                } else {
+                if (x >= v[ic]) {
                     ia = ic;
+                } else {
+                    ib = ic;
                 }
             }
-            ret = ia;
+            /* ia+1 corrects for ia being the lower limit in a cumulative array */
+            ret = ia+1;
         }
         return ret;
     }

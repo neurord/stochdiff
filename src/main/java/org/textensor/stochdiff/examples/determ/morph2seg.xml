@@ -1,0 +1,17 @@
+<Morphology>
+
+<!-- two segments, one with label and one with region -->
+    <Segment id="seg1">
+	<start x="1.0" y="1.0" z="0.0" r="1.0" label="pointA"/>
+	<end x="5.0" y="1.0" z="0.0" r="1.0"/>
+    </Segment>
+
+
+    <Segment id="seg2" region="region1">
+	<start  on="seg1" at="end"/>
+	<end x="10" y="1" z = "0" r="1.0"/>
+    </Segment>
+
+  
+</Morphology>
+

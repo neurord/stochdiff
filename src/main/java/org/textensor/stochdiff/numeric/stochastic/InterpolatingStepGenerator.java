@@ -20,9 +20,8 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
     public final double lnpmin = Math.log(1.e-8);
     public final double lnpmax = Math.log(0.5);
-
     public final static double deltalnp = 0.03;  //0.3;
-
+    //   public final double lnpmax = Math.log(0.5+deltalnp);
 
 
     NGoTable[][] pnTable;
@@ -88,6 +87,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
     public int nGo(int n, double lnp, double r) {
         int ia = (int)((lnp - lnpmin) / deltalnp);
+        //nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
         double f = (lnp - (lnpmin + ia * deltalnp)) / deltalnp;
         if (ia < 0) {
             ia = 0;
@@ -105,10 +105,19 @@ public class InterpolatingStepGenerator extends StepGenerator {
                 E.error("ia too big " + n + " " + lnp + " " + r);
             }
 
+            if (n == 1)
+            {
+                System.out.println("nppts: "+nppts);
+                System.out.println("ia: "+ia);
+                System.out.println("n: "+n);
+                System.out.println("r: "+r);
+            }
+
             double rna = pnTable[ia][n].rnGo(r);
             double rnb = pnTable[ia+1][n].rnGo(r);
             ngo = (int)(f * rnb + (1. - f) * rna);
 
+            //double rnaTest = pnTable[590][120].rnGo(r);
             //if (ngo != 0)
             {
                 //    System.out.println(n + " " + lnp + " " + ngo);

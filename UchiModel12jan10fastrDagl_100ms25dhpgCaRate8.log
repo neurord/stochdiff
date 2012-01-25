@@ -1,0 +1,35 @@
+INFO - subvolume grid size is: 0.14285714285714285 at org.textensor.stochdiff.numeric.BaseCalc.extractGrid(BaseCalc.java:264)
+INFO - TODO - need area factor at org.textensor.stochdiff.model.SpineAllocation.makePopulation(SpineAllocation.java:44)
+INFO - TODO - need area factor
+INFO - total surface area for spine group  sa1 on dendrite is 1.6000000000000005 at org.textensor.stochdiff.disc.SpineLocator.addSpinesTo(SpineLocator.java:74)
+INFO - total surface area for spine group  sa2 on dendrite is 1.6000000000000005
+INFO - extracting output scheme 2 46 at org.textensor.stochdiff.numeric.BaseCalc.extractOutputScheme(BaseCalc.java:194)
+INFO - Using a BINOMIAL step generator at org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator.<init>(InterpolatingStepGenerator.java:53)
+INFO - Using PER PARTICLE destination allocation at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.init(SteppedStochaticGridCalc.java:321)
+INFO - max no of neighbors for a single element is 5 at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.init(SteppedStochaticGridCalc.java:337)
+INFO - Running from time=0.0ms to time=40000.0ms at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.run(SteppedStochaticGridCalc.java:488)
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 14 ran out of particles - need 1 but have 0 at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.advance(SteppedStochaticGridCalc.java:752)
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+WARNING - reaction 14 ran out of particles - need 1 but have 0
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+WARNING - reaction 18 ran out of particles - need 1 but have 0
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining 
+INFO - time 5.000000000000082 dt=0.0025 at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.run(SteppedStochaticGridCalc.java:525)
+INFO - total time 13255401ms at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.run(SteppedStochaticGridCalc.java:536)
+INFO - number injected = 17137 at org.textensor.stochdiff.numeric.grid.SteppedStochaticGridCalc.getParticleCount(SteppedStochaticGridCalc.java:1117)
+INFO - total number of particles at the end: 1849477 at org.textensor.stochdiff.StochDiff.main(StochDiff.java:57)
+INFO - should have written UchiModel12jan10fastrDagl_100ms25dhpgCaRate8.out at org.textensor.stochdiff.StochDiff.main(StochDiff.java:59)

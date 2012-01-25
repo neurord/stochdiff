@@ -21,7 +21,7 @@ public class StimulationTable {
 
     public StimulationTable() {
         //<--WK
-        int tableSize = 100;
+        int tableSize = 1000;
         //WK-->
         sites = new String[tableSize];
         rates = new double[tableSize][];

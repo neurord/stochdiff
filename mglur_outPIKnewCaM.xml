@@ -1,0 +1,59 @@
+<OutputScheme>
+<!--
+     Each file will have a set of concentrations in compartments
+     sampled according to a specific dt
+-->
+
+<!--
+    Every Output block must have in its definition one (and only)
+    instance of:
+     * filename
+    And might have one (and only) instance of:
+     * region or
+     * dt
+    If "region" is ommited then the concs for the whole system will be
+    saved.
+    If "dt" is ommited than the concs will be written at each time step.
+    So the "io file" will be dependent on information stated in the
+    "morph" (regions) and "model" (dt).
+-->
+
+    <OutputSet filename = "fast"  dt="5.0">
+      <OutputSpecie name="DHPG"             />
+      <OutputSpecie name="Ca"             /> 
+    </OutputSet>
+    
+   <OutputSet filename = "slow"  dt="50.0">
+     <OutputSpecie name="Pip2"             />
+     <OutputSpecie name="Plc"            /> 
+     <OutputSpecie name="PlcCa"            /> 
+     <OutputSpecie name="PlcGaGTP"           /> 
+     <OutputSpecie name="PlcCaGaGTP"           /> 
+     <OutputSpecie name="PlcCaPip2"        /> 
+     <OutputSpecie name="PlcCaGaGTPPip2"    /> 
+     <OutputSpecie name="Dag"             /> 
+     <OutputSpecie name="Ip3"            /> 
+     <OutputSpecie name="Pkc"             /> 
+     <OutputSpecie name="PkcCa"           /> 
+     <OutputSpecie name="Pkct"            /> 
+     <OutputSpecie name="Dgl"             /> 
+     <OutputSpecie name="CaDgl"             /> 
+     <OutputSpecie name="DagCaDgl"             /> 
+     <OutputSpecie name="2ag"            /> 
+     <OutputSpecie name="CalbinC"           /> 
+     <OutputSpecie name="pmcaCa"          />  
+     <OutputSpecie name="ncxCa"          /> 
+     <OutputSpecie name="CaMCa4"          /> 
+     <OutputSpecie name="CaMCa2C"          /> 
+     <OutputSpecie name="CaMCa2N"          /> 
+     <OutputSpecie name="DagKdag"             /> 
+     <OutputSpecie name="PA"             /> 
+     <OutputSpecie name="Ip3degrad"             /> 
+     <OutputSpecie name="Ip3degPIk"             /> 
+     <OutputSpecie name="PIkinase"             /> 
+     <OutputSpecie name="2agDegrad"             /> 
+   </OutputSet>
+   
+   
+</OutputScheme>
+
