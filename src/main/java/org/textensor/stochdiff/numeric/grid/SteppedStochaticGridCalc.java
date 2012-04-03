@@ -79,8 +79,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     // we do shared diffusion,
     // (2) otherwise, we do parallel diffusion.
     public static final int SHARED_DIFF_PARTICLES = 4;
-    public static final int NP = 20;
-    // WK
+    public static final int NP = 30;         // AB Changed from 20 to 30. 2011.09.23
 
     Column mconc;
 
@@ -142,6 +141,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
     InterpolatingStepGenerator interpSG;
     MersenneTwister random;
     int nwarn;
+    int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
     int ninfo;
 
     double[][] pSharedOut;
@@ -450,6 +450,8 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         return sb.toString();
     }
 
+
+
     public final int run() {
         init();
 
@@ -525,11 +527,11 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
-                    resultWriter
-                    .writeToSiblingFile(getGridConcsPlainText_dumb(i, time), "-" + fnmsOut[i] + "-conc.txt");
+                    resultWriter.writeToSiblingFile(getGridConcsPlainText_dumb(i, time), "-" + fnmsOut[i] + "-conc.txt");
                     writeTimeArray[i] += Double.valueOf(dtsOut[i]);
                 }
             }
+
 
             time += advance(time);
 
@@ -539,8 +541,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
             }
 
             if (time >= stateSaveTime) {
-                resultWriter
-                .writeToFinalSiblingFile(getStateText(), sdRun.stateSavePrefix + Math.round(time) + ".nrds");
+                resultWriter.writeToFinalSiblingFile(getStateText(), sdRun.stateSavePrefix + Math.round(time) + ".nrds");
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }
@@ -830,7 +831,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         double[] fshare = fSharedExit[iel][k];
 
         int ngo = 0;
-        int ngo_total = 0; // for independent diffusion step
+        int ngo_remaining = 0; // for independent diffusion step      ***KTB edit - this is number of molecules not yet diffused
         int num_molecules_diffused_so_far = 0;
 
         if (np0 == 1) {
@@ -907,54 +908,70 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                 wkB[inbr[io]][k] += 1;
             }
-        } else // INDEPENDENT diffusion
+        } else // MULTINOMIAL diffusion
         {
-            ngo_total = ngo;
+            ngo_remaining = ngo;         //**KTB  ngo_remaining is number of particles not yet diffused.  initially this is ngo
+            //KTB 09-23-2011, use multi-nomial instead of separate binomials to calculate lnpgo, from ngo_remaining
             // WK 9 11 2007
             double prev = 0;
             for (int j = 0; j < inbr.length - 1; j++) {
-                double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);
+                //double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);  (KTB) old method - INDEPENDENT
+                //BHK and KTB implemented the multinomial using tables instead of gaussianStep for small N, and use symmetry of binomial 09/23/11
+                double pgoTmp = (fSharedExit[iel][k][j] - prev)/(fSharedExit[iel][k][inbr.length-1]-prev);
+                double lnpgo;
+                if ((pgoTmp > 0.5) && (ngo_remaining < StepGenerator.NMAX_STOCHASTIC))
+                    lnpgo = Math.log(1.0-pgoTmp);
+                else
+                    lnpgo = Math.log(pgoTmp);
+
                 prev = fSharedExit[iel][k][j];
-                // RO 7 3 2008: changed from 10 to 20 because observed negative
-                // ngo
-                if (ngo_total * Math.exp(lnpgo) < NP) {
-                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random(),
-                                                     random.poisson(ngo_total * Math.exp(lnpgo)), NP);
-                    if (ngo < 0) {
-                        ngo = 0;
 
-                        System.out
-                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) < "
-                                 + NP + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " ngo_total: " + ngo_total + " Math.exp(lnpgo): "
-                                           + Math.exp(lnpgo));
+                //This next section uses the tables KTB
+                if (ngo_remaining < StepGenerator.NMAX_STOCHASTIC) {
+                    if (ngo_remaining == 1)
+                    {
+                        ngo = (random.random() < fSharedExit[iel][k][j] ? 1 : 0); //2011 BHK for ngo_remaining == 1
                     }
+                    else if (ngo_remaining == 0) // 2011 BHK, occaisionally will run out of particles on 2nd to last neighbor
+                    {
+                        ngo = 0;
+                    }
+                    else
+                    {
+                        if (pgoTmp <= 0.5)
+                            ngo = interpSG.nGo(ngo_remaining, lnpgo, random.random()); // 2011 BHK
+                        else  //pgoTmp > 0.5
+                            ngo = ngo_remaining - interpSG.nGo(ngo_remaining, lnpgo, random.random());
+                    }
+                }
+                else if (ngo_remaining * Math.exp(lnpgo) < NP) {
+                    ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random(),
+                                                     random.poisson(ngo_remaining * Math.exp(lnpgo)), NP);
                 } else {
-                    ngo = StepGenerator.gaussianStep(ngo_total, Math.exp(lnpgo), random.gaussian(), random.random());
-                    if (ngo < 0) {
-                        ngo = 0;
-
-                        System.out
-                        .println("in parallelAndSharedDiffusionStep, INDEPENDENT, if (ngo_total*Math.exp(lnpgo) >= "
-                                 + NP + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " ngo_total: " + ngo_total + " Math.exp(lnpgo): "
-                                           + Math.exp(lnpgo));
-                    }
+                    ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random());
                 }
-                // WK
-
-                // WK 7 2 2008: if ngo is negative, exit.
                 if (ngo < 0) {
-                    // System.out.println("in parallelAndSharedDiffusionStep INDEPENDENT: ngo is NEGATIVE. Exiting...");
-                    // System.exit(0);
+                    ngo = 0;
+                    System.out.println("in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo is NEGATIVE.");
+                    System.out.println("ngo: " + ngo + " ngo_remaining: " + ngo_remaining + "pgoTmp " + pgoTmp);
+                }
+                else if (ngo > ngo_remaining) {
+                    if (nngowarn < 10)
+                    {
+                        System.out.println("in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining ");
+                    }
+                    ngo=ngo_remaining; //BHK 2011
+                    nngowarn++;
                 }
                 // WK
+
                 wkB[iel][k] -= ngo;
                 wkB[inbr[j]][k] += ngo;
-                num_molecules_diffused_so_far += ngo;
-            }
+                ngo_remaining-=ngo;
+            } //end of loop through all but last neighbor
 
-            ngo = ngo_total - num_molecules_diffused_so_far;
+            ngo = ngo_remaining;
+
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
             // WK 3/16/2010

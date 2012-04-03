@@ -1,0 +1,102 @@
+Apr 3, 2012:
+fixed the deterministic.  There were several problems
+1. the injections were being treated as 1 D array, not 2D, so only the first injection stim was being used
+This was fixed in dec of 2011
+2. The determ was producing ~2/3 the value of the stochastic.  
+This was fixed by printing out the time array, instead of the time-1 array.
+file: DeterministicGridCalc.java
+
+Jan 18, 2012 - Jan 25, 2012
+v2.1.9 has been created.  This one started with v2.1.8, and incorporated changes in
+1. SteppedStochaticGridCalc.java  - it looks much more similar to 2.1.3 than to 2.1.8, but the differences between 2.1.9 and 2.1.3multinom are similar to diffrences between 2.1.3 and 2.1.8
+2. StimulationTable (n=1000 instead of 100)
+3. InjectionStim (remove onset from calculation of inter-train interval)
+
+No need to edit SpineLocator - this was fixed between v2.1.3 and 2.1.9
+
+This gives correct results using a non-spine test, HOWEVER, it fails using a spine test.  
+The problem is the determination of where to put the spine (line 121) in spineLocator, which calls findBracket in arrayUtil.java
+
+It implemented the binary search incorrectly. 
+This has been fixed, which allowed removal of the 0.5* spinedensity from spineLocator code.  It is now giving ~1 spine/voxel.   
+
+These were both fixed in version 2.1.3, and now both versions give qualitatively the same results, 
+using a longer dendrite which created 8 spines. (the spines were created in different places). 
+Thus, two additional files are different:
+SpineLocator.java (addSpinesTo)
+ArrayUtil.java (findBracket)
+
+Interestingly, the check for whether a voxel already has a spine doesn't work.  This might be OK. 
+
+Tested using Uchi simulations - large set of reactions, 2 injections.  
+When no spines are created, results from 2.1.3 are IDENTICAl to 2.1.9
+When spines are created, there are differences that could be attributed to stochastic variation.
+
+
+Jan 11, 2012
+
+Three differences in spine locator between 2.1.1 and 2.1.3.  Point 3 is causing the problem of spine labeling and stimulation.  This has been fixed.  Next step - build the executable (see build.xml by Robert) run a simulation, e.g. Uchi, using this fix, and then compare with an Uchi simulation using 2.1.1. (the simple problem shows no difference)
+
+THEN, fix point 1 - this requires better understanding of getNormal and surfA
+
+Perhaps before fixing point 1, if 2.1.3 is same as 2.1.1, then update stochasticgridcalc in 2.1.8 for andrew to use.  THEN, try to fix determ (probably the same in 2.1.1, 2.1.3, 2.1.8) and numbers of spines.
+-----------------------------------------------------------------
+Point 1 (common to both 2.1.1 and 2.1.3):
+spineLocator.java, line 90: check to see whether the number of spines is greater than _half_ the number of surface compartments.  Not sure why 0.5* is being used.  Remove 0.5* (but keep the rest of the if statement and recalculation: nspines = (int) (0.5 * eltSA.length)) to allow 1 spine per surface compartment.  
+
+>>>> remove 0.5, but now get error.  This line
+           double abelow = rngen.random() * totalArea;
+calculates where to put the spine.  The mesh file shows compartments extending from 1.0 to 7.67, but abelow is compared to the array: eltSA, which has 3 elements (corresponding to 3 voxles) of values 1.16, 2.33, 3.49.  Where did this come from?  They  came from surfA, which has 3 elements, each of value 1.1666, but what do those values represent?
+They're obtained from getNormal, which does cross product of perimeter of surface.  For the first element, it appeared to use the second element, and calculated a normal of 1.1666 (from endpoints x=3.0 to 5.0). This is in geom.java.  Need to study this more before trying to fix this problem. 
+
+Point 2 (difference, probably doesn't matter):
+Random allocation of spine number has been changed from 2.1.1 to 2.1.3:
+2.1.1:	// double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
+2.1.3	double nspines = avgNoSpines;
+on line 80-90
+Why are spine numbers now calculated deterministically?
+
+Point 3: FIXED!!!!
+line added to 2.1.3:
+	ArrayList<Integer> positionA = new ArrayList<Integer>();
+
+related difference in code:
+
+2.1.1: arrayList is done within loop:
+            if (gotSpine.contains(ip)) {
+               // already got a spine - go round again;
+            } else {
+               gotSpine.add(ip);
+               
+               ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid, ndone);
+               volumeGrid.addElements(elts);
+               ndone += 1;
+            }  
+
+2.1.3: arrayList done after the loop.  Using ndone which is always the last number!!!
+	if (gotSpine.contains(ip)) {
+		// already got a spine - go round again;
+		} else {
+		gotSpine.add(ip);
+		positionA.add(ip);
+		ndone += 1;
+		}
+	}
+	Collections.sort(positionA);
+				
+	for (int posInArray : positionA) {
+	    ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid,	ndone);
+		volumeGrid.addElements(elts);
+	}
+
+
+In 2.1.3, ndone is the last spine +1 when the arrayList and volumeGrid is added. This can't be done in the loop because the spines are sorted first, requiring them to all be created.  However we need to repeat the loop counter as follows:
+
+	Collections.sort(positionA);
+
+	ndone = 0;			
+	for (int posInArray : positionA) {
+	    ArrayList<VolumeElement> elts = addSpineTo(surfVE.get(posInArray), sp.getProfile(), popid,	ndone);
+		volumeGrid.addElements(elts);
+		ndone++;
+	}

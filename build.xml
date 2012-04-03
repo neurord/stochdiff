@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<project name="StochDiff utilities" default="jars" basedir="." >
+	<description>
+	utilities for jarring StochDiff
+
+    </description>
+	<property name="base.dir" location="${user.home}/workspace"/>
+	<property name="eclipse.dir" location="${user.home}/eclipse" />
+	<property name="project.dir" location="${base.dir}/stochdiff2.1.9"/>
+	<property name="jarexport.dir" location="/home/neuroware/stochdif/v2.1.9"/>
+	 
+	 
+
+	<property file="${project.dir}/VERSION"/>
+ 
+ 
+    <target name="jars" depends="sdjar, ccvizjar, srcjar, exjar, reducejar, ccviz3jar">
+    </target>	
+    
+ 
+
+	<target name="sdjar">
+		<jar jarfile="${jarexport.dir}/stochdiff2.1.9.jar">
+        	<fileset dir="${project.dir}"/>
+         
+       		 <manifest>
+		          <attribute name="Created-By" value="Robert Cannon"/>
+		          <attribute name="Main-Class" value="org.textensor.stochdiff.StochDiff"/>
+		    </manifest>
+       </jar>
+	</target>
+	
+	<target name="reducejar">
+			<jar jarfile="${jarexport.dir}/reduce-${stochdiff.version}.jar">
+	        	<fileset dir="${project.dir}/bin"/>
+	         
+	       		 <manifest>
+			          <attribute name="Created-By" value="Robert Cannon"/>
+			          <attribute name="Main-Class" value="org.textensor.stochdiff.reduce.Reduce"/>
+			    </manifest>
+	       </jar>
+		</target>
+		
+	
+	
+	<target name="ccvizjar">
+			<jar jarfile="${jarexport.dir}/ccviz-${ccviz.version}.jar">
+	        	<fileset dir="${project.dir}/bin"/>
+	         
+	       		 <manifest>
+			          <attribute name="Created-By" value="Robert Cannon"/>
+			          <attribute name="Main-Class" value="org.catacomb.dataview.CCViz"/>
+			    </manifest>
+	       </jar>
+		</target>
+	
+	<target name="ccviz3jar">
+			<jar jarfile="${jarexport.dir}/ccviz3d-${ccviz.version}.jar">
+	        	<fileset dir="${project.dir}/bin" includes="org/textensor/vis/**"/>
+	         
+	       		 <manifest>
+			          <attribute name="Created-By" value="Robert Cannon"/>
+			          <attribute name="Main-Class" value="org.textensor.vis.CCViz3D"/>
+			    </manifest>
+	       </jar>
+		</target>
+	
+	
+   
+	<target name="exjar">
+			<jar jarfile="${jarexport.dir}/stochdiff-${stochdiff.version}-examples.jar">
+	        	<fileset dir="${project.dir}/src/org/textensor/stochdiff/examples"/>
+	         
+	       		 <manifest>
+			          <attribute name="Created-By" value="Robert Cannon"/>
+			          <attribute name="Main-Class" value="org.catacomb.dataview.CCViz"/>
+			    </manifest>
+	       </jar>
+		</target>
+   
+
+
+	<target name="srcjar">
+		<jar jarfile="${jarexport.dir}/stochdiff2.1.9-src.jar">
+        	<fileset dir="${project.dir}"/>
+       </jar>
+	</target>
+	
+</project>
