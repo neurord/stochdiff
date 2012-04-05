@@ -1,3 +1,5 @@
+Apr 4, 2012:
+Trying to speed up deterministic.  Noticed that, unlike stochastic, the diffusion is applied to all species, even those with diffusion constant = 0.  
 Apr 3, 2012:
 fixed the deterministic.  There were several problems
 1. the injections were being treated as 1 D array, not 2D, so only the first injection stim was being used

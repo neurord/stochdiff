@@ -6,8 +6,8 @@
     </description>
 	<property name="base.dir" location="${user.home}/workspace"/>
 	<property name="eclipse.dir" location="${user.home}/eclipse" />
-	<property name="project.dir" location="${base.dir}/stochdiff2.1.9"/>
-	<property name="jarexport.dir" location="/home/neuroware/stochdif/v2.1.9"/>
+	<property name="project.dir" location="${base.dir}/stochdiff2.1.10"/>
+	<property name="jarexport.dir" location="/home/neuroware/stochdif/v2.1.10"/>
 	 
 	 
 
@@ -20,7 +20,7 @@
  
 
 	<target name="sdjar">
-		<jar jarfile="${jarexport.dir}/stochdiff2.1.9.jar">
+		<jar jarfile="${jarexport.dir}/stochdiff2.1.10.jar">
         	<fileset dir="${project.dir}"/>
          
        		 <manifest>
@@ -81,7 +81,7 @@
 
 
 	<target name="srcjar">
-		<jar jarfile="${jarexport.dir}/stochdiff2.1.9-src.jar">
+		<jar jarfile="${jarexport.dir}/stochdiff2.1.10-src.jar">
         	<fileset dir="${project.dir}"/>
        </jar>
 	</target>

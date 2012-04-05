@@ -411,16 +411,28 @@ public class DeterministicGridCalc extends BaseCalc {
             int inbr[] = neighbors[iel];
             double gnbr[] = couplingConstants[iel];
             int nnbr = inbr.length;
-
-            for (int j = 0; j < nnbr; j++) {
-                for (int k = 0; k < nspec; k++) {
-                    double ff = fvol * fdiff[k] * gnbr[j];
-                    //AB 2012-apr 3 change wkB to wk[time-1], and wkA to wk[time]
-                    zr[k] += ff * (wkA[inbr[j]][k] - 0.5 * wktm1[iel][k]);
-                    zl[k] += 0.5 * ff;
-                }
-            }
+            /*
+            			for (int j = 0; j < nnbr; j++) {
+            				for (int k = 0; k < nspec; k++) {
+            					double ff = fvol * fdiff[k] * gnbr[j];
+            					//AB 2012-apr 3 change wkB to wk[time-1], and wkA to wk[time]
+            					zr[k] += ff * (wkA[inbr[j]][k] - 0.5 * wktm1[iel][k]);
+            					zl[k] += 0.5 * ff;
+            				}
+            			}
+            			for (int k = 0; k < nspec; k++) {
+            				wkC[iel][k] = (wkA[iel][k] + zr[k]) / zl[k];
+            			}
+            */
+            //AB 2012 Apr 4 - skip the diffusion if fdiff=0 to make this part faster
             for (int k = 0; k < nspec; k++) {
+                if (fdiff[k]>0) {
+                    for (int j = 0; j < nnbr; j++) {
+                        double ff = fvol * fdiff[k] * gnbr[j];
+                        zr[k] += ff * (wkA[inbr[j]][k] - 0.5 * wktm1[iel][k]);
+                        zl[k] += 0.5 * ff;
+                    }
+                }
                 wkC[iel][k] = (wkA[iel][k] + zr[k]) / zl[k];
             }
         }
