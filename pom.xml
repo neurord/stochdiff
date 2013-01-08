@@ -93,4 +93,60 @@
     </dependency>
   </dependencies>
 
+  <reporting>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.6</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+	      <report>index</report>
+              <report>plugins</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <linkJavadoc>true</linkJavadoc>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+          <show>private</show>
+          <nohelp>false</nohelp>
+          <stylesheetfile>javadoc.css</stylesheetfile>
+          <javaApiLinks>
+            <property>
+              <name>api_1.6</name>
+              <value>http://download.oracle.com/javase/6/docs/api/</value>
+            </property>
+          </javaApiLinks>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+
 </project>
