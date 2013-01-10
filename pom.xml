@@ -101,6 +101,13 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/ext/j3dutils.jar</systemPath>
     </dependency>
+
+    <dependency>
+      <groupId>org.jblas</groupId>
+      <artifactId>jblas</artifactId>
+      <version>1.2.3-SNAPSHOT</version>
+    </dependency>
+
   </dependencies>
 
   <reporting>
