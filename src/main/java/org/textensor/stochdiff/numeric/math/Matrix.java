@@ -2,7 +2,6 @@ package org.textensor.stochdiff.numeric.math;
 
 import org.textensor.report.E;
 
-
 public final class Matrix extends Object implements Cloneable {
 
     public double a[][];
@@ -510,20 +509,13 @@ public final class Matrix extends Object implements Cloneable {
 
 
     public static double[] LUSolve(double[][] m, double[] R) {
-
-        Matrix M = new Matrix(m);
-        M.LU();
-        double[] W = M.lubksb(R);
-        return W;
+        org.jblas.DoubleMatrix M = new org.jblas.DoubleMatrix(m);
+        org.jblas.DoubleMatrix b = new org.jblas.DoubleMatrix(R);
+        return org.jblas.Solve.solve(M, b).toArray();
     }
 
-
-    // WTF: this destroys r! (r is the same as the return value)
     public Column LUSolve(Column r) {
-        Matrix m = copy();
-        m.LU();
-        double[] w = m.lubksb(r.getData());
-        return new Column(w);
+        return new Column(LUSolve(this.a, r.getData()));
     }
 
 
