@@ -518,6 +518,7 @@ public final class Matrix extends Object implements Cloneable {
     }
 
 
+    // WTF: this destroys r! (r is the same as the return value)
     public Column LUSolve(Column r) {
         Matrix m = copy();
         m.LU();
