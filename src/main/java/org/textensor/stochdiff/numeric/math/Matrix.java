@@ -506,10 +506,19 @@ public final class Matrix extends Object implements Cloneable {
         return r;
     }
 
-
+    /**
+     * nondestructively copy
+     */
+    static org.jblas.DoubleMatrix makeDoubleMatrix(double [][] m) {
+        int len = m[0].length;
+        double[] dst = new double[m.length * len];
+        for (int i=0; i < m.length; i++)
+            System.arraycopy(m[i], 0, dst, i*len, len);
+        return new org.jblas.DoubleMatrix(m.length, len, dst);
+    }
 
     public static double[] LUSolve(double[][] m, double[] R) {
-        org.jblas.DoubleMatrix M = new org.jblas.DoubleMatrix(m);
+        org.jblas.DoubleMatrix M = makeDoubleMatrix(m);
         org.jblas.DoubleMatrix b = new org.jblas.DoubleMatrix(R);
         return org.jblas.Solve.solve(M, b).toArray();
     }
@@ -517,7 +526,6 @@ public final class Matrix extends Object implements Cloneable {
     public Column LUSolve(Column r) {
         return new Column(LUSolve(this.a, r.getData()));
     }
-
 
 
     public void invert() {
