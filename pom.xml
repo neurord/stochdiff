@@ -40,6 +40,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
         <configuration>
           <source>${project.jdk_version}</source>
           <target>${project.jdk_version}</target>
@@ -72,12 +73,6 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-compiler-plugin</artifactId>
-      <version>3.0</version>
-    </dependency>
-
     <dependency>
       <groupId>java3d</groupId>
       <artifactId>j3d-vectmath</artifactId>
