@@ -4,7 +4,7 @@ package org.textensor.stochdiff.model;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc;
-
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 
 public class SDRun {
 
@@ -63,7 +63,7 @@ public class SDRun {
     public String distribution;
     public String algorithm;
 
-    private int distributionID;
+    private distribution_t distributionID;
     private int algorithmID;
 
 
@@ -91,9 +91,9 @@ public class SDRun {
 
         if (distribution != null && distribution.length() > 0) {
             if (distribution.toLowerCase().equals("binomial")) {
-                distributionID = BaseCalc.BINOMIAL;
+                distributionID = distribution_t.BINOMIAL;
             } else if (distribution.toLowerCase().equals("poisson")) {
-                distributionID = BaseCalc.POISSON;
+                distributionID = distribution_t.POISSON;
             } else {
                 E.shortWarning("Unrecognized distribution (" + distribution
                                + ") expecting binomial or poisson");
@@ -117,7 +117,7 @@ public class SDRun {
 
     // just getters and setters from here on;
 
-    public int getDistributionID() {
+    public distribution_t getDistributionID() {
         return distributionID;
     }
 

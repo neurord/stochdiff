@@ -44,14 +44,16 @@ public abstract class BaseCalc {
     // indices of output species
     public int[] ispecout;
 
-    public static final int BINOMIAL = 0;
-    public static final int POISSON = 1;
+    public enum distribution_t {
+        BINOMIAL,
+        POISSON,
+    }
 
     public static final int INDEPENDENT = 0;
     public static final int SHARED = 1;
     public static final int PARTICLE = 2;
 
-    int distID = BINOMIAL;
+    distribution_t distID = distribution_t.BINOMIAL;
     protected int algoID = INDEPENDENT;
 
     public boolean writeConcentration = false;
@@ -327,11 +329,11 @@ public abstract class BaseCalc {
     }
 
     public final boolean useBinomial() {
-        return (distID == BINOMIAL);
+        return (distID == distribution_t.BINOMIAL);
     }
 
     public final boolean usePoisson() {
-        return (distID == POISSON);
+        return (distID == distribution_t.POISSON);
     }
 
     public final boolean doIndependent() {

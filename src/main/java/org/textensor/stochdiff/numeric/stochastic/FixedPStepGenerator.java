@@ -1,5 +1,6 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 
 public class FixedPStepGenerator {
 
@@ -8,11 +9,11 @@ public class FixedPStepGenerator {
 
     NGoTable[] tables;
 
-    int mode;
+    distribution_t mode;
 
-    public FixedPStepGenerator(double lnp0, int mod) {
+    public FixedPStepGenerator(double lnp0, distribution_t mode) {
         lnp = lnp0;
-        mode = mod;
+        this.mode = mode;
         tables = new NGoTable[StepGenerator.NMAX_STOCHASTIC + 1];
         p = Math.exp(lnp);
     }

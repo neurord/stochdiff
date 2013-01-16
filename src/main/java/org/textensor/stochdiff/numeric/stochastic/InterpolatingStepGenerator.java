@@ -1,8 +1,10 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
 import org.textensor.report.E;
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
-
+import static java.lang.String.format;
 
 
 /*
@@ -48,13 +50,8 @@ public class InterpolatingStepGenerator extends StepGenerator {
         return pInstance;
     }
 
-    public InterpolatingStepGenerator(int mode) {
-
-        if (mode == BINOMIAL) {
-            E.info("Using a BINOMIAL step generator");
-        } else {
-            E.info("Using a POISSON step generator");
-        }
+    public InterpolatingStepGenerator(distribution_t mode) {
+        E.info(format("Using a %s step generator", mode));
 
         nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
         pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
@@ -65,7 +62,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
     // initialize all the tables - may not all be used ever -
     // could evaluate them as required
-    private void fullInit(int mode) {
+    private void fullInit(distribution_t mode) {
         for (int i = 0; i <= nppts; i++) {
             double lnp = lnpmin + i * deltalnp;
             for (int j = 2; j <= StepGenerator.NMAX_STOCHASTIC; j++) {

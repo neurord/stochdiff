@@ -1,6 +1,8 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
 import org.textensor.report.E;
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
 
 public final class NGoTable {
@@ -11,12 +13,12 @@ public final class NGoTable {
     double[] cprob; // cumulative probabilities
     int ncprob;
 
-    int mode;
+    distribution_t mode;
 
-    public NGoTable(int n, double lnp0, int m) {
+    public NGoTable(int n, double lnp0, distribution_t mode) {
         lnp = lnp0;
         nparticle = n;
-        mode = m;
+        this.mode = mode;
 
         double p = Math.exp(lnp);
         double q = 1. - p;
@@ -25,7 +27,8 @@ public final class NGoTable {
 
 
 
-        if (mode == StepGenerator.BINOMIAL) {
+        switch (mode) {
+        case BINOMIAL: {
             BinomialTable btab = BinomialTable.getTable();
             /*
              * accumulate c in reverse order: we add the small quantities first
@@ -69,12 +72,10 @@ public final class NGoTable {
             cprob[ncprob] = 2.;
             // one extra element on the end to save testing for the end condition;
 
+        }; break;
 
+        case POISSON: {
 
-
-
-
-        } else if (mode == StepGenerator.POISSON) {
             double lambda = n * Math.exp(lnp0);
             double emlambda = Math.exp(-1. * lambda);
 
@@ -114,9 +115,10 @@ public final class NGoTable {
             }
             cprob[ncprob] = 2.;
 
+        }; break;
 
+        default:
 
-        } else {
             E.warning("unrecognized distribution " + mode);
         }
 
@@ -298,7 +300,7 @@ public final class NGoTable {
         long tbtot = 0;
         long tctot = 0;
 
-        int m = StepGenerator.BINOMIAL;
+        distribution_t m = BINOMIAL;
 
         for (int i = 10; i <= 90; i+= 10) {
             for (int ip = -6; ip < -1; ip++) {
@@ -326,31 +328,29 @@ public final class NGoTable {
 
 
     private static void dumpExamples() {
-        int mb = StepGenerator.BINOMIAL;
-        int mp = StepGenerator.POISSON;
-        new NGoTable(10, Math.log(0.1), mb).print();
-        new NGoTable(10, Math.log(0.1), mp).print();
+        new NGoTable(10, Math.log(0.1), BINOMIAL).print();
+        new NGoTable(10, Math.log(0.1), POISSON).print();
 
-        new NGoTable(90, Math.log(0.1), mb).print();
-        new NGoTable(90, Math.log(0.1), mp).print();
+        new NGoTable(90, Math.log(0.1), BINOMIAL).print();
+        new NGoTable(90, Math.log(0.1), POISSON).print();
 
-        new NGoTable(10, Math.log(0.01), mb).print();
-        new NGoTable(10, Math.log(0.01), mp).print();
+        new NGoTable(10, Math.log(0.01), BINOMIAL).print();
+        new NGoTable(10, Math.log(0.01), POISSON).print();
 
-        new NGoTable(90, Math.log(0.01), mb).print();
-        new NGoTable(90, Math.log(0.01), mp).print();
+        new NGoTable(90, Math.log(0.01), BINOMIAL).print();
+        new NGoTable(90, Math.log(0.01), POISSON).print();
 
-        new NGoTable(10, Math.log(0.001), mb).print();
-        new NGoTable(10, Math.log(0.001), mp).print();
+        new NGoTable(10, Math.log(0.001), BINOMIAL).print();
+        new NGoTable(10, Math.log(0.001), POISSON).print();
 
-        new NGoTable(90, Math.log(0.001), mb).print();
-        new NGoTable(90, Math.log(0.001), mp).print();
+        new NGoTable(90, Math.log(0.001), BINOMIAL).print();
+        new NGoTable(90, Math.log(0.001), POISSON).print();
 
-        new NGoTable(10, Math.log(0.0001), mb).print();
-        new NGoTable(10, Math.log(0.0001), mp).print();
+        new NGoTable(10, Math.log(0.0001), BINOMIAL).print();
+        new NGoTable(10, Math.log(0.0001), POISSON).print();
 
-        new NGoTable(90, Math.log(0.0001), mb).print();
-        new NGoTable(90, Math.log(0.0001), mp).print();
+        new NGoTable(90, Math.log(0.0001), BINOMIAL).print();
+        new NGoTable(90, Math.log(0.0001), POISSON).print();
     }
 
 

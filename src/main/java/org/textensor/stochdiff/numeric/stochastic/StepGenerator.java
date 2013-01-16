@@ -13,9 +13,6 @@ package org.textensor.stochdiff.numeric.stochastic;
 
 public abstract class StepGenerator {
 
-    protected final static int BINOMIAL = 0;
-    protected final static int POISSON = 1;
-
     public final static int NMAX_STOCHASTIC = 120;
 
     public abstract int nGo(int n, double p, double r);

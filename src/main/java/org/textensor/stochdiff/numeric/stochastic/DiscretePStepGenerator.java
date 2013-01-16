@@ -24,6 +24,8 @@ import java.util.HashMap;
  *
  */
 
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+
 public class DiscretePStepGenerator extends StepGenerator {
 
 
@@ -32,11 +34,11 @@ public class DiscretePStepGenerator extends StepGenerator {
 
     public final static double lnpmin = -20;
 
-    int mode;
+    distribution_t mode;
 
-    public DiscretePStepGenerator(int m) {
+    public DiscretePStepGenerator(distribution_t mode) {
         generators = new HashMap<Integer, FixedPStepGenerator>();
-        mode = m;
+        this.mode = mode;
     }
 
 
