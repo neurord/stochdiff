@@ -1,7 +1,7 @@
 
 <DeclarationReading>
- 
-   <Instantiable class="EditorWindow"/>
+  
+  <Instantiable class="EditorWindow"/>
 
 
 </DeclarationReading>

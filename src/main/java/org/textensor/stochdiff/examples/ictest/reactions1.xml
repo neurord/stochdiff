@@ -1,15 +1,15 @@
 <ReactionScheme>
-    
-    <!-- you can specify the units of the diffusion constant. If they are not 
-	 specified they are assumed to be micron^2/second, (microns written "mu" here)
-	 it should understand microns, mm, and m for distances and seconds and ms for times --> 
+  
+  <!-- you can specify the units of the diffusion constant. If they are not 
+	   specified they are assumed to be micron^2/second, (microns written "mu" here)
+	   it should understand microns, mm, and m for distances and seconds and ms for times --> 
 
-    <Specie name="Specie A" id="a" kdiff="0" kdiffunit = "mu2/s"/>
-    <Specie name="Specie B" id="b" kdiff="0"/>
-    <Specie name="Specie C" id="c" kdiff="0.000" kdiffunit = "mu2/ms"/>
-    <Specie name="Specie D" id="d" kdiff="0.000" kdiffunit = "mu2/ms"/>
+  <Specie name="Specie A" id="a" kdiff="0" kdiffunit = "mu2/s"/>
+  <Specie name="Specie B" id="b" kdiff="0"/>
+  <Specie name="Specie C" id="c" kdiff="0.000" kdiffunit = "mu2/ms"/>
+  <Specie name="Specie D" id="d" kdiff="0.000" kdiffunit = "mu2/ms"/>
 
-    <Reaction name = "Reaction 1" id="r1">
+  <Reaction name = "Reaction 1" id="r1">
 	<Reactant specieID="a"/>
 	<Reactant specieID="b"/>
 	<Product specieID="c"/>
@@ -17,8 +17,8 @@
 	<forwardRate>0.0000000</forwardRate>
 	<reverseRate>0.0000000</reverseRate>
 	<Q10>0.2</Q10>
-    </Reaction>
+  </Reaction>
 
-	
+  
 
 </ReactionScheme>

@@ -1,19 +1,19 @@
 <Morphology>
 
-<!-- Define morphologies for regions other than spines. -->
+  <!-- Define morphologies for regions other than spines. -->
 
-    <Segment id="seg1" region="dend">
+  <Segment id="seg1" region="dend">
 	<start x="1.0" y="1.0" z="0.0" r="0.3"/>
 	<end x="5.0" y="1.0" z="0.0" r="0.3"/>
-    </Segment>
+  </Segment>
 
-<!-- Spine morphologies: width for sections along the spine. -->
+  <!-- Spine morphologies: width for sections along the spine. -->
 
-    <SpineType id="spineA">
+  <SpineType id="spineA">
 	<Section width="0.05" at="0.00" label="stub"/>
 	<Section width="0.05" at="0.02" label="pointA"/>
-    </SpineType>
+  </SpineType>
 
-    <SpineAllocation id="sa1" spineType="spineA" region="dend"  areaDensity="1.5"/>
+  <SpineAllocation id="sa1" spineType="spineA" region="dend"  areaDensity="1.5"/>
 </Morphology>
 

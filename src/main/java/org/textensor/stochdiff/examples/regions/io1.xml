@@ -1,28 +1,28 @@
 <OutputScheme>
-<!--
-     Each file will have a set of concentrations in compartments
-     sampled according to a specific dt
--->
+  <!--
+      Each file will have a set of concentrations in compartments
+      sampled according to a specific dt
+  -->
 
-<!--
-    Every Output block must have in its definition one (and only)
-    instance of:
-     * filename
-    And might have one (and only) instance of:
-     * region or
-     * dt
-    If "region" is ommited then the concs for the whole system will be
-    saved.
-    If "dt" is ommited than the concs will be written at each time step.
-    So th "io file" will be dependent on information stated in the
-    "morph" (regions) and "model" (dt).
--->
+  <!--
+      Every Output block must have in its definition one (and only)
+      instance of:
+      * filename
+      And might have one (and only) instance of:
+      * region or
+      * dt
+      If "region" is ommited then the concs for the whole system will be
+      saved.
+      If "dt" is ommited than the concs will be written at each time step.
+      So th "io file" will be dependent on information stated in the
+      "morph" (regions) and "model" (dt).
+  -->
 
-    <OutputSet filename = "C" region="region1" dt="1">
-        <OutputSpecie       name="a"/>
-        <OutputSpecie       name="b"/>
-        <OutputSpecie       name="c"/>
-    </OutputSet>
+  <OutputSet filename = "C" region="region1" dt="1">
+    <OutputSpecie       name="a"/>
+    <OutputSpecie       name="b"/>
+    <OutputSpecie       name="c"/>
+  </OutputSet>
 
 
 </OutputScheme>

@@ -1,399 +1,399 @@
 <ReactionScheme>
-<!--
-     you can specify the units of the diffusion constant. If they are not
-     specified they are assumed to be micron^2/second, (microns written "mu" here)
-     it should understand microns, mm, and m for distances and seconds and ms for times
--->
-    <Specie name="GaGTP"          id="GaGTP"          kdiff="301.00"  kdiffunit = "mu2/s"/>
-    <Specie name="AC"             id="AC"             kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="E"              id="E"              kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="ATP"            id="ATP"            kdiff="255.34"  kdiffunit = "mu2/s"/>
-    <Specie name="EATP"           id="EATP"           kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKArc"          id="PKArc"          kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcamp1"       id="PKAcamp1"       kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcamp2"       id="PKAcamp2"       kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAc"           id="PKAc"           kdiff="59.54"   kdiffunit = "mu2/s"/>
-    <Specie name="PKAr"           id="PKAr"           kdiff="0"       kdiffunit = "mu2/s"/>
-<!--
-     Nikolaev, O.V.; Lohse, M.J. (2004) Novel single chain cAMP sensors for
-     receptor-induced signal propagation.............(cAMP diff ~270-780 mu2/s)
--->
-    <Specie name="PDE4B"          id="PDE4B"          kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PDE4BcAMP"      id="PDE4BcAMP"      kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcPDE4B"      id="PKAcPDE4B"      kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcPDE4BcAMP"  id="PKAcPDE4BcAMP"  kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="pPDE4B"         id="pPDE4B"         kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="pPDE4BcAMP"     id="pPDE4BcAMP"     kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PDE4D"          id="PDE4D"          kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PDE4DcAMP"      id="PDE4DcAMP"      kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcPDE4D"      id="PKAcPDE4D"      kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="PKAcPDE4DcAMP"  id="PKAcPDE4DcAMP"  kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="pPDE4D"         id="pPDE4D"         kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="pPDE4DcAMP"     id="pPDE4DcAMP"     kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="AMP"            id="AMP"            kdiff="289.72"  kdiffunit = "mu2/s"/>
-    <Specie name="cAMP"           id="cAMP"           kdiff="294.91"  kdiffunit = "mu2/s"/>
-    <Specie name="EPAc"           id="EPAc"           kdiff="0"       kdiffunit = "mu2/s"/>
-    <Specie name="EPAccAMP"       id="EPAccAMP"       kdiff="0"       kdiffunit = "mu2/s"/>
-    <!-- 1)  GaGTP + AC <-> E         -->
-<!--
-        Both (Kf and Kb) have been divided by a
-        1000 to convert from sec to msec
-        (xpp->stochdif).
--->
-    <Reaction name = "GaGTP_AC reac" id="GaGTP_ACid">
-        <Reactant specieID="GaGTP"           />
-        <Reactant specieID="AC"              />
-        <Product  specieID="E"               />
-
-        <forwardRate> 38461.5e-9 </forwardRate>
-        <reverseRate> 10e-3      </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 2)  E + ATP    <-> EATP      -->
-    <Reaction name = "E_ATP reac" id="E_ATPid">
-        <Reactant specieID="E"               />
-        <Reactant specieID="ATP"             />
-        <Product  specieID="EATP"            />
-
-        <forwardRate> 127600e-12 </forwardRate>
-        <reverseRate> 0.2612e-03 </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 3)  EATP       <-> E + CAMP  -->
-    <Reaction name = "EATP reac" id="EATPid">
-        <Reactant specieID="EATP"            />
-        <Product  specieID="E"               />
-        <Product  specieID="cAMP"            />
-
-        <forwardRate> 28.46e-03  </forwardRate>
-        <reverseRate> 259200e-12 </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 4)  2cAMP + PKArc <-> PKAr2cAMP2c2         ( B site binding ) -->
-<!--
-        <forwardRate> 4.3478e-08 </forwardRate>
-        <reverseRate> 0.02e-03   </reverseRate>
-        <Q10>         0.2        </Q10>
-        In order to compensate for the cooperative
-        binding of the 2nd cAMP Kf (forwardRate) has
-        been multiplied by 2   (xpp->stochdif).
--->
-    <Reaction name = "cAMP B bind" id="cAMP_B_bind">
-        <Reactant specieID="PKArc"           />
-        <Reactant specieID="cAMP"       n="2"/>
-        <Product  specieID="PKAcamp1"        />
-
-        <forwardRate> 8.696e-08  </forwardRate>
-        <reverseRate> 0.02e-03   </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 5)  2cAMP + PKAr2cAMP2c2 <-> PKAr2cAMP4c2  ( A site binding ) -->
-    <Reaction name = "cAMP A bind" id="cAMP_A_bind">
-        <Reactant specieID="PKAcamp1"        />
-        <Reactant specieID="cAMP"       n="2"/>
-        <Product  specieID="PKAcamp2"        />
-
-        <forwardRate> 1.154e-07  </forwardRate>
-        <reverseRate> 0.2e-03    </reverseRate>
-        <Q10>         2          </Q10>
-    </Reaction>
-    <!-- 6)  PKAr2cAMP4c2 <-> PKAr2camp4 + 2PKAc -->
-    <Reaction name = "PKArc dissocation" id="PKAdissoc">
-        <Reactant specieID="PKAcamp2"        />
-        <Product  specieID="PKAr"            />
-        <Product  specieID="PKAc"       n="2"/>
-
-        <forwardRate> 0.016e-03  </forwardRate>
-        <reverseRate> 0.0017e-03 </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-    <!-- 7)  cAMP + PDE4B  <-> PDE4BcAMP -->
-    <Reaction name = "PDE4B enzyme1" id="PDE4Bbind">
-        <Reactant specieID="PDE4B"           />
-        <Reactant specieID="cAMP"            />
-        <Product  specieID="PDE4BcAMP"       />
-
-        <forwardRate> 0.03e-03   </forwardRate>
-        <reverseRate> 77.44e-03  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 8)  PDE4BcAMP -> AMP + PDE4B -->
-    <!-- <forwardRate> 19.36e-03  </forwardRate> -->
-    <Reaction name = "PDE4B actvcomp" id="PDE4Bcat">
-        <Reactant specieID="PDE4BcAMP"       />
-        <Product  specieID="PDE4B"           />
-        <Product  specieID="AMP"             />
-
-        <forwardRate> 19.36e-03  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-
-
-
-    <!-- 9)  PKAc + PDE4B -> PKAcPDE4B -->
-    <Reaction name = "PDE4B phosp1" id="phospPDE4B1">
-        <Reactant specieID="PKAc"            />
-        <Reactant specieID="PDE4B"           />
-        <Product  specieID="PKAcPDE4B"       />
-
-        <forwardRate> 3.500e-07  </forwardRate>
-        <reverseRate> 2.04e-04  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 10)  PKAcPDE4B -> PKAc + pPDE4B -->
-    <!-- <forwardRate> 5.56e-06   </forwardRate> -->
-    <Reaction name = "PDE4B phosp2" id="phospPDE4B2">
-        <Reactant specieID="PKAcPDE4B"       />
-        <Product  specieID="pPDE4B"          />
-        <Product  specieID="PKAc"            />
-
-        <forwardRate> 2.085e-04  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 11)  pPDE4B -> PDE4B -->
-    <!-- <forwardRate> 1.36e-07   </forwardRate> -->
-    <Reaction name = "PDE4B d_phosp" id="dphospPDE4B">
-        <Reactant specieID="pPDE4B"          />
-        <Product  specieID="PDE4B"           />
+  <!--
+      you can specify the units of the diffusion constant. If they are not
+      specified they are assumed to be micron^2/second, (microns written "mu" here)
+      it should understand microns, mm, and m for distances and seconds and ms for times
+  -->
+  <Specie name="GaGTP"          id="GaGTP"          kdiff="301.00"  kdiffunit = "mu2/s"/>
+  <Specie name="AC"             id="AC"             kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="E"              id="E"              kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="ATP"            id="ATP"            kdiff="255.34"  kdiffunit = "mu2/s"/>
+  <Specie name="EATP"           id="EATP"           kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKArc"          id="PKArc"          kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcamp1"       id="PKAcamp1"       kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcamp2"       id="PKAcamp2"       kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAc"           id="PKAc"           kdiff="59.54"   kdiffunit = "mu2/s"/>
+  <Specie name="PKAr"           id="PKAr"           kdiff="0"       kdiffunit = "mu2/s"/>
+  <!--
+      Nikolaev, O.V.; Lohse, M.J. (2004) Novel single chain cAMP sensors for
+      receptor-induced signal propagation.............(cAMP diff ~270-780 mu2/s)
+  -->
+  <Specie name="PDE4B"          id="PDE4B"          kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PDE4BcAMP"      id="PDE4BcAMP"      kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcPDE4B"      id="PKAcPDE4B"      kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcPDE4BcAMP"  id="PKAcPDE4BcAMP"  kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="pPDE4B"         id="pPDE4B"         kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="pPDE4BcAMP"     id="pPDE4BcAMP"     kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PDE4D"          id="PDE4D"          kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PDE4DcAMP"      id="PDE4DcAMP"      kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcPDE4D"      id="PKAcPDE4D"      kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="PKAcPDE4DcAMP"  id="PKAcPDE4DcAMP"  kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="pPDE4D"         id="pPDE4D"         kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="pPDE4DcAMP"     id="pPDE4DcAMP"     kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="AMP"            id="AMP"            kdiff="289.72"  kdiffunit = "mu2/s"/>
+  <Specie name="cAMP"           id="cAMP"           kdiff="294.91"  kdiffunit = "mu2/s"/>
+  <Specie name="EPAc"           id="EPAc"           kdiff="0"       kdiffunit = "mu2/s"/>
+  <Specie name="EPAccAMP"       id="EPAccAMP"       kdiff="0"       kdiffunit = "mu2/s"/>
+  <!-- 1)  GaGTP + AC <-> E         -->
+  <!--
+      Both (Kf and Kb) have been divided by a
+      1000 to convert from sec to msec
+      (xpp->stochdif).
+  -->
+  <Reaction name = "GaGTP_AC reac" id="GaGTP_ACid">
+    <Reactant specieID="GaGTP"           />
+    <Reactant specieID="AC"              />
+    <Product  specieID="E"               />
+
+    <forwardRate> 38461.5e-9 </forwardRate>
+    <reverseRate> 10e-3      </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 2)  E + ATP    <-> EATP      -->
+  <Reaction name = "E_ATP reac" id="E_ATPid">
+    <Reactant specieID="E"               />
+    <Reactant specieID="ATP"             />
+    <Product  specieID="EATP"            />
+
+    <forwardRate> 127600e-12 </forwardRate>
+    <reverseRate> 0.2612e-03 </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 3)  EATP       <-> E + CAMP  -->
+  <Reaction name = "EATP reac" id="EATPid">
+    <Reactant specieID="EATP"            />
+    <Product  specieID="E"               />
+    <Product  specieID="cAMP"            />
+
+    <forwardRate> 28.46e-03  </forwardRate>
+    <reverseRate> 259200e-12 </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 4)  2cAMP + PKArc <-> PKAr2cAMP2c2         ( B site binding ) -->
+  <!--
+      <forwardRate> 4.3478e-08 </forwardRate>
+      <reverseRate> 0.02e-03   </reverseRate>
+      <Q10>         0.2        </Q10>
+      In order to compensate for the cooperative
+      binding of the 2nd cAMP Kf (forwardRate) has
+      been multiplied by 2   (xpp->stochdif).
+  -->
+  <Reaction name = "cAMP B bind" id="cAMP_B_bind">
+    <Reactant specieID="PKArc"           />
+    <Reactant specieID="cAMP"       n="2"/>
+    <Product  specieID="PKAcamp1"        />
+
+    <forwardRate> 8.696e-08  </forwardRate>
+    <reverseRate> 0.02e-03   </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 5)  2cAMP + PKAr2cAMP2c2 <-> PKAr2cAMP4c2  ( A site binding ) -->
+  <Reaction name = "cAMP A bind" id="cAMP_A_bind">
+    <Reactant specieID="PKAcamp1"        />
+    <Reactant specieID="cAMP"       n="2"/>
+    <Product  specieID="PKAcamp2"        />
+
+    <forwardRate> 1.154e-07  </forwardRate>
+    <reverseRate> 0.2e-03    </reverseRate>
+    <Q10>         2          </Q10>
+  </Reaction>
+  <!-- 6)  PKAr2cAMP4c2 <-> PKAr2camp4 + 2PKAc -->
+  <Reaction name = "PKArc dissocation" id="PKAdissoc">
+    <Reactant specieID="PKAcamp2"        />
+    <Product  specieID="PKAr"            />
+    <Product  specieID="PKAc"       n="2"/>
+
+    <forwardRate> 0.016e-03  </forwardRate>
+    <reverseRate> 0.0017e-03 </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+  <!-- 7)  cAMP + PDE4B  <-> PDE4BcAMP -->
+  <Reaction name = "PDE4B enzyme1" id="PDE4Bbind">
+    <Reactant specieID="PDE4B"           />
+    <Reactant specieID="cAMP"            />
+    <Product  specieID="PDE4BcAMP"       />
+
+    <forwardRate> 0.03e-03   </forwardRate>
+    <reverseRate> 77.44e-03  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 8)  PDE4BcAMP -> AMP + PDE4B -->
+  <!-- <forwardRate> 19.36e-03  </forwardRate> -->
+  <Reaction name = "PDE4B actvcomp" id="PDE4Bcat">
+    <Reactant specieID="PDE4BcAMP"       />
+    <Product  specieID="PDE4B"           />
+    <Product  specieID="AMP"             />
+
+    <forwardRate> 19.36e-03  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+
+
+
+  <!-- 9)  PKAc + PDE4B -> PKAcPDE4B -->
+  <Reaction name = "PDE4B phosp1" id="phospPDE4B1">
+    <Reactant specieID="PKAc"            />
+    <Reactant specieID="PDE4B"           />
+    <Product  specieID="PKAcPDE4B"       />
+
+    <forwardRate> 3.500e-07  </forwardRate>
+    <reverseRate> 2.04e-04  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 10)  PKAcPDE4B -> PKAc + pPDE4B -->
+  <!-- <forwardRate> 5.56e-06   </forwardRate> -->
+  <Reaction name = "PDE4B phosp2" id="phospPDE4B2">
+    <Reactant specieID="PKAcPDE4B"       />
+    <Product  specieID="pPDE4B"          />
+    <Product  specieID="PKAc"            />
+
+    <forwardRate> 2.085e-04  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 11)  pPDE4B -> PDE4B -->
+  <!-- <forwardRate> 1.36e-07   </forwardRate> -->
+  <Reaction name = "PDE4B d_phosp" id="dphospPDE4B">
+    <Reactant specieID="pPDE4B"          />
+    <Product  specieID="PDE4B"           />
 
-        <forwardRate> 8.000e-06  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
+    <forwardRate> 8.000e-06  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
 
 
 
 
 
-    <!-- 9a)  PKAc + PDE4B -> PKAcPDE4B -->
-    <Reaction name = "PDE4B phosp1a" id="phospPDE4B1a">
-        <Reactant specieID="PKAc"            />
-        <Reactant specieID="PDE4BcAMP"       />
-        <Product  specieID="PKAcPDE4BcAMP"   />
-
-        <forwardRate> 3.500e-07  </forwardRate>
-        <reverseRate> 2.04e-04  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 10a)  PKAcPDE4B -> PKAc + pPDE4B -->
-    <!-- <forwardRate> 5.56e-06   </forwardRate> -->
-    <Reaction name = "PDE4B phosp2a" id="phospPDE4B2a">
-        <Reactant specieID="PKAcPDE4BcAMP"   />
-        <Product  specieID="pPDE4BcAMP"      />
-        <Product  specieID="PKAc"            />
-
-        <forwardRate> 2.085e-04  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 11a)  pPDE4BcAMP -> PDE4BcAMP -->
-    <!-- <forwardRate> 1.36e-07   </forwardRate> -->
-<!--
-    <Reaction name = "PDE4B d_phospa" id="dphospPDE4Ba">
-        <Reactant specieID="pPDE4BcAMP"      />
-        <Product  specieID="PDE4BcAMP"       />
+  <!-- 9a)  PKAc + PDE4B -> PKAcPDE4B -->
+  <Reaction name = "PDE4B phosp1a" id="phospPDE4B1a">
+    <Reactant specieID="PKAc"            />
+    <Reactant specieID="PDE4BcAMP"       />
+    <Product  specieID="PKAcPDE4BcAMP"   />
+
+    <forwardRate> 3.500e-07  </forwardRate>
+    <reverseRate> 2.04e-04  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 10a)  PKAcPDE4B -> PKAc + pPDE4B -->
+  <!-- <forwardRate> 5.56e-06   </forwardRate> -->
+  <Reaction name = "PDE4B phosp2a" id="phospPDE4B2a">
+    <Reactant specieID="PKAcPDE4BcAMP"   />
+    <Product  specieID="pPDE4BcAMP"      />
+    <Product  specieID="PKAc"            />
+
+    <forwardRate> 2.085e-04  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 11a)  pPDE4BcAMP -> PDE4BcAMP -->
+  <!-- <forwardRate> 1.36e-07   </forwardRate> -->
+  <!--
+      <Reaction name = "PDE4B d_phospa" id="dphospPDE4Ba">
+      <Reactant specieID="pPDE4BcAMP"      />
+      <Product  specieID="PDE4BcAMP"       />
 
-        <forwardRate> 8.000e-06   </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>-->
+<forwardRate> 8.000e-06   </forwardRate>
+<reverseRate> 0          </reverseRate>
+<Q10>         0.2        </Q10>
+</Reaction>-->
 
 
 
 
-    <!-- 12)  cAMP + pPDE4B  <-> pPDE4BcAMP -->
-    <Reaction name = "pPDE4B enzyme1" id="pPDE4Bbind">
-        <Reactant specieID="pPDE4B"           />
-        <Reactant specieID="cAMP"             />
-        <Product  specieID="pPDE4BcAMP"       />
+  <!-- 12)  cAMP + pPDE4B  <-> pPDE4BcAMP -->
+  <Reaction name = "pPDE4B enzyme1" id="pPDE4Bbind">
+    <Reactant specieID="pPDE4B"           />
+    <Reactant specieID="cAMP"             />
+    <Product  specieID="pPDE4BcAMP"       />
 
-        <forwardRate> 0.032400002e-03   </forwardRate>
-        <reverseRate> 77.44e-03         </reverseRate>
-        <Q10>         0.2               </Q10>
-    </Reaction>
-    <!-- 13)  pPDE4BcAMP -> AMP + pPDE4B -->
-    <!-- <forwardRate> 27.104e-03 </forwardRate> -->
+    <forwardRate> 0.032400002e-03   </forwardRate>
+    <reverseRate> 77.44e-03         </reverseRate>
+    <Q10>         0.2               </Q10>
+  </Reaction>
+  <!-- 13)  pPDE4BcAMP -> AMP + pPDE4B -->
+  <!-- <forwardRate> 27.104e-03 </forwardRate> -->
 
-    <Reaction name = "pPDE4B actvcomp" id="pPDE4Bcat">
-        <Reactant specieID="pPDE4BcAMP"       />
-        <Product  specieID="pPDE4B"           />
-        <Product  specieID="AMP"              />
-
-        <forwardRate> 27.104e-03 </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-
-
-
-
-
-    <!-- 14)  cAMP + PDE4D  <-> PDE4DcAMP -->
-    <Reaction name = "PDE4D enzyme1" id="PDE4Dbind">
-        <Reactant specieID="PDE4D"           />
-        <Reactant specieID="cAMP"            />
-        <Product  specieID="PDE4DcAMP"       />
+  <Reaction name = "pPDE4B actvcomp" id="pPDE4Bcat">
+    <Reactant specieID="pPDE4BcAMP"       />
+    <Product  specieID="pPDE4B"           />
+    <Product  specieID="AMP"              />
+
+    <forwardRate> 27.104e-03 </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+
+
+
+
+
+  <!-- 14)  cAMP + PDE4D  <-> PDE4DcAMP -->
+  <Reaction name = "PDE4D enzyme1" id="PDE4Dbind">
+    <Reactant specieID="PDE4D"           />
+    <Reactant specieID="cAMP"            />
+    <Product  specieID="PDE4DcAMP"       />
 
-        <forwardRate> 0.012e-03  </forwardRate>
-        <reverseRate> 58.82e-03  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 15)  PDE4DcAMP -> AMP + PDE4D -->
-    <!-- <forwardRate> 14.70e-03  </forwardRate> -->
-    <Reaction name = "PDE4D actvcomp" id="PDE4Dcat">
-        <Reactant specieID="PDE4DcAMP"       />
-        <Product  specieID="PDE4D"           />
-        <Product  specieID="AMP"             />
-
-        <forwardRate> 14.70e-03  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-
-
-
-
-    <!-- 16)  PKAc + PDE4D -> PKAcPDE4D -->
-    <Reaction name = "PDE4D phosp1" id="phospPDE4D1">
-        <Reactant specieID="PKAc"            />
-        <Reactant specieID="PDE4D"           />
-        <Product  specieID="PKAcPDE4D"       />
+    <forwardRate> 0.012e-03  </forwardRate>
+    <reverseRate> 58.82e-03  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 15)  PDE4DcAMP -> AMP + PDE4D -->
+  <!-- <forwardRate> 14.70e-03  </forwardRate> -->
+  <Reaction name = "PDE4D actvcomp" id="PDE4Dcat">
+    <Reactant specieID="PDE4DcAMP"       />
+    <Product  specieID="PDE4D"           />
+    <Product  specieID="AMP"             />
+
+    <forwardRate> 14.70e-03  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+
+
+
+
+  <!-- 16)  PKAc + PDE4D -> PKAcPDE4D -->
+  <Reaction name = "PDE4D phosp1" id="phospPDE4D1">
+    <Reactant specieID="PKAc"            />
+    <Reactant specieID="PDE4D"           />
+    <Product  specieID="PKAcPDE4D"       />
 
-        <forwardRate> 3.500e-07  </forwardRate>
-        <reverseRate> 2.04e-04  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 17)  PKAcPDE4D -> PKAc + pPDE4D -->
-    <!-- <forwardRate> 5.56e-06   </forwardRate> -->
-    <Reaction name = "PDE4D phosp2" id="phospPDE4D2">
-        <Reactant specieID="PKAcPDE4D"       />
-        <Product  specieID="pPDE4D"          />
-        <Product  specieID="PKAc"            />
-
-        <forwardRate> 2.085e-04  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 18)  pPDE4D -> PDE4D -->
-    <!-- <forwardRate> 1.36e-06  5.46e-06 </forwardRate> -->
-    <Reaction name = "PDE4D d_phosp" id="dphospPDE4D">
-        <Reactant specieID="pPDE4D"          />
-        <Product  specieID="PDE4D"           />
-
-        <forwardRate> 8.000e-06  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-
-
-
-
-
-
-    <!-- 16a)  PKAc + PDE4D -> PKAcPDE4D -->
-    <Reaction name = "PDE4D phosp1a" id="phospPDE4D1a">
-        <Reactant specieID="PKAc"            />
-        <Reactant specieID="PDE4DcAMP"       />
-        <Product  specieID="PKAcPDE4DcAMP"   />
-
-        <forwardRate> 3.500e-07  </forwardRate>
-        <reverseRate> 2.04e-04  </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 17a)  PKAcPDE4D -> PKAc + pPDE4D -->
-    <!-- <forwardRate> 5.56e-06   </forwardRate> -->
-    <Reaction name = "PDE4D phosp2a" id="phospPDE4D2a">
-        <Reactant specieID="PKAcPDE4DcAMP"   />
-        <Product  specieID="pPDE4DcAMP"      />
-        <Product  specieID="PKAc"            />
-
-        <forwardRate> 2.085e-04  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- 18a)  pPDE4DcAMP -> PDE4DcAMP -->
-    <!-- <forwardRate> 1.36e-06  5.46e-06 </forwardRate> -->
-<!--
-    <Reaction name = "PDE4D d_phospa" id="dphospPDE4Da">
-        <Reactant specieID="pPDE4DcAMP"          />
-        <Product  specieID="PDE4DcAMP"           />
-
-        <forwardRate> 8.000e-06   </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
--->
-
-
-
-
-    <!-- 19)  cAMP + pPDE4D  <-> pPDE4DcAMP -->
-    <!-- <forwardRate> 0.96e-03   </forwardRate> -->
-    <Reaction name = "pPDE4D enzyme1" id="pPDE4Dbind">
-        <Reactant specieID="pPDE4D"           />
-        <Reactant specieID="cAMP"             />
-        <Product  specieID="pPDE4DcAMP"       />
-
-        <forwardRate> 0.02471167e-03  </forwardRate>
-        <reverseRate> 58.82e-03       </reverseRate>
-        <Q10>         0.2             </Q10>
-    </Reaction>
-    <!-- 20)  pPDE4DcAMP -> AMP + pPDE4D -->
-    <!-- <forwardRate> 92.58e-03  </forwardRate> -->
-    <Reaction name = "pPDE4D actvcomp" id="pPDE4Dcat">
-        <Reactant specieID="pPDE4DcAMP"       />
-        <Product  specieID="pPDE4D"           />
-        <Product  specieID="AMP"              />
-
-        <forwardRate> 92.58e-03  </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-
-
-
-
-
-    <!-- 21)  AMP -> ATP -->
-    <!-- <forwardRate> 10.846e-05  </forwardRate> -->
-    <Reaction name = "AMP reac" id="AMP_id">
-        <Reactant specieID="AMP"             />
-        <Product  specieID="ATP"             />
-
-        <forwardRate> 10.846e-05 </forwardRate>
-        <reverseRate> 0          </reverseRate>
-        <Q10>         0.2        </Q10>
-    </Reaction>
-    <!-- The original value used for this reaction was:
-    kf: 2. 78e-09, kb: 3.41e-05 based on xpp simulations:
-    kf: 2. 78e-06, kb; 0.0347
-    Changed to better fit the temporal shape of the
-    experimental traces: kf=12.5e-07,kb=0.0103833
-    Both (Kf and Kb) have been divided by a
-    1000 to convert from sec to msec (xpp->stochdif):
-    kf: 12.2083e-10
-    kb: 2.16875e-05
-    -->
-    <!-- 22)  EPAc + cAMP -> EPAccAMP -->
-    <Reaction name = "EPAccAMP reac" id="EPAccAMP_id">
-        <Reactant specieID="EPAc"            />
-        <Reactant specieID="cAMP"            />
-        <Product  specieID="EPAccAMP"        />
-
-        <forwardRate> 12.2083e-10  </forwardRate>
-        <reverseRate> 2.16875e-05  </reverseRate>
-        <Q10>         0.2          </Q10>
-    </Reaction>
+    <forwardRate> 3.500e-07  </forwardRate>
+    <reverseRate> 2.04e-04  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 17)  PKAcPDE4D -> PKAc + pPDE4D -->
+  <!-- <forwardRate> 5.56e-06   </forwardRate> -->
+  <Reaction name = "PDE4D phosp2" id="phospPDE4D2">
+    <Reactant specieID="PKAcPDE4D"       />
+    <Product  specieID="pPDE4D"          />
+    <Product  specieID="PKAc"            />
+
+    <forwardRate> 2.085e-04  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 18)  pPDE4D -> PDE4D -->
+  <!-- <forwardRate> 1.36e-06  5.46e-06 </forwardRate> -->
+  <Reaction name = "PDE4D d_phosp" id="dphospPDE4D">
+    <Reactant specieID="pPDE4D"          />
+    <Product  specieID="PDE4D"           />
+
+    <forwardRate> 8.000e-06  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+
+
+
+
+
+
+  <!-- 16a)  PKAc + PDE4D -> PKAcPDE4D -->
+  <Reaction name = "PDE4D phosp1a" id="phospPDE4D1a">
+    <Reactant specieID="PKAc"            />
+    <Reactant specieID="PDE4DcAMP"       />
+    <Product  specieID="PKAcPDE4DcAMP"   />
+
+    <forwardRate> 3.500e-07  </forwardRate>
+    <reverseRate> 2.04e-04  </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 17a)  PKAcPDE4D -> PKAc + pPDE4D -->
+  <!-- <forwardRate> 5.56e-06   </forwardRate> -->
+  <Reaction name = "PDE4D phosp2a" id="phospPDE4D2a">
+    <Reactant specieID="PKAcPDE4DcAMP"   />
+    <Product  specieID="pPDE4DcAMP"      />
+    <Product  specieID="PKAc"            />
+
+    <forwardRate> 2.085e-04  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- 18a)  pPDE4DcAMP -> PDE4DcAMP -->
+  <!-- <forwardRate> 1.36e-06  5.46e-06 </forwardRate> -->
+  <!--
+      <Reaction name = "PDE4D d_phospa" id="dphospPDE4Da">
+      <Reactant specieID="pPDE4DcAMP"          />
+      <Product  specieID="PDE4DcAMP"           />
+
+<forwardRate> 8.000e-06   </forwardRate>
+<reverseRate> 0          </reverseRate>
+<Q10>         0.2        </Q10>
+</Reaction>
+  -->
+
+
+
+
+  <!-- 19)  cAMP + pPDE4D  <-> pPDE4DcAMP -->
+  <!-- <forwardRate> 0.96e-03   </forwardRate> -->
+  <Reaction name = "pPDE4D enzyme1" id="pPDE4Dbind">
+    <Reactant specieID="pPDE4D"           />
+    <Reactant specieID="cAMP"             />
+    <Product  specieID="pPDE4DcAMP"       />
+
+    <forwardRate> 0.02471167e-03  </forwardRate>
+    <reverseRate> 58.82e-03       </reverseRate>
+    <Q10>         0.2             </Q10>
+  </Reaction>
+  <!-- 20)  pPDE4DcAMP -> AMP + pPDE4D -->
+  <!-- <forwardRate> 92.58e-03  </forwardRate> -->
+  <Reaction name = "pPDE4D actvcomp" id="pPDE4Dcat">
+    <Reactant specieID="pPDE4DcAMP"       />
+    <Product  specieID="pPDE4D"           />
+    <Product  specieID="AMP"              />
+
+    <forwardRate> 92.58e-03  </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+
+
+
+
+
+  <!-- 21)  AMP -> ATP -->
+  <!-- <forwardRate> 10.846e-05  </forwardRate> -->
+  <Reaction name = "AMP reac" id="AMP_id">
+    <Reactant specieID="AMP"             />
+    <Product  specieID="ATP"             />
+
+    <forwardRate> 10.846e-05 </forwardRate>
+    <reverseRate> 0          </reverseRate>
+    <Q10>         0.2        </Q10>
+  </Reaction>
+  <!-- The original value used for this reaction was:
+       kf: 2. 78e-09, kb: 3.41e-05 based on xpp simulations:
+       kf: 2. 78e-06, kb; 0.0347
+       Changed to better fit the temporal shape of the
+       experimental traces: kf=12.5e-07,kb=0.0103833
+       Both (Kf and Kb) have been divided by a
+       1000 to convert from sec to msec (xpp->stochdif):
+       kf: 12.2083e-10
+       kb: 2.16875e-05
+  -->
+  <!-- 22)  EPAc + cAMP -> EPAccAMP -->
+  <Reaction name = "EPAccAMP reac" id="EPAccAMP_id">
+    <Reactant specieID="EPAc"            />
+    <Reactant specieID="cAMP"            />
+    <Product  specieID="EPAccAMP"        />
+
+    <forwardRate> 12.2083e-10  </forwardRate>
+    <reverseRate> 2.16875e-05  </reverseRate>
+    <Q10>         0.2          </Q10>
+  </Reaction>
 </ReactionScheme>

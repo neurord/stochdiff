@@ -1,4 +1,4 @@
 
 <DeclarationReading>
-    <Instantiable class="Shape"/>
+  <Instantiable class="Shape"/>
 </DeclarationReading>

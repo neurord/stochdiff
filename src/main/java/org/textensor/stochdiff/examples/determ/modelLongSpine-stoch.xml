@@ -1,61 +1,61 @@
 
 <SDRun>
-    <!-- this file defines a single run of the calculation, using morphology and
-	 reaction data brought in from other files -->
+  <!-- this file defines a single run of the calculation, using morphology and
+	   reaction data brought in from other files -->
 
-    <reactionSchemeFile>reactions1</reactionSchemeFile>
-    <morphologyFile>morphLongSpine</morphologyFile>
-    <stimulationFile>stimSpine</stimulationFile>
-    <initialConditionsFile>icSpine</initialConditionsFile>
-    <outputSchemeFile>io1</outputSchemeFile>
+  <reactionSchemeFile>reactions1</reactionSchemeFile>
+  <morphologyFile>morphLongSpine</morphologyFile>
+  <stimulationFile>stimSpine</stimulationFile>
+  <initialConditionsFile>icSpine</initialConditionsFile>
+  <outputSchemeFile>io1</outputSchemeFile>
 
-    <!--2D means the morphology is interpreted like a flatworm, 3D for
-roundworms. The 2D case is good for testing as it is easy to visualize the
-results (also, 3D may not work yet...)  -->
-    <geometry>2D</geometry>
-    <depth2D>           0.5          </depth2D>
-    <distribution>      BINOMIAL     </distribution>
-    <algorithm>         INDEPENDENT  </algorithm>
-    <simulationSeed>    971263          </simulationSeed>
-    <outputQuantity>NUMBER</outputQuantity>
-
-
-    <!-- run time for the calculation, milliseconds -->
-    <runtime>20</runtime>
-
-    <!-- set the seed to get the same spines each time testing -->
-    <spineSeed>123</spineSeed>
-
- <discretization>
-        <!-- default largest size for elements in bulk volumes (dendrites), microns -->
-        <defaultMaxElementSide> 2.0  </defaultMaxElementSide>
-
-        <!-- discretization for spines, microns -->
-        <spineDeltaX>           0.2  </spineDeltaX>
-
-        <!-- override the default for a particular region. -->
-        <!-- Matches against id or regionClass in the morphology file -->
-        <!-- <MaxElementSide region="pipette">2.0</MaxElementSide> -->
-    </discretization>
+  <!--2D means the morphology is interpreted like a flatworm, 3D for
+      roundworms. The 2D case is good for testing as it is easy to visualize the
+      results (also, 3D may not work yet...)  -->
+  <geometry>2D</geometry>
+  <depth2D>           0.5          </depth2D>
+  <distribution>      BINOMIAL     </distribution>
+  <algorithm>         INDEPENDENT  </algorithm>
+  <simulationSeed>    971263          </simulationSeed>
+  <outputQuantity>NUMBER</outputQuantity>
 
 
+  <!-- run time for the calculation, milliseconds -->
+  <runtime>20</runtime>
+
+  <!-- set the seed to get the same spines each time testing -->
+  <spineSeed>123</spineSeed>
+
+  <discretization>
+    <!-- default largest size for elements in bulk volumes (dendrites), microns -->
+    <defaultMaxElementSide> 2.0  </defaultMaxElementSide>
+
+    <!-- discretization for spines, microns -->
+    <spineDeltaX>           0.2  </spineDeltaX>
+
+    <!-- override the default for a particular region. -->
+    <!-- Matches against id or regionClass in the morphology file -->
+    <!-- <MaxElementSide region="pipette">2.0</MaxElementSide> -->
+  </discretization>
 
 
-    <!-- timestep used in fixed step calculations, in milliseconds -->
-    <fixedStepDt>0.001</fixedStepDt>
-
-    <!-- interval at which stuff should be saved to the output file(s) -->
-	<outputInterval>1.0</outputInterval>
-
-	<outputRegions>all</outputRegions>
-	<outputSpecies>all</outputSpecies>
-
-    <!-- the tolerace is not used yet -->
-    <tolerance>0.001</tolerance>
 
 
-    <!-- calculation types include GRID_STEPPED_STOCHASTIC and GRID_STEPPED_CONTINUOUS for
-	 reaction-diffusion systems. Single mixed pool calculations should be listed here too (TODO) -->
-    <calculation>GRID_STEPPED_STOCHASTIC</calculation>
+  <!-- timestep used in fixed step calculations, in milliseconds -->
+  <fixedStepDt>0.001</fixedStepDt>
+
+  <!-- interval at which stuff should be saved to the output file(s) -->
+  <outputInterval>1.0</outputInterval>
+
+  <outputRegions>all</outputRegions>
+  <outputSpecies>all</outputSpecies>
+
+  <!-- the tolerace is not used yet -->
+  <tolerance>0.001</tolerance>
+
+
+  <!-- calculation types include GRID_STEPPED_STOCHASTIC and GRID_STEPPED_CONTINUOUS for
+	   reaction-diffusion systems. Single mixed pool calculations should be listed here too (TODO) -->
+  <calculation>GRID_STEPPED_STOCHASTIC</calculation>
 
 </SDRun>

@@ -1,52 +1,52 @@
 <Morphology>
 
 
-    <!-- spine morphologies: width for sections along the spine -->
+  <!-- spine morphologies: width for sections along the spine -->
 
-    <SpineType id="spineA">
+  <SpineType id="spineA">
 	<Section width="0.2" at="0.0"/>
 	<Section width="0.2" at="0.6" regionClass="neck"/>
 	<Section width="0.4" at="1.0"/>
 	<Section width="0.4" at="1.2" regionClass="SH1"/>
 	<Section width="0.1" at="1.3" regionClass="SH1"/>
-    </SpineType>
+  </SpineType>
 
-    <!-- regionClass labels can apply to sections or segments and label regions for applying initial conditaions etc -->
+  <!-- regionClass labels can apply to sections or segments and label regions for applying initial conditaions etc -->
 
 
-    <!-- cylindrical spine -->
-    <SpineType id="spineB">
+  <!-- cylindrical spine -->
+  <SpineType id="spineB">
 	<Section width="0.2" at="0.0"/>
 	<Section width="0.3" at="0.7"/>
 	<Section width="0.1" at="0.9"/>
-    </SpineType>
+  </SpineType>
 
 
-    <!-- lengthDensity means you set the number per micron along the segment -->
-    <SpineAllocation spineType="spineA" region="region1" lengthDensity="0.01"/>
-    
-    <!-- areaDensity is the number per unit area -->   
-    <!--SpineAllocation spineType="spineB" region="region1" areaDensity="0.01"/-->
+  <!-- lengthDensity means you set the number per micron along the segment -->
+  <SpineAllocation spineType="spineA" region="region1" lengthDensity="0.01"/>
+  
+  <!-- areaDensity is the number per unit area -->   
+  <!--SpineAllocation spineType="spineB" region="region1" areaDensity="0.01"/-->
 
-    <Segment id="seg1">
+  <Segment id="seg1">
 	<start x="1.0" y="1.0" z="0.0" r="1.0" label="pointA"/>
 	<end x="5.0" y="1.0" z="0.0" r="1.0"/>
-    </Segment>
+  </Segment>
 
 
-    <Segment id="seg2" region="region1">
+  <Segment id="seg2" region="region1">
 	<start  on="seg1" at="end"/>
 	<end x="10" y="1" z = "0" r="1.0"/>
-    </Segment>
+  </Segment>
 
 
-    <!--The following shows how you can get a branch into a minor dendrite spliting off from the main trunk -->
-	 <!--
-    <Segment id="seg3" region="region1">
-	<start on="seg2" atFraction="0.5" r="0.5"/>
-	<end x="7." y = "12." z = "0" r = "0.3"/>
-    </Segment>
-	      -->
-    
+  <!--The following shows how you can get a branch into a minor dendrite spliting off from the main trunk -->
+  <!--
+      <Segment id="seg3" region="region1">
+	  <start on="seg2" atFraction="0.5" r="0.5"/>
+	  <end x="7." y = "12." z = "0" r = "0.3"/>
+      </Segment>
+  -->
+  
 </Morphology>
 

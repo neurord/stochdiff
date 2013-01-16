@@ -1,24 +1,24 @@
 <InitialConditions>
 
-    <!-- these apply to everything unless overridden -->
+  <!-- these apply to everything unless overridden -->
 
-<ConcentrationSet>
-<NanoMolarity specieID="cAMP" value="60"/>
-</ConcentrationSet>	
-
-
- <ConcentrationSet region="head">
-
-<NanoMolarity specieID="cAMP" value="1000"/>
-
-</ConcentrationSet>
+  <ConcentrationSet>
+    <NanoMolarity specieID="cAMP" value="60"/>
+  </ConcentrationSet>	
 
 
-<!--
- <SurfaceDensitySet region="dendrite">
+  <ConcentrationSet region="head">
 
- </SurfaceDensitySet>
--->
+    <NanoMolarity specieID="cAMP" value="1000"/>
+
+  </ConcentrationSet>
+
+
+  <!--
+      <SurfaceDensitySet region="dendrite">
+
+</SurfaceDensitySet>
+  -->
 
 </InitialConditions>
 

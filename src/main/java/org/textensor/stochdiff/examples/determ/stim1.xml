@@ -1,19 +1,19 @@
 <StimulationSet>
 
-    <!-- the injectionSite must match a regionLabel deefined in the morphology -->
-    <InjectionStim specieID="a" injectionSite="pointA">
+  <!-- the injectionSite must match a regionLabel deefined in the morphology -->
+  <InjectionStim specieID="a" injectionSite="pointA">
 	<onset>1.0</onset>
 	<duration>10.0</duration>
 	<rate>20</rate>
-    </InjectionStim>
-    <!-- onset and duration are times measured in milliseconds. The rate is in numbers of particles 
-	 per millisecond -->
+  </InjectionStim>
+  <!-- onset and duration are times measured in milliseconds. The rate is in numbers of particles 
+	   per millisecond -->
 
-    <InjectionStim specieID="d" injectionSite="pointA">
+  <InjectionStim specieID="d" injectionSite="pointA">
 	<onset>1.0</onset>
 	<duration>10.0</duration>
 	<rate>20</rate>
-    </InjectionStim>
+  </InjectionStim>
 
 
 

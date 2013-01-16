@@ -1,17 +1,17 @@
 <StimulationSet>
 
-    <!-- the injectionSite must match a regionLabel deefined in the morphology -->
-    <InjectionStim specieID="GaGTP" injectionSite="pointA">
-        <onset>       100000         </onset>
-        <duration>    5000           </duration>
-        <rate>        20             </rate> <!-- 50 -->
+  <!-- the injectionSite must match a regionLabel deefined in the morphology -->
+  <InjectionStim specieID="GaGTP" injectionSite="pointA">
+    <onset>       100000         </onset>
+    <duration>    5000           </duration>
+    <rate>        20             </rate> <!-- 50 -->
     <!-- TotNumPart = (Totvol/ncomp)*AvgN*<conc_in_comp>  -->
     <!-- TotNumPart = (1.1e13/220)*6.022e14*1000          -->
     <!-- TotNumPart = 301.1       (0.0003346)             -->
     <!-- Attention: we don't wnat to inject 1uM (or 1000nM).
          We want to maintain the concentration around 1000nM
          during stimulation -->
-    </InjectionStim>
-    <!-- onset and duration are times measured in milliseconds. The rate is in
-    numbers of particles per millisecond -->
+  </InjectionStim>
+  <!-- onset and duration are times measured in milliseconds. The rate is in
+       numbers of particles per millisecond -->
 </StimulationSet>

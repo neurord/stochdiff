@@ -1,17 +1,17 @@
 <ReactionScheme>
-    
-    <!-- you can specify the units of the diffusion constant. If they are not 
-	 specified they are assumed to be micron^2/second, (microns written "mu" here)
-	 it should understand microns, mm, and m for distances and seconds and ms for times --> 
-    
-    <!-- This code is implemented CaMKII_bimols Rxns -0.44, 0.28, 0.088
-         Fix 3 products 2rxns break down to 2nd order rxn : LRG/Ip35P1P2 -->
-    <!-- last rxn of Ip35p1p2 was wrong reactant:fixed on Aug,8th,2008
-         Chosen katp=1 sec(not 10 sec) is enough   -->
+  
+  <!-- you can specify the units of the diffusion constant. If they are not 
+	   specified they are assumed to be micron^2/second, (microns written "mu" here)
+	   it should understand microns, mm, and m for distances and seconds and ms for times --> 
+  
+  <!-- This code is implemented CaMKII_bimols Rxns -0.44, 0.28, 0.088
+       Fix 3 products 2rxns break down to 2nd order rxn : LRG/Ip35P1P2 -->
+  <!-- last rxn of Ip35p1p2 was wrong reactant:fixed on Aug,8th,2008
+       Chosen katp=1 sec(not 10 sec) is enough   -->
 
-<Specie name="cAMP" id="cAMP" kdiff="300" kdiffunit = "mu2/s"/>
+  <Specie name="cAMP" id="cAMP" kdiff="300" kdiffunit = "mu2/s"/>
 
 
 
 </ReactionScheme>
- 
+
