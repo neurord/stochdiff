@@ -49,12 +49,14 @@ public abstract class BaseCalc {
         POISSON,
     }
 
-    public static final int INDEPENDENT = 0;
-    public static final int SHARED = 1;
-    public static final int PARTICLE = 2;
+    public enum algorithm_t {
+        INDEPENDENT,
+        SHARED,
+        PARTICLE,
+    }
 
     distribution_t distID = distribution_t.BINOMIAL;
-    protected int algoID = INDEPENDENT;
+    protected algorithm_t algoID = algorithm_t.INDEPENDENT;
 
     public boolean writeConcentration = false;
 
@@ -337,15 +339,15 @@ public abstract class BaseCalc {
     }
 
     public final boolean doIndependent() {
-        return (algoID == INDEPENDENT);
+        return (algoID == algorithm_t.INDEPENDENT);
     }
 
     public final boolean doShared() {
-        return (algoID == SHARED);
+        return (algoID == algorithm_t.SHARED);
     }
 
     public final boolean doParticle() {
-        return (algoID == PARTICLE);
+        return (algoID == algorithm_t.PARTICLE);
     }
 
     public double[] getNanoMolarConcentrations() {

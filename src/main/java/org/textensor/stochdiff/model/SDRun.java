@@ -5,6 +5,7 @@ package org.textensor.stochdiff.model;
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
 
 public class SDRun {
 
@@ -64,7 +65,7 @@ public class SDRun {
     public String algorithm;
 
     private distribution_t distributionID;
-    private int algorithmID;
+    private algorithm_t algorithmID;
 
 
     public ReactionScheme reactionScheme;
@@ -102,11 +103,11 @@ public class SDRun {
 
         if (algorithm != null && algorithm.length() > 0) {
             if (algorithm.toLowerCase().equals("independent")) {
-                algorithmID = BaseCalc.INDEPENDENT;
+                algorithmID = algorithm_t.INDEPENDENT;
             } else if (algorithm.toLowerCase().equals("shared")) {
-                algorithmID = BaseCalc.SHARED;
+                algorithmID = algorithm_t.SHARED;
             } else if (algorithm.toLowerCase().equals("particle")) {
-                algorithmID = BaseCalc.PARTICLE;
+                algorithmID = algorithm_t.PARTICLE;
 
             } else {
                 E.shortWarning("Unrecognized algorithm (" + algorithm
@@ -121,7 +122,7 @@ public class SDRun {
         return distributionID;
     }
 
-    public int getAlgorithmID() {
+    public algorithm_t getAlgorithmID() {
         return algorithmID;
     }
 

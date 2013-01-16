@@ -618,18 +618,25 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                     if (np0 > 0) {
 
-                        if (algoID == INDEPENDENT) {
+                        switch(algoID) {
+                        case INDEPENDENT:
                             // WK 8 28 2007
                             // parallelDiffusionStep(iel, k);
                             parallelAndSharedDiffusionStep(iel, k);
                             // WK
-                        } else if (algoID == SHARED) {
+                            break;
+                        case SHARED:
                             // WK 9 11 2007
                             // sharedDiffusionStep(iel, k);
                             parallelAndSharedDiffusionStep(iel, k);
                             // WK
-                        } else if (algoID == PARTICLE) {
+                            break;
+                        case PARTICLE:
                             particleDiffusionStep(iel, k);
+                            break;
+
+                        default:
+                            assert false;
                         }
                     }
                 }
