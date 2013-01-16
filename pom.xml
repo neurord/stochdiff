@@ -78,7 +78,7 @@
       <artifactId>j3d-vectmath</artifactId>
       <version>1.5.2</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/ext/vecmath.jar</systemPath>
+      <systemPath>${j3ddir}/vecmath.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -86,7 +86,7 @@
       <artifactId>j3d-core</artifactId>
       <version>1.5.2</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/ext/j3dcore.jar</systemPath>
+      <systemPath>${j3ddir}/j3dcore.jar</systemPath>
     </dependency>
 
     <dependency>
@@ -94,7 +94,7 @@
       <artifactId>j3d-core-utils</artifactId>
       <version>1.5.2</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/ext/j3dutils.jar</systemPath>
+      <systemPath>${j3ddir}/j3dutils.jar</systemPath>
     </dependency>
 
     <dependency>
