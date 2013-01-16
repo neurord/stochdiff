@@ -1,0 +1,5 @@
+((nil . ((indent-tabs-mode . nil)
+         (tab-width . 4)
+         (fill-column . 100)))
+ (java-mode . ((c-basic-offset . 4)))
+)
