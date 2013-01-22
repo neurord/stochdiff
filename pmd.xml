@@ -1,0 +1,1751 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.3" timestamp="2013-01-22T16:28:05.382">
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/act/Classdef.java">
+<violation beginline="108" endline="110" begincolumn="34" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="Classdef" method="addStringImport" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="125" endline="128" begincolumn="51" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="Classdef" method="makeJavaImports" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="285" endline="289" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="Classdef" method="writeSystemSource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="290" endline="293" begincolumn="58" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="Classdef" method="writeSystemSource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/act/MethodSignature.java">
+<violation beginline="171" endline="173" begincolumn="48" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="MethodSignature" method="toJavaSource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/be/Position.java">
+<violation beginline="67" endline="69" begincolumn="20" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.be" class="Position" method="reportInValid" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/datalish/Box.java">
+<violation beginline="285" endline="288" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.datalish" class="Box" method="differentFrom" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="301" endline="303" begincolumn="18" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.datalish" class="Box" method="rangesDiffer" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/datalish/SpriteData.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="36" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.datalish" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/datalish/SpritePart.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="36" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.datalish" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/AxisPainter.java">
+<violation beginline="110" endline="113" begincolumn="25" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="AxisPainter" method="drawXAxis" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="168" endline="171" begincolumn="25" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="AxisPainter" method="drawYAxis" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/BatchImageMaker.java">
+<violation beginline="65" endline="67" begincolumn="39" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="BatchImageMaker" method="makeFigure" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="87" endline="89" begincolumn="43" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="BatchImageMaker" method="makeFigure" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="113" endline="115" begincolumn="39" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="BatchImageMaker" method="makeMovie" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="131" endline="134" begincolumn="43" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="BatchImageMaker" method="makeMovie" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/DataPlotPainter.java">
+<violation beginline="73" endline="74" begincolumn="47" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="DataPlotPainter" method="showFrame" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/DataviewController.java">
+<violation beginline="177" endline="181" begincolumn="91" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview" class="DataviewController" method="setDisplays" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/Plot.java">
+<violation beginline="12" endline="12" begincolumn="1" endcolumn="29" rule="UnusedImports" ruleset="Import Statement Rules" package="org.catacomb.dataview" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.catacomb.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/Plotter.java">
+<violation beginline="29" endline="29" begincolumn="50" endcolumn="64" rule="AvoidThreadGroup" ruleset="Basic Rules" package="org.catacomb.dataview" class="Plotter" method="showThreads" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#AvoidThreadGroup" priority="3">
+Avoid using java.lang.ThreadGroup; it is not thread safe
+</violation>
+<violation beginline="55" endline="55" begincolumn="36" endcolumn="46" rule="AvoidThreadGroup" ruleset="Basic Rules" package="org.catacomb.dataview" class="Plotter" method="visit" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#AvoidThreadGroup" priority="3">
+Avoid using java.lang.ThreadGroup; it is not thread safe
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/StringPlotElement.java">
+<violation beginline="22" endline="24" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.dataview" class="StringPlotElement" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'c'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/build/Line.java">
+<violation beginline="57" endline="59" begincolumn="38" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview.build" class="Line" method="getData" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/formats/Mesh2plusTimeDisplay.java">
+<violation beginline="269" endline="274" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.dataview.formats" class="Mesh2plusTimeDisplay" method="getLimitBox" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/formats/MeshDataReader.java">
+<violation beginline="55" endline="58" begincolumn="48" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview.formats" class="MeshDataReader" method="read" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/gui/BasicPlotController.java">
+<violation beginline="7" endline="7" begincolumn="1" endcolumn="29" rule="UnusedImports" ruleset="Import Statement Rules" package="org.catacomb.dataview.gui" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.catacomb.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/gui/DViewController.java">
+<violation beginline="196" endline="198" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.dataview.gui" class="DViewController" method="makeImages" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/gui/FramePlayer.java">
+<violation beginline="42" endline="44" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.dataview.gui" class="FramePlayer" method="run" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/model/Plottable.java">
+<violation beginline="44" endline="47" begincolumn="30" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.dataview.model" class="Plottable" method="getScaleFactors" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/dataview/read/FileImportContext.java">
+<violation beginline="5" endline="5" begincolumn="1" endcolumn="43" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.dataview.read" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/BorderPanel.java">
+<violation beginline="58" endline="61" begincolumn="40" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="BorderPanel" method="populatePanel" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/EditorWindow.java">
+<violation beginline="55" endline="57" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="EditorWindow" method="add" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/InfoPanel.java">
+<violation beginline="48" endline="50" begincolumn="66" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="InfoPanel" method="populatePanel" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/LabelledTextField.java">
+<violation beginline="79" endline="81" begincolumn="30" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="LabelledTextField" method="populatePanel" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/Panel.java">
+<violation beginline="131" endline="176" begincolumn="19" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.blocks" class="Panel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'ctx'.
+</violation>
+<violation beginline="159" endline="161" begincolumn="47" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="Panel" method="applyBorder" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="167" endline="169" begincolumn="33" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="Panel" method="applyBorder" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/blocks/TreePanel.java">
+<violation beginline="69" endline="72" begincolumn="48" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.blocks" class="TreePanel" method="populatePanel" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/build/ContingencyGroup.java">
+<violation beginline="13" endline="15" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.build" class="ContingencyGroup" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/build/Druid.java">
+<violation beginline="76" endline="78" begincolumn="77" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.build" class="Druid" method="buildGUI" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="82" endline="85" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.build" class="Druid" method="buildGUI" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/build/DruidTargetStore.java">
+<violation beginline="90" endline="93" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.build" class="DruidTargetStore" method="get" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/build/InfoAggregator.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="43" rule="UnusedImports" ruleset="Import Statement Rules" package="org.catacomb.druid.build" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.catacomb.druid.dialog.Dialoguer'
+</violation>
+<violation beginline="60" endline="60" begincolumn="18" endcolumn="28" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.catacomb.druid.build" class="InfoAggregator" method="checkNbuf" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'checkNbuf()'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruActionRelay.java">
+<violation beginline="52" endline="52" begincolumn="28" endcolumn="41" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruActionRelay" method="actionB" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+<violation beginline="78" endline="78" begincolumn="23" endcolumn="39" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruActionRelay" method="getBoolean" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+<violation beginline="81" endline="81" begincolumn="23" endcolumn="40" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruActionRelay" method="getBoolean" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+<violation beginline="124" endline="126" begincolumn="37" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruActionRelay" method="invokeMethod" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruAssemblyPanel.java">
+<violation beginline="29" endline="33" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.gui.base" class="DruAssemblyPanel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'bsName'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruButtonGroup.java">
+<violation beginline="16" endline="18" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.gui.base" class="DruButtonGroup" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruCollapsiblePanel.java">
+<violation beginline="27" endline="29" begincolumn="24" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruCollapsiblePanel" method="collapse" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="39" endline="41" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruCollapsiblePanel" method="expand" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruImageLabelPanel.java">
+<violation beginline="39" endline="41" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruImageLabelPanel" method="postApply" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruInfoPanel.java">
+<violation beginline="145" endline="148" begincolumn="66" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruInfoPanel" method="showInfo" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruKitPanel.java">
+<violation beginline="48" endline="50" begincolumn="40" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruKitPanel" method="setRealizationContext" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruLabelPanel.java">
+<violation beginline="57" endline="59" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruLabelPanel" method="postApply" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruPseudoCardPanel.java">
+<violation beginline="84" endline="87" begincolumn="37" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.base" class="DruPseudoCardPanel" method="showCard" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/base/DruTabbedPanel.java">
+<violation beginline="36" endline="38" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.gui.base" class="DruTabbedPanel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruExpandingTextArea.java">
+<violation beginline="112" endline="114" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruExpandingTextArea" method="valueChangedBy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruLabelledTextField.java">
+<violation beginline="91" endline="93" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruLabelledTextField" method="valueChangedBy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="113" endline="115" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruLabelledTextField" method="usedBy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruListPanel.java">
+<violation beginline="249" endline="250" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruListPanel" method="syncFromKeyedList" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruLogPanel.java">
+<violation beginline="36" endline="68" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.gui.edit" class="DruLogPanel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'h'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruRadioButtons.java">
+<violation beginline="23" endline="35" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.gui.edit" class="DruRadioButtons" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'lab'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruTextArea.java">
+<violation beginline="43" endline="45" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruTextArea" method="valueChangedBy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruTextField.java">
+<violation beginline="52" endline="54" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruTextField" method="valueChangedBy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruTreePanel.java">
+<violation beginline="148" endline="150" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="DruTreePanel" method="selectionAction" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/Effect.java">
+<violation beginline="48" endline="50" begincolumn="58" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.gui.edit" class="Effect" method="getTarget" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/load/DruidContentLoader.java">
+<violation beginline="6" endline="6" begincolumn="8" endcolumn="47" rule="DuplicateImports" ruleset="Import Statement Rules" package="org.catacomb.druid.load" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#DuplicateImports" priority="4">
+Avoid duplicate imports such as 'org.catacomb.interlish.structure.Factory'
+</violation>
+<violation beginline="103" endline="105" begincolumn="44" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="DruidContentLoader" method="getResource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="219" endline="221" begincolumn="28" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="DruidContentLoader" method="getSource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="226" endline="228" begincolumn="24" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="DruidContentLoader" method="getSource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/load/RoleMap.java">
+<violation beginline="51" endline="53" begincolumn="19" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="RoleMap" method="hasRole" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/load/Settings.java">
+<violation beginline="22" endline="24" begincolumn="29" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="Settings" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="29" endline="31" begincolumn="28" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.load" class="Settings" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/manifest/DecManifest.java">
+<violation beginline="158" endline="160" begincolumn="20" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.manifest" class="DecManifest" method="addResource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="158" endline="158" begincolumn="13" endcolumn="17" rule="UnconditionalIfStatement" ruleset="Basic Rules" package="org.catacomb.druid.manifest" class="DecManifest" method="addResource" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnconditionalIfStatement" priority="3">
+Do not use if statements that are always true or always false
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/market/ProducerConsumerBoard.java">
+<violation beginline="107" endline="111" begincolumn="54" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.market" class="ProducerConsumerBoard" method="addConsumer" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="197" endline="206" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.market" class="ProducerConsumerBoard" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'boardID'.
+</violation>
+<violation beginline="197" endline="206" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.market" class="ProducerConsumerBoard" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'hm'.
+</violation>
+<violation beginline="197" endline="206" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.market" class="ProducerConsumerBoard" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/market/SupplyClerk.java">
+<violation beginline="38" endline="40" begincolumn="42" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.market" class="SupplyClerk" method="notifyAllIfChanged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/CheckListCellRenderer.java">
+<violation beginline="34" endline="65" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="CheckListCellRenderer" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'renderer'.
+</violation>
+<violation beginline="91" endline="93" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="CheckListCellRenderer" method="getListCellRendererComponent" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DButton.java">
+<violation beginline="87" endline="89" begincolumn="31" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DButton" method="suggest" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DCheckbox.java">
+<violation beginline="33" endline="44" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="DCheckbox" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'action'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DCheckboxList.java">
+<violation beginline="84" endline="86" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DCheckboxList" method="valueChanged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="87" endline="89" begincolumn="44" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DCheckboxList" method="valueChanged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DCheckboxTree.java">
+<violation beginline="271" endline="273" begincolumn="30" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DCheckboxTree" method="setSelected" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DChoice.java">
+<violation beginline="150" endline="154" begincolumn="42" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DChoice" method="setOptions" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="190" endline="192" begincolumn="51" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DChoice" method="checkOptions" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="209" endline="212" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DChoice" method="setSelected" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="220" endline="222" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DChoice" method="setSelected" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DDialog.java">
+<violation beginline="46" endline="48" begincolumn="12" endcolumn="5" rule="UselessOverridingMethod" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DDialog" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UselessOverridingMethod" priority="3">
+Overriding method merely calls super
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DEditorPane.java">
+<violation beginline="60" endline="62" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DEditorPane" method="showHTML" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DFileChooser.java">
+<violation beginline="25" endline="27" begincolumn="39" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DFileChooser" method="addExtensionFilter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DFloat.java">
+<violation beginline="189" endline="192" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DFloat" method="labelAction" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DFrame.java">
+<violation beginline="100" endline="102" begincolumn="12" endcolumn="5" rule="UselessOverridingMethod" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DFrame" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UselessOverridingMethod" priority="3">
+Overriding method merely calls super
+</violation>
+<violation beginline="191" endline="203" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="DFrame" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'e'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DHTMLPane.java">
+<violation beginline="187" endline="189" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DHTMLPane" method="showHTML" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="213" endline="215" begincolumn="74" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DHTMLPane" method="hyperlinkUpdate" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="215" endline="217" begincolumn="73" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DHTMLPane" method="hyperlinkUpdate" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DList.java">
+<violation beginline="102" endline="104" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DList" method="valueChanged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="104" endline="106" begincolumn="62" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DList" method="valueChanged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DListColorRenderer.java">
+<violation beginline="118" endline="120" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DListColorRenderer" method="getListCellRendererComponent" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DPopLabel.java">
+<violation beginline="48" endline="58" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="DPopLabel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DSimpleSlider.java">
+<violation beginline="17" endline="20" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="DSimpleSlider" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'label'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DTabbedPane.java">
+<violation beginline="63" endline="63" begincolumn="48" endcolumn="65" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTabbedPane" method="applyUIColors" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+<violation beginline="94" endline="96" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTabbedPane" method="report" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DTextArea.java">
+<violation beginline="196" endline="198" begincolumn="28" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextArea" method="flagChange" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="214" endline="216" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextArea" method="focusLost" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="243" endline="243" begincolumn="39" endcolumn="52" rule="AvoidThreadGroup" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextArea" method="highlightLine" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#AvoidThreadGroup" priority="3">
+Avoid using java.lang.ThreadGroup; it is not thread safe
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DTextField.java">
+<violation beginline="57" endline="59" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextField" method="enableReturnEvents" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="129" endline="131" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextField" method="flagChange" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="203" endline="205" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTextField" method="focusLost" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DTreeDropTarget.java">
+<violation beginline="61" endline="63" begincolumn="20" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTreeDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="61" endline="61" begincolumn="13" endcolumn="17" rule="UnconditionalIfStatement" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DTreeDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnconditionalIfStatement" priority="3">
+Do not use if statements that are always true or always false
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DTreePanel.java">
+<violation beginline="16" endline="30" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing" class="DTreePanel" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 's'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/DValueHistory.java">
+<violation beginline="83" endline="85" begincolumn="37" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="DValueHistory" method="setOptions" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/RolloverEffect.java">
+<violation beginline="64" endline="66" begincolumn="46" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing" class="RolloverEffect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/dnd/Region.java">
+<violation beginline="30" endline="36" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing.dnd" class="Region" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'object'.
+</violation>
+<violation beginline="30" endline="36" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.swing.dnd" class="Region" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'string'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/dnd/RegionDragSource.java">
+<violation beginline="33" endline="35" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionDragSource" method="dragGestureRecognized" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/dnd/RegionDropTarget.java">
+<violation beginline="57" endline="59" begincolumn="20" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="57" endline="57" begincolumn="13" endcolumn="17" rule="UnconditionalIfStatement" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnconditionalIfStatement" priority="3">
+Do not use if statements that are always true or always false
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/dnd/RegionStore.java">
+<violation beginline="87" endline="89" begincolumn="57" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionStore" method="activeRegion" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="138" endline="140" begincolumn="70" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionStore" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="161" endline="163" begincolumn="72" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="RegionStore" method="hoverOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/dnd/TextFieldDropTarget.java">
+<violation beginline="43" endline="45" begincolumn="20" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="TextFieldDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="43" endline="43" begincolumn="13" endcolumn="17" rule="UnconditionalIfStatement" ruleset="Basic Rules" package="org.catacomb.druid.swing.dnd" class="TextFieldDropTarget" method="dragOver" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnconditionalIfStatement" priority="3">
+Do not use if statements that are always true or always false
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/ui/DruidTreeUI.java">
+<violation beginline="47" endline="49" begincolumn="12" endcolumn="5" rule="UselessOverridingMethod" ruleset="Basic Rules" package="org.catacomb.druid.swing.ui" class="DruidTreeUI" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UselessOverridingMethod" priority="3">
+Overriding method merely calls super
+</violation>
+<violation beginline="52" endline="54" begincolumn="12" endcolumn="5" rule="UselessOverridingMethod" ruleset="Basic Rules" package="org.catacomb.druid.swing.ui" class="DruidTreeUI" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UselessOverridingMethod" priority="3">
+Overriding method merely calls super
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/util/FileChooser.java">
+<violation beginline="64" endline="66" begincolumn="37" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util" class="FileChooser" method="setDefaultFolderForMode" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="108" endline="110" begincolumn="24" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util" class="FileChooser" method="cacheDir" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/util/Snapshot.java">
+<violation beginline="21" endline="23" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.druid.util" class="Snapshot" method="saveSnapshot" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/util/tree/RelationNode.java">
+<violation beginline="111" endline="113" begincolumn="44" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util.tree" class="RelationNode" method="resolve" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="117" endline="119" begincolumn="46" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util.tree" class="RelationNode" method="resolve" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/util/tree/RelationTree.java">
+<violation beginline="241" endline="243" begincolumn="29" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util.tree" class="RelationTree" method="build" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/util/tree/Trawler.java">
+<violation beginline="29" endline="32" begincolumn="33" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.util.tree" class="Trawler" method="addIfNew" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/base/TextBlock.java">
+<violation beginline="230" endline="232" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.base" class="TextBlock" method="setType" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/base/WordBlock.java">
+<violation beginline="64" endline="66" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.base" class="WordBlock" method="weakSetType" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/canvas/FontStore.java">
+<violation beginline="57" endline="59" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.canvas" class="FontStore" method="getFont" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/canvas/KeyWriter.java">
+<violation beginline="102" endline="104" begincolumn="29" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.canvas" class="KeyWriter" method="caretLeft" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="122" endline="124" begincolumn="29" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.canvas" class="KeyWriter" method="caretRight" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="159" endline="161" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.canvas" class="KeyWriter" method="insertCharacter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/canvas/TextBoard.java">
+<violation beginline="141" endline="143" begincolumn="49" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.canvas" class="TextBoard" method="paintCaret" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/data/XTypeStore.java">
+<violation beginline="167" endline="169" begincolumn="45" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.data" class="XTypeStore" method="addIfNew" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="176" endline="178" begincolumn="50" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.druid.xtext.data" class="XTypeStore" method="addIfNew" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/xtext/parse/TextSplitter.java">
+<violation beginline="12" endline="14" begincolumn="12" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.druid.xtext.parse" class="TextSplitter" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused constructor parameters such as 'txt'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/arbor/SegmentGraphPoint.java">
+<violation beginline="255" endline="257" begincolumn="42" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.arbor" class="SegmentGraphPoint" method="recHighlight" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="276" endline="279" begincolumn="41" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.arbor" class="SegmentGraphPoint" method="recHighlightPath" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/arbor/SegmentGraphVE.java">
+<violation beginline="231" endline="235" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.graph.arbor" class="SegmentGraphVE" method="pickPressed" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="246" endline="257" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.graph.arbor" class="SegmentGraphVE" method="pickDragged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/drawing/FixedDrawing.java">
+<violation beginline="38" endline="43" begincolumn="34" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="FixedDrawing" method="makeShapes" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/drawing/FixedDrawingComponent.java">
+<violation beginline="164" endline="166" begincolumn="50" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="FixedDrawingComponent" method="parseColor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="178" endline="181" begincolumn="24" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="FixedDrawingComponent" method="parseWidthStyle" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/drawing/Shape.java">
+<violation beginline="470" endline="472" begincolumn="30" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="Shape" method="deletePoint" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="472" endline="474" begincolumn="42" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="Shape" method="deletePoint" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="515" endline="519" begincolumn="36" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="Shape" method="movePoint" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/drawing/ShapeSymmetry.java">
+<violation beginline="64" endline="66" begincolumn="43" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.drawing" class="ShapeSymmetry" method="applySymmetry" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/AboveBelowSplitPanel.java">
+<violation beginline="90" endline="92" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="AboveBelowSplitPanel" method="componentResized" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/DisplayStyleSet.java">
+<violation beginline="175" endline="177" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="DisplayStyleSet" method="assignIfUnset" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="183" endline="185" begincolumn="28" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="DisplayStyleSet" method="assignIfUnset" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/HoverTimer.java">
+<violation beginline="50" endline="52" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="HoverTimer" method="run" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/Mouse.java">
+<violation beginline="170" endline="179" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Mouse" method="mouseMoved" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="221" endline="223" begincolumn="38" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Mouse" method="mousePressed" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="243" endline="246" begincolumn="37" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Mouse" method="mouseDragged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="267" endline="269" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Mouse" method="mouseDragged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="286" endline="288" begincolumn="37" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Mouse" method="mouseReleased" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/MovieDisplay.java">
+<violation beginline="236" endline="238" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="MovieDisplay" method="start" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/MovieFramePlayer.java">
+<violation beginline="40" endline="42" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="MovieFramePlayer" method="run" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/Painter.java">
+<violation beginline="121" endline="123" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="210" endline="212" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="821" endline="823" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" method="drawFilledTriangle" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="913" endline="923" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="927" endline="958" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1122" endline="1124" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1127" endline="1131" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1133" endline="1137" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1139" endline="1143" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1146" endline="1152" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1162" endline="1169" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1173" endline="1188" begincolumn="11" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1192" endline="1204" begincolumn="11" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1209" endline="1225" begincolumn="11" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1228" endline="1231" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1234" endline="1238" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1241" endline="1245" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1247" endline="1256" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1259" endline="1266" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="1281" endline="1284" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="Painter" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/PanHandler.java">
+<violation beginline="49" endline="52" begincolumn="41" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="PanHandler" method="init" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/PickHandler.java">
+<violation beginline="72" endline="75" begincolumn="65" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="PickHandler" method="motionChange" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="204" endline="206" begincolumn="30" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="PickHandler" method="applyOnDrag" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/PickWorldCanvas.java">
+<violation beginline="97" endline="99" begincolumn="29" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="PickWorldCanvas" method="postPaint" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/RollHandler.java">
+<violation beginline="46" endline="49" begincolumn="37" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="RollHandler" method="init" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/RolloverEffect.java">
+<violation beginline="64" endline="66" begincolumn="46" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="RolloverEffect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/SpriteMoviePainter.java">
+<violation beginline="69" endline="69" begincolumn="59" endcolumn="59" rule="EmptyStatementNotInLoop" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="SpriteMoviePainter" method="instruct" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyStatementNotInLoop" priority="3">
+An empty statement (semicolon) not part of a loop
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/ViewSet.java">
+<violation beginline="71" endline="73" begincolumn="45" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="ViewSet" method="addIfNew" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/WorldCanvas.java">
+<violation beginline="166" endline="168" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldCanvas" method="frameToBox" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/WorldTransform.java">
+<violation beginline="127" endline="132" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="358" endline="360" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="363" endline="365" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="369" endline="392" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="388" endline="390" begincolumn="35" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" method="powx" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="395" endline="419" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="415" endline="417" begincolumn="36" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" method="powy" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="423" endline="425" begincolumn="19" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="428" endline="430" begincolumn="19" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="434" endline="436" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="439" endline="441" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="444" endline="446" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="449" endline="451" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="454" endline="456" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="460" endline="462" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="465" endline="467" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="470" endline="472" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="475" endline="477" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="481" endline="483" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="486" endline="488" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="492" endline="494" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="497" endline="499" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="502" endline="504" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="507" endline="509" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="513" endline="519" begincolumn="19" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="522" endline="528" begincolumn="19" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="732" endline="739" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="754" endline="772" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="858" endline="860" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="862" endline="864" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="866" endline="868" begincolumn="21" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="951" endline="973" begincolumn="11" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="976" endline="992" begincolumn="11" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="WorldTransform" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/XAxisCanvas.java">
+<violation beginline="79" endline="82" begincolumn="25" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="XAxisCanvas" method="drawAxis" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/YAxisCanvas.java">
+<violation beginline="88" endline="91" begincolumn="25" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="YAxisCanvas" method="drawAxis" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/graph/gui/ZoneDemo.java">
+<violation beginline="84" endline="86" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.graph.gui" class="ZoneDemo" method="pickDragged" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/icon/IconLoader.java">
+<violation beginline="37" endline="39" begincolumn="61" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.icon" class="IconLoader" method="createImageIcon" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/icon/splash/Splash.java">
+<violation beginline="60" endline="62" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.icon.splash" class="Splash" method="run" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/content/KeyedList.java">
+<violation beginline="319" endline="321" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.content" class="KeyedList" method="getFullID" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/content/PrimitiveValue.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="53" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.interlish.content" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/content/QuantifiedListValue.java">
+<violation beginline="49" endline="51" begincolumn="19" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.content" class="QuantifiedListValue" method="silentSetQuantity" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/content/StringValue.java">
+<violation beginline="92" endline="94" begincolumn="56" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.content" class="StringValue" method="silentAppendLine" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/reflect/Narrower.java">
+<violation beginline="28" endline="28" begincolumn="19" endcolumn="47" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="Narrower" method="narrow" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/reflect/ObjectBuilder.java">
+<violation beginline="245" endline="247" begincolumn="49" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ObjectBuilder" method="populate" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/reflect/ReflectionConstructor.java">
+<violation beginline="98" endline="101" begincolumn="32" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="checkAddPackage" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="223" endline="226" begincolumn="42" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="getField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="226" endline="234" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="getField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="353" endline="356" begincolumn="49" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="setAttributeField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="373" endline="373" begincolumn="19" endcolumn="63" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="setField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+<violation beginline="412" endline="413" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="setField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="444" endline="447" begincolumn="44" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.reflect" class="ReflectionConstructor" method="setField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/report/Slower.java">
+<violation beginline="11" endline="13" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.interlish.report" class="Slower" method="pause" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/service/ScriptManager.java">
+<violation beginline="88" endline="90" begincolumn="36" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.service" class="ScriptManager" method="checkScripts" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="108" endline="117" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.interlish.service" class="ScriptManager" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'role'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/interlish/util/JUtil.java">
+<violation beginline="121" endline="137" begincolumn="20" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.catacomb.interlish.util" class="JUtil" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'logger'.
+</violation>
+<violation beginline="216" endline="218" begincolumn="35" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.util" class="JUtil" method="newInstance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="264" endline="266" begincolumn="63" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.util" class="JUtil" method="unpackJar" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="306" endline="309" begincolumn="70" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.interlish.util" class="JUtil" method="extractJarResources" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/movie/gif/NeuQuant.java">
+<violation beginline="405" endline="406" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.movie.gif" class="NeuQuant" method="alterneigh" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="414" endline="415" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.movie.gif" class="NeuQuant" method="alterneigh" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/BlockStack.java">
+<violation beginline="113" endline="115" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="BlockStack" method="initSlices" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="173" endline="176" begincolumn="48" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="BlockStack" method="initSlices" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="192" endline="195" begincolumn="65" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="BlockStack" method="initSlices" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/DDSlice.java">
+<violation beginline="46" endline="49" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="DDSlice" method="getDData" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/DSlice.java">
+<violation beginline="26" endline="29" begincolumn="25" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="DSlice" method="getData" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/DataSetArray.java">
+<violation beginline="47" endline="49" begincolumn="36" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="DataSetArray" method="add" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/NDSAccessor.java">
+<violation beginline="103" endline="105" begincolumn="55" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NDSAccessor" method="getOrdinates" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="122" endline="125" begincolumn="30" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NDSAccessor" method="addStackSlices" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="131" endline="134" begincolumn="50" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NDSAccessor" method="addStackSlices" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/NumDataSet.java">
+<violation beginline="191" endline="193" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NumDataSet" method="copyMarked" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/NumDataStore.java">
+<violation beginline="165" endline="167" begincolumn="28" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NumDataStore" method="removeDataWatcher" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="289" endline="291" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NumDataStore" method="reportNewChild" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="425" endline="427" begincolumn="30" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NumDataStore" method="getPath" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="433" endline="435" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.data" class="NumDataStore" method="getPath" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/data/SimpleSpriteBlock.java">
+<violation beginline="5" endline="5" begincolumn="1" endcolumn="42" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.numeric.data" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+<violation beginline="6" endline="6" begincolumn="1" endcolumn="45" rule="ImportFromSamePackage" ruleset="Import Statement Rules" package="org.catacomb.numeric.data" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#ImportFromSamePackage" priority="3">
+No need to import a type that lives in the same package
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/difnet/calc/OrderedNetMap.java">
+<violation beginline="85" endline="87" begincolumn="40" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.difnet.calc" class="OrderedNetMap" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="92" endline="94" begincolumn="40" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.difnet.calc" class="OrderedNetMap" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="123" endline="123" begincolumn="13" endcolumn="17" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.catacomb.numeric.difnet.calc" class="OrderedNetMap" variable="ntree" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'ntree'.
+</violation>
+<violation beginline="169" endline="171" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.difnet.calc" class="OrderedNetMap" method="print" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="246" endline="253" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.numeric.difnet.calc" class="OrderedNetMap" method="recindex" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/function/HoldLastScalarFunction.java">
+<violation beginline="62" endline="65" begincolumn="50" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.numeric.function" class="HoldLastScalarFunction" method="getScalar" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/math/Matrix.java">
+<violation beginline="48" endline="50" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="588" endline="594" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="599" endline="605" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/math/Random.java">
+<violation beginline="90" endline="92" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Random" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="96" endline="106" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Random" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="110" endline="139" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.math" class="Random" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/numeric/phys/Units.java">
+<violation beginline="59" endline="61" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="62" endline="64" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="65" endline="67" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="68" endline="70" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="71" endline="73" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="74" endline="76" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="77" endline="79" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="80" endline="82" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="83" endline="85" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="86" endline="88" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="89" endline="91" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="92" endline="94" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="95" endline="97" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="98" endline="100" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="101" endline="103" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="104" endline="106" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="107" endline="109" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="110" endline="112" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.catacomb.numeric.phys" class="Units" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/report/E.java">
+<violation beginline="210" endline="212" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.report" class="E" method="shortMissingOnce" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="280" endline="281" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.catacomb.report" class="E" method="pause" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="344" endline="346" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.report" class="E" method="warnOnce" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/Reflector.java">
+<violation beginline="69" endline="72" begincolumn="65" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial" class="Reflector" method="makeObjectElementByReflection" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="94" endline="97" begincolumn="77" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial" class="Reflector" method="makeObjectElementByReflection" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="102" endline="105" begincolumn="34" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial" class="Reflector" method="makeObjectElementByReflection" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="109" endline="112" begincolumn="54" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial" class="Reflector" method="makeObjectElementByReflection" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/SerializationContext.java">
+<violation beginline="74" endline="77" begincolumn="65" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial" class="SerializationContext" method="shouldWritePackage" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/jar/CustomJar.java">
+<violation beginline="41" endline="43" begincolumn="36" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.jar" class="CustomJar" method="claims" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/quickxml/Element.java">
+<violation beginline="187" endline="190" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.serial.quickxml" class="Element" method="hasElement" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/quickxml/XMLFileElement.java">
+<violation beginline="18" endline="20" begincolumn="28" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.quickxml" class="XMLFileElement" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/xml/XMLChecker.java">
+<violation beginline="44" endline="47" begincolumn="32" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.xml" class="XMLChecker" method="deGarbage" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/xml/XMLReader.java">
+<violation beginline="171" endline="176" begincolumn="34" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.xml" class="XMLReader" method="readFieldIntoParent" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/xml/XMLToken.java">
+<violation beginline="95" endline="99" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.serial.xml" class="XMLToken" method="toString" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/xml/XMLTokenizer.java">
+<violation beginline="263" endline="266" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.xml" class="XMLTokenizer" method="nextToken" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/serial/xml/XMLWriter.java">
+<violation beginline="80" endline="82" begincolumn="61" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.serial.xml" class="XMLWriter" method="appendObject" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/ArrayUtil.java">
+<violation beginline="157" endline="160" begincolumn="21" endcolumn="21" rule="JumbledIncrementer" ruleset="Basic Rules" package="org.catacomb.util" class="ArrayUtil" method="avg" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#JumbledIncrementer" priority="3">
+Avoid modifying an outer loop incrementer in an inner loop for update expression
+</violation>
+<violation beginline="177" endline="181" begincolumn="21" endcolumn="21" rule="JumbledIncrementer" ruleset="Basic Rules" package="org.catacomb.util" class="ArrayUtil" method="sd" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#JumbledIncrementer" priority="3">
+Avoid modifying an outer loop incrementer in an inner loop for update expression
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/Diff.java">
+<violation beginline="245" endline="263" begincolumn="25" endcolumn="25" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.util" class="Diff" method="diag" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="278" endline="295" begincolumn="25" endcolumn="25" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.catacomb.util" class="Diff" method="diag" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/FileAccumulator.java">
+<violation beginline="42" endline="44" begincolumn="33" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.util" class="FileAccumulator" method="addIfNew" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="77" endline="79" begincolumn="44" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.util" class="FileAccumulator" method="saveJar" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/FileLister.java">
+<violation beginline="32" endline="34" begincolumn="46" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.util" class="FileLister" method="listResources" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/FileUtil.java">
+<violation beginline="302" endline="304" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.util" class="FileUtil" method="clearCache" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/StringUtil.java">
+<violation beginline="153" endline="155" begincolumn="26" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.util" class="StringUtil" method="semiHTMLize" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/xdoc/TextTagger.java">
+<violation beginline="514" endline="517" begincolumn="51" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.xdoc" class="TextTagger" method="wrapList" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/report/E.java">
+<violation beginline="195" endline="196" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.textensor.report" class="E" method="pause" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/ResultWriter.java">
+<violation beginline="3" endline="3" begincolumn="8" endcolumn="19" rule="DuplicateImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#DuplicateImports" priority="4">
+Avoid duplicate imports such as 'java.io.File'
+</violation>
+<violation beginline="213" endline="215" begincolumn="27" endcolumn="25" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.textensor.stochdiff" class="ResultWriter" method="pruneFrom" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/StochDiff.java">
+<violation beginline="29" endline="31" begincolumn="37" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff" class="StochDiff" method="main" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="65" endline="65" begincolumn="25" endcolumn="39" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff" class="StochDiff" method="dump" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'dump(SDRun)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/CurvedVolumeSlice.java">
+<violation beginline="357" endline="373" begincolumn="13" endcolumn="5" rule="UnusedFormalParameter" ruleset="Unused Code Rules" package="org.textensor.stochdiff.disc" class="CurvedVolumeSlice" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedFormalParameter" priority="3">
+Avoid unused method parameters such as 'radius'.
+</violation>
+<violation beginline="385" endline="385" begincolumn="13" endcolumn="18" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.disc" class="CurvedVolumeSlice" method="getRadialSplit" variable="nsplit" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'nsplit'.
+</violation>
+<violation beginline="449" endline="451" begincolumn="37" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="CurvedVolumeSlice" method="planeConnect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="451" endline="454" begincolumn="44" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="CurvedVolumeSlice" method="planeConnect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/DiscBoxer.java">
+<violation beginline="9" endline="9" begincolumn="1" endcolumn="56" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.morph.VolumeLine'
+</violation>
+<violation beginline="94" endline="99" begincolumn="44" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="DiscBoxer" method="recAdd" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/DiscSplitter.java">
+<violation beginline="9" endline="9" begincolumn="1" endcolumn="56" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.morph.VolumeLine'
+</violation>
+<violation beginline="10" endline="10" begincolumn="1" endcolumn="57" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.morph.VolumeSlice'
+</violation>
+<violation beginline="97" endline="102" begincolumn="44" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="DiscSplitter" method="recAdd" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/LineBoxer.java">
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="23" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.Queue'
+</violation>
+<violation beginline="9" endline="9" begincolumn="1" endcolumn="50" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.concurrent.ConcurrentLinkedQueue'
+</violation>
+<violation beginline="104" endline="109" begincolumn="44" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="LineBoxer" method="recAdd" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="155" endline="155" begincolumn="13" endcolumn="17" rule="UnconditionalIfStatement" ruleset="Basic Rules" package="org.textensor.stochdiff.disc" class="LineBoxer" method="baseGrid" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnconditionalIfStatement" priority="3">
+Do not use if statements that are always true or always false
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/SegmentMerger.java">
+<violation beginline="16" endline="16" begincolumn="25" endcolumn="86" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.disc" class="SegmentMerger" method="merge" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'merge(TreePoint,double,double,double)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/SegmentSlicer.java">
+<violation beginline="267" endline="267" begincolumn="22" endcolumn="70" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.disc" class="SegmentSlicer" method="getFixedSubdivision" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'getFixedSubdivision(TreePoint,TreePoint)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/SpineLocator.java">
+<violation beginline="9" endline="9" begincolumn="1" endcolumn="55" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.math.RandomMath'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/disc/TreeCurvedElementDiscretizer.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="30" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.disc" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/examples/restart/ReduceTest.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="35" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.examples.restart" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.catacomb.dataview.CCViz'
+</violation>
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="41" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.examples.restart" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.StochDiff'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/inter/ModelReader.java">
+<violation beginline="59" endline="61" begincolumn="27" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.inter" class="ModelReader" method="getFile" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/inter/SDState.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="30" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.inter" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/model/MorphPoint.java">
+<violation beginline="20" endline="20" begincolumn="21" endcolumn="29" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="org.textensor.stochdiff.model" class="MorphPoint" variable="r_segment" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'r_segment'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/model/Morphology.java">
+<violation beginline="69" endline="71" begincolumn="31" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.model" class="Morphology" method="resolve" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/model/SDRun.java">
+<violation beginline="6" endline="6" begincolumn="1" endcolumn="48" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.model" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.BaseCalc'
+</violation>
+<violation beginline="192" endline="194" begincolumn="16" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.model" class="SDRun" method="getStartTime" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="214" endline="216" begincolumn="29" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.model" class="SDRun" method="continueOutput" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/model/Segment.java">
+<violation beginline="71" endline="73" begincolumn="34" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.model" class="Segment" method="checkHasPositions" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="76" endline="78" begincolumn="32" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.model" class="Segment" method="checkHasPositions" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/model/SurfaceLayers.java">
+<violation beginline="5" endline="5" begincolumn="1" endcolumn="30" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.model" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/neuroml/morphml.java">
+<violation beginline="38" endline="40" begincolumn="41" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.neuroml" class="morphml" method="add" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/neuroml/segment.java">
+<violation beginline="8" endline="8" begincolumn="1" endcolumn="48" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.neuroml" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.model.MorphPoint'
+</violation>
+<violation beginline="27" endline="29" begincolumn="47" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.neuroml" class="segment" method="add" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/BaseCalc.java">
+<violation beginline="85" endline="87" begincolumn="33" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric" class="BaseCalc" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/StaticCalc.java">
+<violation beginline="91" endline="94" begincolumn="47" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric" class="StaticCalc" method="reinit" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/grid/DeterministicGridCalc.java">
+<violation beginline="173" endline="176" begincolumn="47" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.grid" class="DeterministicGridCalc" method="init" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="336" endline="336" begincolumn="13" endcolumn="15" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.grid" class="DeterministicGridCalc" method="run" variable="iwr" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'iwr'.
+</violation>
+<violation beginline="534" endline="536" begincolumn="25" endcolumn="25" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.grid" class="DeterministicGridCalc" method="getGridConcsHeadings_dumb" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/grid/SteppedStochaticGridCalc.java">
+<violation beginline="27" endline="27" begincolumn="1" endcolumn="34" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.grid" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.Debug'
+</violation>
+<violation beginline="251" endline="254" begincolumn="47" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="init" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="488" endline="488" begincolumn="21" endcolumn="22" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="run" variable="nt" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'nt'.
+</violation>
+<violation beginline="702" endline="704" begincolumn="29" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="advance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="842" endline="842" begincolumn="13" endcolumn="41" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="parallelAndSharedDiffusionStep" variable="num_molecules_diffused_so_far" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'num_molecules_diffused_so_far'.
+</violation>
+<violation beginline="898" endline="901" begincolumn="22" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="parallelAndSharedDiffusionStep" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="995" endline="995" begincolumn="24" endcolumn="60" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="parallelDiffusionStep" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'parallelDiffusionStep(int,int)'.
+</violation>
+<violation beginline="1065" endline="1065" begincolumn="24" endcolumn="58" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.grid" class="SteppedStochaticGridCalc" method="sharedDiffusionStep" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'sharedDiffusionStep(int,int)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/math/Column.java">
+<violation beginline="130" endline="132" begincolumn="26" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="Column" method="writeTo" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/math/Matrix.java">
+<violation beginline="95" endline="97" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="695" endline="700" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="705" endline="711" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="713" endline="719" begincolumn="18" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="Matrix" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/math/NRRandom.java">
+<violation beginline="24" endline="28" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.math" class="NRRandom" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/morph/CurvedVolumeElement.java">
+<violation beginline="120" endline="120" begincolumn="13" endcolumn="14" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.morph" class="CurvedVolumeElement" method="getText3D" variable="nv" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'nv'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/morph/TreePoint.java">
+<violation beginline="151" endline="154" begincolumn="18" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.morph" class="TreePoint" method="addNeighbor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/morph/VolumeGrid.java">
+<violation beginline="390" endline="392" begincolumn="24" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.morph" class="VolumeGrid" method="getMatches" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/morph/VolumeLine.java">
+<violation beginline="255" endline="257" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.morph" class="VolumeLine" method="smallBigMatchConnect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="265" endline="267" begincolumn="24" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.morph" class="VolumeLine" method="smallBigMatchConnect" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="313" endline="313" begincolumn="24" endcolumn="56" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.morph" class="VolumeLine" method="makeRanges" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'makeRanges(double,int)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/morph/VolumeSlice.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="30" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.morph" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/stochastic/NGoTable.java">
+<violation beginline="75" endline="75" begincolumn="10" endcolumn="10" rule="EmptyStatementNotInLoop" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.stochastic" class="NGoTable" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyStatementNotInLoop" priority="3">
+An empty statement (semicolon) not part of a loop
+</violation>
+<violation beginline="118" endline="118" begincolumn="10" endcolumn="10" rule="EmptyStatementNotInLoop" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.stochastic" class="NGoTable" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyStatementNotInLoop" priority="3">
+An empty statement (semicolon) not part of a loop
+</violation>
+<violation beginline="298" endline="298" begincolumn="25" endcolumn="36" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.stochastic" class="NGoTable" method="lookupTest" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'lookupTest()'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/numeric/tmp/Tmp1A.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="20" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.tmp" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.io.File'
+</violation>
+<violation beginline="4" endline="4" begincolumn="1" endcolumn="33" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.tmp" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.StringTokenizer'
+</violation>
+<violation beginline="6" endline="6" begincolumn="1" endcolumn="34" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.tmp" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.Debug'
+</violation>
+<violation beginline="8" endline="8" begincolumn="1" endcolumn="44" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.numeric.tmp" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.ResultWriter'
+</violation>
+<violation beginline="207" endline="210" begincolumn="47" endcolumn="21" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.tmp" class="Tmp1A" method="init" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="621" endline="623" begincolumn="29" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.stochdiff.numeric.tmp" class="Tmp1A" method="advance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="761" endline="761" begincolumn="13" endcolumn="41" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.tmp" class="Tmp1A" method="parallelAndSharedDiffusionStep" variable="num_molecules_diffused_so_far" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'num_molecules_diffused_so_far'.
+</violation>
+<violation beginline="916" endline="916" begincolumn="24" endcolumn="60" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.tmp" class="Tmp1A" method="parallelDiffusionStep" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'parallelDiffusionStep(int,int)'.
+</violation>
+<violation beginline="986" endline="986" begincolumn="24" endcolumn="58" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.numeric.tmp" class="Tmp1A" method="sharedDiffusionStep" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'sharedDiffusionStep(int,int)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/reduce/Reduce.java">
+<violation beginline="61" endline="61" begincolumn="25" endcolumn="39" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.stochdiff.reduce" class="Reduce" method="dump" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'dump(SDRun)'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/stochdiff/reduce/Reducer.java">
+<violation beginline="12" endline="12" begincolumn="1" endcolumn="48" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.stochdiff.reduce" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.stochdiff.numeric.BaseCalc'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/util/ArrayUtil.java">
+<violation beginline="96" endline="98" begincolumn="40" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.util" class="ArrayUtil" method="arraysMatch" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/CCViz3D.java">
+<violation beginline="7" endline="7" begincolumn="1" endcolumn="27" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.vis" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.ArrayList'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/ElementReader.java">
+<violation beginline="31" endline="31" begincolumn="21" endcolumn="24" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.vis" class="ElementReader" method="read" variable="ielt" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'ielt'.
+</violation>
+<violation beginline="66" endline="66" begincolumn="13" endcolumn="16" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.vis" class="ElementReader" method="nextInt" variable="itok" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'itok'.
+</violation>
+<violation beginline="79" endline="79" begincolumn="13" endcolumn="16" rule="UnusedLocalVariable" ruleset="Unused Code Rules" package="org.textensor.vis" class="ElementReader" method="nextFloat" variable="itok" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedLocalVariable" priority="3">
+Avoid unused local variables such as 'itok'.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/Icing3DViewer.java">
+<violation beginline="8" endline="8" begincolumn="1" endcolumn="25" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.vis" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'java.util.HashSet'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/SceneGraphBuilder.java">
+<violation beginline="15" endline="15" begincolumn="1" endcolumn="46" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.vis" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'javax.media.j3d.TransparencyAttributes'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/SceneGraphViewer.java">
+<violation beginline="588" endline="590" begincolumn="24" endcolumn="17" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="toggleHide" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="597" endline="597" begincolumn="18" endcolumn="45" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="org.textensor.vis" class="SceneGraphViewer" method="toggleHideShape" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'toggleHideShape(Shape3D)'.
+</violation>
+<violation beginline="636" endline="638" begincolumn="23" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="mouseReleased" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="638" endline="640" begincolumn="34" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="mouseReleased" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="640" endline="643" begincolumn="34" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="mouseReleased" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="882" endline="884" begincolumn="55" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="removeUnlistedDecoration" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="900" endline="902" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="setDecorationVisibility" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="911" endline="913" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.vis" class="SceneGraphViewer" method="setDecorationVisibility" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/vis/VolElt.java">
+<violation beginline="3" endline="3" begincolumn="1" endcolumn="30" rule="UnusedImports" ruleset="Import Statement Rules" package="org.textensor.vis" externalInfoUrl="http://pmd.sourceforge.net/rules/imports.html#UnusedImports" priority="4">
+Avoid unused imports such as 'org.textensor.report.E'
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/Narrower.java">
+<violation beginline="26" endline="26" begincolumn="19" endcolumn="47" rule="BooleanInstantiation" ruleset="Basic Rules" package="org.textensor.xml" class="Narrower" method="narrow" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#BooleanInstantiation" priority="2">
+Avoid instantiating Boolean objects; reference Boolean.TRUE or Boolean.FALSE or call Boolean.valueOf() instead.
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/ReflectionInstantiator.java">
+<violation beginline="63" endline="66" begincolumn="32" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="checkAddPackage" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="97" endline="98" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="newInstance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="105" endline="106" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="newInstance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="195" endline="198" begincolumn="42" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="getField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="198" endline="206" begincolumn="20" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="getField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="307" endline="310" begincolumn="49" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="setAttributeField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+<violation beginline="349" endline="350" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="org.textensor.xml" class="ReflectionInstantiator" method="setField" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/XMLChecker.java">
+<violation beginline="42" endline="45" begincolumn="32" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="XMLChecker" method="deGarbage" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/XMLReader.java">
+<violation beginline="165" endline="170" begincolumn="34" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="XMLReader" method="readFieldIntoParent" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/XMLToken.java">
+<violation beginline="92" endline="96" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="org.textensor.xml" class="XMLToken" method="toString" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/textensor/xml/XMLTokenizer.java">
+<violation beginline="267" endline="270" begincolumn="31" endcolumn="13" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.textensor.xml" class="XMLTokenizer" method="nextToken" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
+Avoid empty if statements
+</violation>
+</file>
+<suppressedviolation filename="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/gui/edit/DruTreePanel.java" suppressiontype="annotation" msg="Avoid unused private methods such as 'dumpptc(Object)'." usermsg=""/>
+<suppressedviolation filename="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/split/SplitterLayout.java" suppressiontype="annotation" msg="Avoid unnecessary return statements" usermsg=""/>
+<suppressedviolation filename="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/druid/swing/split/SplitterLayout.java" suppressiontype="annotation" msg="Avoid unused local variables such as 'numRelatives'." usermsg=""/>
+<suppressedviolation filename="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/DiffPrint.java" suppressiontype="annotation" msg="Avoid unused method parameters such as 'start'." usermsg=""/>
+<suppressedviolation filename="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/util/DiffPrint.java" suppressiontype="annotation" msg="Avoid unused method parameters such as 'lines'." usermsg=""/>
+</pmd>
