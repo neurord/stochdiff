@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>MeshNetConverter xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../apidocs/org/catacomb/numeric/mesh/MeshNetConverter.html">View Javadoc</a></div><pre>
+
+<a class="jxr_linenumber" name="1" href="#1">1</a>   <strong class="jxr_keyword">package</strong> org.catacomb.numeric.mesh;
+<a class="jxr_linenumber" name="2" href="#2">2</a>   
+<a class="jxr_linenumber" name="3" href="#3">3</a>   <strong class="jxr_keyword">import</strong> org.catacomb.numeric.difnet.NetFactory;
+<a class="jxr_linenumber" name="4" href="#4">4</a>   <strong class="jxr_keyword">import</strong> org.catacomb.numeric.difnet.NetStructure;
+<a class="jxr_linenumber" name="5" href="#5">5</a>   <strong class="jxr_keyword">import</strong> org.catacomb.numeric.difnet.StructureLink;
+<a class="jxr_linenumber" name="6" href="#6">6</a>   <strong class="jxr_keyword">import</strong> org.catacomb.numeric.difnet.StructureNode;
+<a class="jxr_linenumber" name="7" href="#7">7</a>   
+<a class="jxr_linenumber" name="8" href="#8">8</a>   
+<a class="jxr_linenumber" name="9" href="#9">9</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../org/catacomb/numeric/mesh/MeshNetConverter.html">MeshNetConverter</a> {
+<a class="jxr_linenumber" name="10" href="#10">10</a>  
+<a class="jxr_linenumber" name="11" href="#11">11</a>  
+<a class="jxr_linenumber" name="12" href="#12">12</a>  
+<a class="jxr_linenumber" name="13" href="#13">13</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../org/catacomb/numeric/difnet/NetStructure.html">NetStructure</a> meshToNet(<a href="../../../../org/catacomb/numeric/mesh/MeshPoint.html">MeshPoint</a>[] pts, <a href="../../../../org/catacomb/numeric/difnet/NetFactory.html">NetFactory</a> netFactory) {
+<a class="jxr_linenumber" name="14" href="#14">14</a>          <strong class="jxr_keyword">int</strong> nl = 0;
+<a class="jxr_linenumber" name="15" href="#15">15</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; pts.length; i++) {
+<a class="jxr_linenumber" name="16" href="#16">16</a>              pts[i].setWork(i);
+<a class="jxr_linenumber" name="17" href="#17">17</a>              nl += pts[i].getNeighborCount();
+<a class="jxr_linenumber" name="18" href="#18">18</a>          }
+<a class="jxr_linenumber" name="19" href="#19">19</a>          nl /= 2; <em class="jxr_comment">// so far, all links counted twice</em>
+<a class="jxr_linenumber" name="20" href="#20">20</a>  
+<a class="jxr_linenumber" name="21" href="#21">21</a>          <a href="../../../../org/catacomb/numeric/difnet/StructureNode.html">StructureNode</a>[] nodes = netFactory.newNodeArray(pts.length);
+<a class="jxr_linenumber" name="22" href="#22">22</a>          <a href="../../../../org/catacomb/numeric/difnet/StructureLink.html">StructureLink</a>[] links = netFactory.newLinkArray(nl);
+<a class="jxr_linenumber" name="23" href="#23">23</a>  
+<a class="jxr_linenumber" name="24" href="#24">24</a>  
+<a class="jxr_linenumber" name="25" href="#25">25</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; pts.length; i++) {
+<a class="jxr_linenumber" name="26" href="#26">26</a>  
+<a class="jxr_linenumber" name="27" href="#27">27</a>              <a href="../../../../org/catacomb/numeric/mesh/MeshPoint.html">MeshPoint</a> mp = pts[i];
+<a class="jxr_linenumber" name="28" href="#28">28</a>  
+<a class="jxr_linenumber" name="29" href="#29">29</a>              <a href="../../../../org/catacomb/numeric/difnet/StructureNode.html">StructureNode</a> snode = netFactory.newStructureNode();
+<a class="jxr_linenumber" name="30" href="#30">30</a>              nodes[i] = snode;
+<a class="jxr_linenumber" name="31" href="#31">31</a>  
+<a class="jxr_linenumber" name="32" href="#32">32</a>              snode.setPosition(mp.getX(), mp.getY(), mp.getZ());
+<a class="jxr_linenumber" name="33" href="#33">33</a>              snode.setRadius(mp.getR());
+<a class="jxr_linenumber" name="34" href="#34">34</a>  
+<a class="jxr_linenumber" name="35" href="#35">35</a>  
+<a class="jxr_linenumber" name="36" href="#36">36</a>          }
+<a class="jxr_linenumber" name="37" href="#37">37</a>  
+<a class="jxr_linenumber" name="38" href="#38">38</a>          nl = 0;
+<a class="jxr_linenumber" name="39" href="#39">39</a>          <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; pts.length; i++) {
+<a class="jxr_linenumber" name="40" href="#40">40</a>              <a href="../../../../org/catacomb/numeric/mesh/MeshPoint.html">MeshPoint</a> mp = pts[i];
+<a class="jxr_linenumber" name="41" href="#41">41</a>  
+<a class="jxr_linenumber" name="42" href="#42">42</a>              <strong class="jxr_keyword">int</strong> nn = mp.getNeighborCount();
+<a class="jxr_linenumber" name="43" href="#43">43</a>              <a href="../../../../org/catacomb/numeric/mesh/MeshPoint.html">MeshPoint</a>[] mpn = mp.getNeighbors();
+<a class="jxr_linenumber" name="44" href="#44">44</a>  
+<a class="jxr_linenumber" name="45" href="#45">45</a>              <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> j = 0; j &lt; nn; j++) {
+<a class="jxr_linenumber" name="46" href="#46">46</a>                  <strong class="jxr_keyword">if</strong> (mpn[j].getWork() &gt; i) {
+<a class="jxr_linenumber" name="47" href="#47">47</a>                      <a href="../../../../org/catacomb/numeric/difnet/StructureLink.html">StructureLink</a> slink = netFactory.newStructureLink();
+<a class="jxr_linenumber" name="48" href="#48">48</a>                      slink.setNodeA(nodes[i]);
+<a class="jxr_linenumber" name="49" href="#49">49</a>                      slink.setNodeB(nodes[mpn[j].getWork()]);
+<a class="jxr_linenumber" name="50" href="#50">50</a>  
+<a class="jxr_linenumber" name="51" href="#51">51</a>                      links[nl++] = slink;
+<a class="jxr_linenumber" name="52" href="#52">52</a>                  }
+<a class="jxr_linenumber" name="53" href="#53">53</a>              }
+<a class="jxr_linenumber" name="54" href="#54">54</a>          }
+<a class="jxr_linenumber" name="55" href="#55">55</a>  
+<a class="jxr_linenumber" name="56" href="#56">56</a>          <a href="../../../../org/catacomb/numeric/difnet/NetStructure.html">NetStructure</a> netStructure = netFactory.newNetStructure(nodes, links);
+<a class="jxr_linenumber" name="57" href="#57">57</a>  
+<a class="jxr_linenumber" name="58" href="#58">58</a>          <strong class="jxr_keyword">return</strong> netStructure;
+<a class="jxr_linenumber" name="59" href="#59">59</a>      }
+<a class="jxr_linenumber" name="60" href="#60">60</a>  
+<a class="jxr_linenumber" name="61" href="#61">61</a>  }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>
+

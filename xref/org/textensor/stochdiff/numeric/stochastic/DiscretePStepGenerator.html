@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>DiscretePStepGenerator xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../apidocs/org/textensor/stochdiff/numeric/stochastic/DiscretePStepGenerator.html">View Javadoc</a></div><pre>
+
+<a class="jxr_linenumber" name="1" href="#1">1</a>   <strong class="jxr_keyword">package</strong> org.textensor.stochdiff.numeric.stochastic;
+<a class="jxr_linenumber" name="2" href="#2">2</a>   
+<a class="jxr_linenumber" name="3" href="#3">3</a>   <strong class="jxr_keyword">import</strong> java.util.HashMap;
+<a class="jxr_linenumber" name="4" href="#4">4</a>   
+<a class="jxr_linenumber" name="5" href="#5">5</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="6" href="#6">6</a>   <em class="jxr_comment"> * Caching store of generators for cases where only a fixed number</em>
+<a class="jxr_linenumber" name="7" href="#7">7</a>   <em class="jxr_comment"> * of different probabilities occur in the model. This applies to</em>
+<a class="jxr_linenumber" name="8" href="#8">8</a>   <em class="jxr_comment"> * diffusion on a grid where all the elements have the same (or one</em>
+<a class="jxr_linenumber" name="9" href="#9">9</a>   <em class="jxr_comment"> * of a few) volume and coupling constants. Then you get a different p</em>
+<a class="jxr_linenumber" name="10" href="#10">10</a>  <em class="jxr_comment"> * for each diffusible species and for each different coupling constant.</em>
+<a class="jxr_linenumber" name="11" href="#11">11</a>  <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="12" href="#12">12</a>  <em class="jxr_comment"> * The way to use this is to create a DiscretePStepGenerator at the</em>
+<a class="jxr_linenumber" name="13" href="#13">13</a>  <em class="jxr_comment"> * beginning, and then call getGenerator for each connection in the</em>
+<a class="jxr_linenumber" name="14" href="#14">14</a>  <em class="jxr_comment"> * model. Then during the calculation, call generator.nGo(n, r) to</em>
+<a class="jxr_linenumber" name="15" href="#15">15</a>  <em class="jxr_comment"> * get the number of particles that will move in one step.</em>
+<a class="jxr_linenumber" name="16" href="#16">16</a>  <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="17" href="#17">17</a>  <em class="jxr_comment"> *  Generators are cached in the hash map according to an integer</em>
+<a class="jxr_linenumber" name="18" href="#18">18</a>  <em class="jxr_comment"> *  key based on their probability. Effectively, this splits the</em>
+<a class="jxr_linenumber" name="19" href="#19">19</a>  <em class="jxr_comment"> *  space in log(p) between -20 and 0 into about 2E9 separate bins</em>
+<a class="jxr_linenumber" name="20" href="#20">20</a>  <em class="jxr_comment"> *  and treats all p's in a single bin as the same. It avoids any</em>
+<a class="jxr_linenumber" name="21" href="#21">21</a>  <em class="jxr_comment"> *  risk of creating separate generators for probabilities that</em>
+<a class="jxr_linenumber" name="22" href="#22">22</a>  <em class="jxr_comment"> *  only differ by rounding errors.</em>
+<a class="jxr_linenumber" name="23" href="#23">23</a>  <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="24" href="#24">24</a>  <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="25" href="#25">25</a>  <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="26" href="#26">26</a>  
+<a class="jxr_linenumber" name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+<a class="jxr_linenumber" name="28" href="#28">28</a>  
+<a class="jxr_linenumber" name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/DiscretePStepGenerator.html">DiscretePStepGenerator</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/StepGenerator.html">StepGenerator</a> {
+<a class="jxr_linenumber" name="30" href="#30">30</a>  
+<a class="jxr_linenumber" name="31" href="#31">31</a>  
+<a class="jxr_linenumber" name="32" href="#32">32</a>      HashMap&lt;Integer, FixedPStepGenerator&gt; generators;
+<a class="jxr_linenumber" name="33" href="#33">33</a>  
+<a class="jxr_linenumber" name="34" href="#34">34</a>  
+<a class="jxr_linenumber" name="35" href="#35">35</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">double</strong> lnpmin = -20;
+<a class="jxr_linenumber" name="36" href="#36">36</a>  
+<a class="jxr_linenumber" name="37" href="#37">37</a>      distribution_t mode;
+<a class="jxr_linenumber" name="38" href="#38">38</a>  
+<a class="jxr_linenumber" name="39" href="#39">39</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/DiscretePStepGenerator.html">DiscretePStepGenerator</a>(distribution_t mode) {
+<a class="jxr_linenumber" name="40" href="#40">40</a>          generators = <strong class="jxr_keyword">new</strong> HashMap&lt;Integer, FixedPStepGenerator&gt;();
+<a class="jxr_linenumber" name="41" href="#41">41</a>          <strong class="jxr_keyword">this</strong>.mode = mode;
+<a class="jxr_linenumber" name="42" href="#42">42</a>      }
+<a class="jxr_linenumber" name="43" href="#43">43</a>  
+<a class="jxr_linenumber" name="44" href="#44">44</a>  
+<a class="jxr_linenumber" name="45" href="#45">45</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/FixedPStepGenerator.html">FixedPStepGenerator</a> getGenerator(<strong class="jxr_keyword">double</strong> lnp) {
+<a class="jxr_linenumber" name="46" href="#46">46</a>          <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/FixedPStepGenerator.html">FixedPStepGenerator</a> ret = <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="47" href="#47">47</a>          <strong class="jxr_keyword">double</strong> po = lnp - lnpmin;
+<a class="jxr_linenumber" name="48" href="#48">48</a>          <strong class="jxr_keyword">if</strong> (po &lt; 0.) {
+<a class="jxr_linenumber" name="49" href="#49">49</a>              po = 0.;
+<a class="jxr_linenumber" name="50" href="#50">50</a>          }
+<a class="jxr_linenumber" name="51" href="#51">51</a>          <strong class="jxr_keyword">int</strong> ipbin = (<strong class="jxr_keyword">int</strong>)(Integer.MAX_VALUE * (po / (0. - lnpmin)));
+<a class="jxr_linenumber" name="52" href="#52">52</a>          Integer key = <strong class="jxr_keyword">new</strong> Integer(ipbin);
+<a class="jxr_linenumber" name="53" href="#53">53</a>          <strong class="jxr_keyword">if</strong> (generators.containsKey(key)) {
+<a class="jxr_linenumber" name="54" href="#54">54</a>              ret = generators.get(key);
+<a class="jxr_linenumber" name="55" href="#55">55</a>          } <strong class="jxr_keyword">else</strong> {
+<a class="jxr_linenumber" name="56" href="#56">56</a>              ret = <strong class="jxr_keyword">new</strong> <a href="../../../../../org/textensor/stochdiff/numeric/stochastic/FixedPStepGenerator.html">FixedPStepGenerator</a>(lnp, mode);
+<a class="jxr_linenumber" name="57" href="#57">57</a>              generators.put(key, ret);
+<a class="jxr_linenumber" name="58" href="#58">58</a>          }
+<a class="jxr_linenumber" name="59" href="#59">59</a>          <strong class="jxr_keyword">return</strong> ret;
+<a class="jxr_linenumber" name="60" href="#60">60</a>      }
+<a class="jxr_linenumber" name="61" href="#61">61</a>  
+<a class="jxr_linenumber" name="62" href="#62">62</a>  
+<a class="jxr_linenumber" name="63" href="#63">63</a>      <em class="jxr_comment">// this is here for completeness, but shouldnt be used</em>
+<a class="jxr_linenumber" name="64" href="#64">64</a>      <em class="jxr_comment">// in real calculations - you should call getGenerator once</em>
+<a class="jxr_linenumber" name="65" href="#65">65</a>      <em class="jxr_comment">// at the beginning and then use that - it will be much faster.</em>
+<a class="jxr_linenumber" name="66" href="#66">66</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> nGo(<strong class="jxr_keyword">int</strong> n, <strong class="jxr_keyword">double</strong> lnp, <strong class="jxr_keyword">double</strong> r) {
+<a class="jxr_linenumber" name="67" href="#67">67</a>          <strong class="jxr_keyword">return</strong> getGenerator(lnp).nGo(n, r);
+<a class="jxr_linenumber" name="68" href="#68">68</a>      }
+<a class="jxr_linenumber" name="69" href="#69">69</a>  
+<a class="jxr_linenumber" name="70" href="#70">70</a>  
+<a class="jxr_linenumber" name="71" href="#71">71</a>  
+<a class="jxr_linenumber" name="72" href="#72">72</a>  
+<a class="jxr_linenumber" name="73" href="#73">73</a>  }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>
+
