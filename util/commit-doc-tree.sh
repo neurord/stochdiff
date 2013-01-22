@@ -26,14 +26,14 @@ if [ $(git rev-parse gh-pages) != $(git rev-parse $(git config  branch.gh-pages.
 fi
 
 # get the 'git describe' output
-git_describe=$( git describe)
+git_describe=$(git describe --always)
 
-# make the documentation, hope it doesn't fail
-echo "Generating doc from $git_describe"
-if ! mvn site ; then
-    echo "Fatal: 'make'ing the docs failed cannot commit!"
-    exit 5
-fi
+# # make the documentation, hope it doesn't fail
+# echo "Generating doc from $git_describe"
+# if ! mvn site ; then
+#     echo "Fatal: 'make'ing the docs failed cannot commit!"
+#     exit 5
+# fi
 
 docdirectory=target/site
 
