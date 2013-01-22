@@ -118,6 +118,9 @@
               <report>index</report>
               <report>plugins</report>
               <report>summary</report>
+              <report>scm</report>
+              <report>dependencies</report>
+              <report>issue-tracking</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -180,5 +183,23 @@
     </plugins>
   </reporting>
 
+  <scm>
+    <connection>scm:https://github.com/neurord/stochdiff.git</connection>
+    <developerConnection>scm:git@github.com:neurord/stochdiff.git</developerConnection>
+    <url>https://github.com/neurord/stochdiff.git</url>
+  </scm>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/neurord/stochdiff/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License, Version 2 or later</name>
+      <distribution>repo</distribution>
+      <url>http://www.gnu.org/licenses/gpl2.html</url>
+    </license>
+  </licenses>
 
 </project>
