@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pmd version="4.3" timestamp="2013-01-22T16:28:05.382">
+<pmd version="4.3" timestamp="2013-01-22T16:54:13.548">
 <file name="/home/zbyszek/neuro/neurord/stochdiff/src/main/java/org/catacomb/act/Classdef.java">
 <violation beginline="108" endline="110" begincolumn="34" endcolumn="9" rule="EmptyIfStmt" ruleset="Basic Rules" package="org.catacomb.act" class="Classdef" method="addStringImport" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyIfStmt" priority="3">
 Avoid empty if statements
