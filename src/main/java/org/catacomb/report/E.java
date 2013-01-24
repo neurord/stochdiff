@@ -267,21 +267,6 @@ public class E {
     }
 
 
-
-    public static void delay() {
-        pause(200);
-    }
-
-
-    public static void pause(int n) {
-        try {
-
-            Thread.sleep(n);
-        } catch (Exception ex) {
-        }
-    }
-
-
     public static void newLine() {
         System.out.println("...");
     }
