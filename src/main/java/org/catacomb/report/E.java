@@ -159,7 +159,7 @@ public class E {
     public static void fatalError(String s) {
         report(FATAL, s);
         stackTrace();
-        System.exit(0);
+        System.exit(3);
     }
 
 

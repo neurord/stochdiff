@@ -252,6 +252,8 @@ public class ResultWriter {
 
         E.info("rename result: " + suc);
 
+        throw new RuntimeException("WTF?");
+        /*
         System.exit(0);
 
         try {
@@ -291,12 +293,13 @@ public class ResultWriter {
             r.close();
             E.info("exiting...");
 
-            System.exit(0);
+            System.exit(3);
             // fwk.delete();
 
         } catch (Exception ex) {
             E.error("cant prune data file: " + ex);
         }
+        */
     }
 
 }

@@ -316,7 +316,7 @@ public class Tmp1A extends BaseCalc {
                         System.out.println("In DIFFUSION: probability TOO HIGH!");
                         System.out.println("Reduce your timestep, and try again...");
                         System.out.println("WK====================================");
-                        System.exit(0);
+                        System.exit(3);
 
                         /*
                          * if (nwarn < 4) {
@@ -665,7 +665,7 @@ public class Tmp1A extends BaseCalc {
                     // if (ngo < 0)
                     // {
                     // System.out.println("in advance: ngo is NEGATIVE. Exiting...");
-                    // System.exit(0);
+                    // System.exit(3);
                     // }
                     // WK
 
@@ -768,7 +768,7 @@ public class Tmp1A extends BaseCalc {
             if (ngo < 0) {
                 System.out
                 .println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE from table. Exiting...");
-                System.exit(0);
+                System.exit(3);
             }
 
         } else {
@@ -817,7 +817,7 @@ public class Tmp1A extends BaseCalc {
         // WK 7 2 2008: if ngo is negative, exit. KB if ngo>np0 print message
         if (ngo < 0) {
             System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Should be impossible");
-            // System.exit(0);
+            // System.exit(3);
         }
         if (ngo > np0) {
             System.out.println("in parallelAndSharedDiffusionStep: nngo is greater than np0. This is bad");

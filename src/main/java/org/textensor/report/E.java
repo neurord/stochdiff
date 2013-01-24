@@ -50,7 +50,7 @@ public class E {
     public static void fatalError(String s) {
         System.out.println("FATAL - " + s);
         stackTrace();
-        System.exit(0);
+        System.exit(3);
     }
 
 

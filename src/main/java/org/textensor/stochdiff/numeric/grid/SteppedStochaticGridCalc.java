@@ -360,7 +360,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         System.out.println("In DIFFUSION: probability TOO HIGH!");
                         System.out.println("Reduce your timestep, and try again...");
                         System.out.println("WK====================================");
-                        System.exit(0);
+                        System.exit(3);
 
                         /*
                          * if (nwarn < 4) {
@@ -746,7 +746,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     // if (ngo < 0)
                     // {
                     // System.out.println("in advance: ngo is NEGATIVE. Exiting...");
-                    // System.exit(0);
+                    // System.exit(3);
                     // }
                     // WK
 
@@ -848,7 +848,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (ngo < 0) {
                 System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
-                System.exit(0);
+                System.exit(3);
             }
 
         } else {
@@ -897,7 +897,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         // WK 7 2 2008: if ngo is negative, exit.
         if (ngo < 0) {
             // System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Exiting...");
-            // System.exit(0);
+            // System.exit(3);
         }
         // WK
         // if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
