@@ -118,7 +118,7 @@ public class E {
 
     public static String getShortSource() {
         StackTraceElement[] stea = (new Exception()).getStackTrace();
-        return stea[2].toString();
+        return stea[2].getClassName() + ":" + stea[2].getMethodName();
     }
 
 
