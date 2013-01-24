@@ -364,7 +364,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                         /*
                          * if (nwarn < 4) {
-                         * E.shortWarning("p too large at element " + iel +
+                         * E.warning("p too large at element " + iel +
                          * " species " + k + " - capping from " +
                          * Math.exp(lnptot) + " to " + Math.exp(-1.)); nwarn++;
                          * } lnptot= -1.;
@@ -692,7 +692,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                 if (lnp > -1.) {
                     if (nwarn < 5) {
-                        E.shortWarning("p too large at element " + iel + " reaction " + ireac + " capping from "
+                        E.warning("p too large at element " + iel + " reaction " + ireac + " capping from "
                                        + Math.exp(lnp) + " to " + " exp(-1.)");
                         nwarn++;
                     }
@@ -771,7 +771,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         // or use a smaller timestep;
 
                         if (nwarn < 10) {
-                            E.shortWarning("reaction " + ireac + " ran out of particles - need " + ngo + " but have "
+                            E.warning("reaction " + ireac + " ran out of particles - need " + ngo + " but have "
                                            + navail);
                             nwarn++;
                         }
@@ -1009,7 +1009,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (lnpgo > -1.) {
                 if (nwarn < 4) {
-                    E.shortWarning("p too large at element " + iel + " transition " + j + " to  " + inbr[j]
+                    E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j]
                                    + " - capping " + Math.exp(lnpgo) + " coupling is " + lngnbr[j]);
                     nwarn++;
                 }
@@ -1040,7 +1040,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (ngo > wkB[iel][k]) {
                 if (nwarn < 10) {
-                    E.shortWarning("ran out of particles - curtailing last transition from " + ngo + " to "
+                    E.warning("ran out of particles - curtailing last transition from " + ngo + " to "
                                    + wkB[iel][k] + " leaving point " + iel + " species " + k);
                 } else if (nwarn == 10) {
                     E.info("Suppressing future warnings");

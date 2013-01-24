@@ -71,10 +71,6 @@ public class E {
         report(INFO, s + getShortSource());
     }
 
-    public static void infoTime(String s) {
-        report(INFO, s + " at " + getStringTime());
-    }
-
 
     public static void longInfo(String s) {
         report(INFO, s);
