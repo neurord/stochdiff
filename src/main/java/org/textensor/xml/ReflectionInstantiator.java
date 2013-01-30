@@ -367,7 +367,7 @@ public class ReflectionInstantiator {
                 ok = true;
 
             } else {
-                E.oneLineWarning("no such field " + sf + " on " + ob + "while settting " + arg);
+                E.warning("no such field " + sf + " on " + ob + "while settting " + arg);
                 E.reportCached();
                 ok = false;
             }

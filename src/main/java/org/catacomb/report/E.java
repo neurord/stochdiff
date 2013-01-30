@@ -71,10 +71,6 @@ public class E {
         report(INFO, s + getShortSource());
     }
 
-    public static void infoTime(String s) {
-        report(INFO, s + " at " + getStringTime());
-    }
-
 
     public static void longInfo(String s) {
         report(INFO, s);
@@ -163,7 +159,7 @@ public class E {
     public static void fatalError(String s) {
         report(FATAL, s);
         stackTrace();
-        System.exit(0);
+        System.exit(3);
     }
 
 
@@ -264,21 +260,6 @@ public class E {
             lastShortSource = ss;
         }
         return ss;
-    }
-
-
-
-    public static void delay() {
-        pause(200);
-    }
-
-
-    public static void pause(int n) {
-        try {
-
-            Thread.sleep(n);
-        } catch (Exception ex) {
-        }
     }
 
 

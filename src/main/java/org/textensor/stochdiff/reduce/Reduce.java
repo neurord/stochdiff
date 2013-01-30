@@ -25,7 +25,7 @@ public class Reduce {
                                + "The targetStateFile is a saved state corresponding to a model in the same grid. \n"
                                + "The initial conditions file from the model is used a a template for a new initial " +
                                "conditions file.");
-            System.exit(0);
+            System.exit(1);
 
         } else {
             modelFile = new File(argv[0]);

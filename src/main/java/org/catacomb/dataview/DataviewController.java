@@ -259,7 +259,7 @@ public class DataviewController implements Controller {
 
     public void requestExit() {
         E.missing();
-        System.exit(0);
+        System.exit(3);
     }
 
 

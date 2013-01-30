@@ -198,7 +198,7 @@ public class XMLReader {
 
                         } else {
                             nerror++;
-                            E.shortError(" non-matching close item \n" + "start Item was: \n"
+                            E.error(" non-matching close item \n" + "start Item was: \n"
                                          + start.toString() + "\n" + "but close was: \n" + next.toString() + "\n");
                         }
 
@@ -262,7 +262,7 @@ public class XMLReader {
 
 
                     } else if (next.isNumber()) {
-                        E.shortError("XMLReader sjhould never return numbers....!!!! but " + "just got " + next);
+                        E.error("XMLReader sjhould never return numbers....!!!! but " + "just got " + next);
                     }
                     next = readToken(tkz);
                 }

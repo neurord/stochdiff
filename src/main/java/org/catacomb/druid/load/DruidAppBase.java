@@ -102,7 +102,7 @@ public final class DruidAppBase implements AppPersistProvider {
 
     public void requestExit() {
 
-        System.exit(0);
+        System.exit(3);
 
 
     }
@@ -137,7 +137,7 @@ public final class DruidAppBase implements AppPersistProvider {
 
 
     public void forceExit() {
-        System.exit(0);
+        System.exit(3);
     }
 
 

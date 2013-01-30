@@ -1,80 +1,27 @@
 package org.textensor.report;
 
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class E {
 
-    public static long time0 = 0;
-
-    static String lastShortSource;
     static String cachedAction;
     static String lastErr;
     static int nrep;
 
-    private static long getTime() {
-        return System.currentTimeMillis();
-    }
-
-
-    public static void zeroTime() {
-        time0 = getTime();
-    }
-
-    public static String getStringTime() {
-        if (time0 == 0) {
-            zeroTime();
-        }
-        long dt = (getTime() - time0);
-        return "" + dt;
-    }
-
     public static void info(String s) {
-        System.out.println("INFO - " + s + getShortSource());
-    }
-
-    public static void infoTime(String s) {
-        System.out.println("INFO - " + s + " at " + getStringTime());
-    }
-
-
-    public static void longInfo(String s) {
-        System.out.println("INFO - " + s);
-        showSource(16);
-    }
-
-
-    public static void message(String s) {
-        System.out.println("MESSAGE - " + s);
-    }
-
-    public static void oneLineWarning(String s) {
-        System.out.println("WARNING - " + s + getShortSource());
-    }
-
-
-    public static void shortWarning(String s) {
-        System.out.println("WARNING - " + s + getShortSource());
-    }
-
-    public static void shortError(String s) {
-        System.out.println("ERROR - " + s + getShortSource());
-    }
-
-    public static void medWarning(String s) {
-        System.out.println("WARNING - " + s);
-        showSource(4);
+	Logger log = LogManager.getLogger(getShortSource());
+	log.info(s);
     }
 
     public static void warning(String s) {
-        System.out.println("WARNING - " + s);
-        showSource(12);
+	Logger log = LogManager.getLogger(getShortSource());
+	log.warn(s);
     }
 
-    public static void linkToWarning(String s, Object obj) {
-        System.out.println("WARNING - " + s);
-        String fcn = obj.getClass().getName();
-        String scn = fcn.substring(fcn.lastIndexOf(".") + 1, fcn.length());
-        System.out.println("  at " + fcn + ".nomethod(" + scn + ".java:1)");
+    public static void _error(String s) {
+	Logger log = LogManager.getLogger(getShortSource());
+	log.error(s);
     }
 
     public static void error(String s) {
@@ -89,8 +36,7 @@ public class E {
             }
             nrep = 0;
             lastErr = s;
-            System.out.println("ERROR - " + s);
-            showSource();
+            _error(s);
         }
     }
 
@@ -104,7 +50,7 @@ public class E {
     public static void fatalError(String s) {
         System.out.println("FATAL - " + s);
         stackTrace();
-        System.exit(0);
+        System.exit(3);
     }
 
 
@@ -172,28 +118,7 @@ public class E {
 
     public static String getShortSource() {
         StackTraceElement[] stea = (new Exception()).getStackTrace();
-        String ss = (" at " + stea[2].toString());
-        if (ss.equals(lastShortSource)) {
-            ss = "";
-        } else {
-            lastShortSource = ss;
-        }
-        return ss;
-    }
-
-
-
-    public static void delay() {
-        pause(200);
-    }
-
-
-    public static void pause(int n) {
-        try {
-
-            Thread.sleep(n);
-        } catch (Exception ex) {
-        }
+        return stea[2].getClassName() + ":" + stea[2].getMethodName();
     }
 
 

@@ -52,27 +52,38 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.6</version>
-	    <executions>
-	      <execution>
-	        <id>print-classpath</id>
-	        <phase>compile</phase>
-	        <configuration>
+            <executions>
+              <execution>
+                <id>print-classpath</id>
+                <phase>compile</phase>
+                <configuration>
               <target>
-		        <property name="runtime_classpath" refid="maven.runtime.classpath"/>
-		        <echo message="runtime CLASSPATH=${runtime_classpath}"/>
+                        <property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                        <echo message="runtime CLASSPATH=${runtime_classpath}"/>
               </target>
-	        </configuration>
-	        <goals>
+                </configuration>
+                <goals>
               <goal>run</goal>
-	        </goals>
-	      </execution>
-	    </executions>
+                </goals>
+              </execution>
+            </executions>
       </plugin>
 
     </plugins>
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.0-beta3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.0-beta3</version>
+    </dependency>
+
     <dependency>
       <groupId>java3d</groupId>
       <artifactId>j3d-vectmath</artifactId>
@@ -115,9 +126,12 @@
         <reportSets>
           <reportSet>
             <reports>
-	      <report>index</report>
+              <report>index</report>
               <report>plugins</report>
               <report>summary</report>
+              <report>scm</report>
+              <report>dependencies</report>
+              <report>issue-tracking</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -130,6 +144,26 @@
         <configuration>
           <aggregate>true</aggregate>
           <linkJavadoc>true</linkJavadoc>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>2.7.1</version>
+        <configuration>
+          <targetJdk>${project.jdk_version}</targetJdk>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.5.2</version>
+        <configuration>
+          <findbugsXmlOutput>true</findbugsXmlOutput>
+          <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+          <xmlOutput>true</xmlOutput>
         </configuration>
       </plugin>
 
@@ -160,5 +194,23 @@
     </plugins>
   </reporting>
 
+  <scm>
+    <connection>scm:https://github.com/neurord/stochdiff.git</connection>
+    <developerConnection>scm:git@github.com:neurord/stochdiff.git</developerConnection>
+    <url>https://github.com/neurord/stochdiff.git</url>
+  </scm>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/neurord/stochdiff/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License, Version 2 or later</name>
+      <distribution>repo</distribution>
+      <url>http://www.gnu.org/licenses/gpl2.html</url>
+    </license>
+  </licenses>
 
 </project>

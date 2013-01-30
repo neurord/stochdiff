@@ -287,20 +287,20 @@ public class XMLTokenizer {
                                     attNV[2 * natt + 1] = streamTokenizer.sval;
                                     natt++;
                                 } else {
-                                    E.shortError("expecting quoted string " + " while reading atributes "
+                                    E.error("expecting quoted string " + " while reading atributes "
                                                  + "but got " + stok(itok) + " sval=" + streamTokenizer.sval
                                                  + " nval=" + streamTokenizer.nval);
                                     E.info("original string was " + srcString);
                                 }
                             } else {
-                                E.shortError("at " + streamTokenizer.lineno()
+                                E.error("at " + streamTokenizer.lineno()
                                              + " expecting = while reading attributes " + "but got " + stok(itok)
                                              + " sval=" + streamTokenizer.sval + " nval=" + streamTokenizer.nval);
                                 E.info("original string was " + srcString);
                             }
                         }
                     } else {
-                        E.shortError("at line " + streamTokenizer.lineno()
+                        E.error("at line " + streamTokenizer.lineno()
                                      + " found non-word while reading attributes " + stok(itok)
                                      + "  item so far = " + this);
                         E.info("original string was " + srcString);

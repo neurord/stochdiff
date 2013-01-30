@@ -96,7 +96,7 @@ public class SDRun {
             } else if (distribution.toLowerCase().equals("poisson")) {
                 distributionID = distribution_t.POISSON;
             } else {
-                E.shortWarning("Unrecognized distribution (" + distribution
+                E.warning("Unrecognized distribution (" + distribution
                                + ") expecting binomial or poisson");
             }
         }
@@ -110,7 +110,7 @@ public class SDRun {
                 algorithmID = algorithm_t.PARTICLE;
 
             } else {
-                E.shortWarning("Unrecognized algorithm (" + algorithm
+                E.warning("Unrecognized algorithm (" + algorithm
                                + ") expecting independent or shared");
             }
         }

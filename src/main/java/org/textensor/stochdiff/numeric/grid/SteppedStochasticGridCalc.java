@@ -60,7 +60,7 @@ import org.textensor.vis.CCViz3D;
  *
  */
 
-public class SteppedStochaticGridCalc extends BaseCalc {
+public class SteppedStochasticGridCalc extends BaseCalc {
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.6022;
@@ -150,7 +150,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     double stateSaveTime;
 
-    public SteppedStochaticGridCalc(SDRun sdm) {
+    public SteppedStochasticGridCalc(SDRun sdm) {
         super(sdm);
     }
 
@@ -360,11 +360,11 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         System.out.println("In DIFFUSION: probability TOO HIGH!");
                         System.out.println("Reduce your timestep, and try again...");
                         System.out.println("WK====================================");
-                        System.exit(0);
+                        System.exit(3);
 
                         /*
                          * if (nwarn < 4) {
-                         * E.shortWarning("p too large at element " + iel +
+                         * E.warning("p too large at element " + iel +
                          * " species " + k + " - capping from " +
                          * Math.exp(lnptot) + " to " + Math.exp(-1.)); nwarn++;
                          * } lnptot= -1.;
@@ -692,7 +692,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
                 if (lnp > -1.) {
                     if (nwarn < 5) {
-                        E.shortWarning("p too large at element " + iel + " reaction " + ireac + " capping from "
+                        E.warning("p too large at element " + iel + " reaction " + ireac + " capping from "
                                        + Math.exp(lnp) + " to " + " exp(-1.)");
                         nwarn++;
                     }
@@ -746,7 +746,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                     // if (ngo < 0)
                     // {
                     // System.out.println("in advance: ngo is NEGATIVE. Exiting...");
-                    // System.exit(0);
+                    // System.exit(3);
                     // }
                     // WK
 
@@ -771,7 +771,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
                         // or use a smaller timestep;
 
                         if (nwarn < 10) {
-                            E.shortWarning("reaction " + ireac + " ran out of particles - need " + ngo + " but have "
+                            E.warning("reaction " + ireac + " ran out of particles - need " + ngo + " but have "
                                            + navail);
                             nwarn++;
                         }
@@ -848,7 +848,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (ngo < 0) {
                 System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
-                System.exit(0);
+                System.exit(3);
             }
 
         } else {
@@ -897,7 +897,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
         // WK 7 2 2008: if ngo is negative, exit.
         if (ngo < 0) {
             // System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Exiting...");
-            // System.exit(0);
+            // System.exit(3);
         }
         // WK
         // if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
@@ -1009,7 +1009,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (lnpgo > -1.) {
                 if (nwarn < 4) {
-                    E.shortWarning("p too large at element " + iel + " transition " + j + " to  " + inbr[j]
+                    E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j]
                                    + " - capping " + Math.exp(lnpgo) + " coupling is " + lngnbr[j]);
                     nwarn++;
                 }
@@ -1040,7 +1040,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
             if (ngo > wkB[iel][k]) {
                 if (nwarn < 10) {
-                    E.shortWarning("ran out of particles - curtailing last transition from " + ngo + " to "
+                    E.warning("ran out of particles - curtailing last transition from " + ngo + " to "
                                    + wkB[iel][k] + " leaving point " + iel + " species " + k);
                 } else if (nwarn == 10) {
                     E.info("Suppressing future warnings");

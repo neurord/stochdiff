@@ -93,7 +93,7 @@ public class CCVizController implements Controller {
 
 
     public void exit() {
-        System.exit(0);
+        System.exit(3);
     }
 
 
