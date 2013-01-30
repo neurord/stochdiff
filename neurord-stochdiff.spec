@@ -1,7 +1,7 @@
 Summary: Reaction-diffusion simulator
 Name: neurord-stochdiff
 Version: 2.1.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: Optional
 URL: https://github.com/neurord/stochdiff
@@ -75,5 +75,8 @@ mvn-rpmbuild -Dj3ddir=$HOME/neuro/j3d-1_5_2-linux-amd64/lib/ext verify
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Jan 30 2013 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - stochdiff-1
+* Wed Jan 30 2013  <zbyszek@meshugaas.krasnow.gmu.edu> - 2.1.10-2
+- New logging setup.
+
+* Wed Jan 30 2013 Zbigniew Jedrzejewski-Szmek <zbyszek@in.waw.pl> - 2.1.10-1
 - Initial build.
