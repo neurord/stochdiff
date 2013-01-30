@@ -12,6 +12,8 @@ import org.textensor.xml.XMLWriter;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import org.textensor.util.CustomFileAppender;
+
 public class StochDiff {
     static final Logger log = LogManager.getLogger("stochdiff");
 
@@ -57,6 +59,11 @@ public class StochDiff {
             }
             outputFile = new File(s + ".out");
         }
+
+        final String logfile = outputFile.toString().substring(0,
+                                            outputFile.toString().lastIndexOf("."))
+            + ".log";
+        CustomFileAppender.addFileAppender(logfile);
 
         SDRun sdModel = ModelReader.read(modelFile);
         sdModel.resolve();
