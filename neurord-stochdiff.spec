@@ -56,6 +56,9 @@ cp -rp target/site/apidocs/ $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 install -d -m 755 $RPM_BUILD_ROOT%{_mavenpomdir}
 install -pm 644 pom.xml $RPM_BUILD_ROOT%{_mavenpomdir}/JPP-%{name}.pom
 
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+install -m 0755 util/stochdiff.sh $RPM_BUILD_ROOT%{_bindir}/stochdiff
+
 %add_maven_depmap JPP-%{name}.pom %{name}.jar
 
 %check
@@ -65,6 +68,7 @@ mvn-rpmbuild -Dj3ddir=$HOME/neuro/j3d-1_5_2-linux-amd64/lib/ext verify
 %{_mavenpomdir}/JPP-%{name}.pom
 %{_mavendepmapfragdir}/%{name}
 %{_javadir}/%{name}.jar
+%{_bindir}/stochdiff
 %doc
 
 %files javadoc
