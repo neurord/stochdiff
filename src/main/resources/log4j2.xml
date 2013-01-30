@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration status="OFF">
+<configuration status="ALL" packages="org.textensor.util">
   <appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}"/>
     </Console>
+
+    <CustomFile name="model-logfile">
+      <PatternLayout>
+        <pattern>%d{HH:mm:ss.SSS} %level %logger - %msg%n</pattern>
+      </PatternLayout>
+    </CustomFile>
   </appenders>
   <loggers>
     <root level="debug">
       <appender-ref ref="Console"/>
+      <appender-ref ref="model-logfile"/>
     </root>
   </loggers>
 </configuration>
