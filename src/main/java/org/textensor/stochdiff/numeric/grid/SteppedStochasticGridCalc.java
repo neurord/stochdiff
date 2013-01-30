@@ -60,7 +60,7 @@ import org.textensor.vis.CCViz3D;
  *
  */
 
-public class SteppedStochaticGridCalc extends BaseCalc {
+public class SteppedStochasticGridCalc extends BaseCalc {
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.6022;
@@ -150,7 +150,7 @@ public class SteppedStochaticGridCalc extends BaseCalc {
 
     double stateSaveTime;
 
-    public SteppedStochaticGridCalc(SDRun sdm) {
+    public SteppedStochasticGridCalc(SDRun sdm) {
         super(sdm);
     }
 

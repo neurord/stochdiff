@@ -1,8 +1,8 @@
 //5 13 2010 RO Methods used to save alternative files "*conc.txt" included for deterministic
-//             copied from SteppedStochaticGridCalc.java, getGridConcsPlainText, getGridConcsPlainText_dumb,
+//             copied from SteppedStochasticGridCalc.java, getGridConcsPlainText, getGridConcsPlainText_dumb,
 //             getGridConcsHeadings, getGridConcsHeadings_dumb, stringi and stringd
 //             Other variables have been included in class DeterministicGridCalc following
-//             the template from SteppedStochaticGridCalc in order to save files "*conc.txt"
+//             the template from SteppedStochasticGridCalc in order to save files "*conc.txt"
 package org.textensor.stochdiff.numeric.grid;
 
 import org.textensor.report.E;
@@ -302,7 +302,7 @@ public class DeterministicGridCalc extends BaseCalc {
 
         if (resultWriter != null) {
             resultWriter.writeString(vgrid.getAsText());
-            // RO 5 13 2010: follows template in SteppedStochaticGridCalc
+            // RO 5 13 2010: follows template in SteppedStochasticGridCalc
             resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
             for (int i = 0; i < fnmsOut.length; i++) {
                 resultWriter.writeToSiblingFile(getGridConcsHeadings_dumb(i), "-" + fnmsOut[i] + "-conc.txt");
@@ -337,7 +337,7 @@ public class DeterministicGridCalc extends BaseCalc {
         // RO
         while (time < endtime) {
 
-            // RO 5 13 2010: follows template in SteppedStochaticGridCalc
+            // RO 5 13 2010: follows template in SteppedStochasticGridCalc
             if (time >= writeTime) {
                 if (resultWriter != null) {
                     resultWriter.writeString(getGridConcsText(time));
