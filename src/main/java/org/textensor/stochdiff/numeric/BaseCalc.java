@@ -38,7 +38,7 @@ public abstract class BaseCalc {
     public SDRun sdRun;
 
     // particles Per Unit Volume and Concentration
-    public static final double PARTICLES_PUVC = 0.6022;
+    public static final double PARTICLES_PUVC = 0.602214179;
     public static final double LN_PARTICLES_PUVC = Math.log(PARTICLES_PUVC);
 
     // particles per unit area and surface density
