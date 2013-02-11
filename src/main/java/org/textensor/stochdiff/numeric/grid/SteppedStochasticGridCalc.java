@@ -46,31 +46,11 @@ import org.textensor.vis.CCViz3D;
  * in p (probability of event for one particle)  and
  * n (number of particles of a given type)  for a uniform random number.
  *
- * This is approximate because the effect of the particles on thier new
- * location is note taken into account until the following step.
- *
- *
- * Units: concentrations are expressed in nM and volumes in cubic microns
- * So, in these units , one Litre is 10^15 and a 1M solution is 10^9
- * The conversion factor between concentrations and particle number is
- * therefore
- * nparticles = 6.022^23 * vol/10^15 * conc/10^9
- * ie, nparticles = 0.6022 * conc
- *
- *
+ * This is approximate because the effect of the particles on their new
+ * location is not taken into account until the following step.
  */
 
 public class SteppedStochasticGridCalc extends BaseCalc {
-
-    // particles Per Unit Volume and Concentration
-    public static final double PARTICLES_PUVC = 0.6022;
-    public static final double LN_PARTICLES_PUVC = Math.log(PARTICLES_PUVC);
-
-    public final static double CONC_OF_N = 1. / 0.6022;
-
-    // particles per unit area and surface density
-    // (is the same as PUVC - sd unit is picomoles per square metre)
-    public static final double PARTICLES_PUASD = 0.6022;
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),
@@ -282,7 +262,7 @@ public class SteppedStochasticGridCalc extends BaseCalc {
             if (cc != null) {
                 for (int i = 0; i < nel; i++) {
                     for (int j = 0; j < nspec; j++) {
-                        int np = (int) Math.round(cc[i][j] * volumes[i] / CONC_OF_N);
+                        int np = (int) Math.round(cc[i][j] * volumes[i] / NM_PER_PARTICLE_PUV);
                         wkA[i][j] = np;
                         wkB[i][j] = np;
                     }
@@ -400,7 +380,7 @@ public class SteppedStochasticGridCalc extends BaseCalc {
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < nspecout; j++) {
                 if (writeConcentration) {
-                    sb.append(stringd((CONC_OF_N * wkA[i][ispecout[j]] / volumes[i])));
+                    sb.append(stringd((NM_PER_PARTICLE_PUV * wkA[i][ispecout[j]] / volumes[i])));
 
                 } else {
                     sb.append(stringi(wkA[i][ispecout[j]]));
@@ -421,7 +401,7 @@ public class SteppedStochasticGridCalc extends BaseCalc {
 
                     int npart = wkA[i][specIndexesOut[filenum][j]];
                     if (writeConcentration) {
-                        sb.append(stringd((CONC_OF_N * npart / volumes[i])));
+                        sb.append(stringd((NM_PER_PARTICLE_PUV * npart / volumes[i])));
                     } else {
                         sb.append(stringi(npart));
                     }
@@ -443,7 +423,7 @@ public class SteppedStochasticGridCalc extends BaseCalc {
         sb.append("\n");
         for (int i = 0; i < nel; i++) {
             for (int j = 0; j < specieIDs.length; j++) {
-                sb.append(stringd((CONC_OF_N * wkA[i][j] / volumes[i])));
+                sb.append(stringd((NM_PER_PARTICLE_PUV * wkA[i][j] / volumes[i])));
             }
             sb.append("\n");
         }

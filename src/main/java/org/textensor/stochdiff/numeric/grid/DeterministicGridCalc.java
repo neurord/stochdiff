@@ -22,14 +22,6 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 public class DeterministicGridCalc extends BaseCalc {
 
-    // converting particle numbers to concentrations
-    // nanomoles per particle per unit volume
-    // ie, each particle added to a cubic micron increases
-    // the nanoMolar concentration this much
-    final static double NM_PER_PARTICLE_PUV = 1. / 0.6022;
-
-    final static double PARTICLES_PUVC = 0.6022;
-
     Column mconc;
 
     ReactionTable rtab;

@@ -24,9 +24,32 @@ import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.util.ArrayUtil;
 
+/**
+ * Units: concentrations are expressed in nM and volumes in cubic microns
+ * So, in these units, one Litre is 10^15 and a 1M solution is 10^9.
+ * The conversion factor between concentrations and particle number is
+ * therefore
+ * nparticles = 6.022^23 * vol/10^15 * conc/10^9
+ * ie, nparticles = 0.6022 * conc
+ */
+
 public abstract class BaseCalc {
 
     public SDRun sdRun;
+
+    // particles Per Unit Volume and Concentration
+    public static final double PARTICLES_PUVC = 0.6022;
+    public static final double LN_PARTICLES_PUVC = Math.log(PARTICLES_PUVC);
+
+    // particles per unit area and surface density
+    // (is the same as PUVC - sd unit is picomoles per square metre)
+    public static final double PARTICLES_PUASD = PARTICLES_PUVC;
+
+    // converting particle numbers to concentrations
+    // nanomoles per particle per unit volume
+    // ie, each particle added to a cubic micron increases
+    // the nanoMolar concentration this much
+    public static final double NM_PER_PARTICLE_PUV = 1. / PARTICLES_PUVC;
 
     ReactionTable reactionTable;
     VolumeGrid volumeGrid;
