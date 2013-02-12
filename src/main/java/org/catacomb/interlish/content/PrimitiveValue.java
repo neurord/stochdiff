@@ -66,7 +66,7 @@ public class PrimitiveValue implements Value, TouchTimed, ParentReporter {
 
     public void removeValueWatcher(ValueWatcher vw) {
         if (watchers == null) {
-            E.warning("cant remove - not present");
+            E.warning("cannot remove - not present");
         } else {
             if (watchers.contains(vw)) {
                 watchers.remove(vw);
@@ -88,7 +88,7 @@ public class PrimitiveValue implements Value, TouchTimed, ParentReporter {
 
     public void removeUseWatcher(UseWatcher vw) {
         if (useWatchers == null) {
-            E.warning("cant remove - not present");
+            E.warning("cannot remove - not present");
         } else {
             if (useWatchers.contains(vw)) {
                 useWatchers.remove(vw);

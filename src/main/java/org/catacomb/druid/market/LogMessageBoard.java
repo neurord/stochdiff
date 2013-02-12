@@ -15,7 +15,7 @@ public class LogMessageBoard extends ProducerConsumerBoard {
             ((LogMessageGenerator)p).setLog((InfoLog)c);
 
         } else {
-            E.error("log board cant connect " + p + " and " + c);
+            E.error("log board cannot connect " + p + " and " + c);
         }
     }
 

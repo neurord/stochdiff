@@ -59,7 +59,7 @@ public class DruLinkHandler implements HyperlinkHandler {
             currentAddress = s;
 
         } else {
-            E.warning("page supplier cant get " + s);
+            E.warning("page supplier cannot get " + s);
         }
     }
 

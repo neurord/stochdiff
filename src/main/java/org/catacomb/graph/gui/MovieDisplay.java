@@ -108,7 +108,7 @@ public class MovieDisplay extends BasePanel
 
 
         if (!done) {
-            E.error("cant attach " + obj + " to a data Display");
+            E.error("cannot attach " + obj + " to a data Display");
         }
     }
 

@@ -26,7 +26,7 @@ public class OutputScheme implements AddableTo
         }
         else
         {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

@@ -31,7 +31,7 @@ public class KitPanel extends Panel implements AddableTo {
             ((AdderTo)obj).addTo(this);
 
         } else {
-            E.error("cant add non-realizer " + obj + " to " + this);
+            E.error("cannot add non-realizer " + obj + " to " + this);
         }
     }
 

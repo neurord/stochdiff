@@ -19,7 +19,7 @@ public class MorphMLCableGroup implements AddableTo {
             cables.add((cable)obj);
 
         } else {
-            E.warning("cant add " + obj);
+            E.warning("cannot add " + obj);
         }
     }
 

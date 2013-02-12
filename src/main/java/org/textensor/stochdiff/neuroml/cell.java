@@ -43,7 +43,7 @@ public class cell implements MetaContainer, AddableTo, Transitional {
 
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

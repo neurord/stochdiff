@@ -182,7 +182,7 @@ public class DruCheckboxListPanel extends DruGCPanel implements ListDisplay, Lab
 
 
     public void setCellRenderer(DruListCellRenderer obj) {
-        E.error("cant set renderer for a checkbox list...");
+        E.error("cannot set renderer for a checkbox list...");
         //  dList.setCellRenderer(obj.getGUIPeer());
     }
 

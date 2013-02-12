@@ -46,7 +46,7 @@ public class NVPair {
         if (pairValue != null) {
             pairValue.add(nvp);
         } else {
-            E.error("NVPair cant add a NVPair - null value array ");
+            E.error("NVPair cannot add a NVPair - null value array ");
         }
     }
 

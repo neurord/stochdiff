@@ -459,7 +459,7 @@ public class Shape extends Polypoint
         if (itg >= 0) {
             ret = deletePoint(itg);
         } else {
-            E.error("cant find point");
+            E.error("cannot find point");
         }
         return ret;
     }
@@ -468,7 +468,7 @@ public class Shape extends Polypoint
     public boolean deletePoint(int itg) {
         boolean bdone = false;
         if (isRectangular()) {
-            // cant delete;
+            // cannot delete;
         } else if (p_points.length <= 2) {
             // cante delete - kill whole shape;
         } else {

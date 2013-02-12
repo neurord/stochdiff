@@ -130,7 +130,7 @@ public class DecManifest {
                     roles.add(new ClassRole(cls, "provides", prv));
 
                 } else {
-                    E.error("cant extract info from " + elt);
+                    E.error("cannot extract info from " + elt);
                 }
 
             } else if (elt.getName().equals("Factory")) {
@@ -139,7 +139,7 @@ public class DecManifest {
                 if (cls != null && val != null) {
                     roles.add(new ClassRole(cls, "makes", val));
                 } else {
-                    E.error("cant extract info from " + elt);
+                    E.error("cannot extract info from " + elt);
                 }
 
 

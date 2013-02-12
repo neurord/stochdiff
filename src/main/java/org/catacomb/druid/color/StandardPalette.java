@@ -36,7 +36,7 @@ public class StandardPalette {
             for (int i = 0; i < colorNames.length; i++) {
                 Color c = sc.getColor(colorNames[i]);
                 if (c == null) {
-                    E.warning("cant get color " + colorNames[i]);
+                    E.warning("cannot get color " + colorNames[i]);
                 } else {
                     colors[i] = c;
                 }
@@ -44,7 +44,7 @@ public class StandardPalette {
 
 
         } else {
-            E.error("cant read standard colors");
+            E.error("cannot read standard colors");
             colors = new Color[1];
             colors[0] = Color.black;
 

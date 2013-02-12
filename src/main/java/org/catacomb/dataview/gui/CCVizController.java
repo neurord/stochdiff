@@ -49,7 +49,7 @@ public class CCVizController implements Controller {
         dataHandler = DataHandlerFactory.getHandler(s);
         if (dataHandler == null) {
             int[] xy = {500, 500};
-            Dialoguer.message(xy, "unrecognized file - cant plot " + s);
+            Dialoguer.message(xy, "unrecognized file - cannot plot " + s);
         } else {
             dataHandler.read(f);
 

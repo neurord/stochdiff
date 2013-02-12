@@ -21,7 +21,7 @@ public class DruWindowEditEffect extends Effect {
 
     public void apply(boolean b) {
         Object tgt = getTarget();
-        E.missing("cant access edot ctrl " + tgt);
+        E.missing("cannot access edot ctrl " + tgt);
 //      Sys.getSys().getModelEditor().showEditor(config, tgt);
     }
 

@@ -30,7 +30,7 @@ public class KeyedMultiList<V> {
         try {
             itemClass = Class.forName(s);
         } catch (Exception ex) {
-            E.error("cant find class " + s + " " + ex);
+            E.error("cannot find class " + s + " " + ex);
         }
     }
 

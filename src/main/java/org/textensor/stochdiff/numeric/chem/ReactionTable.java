@@ -97,10 +97,10 @@ public class ReactionTable {
 
 
         if (aidx.length > 2) {
-            E.error("cant handle reactions with more than two reactants");
+            E.error("cannot handle reactions with more than two reactants");
         }
         if (bidx.length > 2) {
-            E.error("cant handle reactions with more than two products");
+            E.error("cannot handle reactions with more than two products");
         }
 
 
@@ -346,7 +346,7 @@ public class ReactionTable {
             }
         }
         if (iret < 0) {
-            E.error("cant find specie " + specieID + " required for stimulation");
+            E.error("cannot find specie " + specieID + " required for stimulation");
             E.dump("specs", sa);
         }
         return iret;

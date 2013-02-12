@@ -104,7 +104,7 @@ public class GraphMaker {
             ImageIO.write(image, "PNG", fout);
 
         } catch (Exception ex) {
-            E.error("cant write " + fout + " " + ex);
+            E.error("cannot write " + fout + " " + ex);
         }
 
     }

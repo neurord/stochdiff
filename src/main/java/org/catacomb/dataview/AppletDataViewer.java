@@ -64,7 +64,7 @@ public class AppletDataViewer extends JApplet {
 
 
         } catch (Exception ex) {
-            E.error("cant init applet " + ex);
+            E.error("cannot init applet " + ex);
         }
 
     }

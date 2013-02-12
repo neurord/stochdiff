@@ -35,7 +35,7 @@ public class NumericDataRW {
             ret = bout.toByteArray();
         } catch (Exception ex) {
 
-            E.error("cant binarize " + dset + " " + ex);
+            E.error("cannot binarize " + dset + " " + ex);
             ex.printStackTrace();
         }
         return ret;
@@ -87,7 +87,7 @@ public class NumericDataRW {
             }
 
         } else {
-            E.error("data ion cant write " + obj);
+            E.error("data ion cannot write " + obj);
         }
     }
 

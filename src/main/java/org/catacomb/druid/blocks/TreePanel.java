@@ -38,7 +38,7 @@ public class TreePanel extends Panel implements AddableTo {
         if (obj instanceof PopupMenu) {
             popup = (PopupMenu)obj;
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

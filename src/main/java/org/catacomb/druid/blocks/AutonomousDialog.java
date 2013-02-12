@@ -31,7 +31,7 @@ public class AutonomousDialog implements AddableTo, Realizer {
         if (obj instanceof Panel) {
             panel = (Panel)obj;
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

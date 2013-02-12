@@ -74,7 +74,7 @@ public class NumDataSet extends DataItem implements ElementWriter {
         if (obj instanceof Named && obj instanceof DataItem) {
             itemHM.put(((Named)obj).getName(), (DataItem)obj);
         } else {
-            E.error("NumDataSet cant add " + obj);
+            E.error("NumDataSet cannot add " + obj);
         }
     }
 
@@ -129,7 +129,7 @@ public class NumDataSet extends DataItem implements ElementWriter {
                 itemHM.remove(nm);
                 itemHM.put(nm, arl);
             } else {
-                E.error("cant add data set " + ds + " to " + this + " : mismatched types");
+                E.error("cannot add data set " + ds + " to " + this + " : mismatched types");
             }
 
 
@@ -166,7 +166,7 @@ public class NumDataSet extends DataItem implements ElementWriter {
                 }
 
             } else {
-                E.error("Data set element making cant handle " + obj);
+                E.error("Data set element making cannot handle " + obj);
             }
         }
 

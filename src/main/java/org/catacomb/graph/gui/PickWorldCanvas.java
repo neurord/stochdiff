@@ -133,7 +133,7 @@ public class PickWorldCanvas extends WorldCanvas {
         }
 
         if (!done) {
-            E.error(" - cant attach " + obj + " to a PickWorldCanvas");
+            E.error(" - cannot attach " + obj + " to a PickWorldCanvas");
         }
 
     }

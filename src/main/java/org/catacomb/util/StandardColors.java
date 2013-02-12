@@ -35,7 +35,7 @@ public class StandardColors implements AddableTo {
             colors.put(cdef.getName(), cdef.getColor());
 
         } else {
-            E.error("standard colors cant use " + obj);
+            E.error("standard colors cannot use " + obj);
         }
     }
 

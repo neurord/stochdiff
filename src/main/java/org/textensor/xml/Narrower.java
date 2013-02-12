@@ -109,7 +109,7 @@ public final class Narrower {
             }
 
         } else {
-            err("ERROR - cant make string array from " + ob);
+            err("ERROR - cannot make string array from " + ob);
         }
         return sret;
     }
@@ -210,7 +210,7 @@ public final class Narrower {
                 iret = parseInt((String)arg);
             }
         } else {
-            err("cant make an int from " + arg + " " + arg.getClass());
+            err("cannot make an int from " + arg + " " + arg.getClass());
         }
         return iret;
     }
@@ -239,7 +239,7 @@ public final class Narrower {
             dret = parseDouble((String)arg);
 
         } else {
-            err(" cant make a double from " + arg + " " + arg.getClass());
+            err(" cannot make a double from " + arg + " " + arg.getClass());
             (new Exception()).printStackTrace();
         }
         return dret;
@@ -255,7 +255,7 @@ public final class Narrower {
             String sob = ((String)arg).trim();
             bret = (sob.equals("1") || sob.equals("true"));
         } else {
-            err(" instantiator cant make a boolean from " + arg);
+            err(" instantiator cannot make a boolean from " + arg);
         }
         return bret;
     }
@@ -279,7 +279,7 @@ public final class Narrower {
                 dret[iout++] = makeDoubleArray(sub);
             }
         } else {
-            err("cant make DD array from " + ob);
+            err("cannot make DD array from " + ob);
         }
         return dret;
     }
@@ -302,7 +302,7 @@ public final class Narrower {
                 iret[iout++] = makeIntArray(sub);
             }
         } else {
-            err("cant make II array from " + ob);
+            err("cannot make II array from " + ob);
         }
         return iret;
     }
@@ -343,7 +343,7 @@ public final class Narrower {
                 value[i] = (new Double(sa[i])).doubleValue();
             }
         } catch (Exception ex) {
-            E.error("float reading cant extract " + nt + " doubles from " + s);
+            E.error("float reading cannot extract " + nt + " doubles from " + s);
             for (int i = 0; i < nt; i++) {
                 E.info("string " + i + "=xxx" + sa[i] + "xxx");
             }

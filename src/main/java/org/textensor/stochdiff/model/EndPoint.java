@@ -64,7 +64,7 @@ public class EndPoint extends MorphPoint {
                 }
 
             } else {
-                E.error("point refers to segment " + on + " but that segment cant be found");
+                E.error("point refers to segment " + on + " but that segment cannot be found");
             }
 
         }

@@ -131,7 +131,7 @@ public abstract class FileUtil {
             os.write(ba);
             os.flush();
         } catch (Exception e) {
-            E.error("cant write byte array " + ba + " to " + f);
+            E.error("cannot write byte array " + ba + " to " + f);
         }
     }
 

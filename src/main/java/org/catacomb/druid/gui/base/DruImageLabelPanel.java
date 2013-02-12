@@ -63,7 +63,7 @@ public class DruImageLabelPanel extends DruPanel {
             }
         }
         if (!done) {
-            E.warning("cant find tag " + s);
+            E.warning("cannot find tag " + s);
         }
     }
 

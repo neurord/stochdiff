@@ -26,7 +26,7 @@ public class meta implements AddableTo, XMLContainer {
         } else if (obj instanceof meta) {
             metas.add((meta)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

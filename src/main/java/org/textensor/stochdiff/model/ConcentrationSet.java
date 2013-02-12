@@ -26,7 +26,7 @@ public class ConcentrationSet implements AddableTo {
         if (obj instanceof Concentration) {
             concentrations.add((Concentration)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

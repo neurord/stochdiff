@@ -56,7 +56,7 @@ public class PanelPack {
             if (obj instanceof TextSettable) {
                 ((TextSettable)obj).setText(txt);
             } else {
-                E.error("cant set text in " + obj);
+                E.error("cannot set text in " + obj);
             }
 
         } else {
@@ -103,7 +103,7 @@ public class PanelPack {
             if (obj instanceof StringValueEditor) {
                 ((StringValueEditor)obj).setStringValue(sv);
             } else {
-                E.error("cant set text in " + obj);
+                E.error("cannot set text in " + obj);
             }
 
         } else {

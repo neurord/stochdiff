@@ -124,7 +124,7 @@ public class FileAccumulator {
                     addIfNew(f);
                 }
             } else {
-                E.warning("cant add wildcard imports " + path);
+                E.warning("cannot add wildcard imports " + path);
             }
 
 

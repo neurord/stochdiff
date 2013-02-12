@@ -150,7 +150,7 @@ public class DruidTargetStore implements TargetStore {
         if (obj instanceof StringValueSettable) {
             ((StringValueSettable)obj).setStringValue(value);
         } else {
-            E.error("cant set " + value + " in " + id);
+            E.error("cannot set " + value + " in " + id);
         }
     }
 
@@ -160,7 +160,7 @@ public class DruidTargetStore implements TargetStore {
             ((ObjectValueSettable)obj).setObjectValue(val);
 
         } else {
-            E.error("cant set " + val + " in " + id);
+            E.error("cannot set " + val + " in " + id);
         }
 
     }
@@ -174,7 +174,7 @@ public class DruidTargetStore implements TargetStore {
             ret = (ProgressReport)obj;
 
         } else {
-            E.error("cant get progress report " + id + " (got " + obj + ")");
+            E.error("cannot get progress report " + id + " (got " + obj + ")");
             ret = new PrintProgressReport();
         }
         return ret;
@@ -191,7 +191,7 @@ public class DruidTargetStore implements TargetStore {
             ret = (PopulableMenu)obj;
 
         } else {
-            E.error("cant get subMenu " + id + " (got " + obj + ")");
+            E.error("cannot get subMenu " + id + " (got " + obj + ")");
         }
         return ret;
     }
@@ -205,7 +205,7 @@ public class DruidTargetStore implements TargetStore {
             ret = (Button)obj;
 
         } else {
-            E.error("cant get button " + id + " (got " + obj + ")");
+            E.error("cannot get button " + id + " (got " + obj + ")");
         }
         return ret;
     }

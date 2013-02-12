@@ -145,7 +145,7 @@ public class ColorUtil {
             cret = new Color(ic);
 
         } catch (NumberFormatException ex) {
-            E.error("cant decode color string " + s);
+            E.error("cannot decode color string " + s);
             cret = Color.red;
         }
         return cret;
@@ -160,7 +160,7 @@ public class ColorUtil {
             ret = new Color(icol);
 
         } else {
-            E.error(" - cant read color " + s);
+            E.error(" - cannot read color " + s);
 
         }
         return ret;

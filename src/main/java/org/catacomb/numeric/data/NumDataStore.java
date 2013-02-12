@@ -126,7 +126,7 @@ public class NumDataStore implements RunDataStore, Named, TreeRoot,
             reportDataStructureChange();
             reportNewChild();
         } else {
-            E.error("cant add " + ndi);
+            E.error("cannot add " + ndi);
         }
 
     }

@@ -25,7 +25,7 @@ public class SinglePanelContainer implements AddableTo {
             } else if (obj instanceof PanelWrapper) {
                 ret = ((PanelWrapper)obj).getPanel();
             } else {
-                E.error("cant get panel from " + obj);
+                E.error("cannot get panel from " + obj);
             }
         }
 
@@ -43,7 +43,7 @@ public class SinglePanelContainer implements AddableTo {
             }
 
         } else {
-            E.error("cant add  non-panel to " + this);
+            E.error("cannot add  non-panel to " + this);
             E.info("tried to add " + obj + " (" + obj.getClass().getName() + ")");
         }
 

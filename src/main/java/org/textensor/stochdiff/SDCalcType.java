@@ -56,7 +56,7 @@ public enum SDCalcType {
             ret = (BaseCalc)(constructor.newInstance(args));
 
         } catch (Exception ex) {
-            E.error("ex " + ex + " cant instantiate " + name() + " " + calcClass);
+            E.error("ex " + ex + " cannot instantiate " + name() + " " + calcClass);
             ex.printStackTrace();
         }
         return ret;

@@ -55,7 +55,7 @@ public class TableDataReader implements DataReader {
                         nread += 1;
                     }
                 } catch (Exception ex) {
-                    E.error("cant read line needed in table data reader " + ex);
+                    E.error("cannot read line needed in table data reader " + ex);
                 }
 
             }
@@ -89,7 +89,7 @@ public class TableDataReader implements DataReader {
 
 
         } else {
-            E.error("cant read " + line);
+            E.error("cannot read " + line);
         }
 
     }

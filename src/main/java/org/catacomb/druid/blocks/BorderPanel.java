@@ -35,7 +35,7 @@ public class BorderPanel extends Panel implements AddableTo {
             inserters.add((PanelInserter)obj);
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

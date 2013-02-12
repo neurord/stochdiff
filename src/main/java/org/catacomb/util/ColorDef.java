@@ -29,7 +29,7 @@ public class ColorDef {
                 cvalue = new Color(ic);
 
             } catch (NumberFormatException ex) {
-                E.error(" - ColorDef cant decode color string " + value);
+                E.error(" - ColorDef cannot decode color string " + value);
                 cvalue = Color.red;
             }
         }

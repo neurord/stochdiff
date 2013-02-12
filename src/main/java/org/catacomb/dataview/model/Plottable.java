@@ -47,7 +47,7 @@ public abstract class Plottable {
         } else {
             double[] row = AsciiIO.readRow(rescale);
             if (row == null) {
-                E.warning("cant read scale factors from " + rescale);
+                E.warning("cannot read scale factors from " + rescale);
             } else {
                 for (int i = 0; i < nsf && i < row.length; i++) {
                     ret[i] = row[i];

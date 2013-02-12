@@ -20,7 +20,7 @@ public class ChildrenOf implements AdderTo {
         if (obj instanceof AdderTo) {
             ((AdderTo)obj).addTo(ato);
         } else {
-            E.error("cant add children from " + obj);
+            E.error("cannot add children from " + obj);
         }
 
     }

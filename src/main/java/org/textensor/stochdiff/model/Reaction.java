@@ -51,7 +51,7 @@ public class Reaction implements AddableTo {
             catalyst = (Catalyst)obj;
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
 
     }

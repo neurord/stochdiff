@@ -36,7 +36,7 @@ public class Dataview implements AddableTo {
             panels.add((DVPanel)obj);
 
         } else {
-            E.debugError("dataview - cant add " + obj +
+            E.debugError("dataview - cannot add " + obj +
                          " (" + obj.getClass().getName() + ")");
         }
     }

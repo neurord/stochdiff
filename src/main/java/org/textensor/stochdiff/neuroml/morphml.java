@@ -53,7 +53,7 @@ public class morphml implements AddableTo, Transitional {
                     obj = ((Transitional)obj).getFinal();
                 }
             } catch (Exception ex) {
-                E.error("cant convert from " + obj);
+                E.error("cannot convert from " + obj);
             }
             ret = (cell)obj;
         }

@@ -23,7 +23,7 @@ public class HoldLastScalarFunction implements ScalarFunction {
 
     public void addTransition(double t, double v) {
         if (t < times[ntv-1]) {
-            E.missing("cant add prior transition");
+            E.missing("cannot add prior transition");
         } else {
             if (ntv == times.length) {
                 double[] tt = new double[2 * times.length];

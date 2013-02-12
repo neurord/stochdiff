@@ -70,7 +70,7 @@ public class ObjectAccessor implements Structure, Targeted, Accessor {
         try {
             ret = fld.get(target);
         } catch (Exception ex) {
-            E.error("object has field but cant access " + s + " " + target);
+            E.error("object has field but cannot access " + s + " " + target);
         }
         return ret;
     }
@@ -86,7 +86,7 @@ public class ObjectAccessor implements Structure, Targeted, Accessor {
         try {
             ret = m.invoke(target, emptyOA);
         } catch (Exception ex) {
-            E.error("get method exists but cant use it: " + ex);
+            E.error("get method exists but cannot use it: " + ex);
         }
         return ret;
     }

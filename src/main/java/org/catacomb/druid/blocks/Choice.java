@@ -58,7 +58,7 @@ public class Choice extends Panel implements AddableTo {
             effects.add((BaseEffect)obj);
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

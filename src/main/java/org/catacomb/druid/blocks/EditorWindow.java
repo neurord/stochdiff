@@ -55,7 +55,7 @@ public class EditorWindow implements Realizer, AddableTo {
         } else if (obj instanceof Role) {
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

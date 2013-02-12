@@ -37,7 +37,7 @@ public class KeyedList<V> implements ElementWriter {
         try {
             itemClass = Class.forName(s);
         } catch (Exception ex) {
-            E.error("cant find class " + s + " " + ex);
+            E.error("cannot find class " + s + " " + ex);
         }
     }
 
@@ -160,7 +160,7 @@ public class KeyedList<V> implements ElementWriter {
             if (itemHM.containsKey(sf)) {
                 ret = itemHM.get(sf);
             } else {
-                E.error("cant get " + s + " from keyed list");
+                E.error("cannot get " + s + " from keyed list");
             }
 
         }
@@ -188,12 +188,12 @@ public class KeyedList<V> implements ElementWriter {
                 addItem(ret);
 
             } catch (Exception ex) {
-                E.error("cant make item of type " + itemClass + " " + ex);
+                E.error("cannot make item of type " + itemClass + " " + ex);
             }
 
 
         } else {
-            E.error("cant make new item - null classs");
+            E.error("cannot make new item - null classs");
         }
 
 
@@ -220,7 +220,7 @@ public class KeyedList<V> implements ElementWriter {
             addToHM(repl);
 
         } else {
-            E.error(" cant supercede non supercedable: " + old);
+            E.error(" cannot supercede non supercedable: " + old);
         }
     }
 

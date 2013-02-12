@@ -33,7 +33,7 @@ public class DataIO {
                 value[i] = (new Double(sa[i])).doubleValue();
             }
         } catch (Exception ex) {
-            E.error("float reading cant extract " + nt + " doubles from " + s);
+            E.error("float reading cannot extract " + nt + " doubles from " + s);
             for (int i = 0; i < nt; i++) {
                 E.info("string " + i + "=xxx" + sa[i] + "xxx");
             }

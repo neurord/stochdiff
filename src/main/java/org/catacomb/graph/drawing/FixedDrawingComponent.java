@@ -164,7 +164,7 @@ public abstract class FixedDrawingComponent implements ReReferencable, Cloneable
         } else if (s == null || s.length() == 0) {
 
         } else {
-            E.error(" - cant read color " + s);
+            E.error(" - cannot read color " + s);
         }
         return ret;
     }

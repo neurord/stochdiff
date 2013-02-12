@@ -19,10 +19,10 @@ public class TreeBoard extends ProducerConsumerBoard {
                 ((TreeExplorer)c).setTree((Tree)p);
 
             } else {
-                E.error("cant set tree - not a TreeProvider " + p);
+                E.error("cannot set tree - not a TreeProvider " + p);
             }
         } else {
-            E.error("cant set tree - not a TreeExplorer " + c);
+            E.error("cannot set tree - not a TreeExplorer " + c);
         }
 
     }

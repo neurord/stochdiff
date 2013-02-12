@@ -27,7 +27,7 @@ public class segment implements AddableTo {
         if (obj instanceof MorphMLProperties) {
             // TODO - do we need these?
         } else {
-            E.warning("cant add " + obj);
+            E.warning("cannot add " + obj);
         }
     }
 

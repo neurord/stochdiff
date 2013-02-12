@@ -288,7 +288,7 @@ public class DataSlice {
             }
 
         } else {
-            E.error("cant get int vector from " + this + " restype=" + resultType);
+            E.error("cannot get int vector from " + this + " restype=" + resultType);
         }
         return ret;
     }

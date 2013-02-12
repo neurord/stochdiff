@@ -97,7 +97,7 @@ public class DataDisplay extends BasePanel implements ModeSettable, RangeListene
             pwCanvas.addRangeListener(this);
             rangeWatcher = rw;
         } else {
-            E.error("cant add another range watcher - already watching");
+            E.error("cannot add another range watcher - already watching");
         }
     }
 
@@ -177,7 +177,7 @@ public class DataDisplay extends BasePanel implements ModeSettable, RangeListene
         }
 
         if (!done) {
-            E.error("cant attach " + obj + " to a data Display");
+            E.error("cannot attach " + obj + " to a data Display");
         }
     }
 

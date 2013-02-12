@@ -48,7 +48,7 @@ public class LabelledTextField extends Panel implements AddableTo {
         if (obj instanceof BaseEffect) {
             effects.add((BaseEffect)obj);
         } else {
-            E.error("cant add non effect " + obj);
+            E.error("cannot add non effect " + obj);
         }
     }
     public DruPanel instantiatePanel() {

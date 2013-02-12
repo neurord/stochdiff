@@ -95,7 +95,7 @@ public class XMLStore {
             ret = fullIDToSource.get(locator);
 
         } else {
-            E.error("cant find resource at " + locator);
+            E.error("cannot find resource at " + locator);
             dumpStore();
         }
         return ret;

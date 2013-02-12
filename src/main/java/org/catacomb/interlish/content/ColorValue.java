@@ -30,7 +30,7 @@ public class ColorValue extends PrimitiveValue {
             cval = Integer.decode(s).intValue();
 
         } catch (NumberFormatException ex) {
-            E.error("cant decode color string " + s);
+            E.error("cannot decode color string " + s);
         }
     }
 

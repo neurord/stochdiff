@@ -55,7 +55,7 @@ public class Frame implements AddableTo, Realizer {
             }
             menuBar.add(obj);
         } else {
-            E.error("cant add to frame: " + obj);
+            E.error("cannot add to frame: " + obj);
         }
 
     }

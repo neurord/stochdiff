@@ -120,7 +120,7 @@ public class SpineLocator {
 
                     if (posInArray < 0) {
                         E.info("tot area " + totalArea);
-                        E.dump("cant get pos " + abelow, eltSA);
+                        E.dump("cannot get pos " + abelow, eltSA);
                     }
 
 

@@ -74,7 +74,7 @@ public class SegmentMerger {
                 double ldab = lab * (cp.r + cq.r);
                 int nadd = (int)(ltot / maxlen);
                 if (nadd > vpt.size())
-                    nadd = vpt.size(); // cant happen at present;
+                    nadd = vpt.size(); // cannot happen at present;
                 // recycle nadd points;
 
                 boolean cor = (Math.abs((lab - ltot) / (lab + ltot)) > 0.5 * tol || Math.abs((ldab - ldtot)

@@ -33,7 +33,7 @@ public abstract class MultiPanel extends Panel implements AddableTo {
         if (obj instanceof Realizer) {
             realizers.add((Realizer)obj);
         } else {
-            E.error("cant add non-realizer " + obj + " to " + this);
+            E.error("cannot add non-realizer " + obj + " to " + this);
         }
     }
 

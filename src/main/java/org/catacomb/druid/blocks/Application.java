@@ -105,7 +105,7 @@ public class Application implements AddableTo, Realizer {
         }
 
         if (stateExposure) {
-            E.missing("cant do state exposure");
+            E.missing("cannot do state exposure");
 //      ctx.getHookupBoard().addProducer("Page", new StatePageSupplier(doc.getContent()), "state");
         }
 
@@ -143,7 +143,7 @@ public class Application implements AddableTo, Realizer {
             frame = (Frame)obj;
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
 
 

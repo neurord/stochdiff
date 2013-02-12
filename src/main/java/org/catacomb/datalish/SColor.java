@@ -69,14 +69,14 @@ public class SColor implements DeReferencable, ReReferencable {
         }
 
         if (s == null) {
-            E.error("cant get color " + s);
+            E.error("cannot get color " + s);
         } else {
             try {
                 int ic = Integer.decode(s).intValue();
                 cret = new Color(ic);
 
             } catch (NumberFormatException ex) {
-                E.error(" - cant decode color string " + s);
+                E.error(" - cannot decode color string " + s);
                 cret = Color.red;
             }
         }

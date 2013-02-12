@@ -179,7 +179,7 @@ public class DataviewController implements Controller {
 
 
             } else {
-                E.error("dataview controller cant handle display item " + obj);
+                E.error("dataview controller cannot handle display item " + obj);
             }
 
             if (obj instanceof DruPanel && ((DruPanel)obj).getID().equals("main")) {
@@ -227,7 +227,7 @@ public class DataviewController implements Controller {
 
 
     public void setMode(String dom, String mod) {
-        E.missing("cant set mode from here");
+        E.missing("cannot set mode from here");
         for (int i = 0; i < ndisplay; i++) {
             // displays[i].setMode(dom, mod);
         }
@@ -329,7 +329,7 @@ public class DataviewController implements Controller {
         if (frameController != null) {
             frameController.makeMovie(f);
         } else {
-            E.error("no frame controller - cant make movie");
+            E.error("no frame controller - cannot make movie");
         }
     }
 
@@ -338,7 +338,7 @@ public class DataviewController implements Controller {
         if (frameController != null) {
             frameController.makeThumbnailMovie(f);
         } else {
-            E.error("no frame controller - cant make movie");
+            E.error("no frame controller - cannot make movie");
         }
     }
 

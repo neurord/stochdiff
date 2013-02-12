@@ -24,7 +24,7 @@ public class ExpandingTextAreaController  implements LabelActor {
         } else if (s.equals("remove")) {
             remove();
         } else {
-            E.error("cant act on " + s);
+            E.error("cannot act on " + s);
         }
     }
 

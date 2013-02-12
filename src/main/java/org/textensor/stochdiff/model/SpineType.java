@@ -24,7 +24,7 @@ public class SpineType implements AddableTo {
         if (obj instanceof Section) {
             sections.add((Section)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

@@ -35,7 +35,7 @@ public class LineGraph implements AddableTo {
             views.add((View)obj);
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

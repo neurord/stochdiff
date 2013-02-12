@@ -55,7 +55,7 @@ public class BuildInfo {
             }
 
         } else {
-            E.warning("cant find " + start + " in " + src);
+            E.warning("cannot find " + start + " in " + src);
         }
         return ret;
     }

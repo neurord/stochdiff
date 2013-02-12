@@ -29,7 +29,7 @@ public class DataPlot extends DVPanel implements AddableTo {
             displayList.add((Displayable)obj);
 
         } else {
-            System.out.println("data view cant add " + obj);
+            System.out.println("data view cannot add " + obj);
         }
     }
 

@@ -125,7 +125,7 @@ public class OmElementizer implements Elementizer {
                 }
             }
         } catch (Exception ex) {
-            System.out.println("ERROR - sand Reflector cant handle " + arr + " " + ex);
+            System.out.println("ERROR - sand Reflector cannot handle " + arr + " " + ex);
         }
         return makeListElement(arl);
     }

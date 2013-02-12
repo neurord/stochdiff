@@ -31,7 +31,7 @@ public class ReactionScheme implements AddableTo {
         } else if (obj instanceof Reaction) {
             reactions.add((Reaction)obj);
         } else {
-            E.error("cant add " + obj + " to reaction scheme ");
+            E.error("cannot add " + obj + " to reaction scheme ");
         }
     }
 

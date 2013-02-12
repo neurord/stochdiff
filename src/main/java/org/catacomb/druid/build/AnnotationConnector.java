@@ -72,7 +72,7 @@ public class AnnotationConnector {
         try {
             fval = fld.get(ctrl);
         } catch (Exception ex) {
-            E.warning("cant get field " + fld + " on " + ctrl);
+            E.warning("cannot get field " + fld + " on " + ctrl);
         }
 
         if (fval == null) {
@@ -110,7 +110,7 @@ public class AnnotationConnector {
             ((ColorValueEditor)edtr).setColorValue((ColorValue)fval);
 
         } else {
-            E.error("cant connect val to editor " + fval + " " + edtr);
+            E.error("cannot connect val to editor " + fval + " " + edtr);
         }
     }
 
@@ -131,14 +131,14 @@ public class AnnotationConnector {
             } else if (cpt instanceof Controller) {
                 subctrl = cpt;
             } else {
-                E.error("cant control connect " + cpt + " " + cpt.getClass().getName());
+                E.error("cannot control connect " + cpt + " " + cpt.getClass().getName());
             }
             if (subctrl != null) {
                 try {
                     fld.set(ctrl, subctrl);
 
                 } catch (Exception ex) {
-                    E.error("cant set gui cpt in controller: " + guiID + " cpt is " + cpt
+                    E.error("cannot set gui cpt in controller: " + guiID + " cpt is " + cpt
                             + " but field needs " + fld.getType());
                 }
             }
@@ -161,7 +161,7 @@ public class AnnotationConnector {
                 fld.set(ctrl, cpt);
 
             } catch (Exception ex) {
-                E.error("cant set gui cpt in controller: " + guiID + " cpt is " + cpt
+                E.error("cannot set gui cpt in controller: " + guiID + " cpt is " + cpt
                         + " but field needs " + fld.getType());
             }
         }

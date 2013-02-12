@@ -72,7 +72,7 @@ public class DListQuantityRenderer extends JPanel implements DListCellRenderer {
             nameLabel.setText(nvp.getName());
 
         } else {
-            E.error("cant render " + value);
+            E.error("cannot render " + value);
         }
 
         Color cbg = (isSelected ? csel : list.getBackground());

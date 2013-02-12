@@ -97,7 +97,7 @@ public class DruCheckbox extends DruGCPanel
             booleanValue.reportableSetBoolean(b, null);
 
         } else {
-            E.warning("cant set state - no value holder");
+            E.warning("cannot set state - no value holder");
         }
     }
 

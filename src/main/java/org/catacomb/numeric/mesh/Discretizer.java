@@ -236,7 +236,7 @@ public abstract class Discretizer {
                 int nadd = (int)(ltot / maxlen);
 
                 if (nadd > vpt.size()) {
-                    nadd = vpt.size(); //cant happen at present;
+                    nadd = vpt.size(); //cannot happen at present;
                 }
                 // recycle nadd points;
 

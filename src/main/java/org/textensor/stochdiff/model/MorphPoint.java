@@ -113,7 +113,7 @@ public class MorphPoint {
 
     public void transferConnections() {
         if (r_peerPoint == null) {
-            E.error("cant transfer connections - no peer");
+            E.error("cannot transfer connections - no peer");
         } else {
             if (neighbors != null) {
                 for (MorphPoint mp : neighbors) {
@@ -162,7 +162,7 @@ public class MorphPoint {
             ret = Math.sqrt(dx*dx + dy*dy + dz*dz);
 
         } else {
-            E.error("cant calculate distance (undefined position)");
+            E.error("cannot calculate distance (undefined position)");
         }
         return ret;
     }

@@ -14,7 +14,7 @@ public class NumUtil {
             int ir = Integer.parseInt(s);
             ret = ir;
         } catch (Exception ex) {
-            E.warning("cant parse int " + s);
+            E.warning("cannot parse int " + s);
         }
 
         return ret;
@@ -29,7 +29,7 @@ public class NumUtil {
             Double d = new Double(s);
             ret = d.doubleValue();
         } catch (Exception ex) {
-            E.warning("cant parese double " + s);
+            E.warning("cannot parese double " + s);
         }
         return ret;
     }

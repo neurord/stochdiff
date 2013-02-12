@@ -48,7 +48,7 @@ public class Splash implements Runnable {
             Thread th = new Thread(this);
             th.start();
         } catch (Exception ex) {
-            E.error("cant read splash " + imgsrc + " " + ex);
+            E.error("cannot read splash " + imgsrc + " " + ex);
         }
     }
 

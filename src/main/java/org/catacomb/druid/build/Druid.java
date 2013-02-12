@@ -88,7 +88,7 @@ public class Druid implements Portal {
         Object obj = resourceLoader.getResource(configPath, null);
 
         if (obj == null) {
-            E.error("druid cant find config " + configPath);
+            E.error("druid cannot find config " + configPath);
         }
 
         // parent context null for main frame;
@@ -131,7 +131,7 @@ public class Druid implements Portal {
             ret = ((PanelWrapper)rootComponent).getPanel();
 
         } else {
-            E.error("cant get panel - root=" + rootComponent + " " + baseController);
+            E.error("cannot get panel - root=" + rootComponent + " " + baseController);
         }
         return ret;
     }
@@ -180,7 +180,7 @@ public class Druid implements Portal {
             ((Targetable)baseController).setTarget(focusObject);
 
         } else {
-            E.error("cant show " + focusObject + " with " + baseController);
+            E.error("cannot show " + focusObject + " with " + baseController);
         }
         show();
     }
@@ -234,7 +234,7 @@ public class Druid implements Portal {
             }
 
         } else {
-            E.warning("druid cant self-activate " + rootComponent);
+            E.warning("druid cannot self-activate " + rootComponent);
         }
 
         // used to log unresolved here - done in app now? but others?
@@ -245,7 +245,7 @@ public class Druid implements Portal {
 
     public void attachSingleController(Controller ctrl) {
         if (ctrl instanceof RootController) {
-            E.error("cant attach root controller this way");
+            E.error("cannot attach root controller this way");
         }
         baseController = ctrl;
 
@@ -285,7 +285,7 @@ public class Druid implements Portal {
         if (rootComponent instanceof IDable) {
             ((IDable)rootComponent).setID(id);
         } else {
-            E.error("cant set id on " + rootComponent);
+            E.error("cannot set id on " + rootComponent);
         }
     }
 
@@ -398,7 +398,7 @@ public class Druid implements Portal {
             ((Dialog)rootComponent).setModal(b);
 
         } else {
-            E.error("cant set modal on " + rootComponent.getClass().getName());
+            E.error("cannot set modal on " + rootComponent.getClass().getName());
         }
     }
 
@@ -422,7 +422,7 @@ public class Druid implements Portal {
         } else if (rootComponent instanceof PanelWrapper) {
             ret = ((PanelWrapper)rootComponent).getPanel().getLocation();
         } else {
-            E.warning("cant get position for " + rootComponent);
+            E.warning("cannot get position for " + rootComponent);
         }
         return ret;
     }

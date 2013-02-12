@@ -72,7 +72,7 @@ public class Reflector {
             val = f.get(parent);
 
         } catch (Exception ex) {
-            E.error("cant get " + fieldname + " on " + parent + " " + ex);
+            E.error("cannot get " + fieldname + " on " + parent + " " + ex);
         }
 
         return val;

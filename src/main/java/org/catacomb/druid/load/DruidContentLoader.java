@@ -173,7 +173,7 @@ public class DruidContentLoader implements ContentLoader {
             if (stxt != null) {
                 df.setCachedText(stxt);
             } else {
-                E.error("cant read " + df.getFullID() + " no such resource");
+                E.error("cannot read " + df.getFullID() + " no such resource");
                 df.setCachedText("");
             }
 
@@ -184,7 +184,7 @@ public class DruidContentLoader implements ContentLoader {
             if (s != null) {
                 df.setCachedText(s);
             } else {
-                E.error("cant read " + fsrc + " no such file");
+                E.error("cannot read " + fsrc + " no such file");
                 df.setCachedText("");
             }
         }
@@ -236,7 +236,7 @@ public class DruidContentLoader implements ContentLoader {
             decFile = new DecFile(location);
             store.addSource(decFile);
         } else {
-            E.error("XMLStore cant find " + location + " ");
+            E.error("XMLStore cannot find " + location + " ");
         }
         return decFile;
     }

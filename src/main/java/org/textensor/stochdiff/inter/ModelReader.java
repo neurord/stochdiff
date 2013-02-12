@@ -61,7 +61,7 @@ public class ModelReader {
         } else {
             ret = new File(fparent, rpath + ".xml");
             if (! ret.exists()) {
-                E.error("cant find file " + rpath + " in folder " + fparent + " (tried plain and adding .xml)");
+                E.error("cannot find file " + rpath + " in folder " + fparent + " (tried plain and adding .xml)");
             }
         }
         return ret;

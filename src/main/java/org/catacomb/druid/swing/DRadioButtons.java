@@ -152,7 +152,7 @@ public class DRadioButtons extends DPanel implements ActionListener {
                 for (int i = 0; i < options.length; i++) {
                     sb.append(options[i] + ", ");
                 }
-                E.error("cant set selected  - not an option " + s + " possibilities are: " + sb.toString());
+                E.error("cannot set selected  - not an option " + s + " possibilities are: " + sb.toString());
             }
         }
     }

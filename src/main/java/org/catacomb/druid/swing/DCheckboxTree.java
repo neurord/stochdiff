@@ -245,7 +245,7 @@ public class DCheckboxTree extends JTree implements TreeSelectionListener, Mouse
         Tree tr = dTreeModel.getTree();
         Object[] oa = tr.getObjectPath(sp, true);
         if (oa == null) {
-            E.warning("cant get path for " + sp);
+            E.warning("cannot get path for " + sp);
         } else {
             TreePath tp = new TreePath(oa);
             TreePath[] tpa = { tp };

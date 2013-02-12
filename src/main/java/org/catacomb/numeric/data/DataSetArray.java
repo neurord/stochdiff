@@ -87,7 +87,7 @@ public class DataSetArray extends DataItem {
                 index = Integer.parseInt(cond);
 
             } catch (Exception ex) {
-                E.error(" cant slice dat aset array with " + cond + " " + ex);
+                E.error(" cannot slice dat aset array with " + cond + " " + ex);
             }
             ret = new DataSetArray();
             ret.add(dsa[index]);

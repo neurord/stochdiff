@@ -25,7 +25,7 @@ public class PanelDesigns implements AddableTo, AdderTo {
         if (obj instanceof Realizer) {
             realizers.add((Realizer)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

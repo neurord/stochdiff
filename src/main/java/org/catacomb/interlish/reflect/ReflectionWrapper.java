@@ -89,7 +89,7 @@ public class ReflectionWrapper implements SettableStructure {
             Field fld = m_cls.getField(s);
             ret = fld.get(target);
         } catch (Exception ex) {
-            System.out.println("WARNING - cant get (direct access) field " + s + " on " + target);
+            System.out.println("WARNING - cannot get (direct access) field " + s + " on " + target);
         }
         return ret;
     }
@@ -106,7 +106,7 @@ public class ReflectionWrapper implements SettableStructure {
             ret = m.invoke(target, emptyOA);
 
         } catch (Exception ex) {
-            System.out.println("WARNING - cant get (getter method) field " + s + " on " + target);
+            System.out.println("WARNING - cannot get (getter method) field " + s + " on " + target);
         }
 
         return ret;
@@ -151,7 +151,7 @@ public class ReflectionWrapper implements SettableStructure {
             m.invoke(target, args);
 
         } catch (Exception ex) {
-            System.out.println("WARNING - cant set field " + s + " on " + target + " by executing "
+            System.out.println("WARNING - cannot set field " + s + " on " + target + " by executing "
                                + mnm + " with arg " + val + " " + val.getClass().getName() + " " + ex);
         }
     }

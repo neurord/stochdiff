@@ -61,7 +61,7 @@ public class JUtil {
             }
 
         } catch (Exception ex) {
-            myLogger.log("ResourceAccess - cant get " + path + " " + ex);
+            myLogger.log("ResourceAccess - cannot get " + path + " " + ex);
             ex.printStackTrace();
         }
         return sret;
@@ -111,7 +111,7 @@ public class JUtil {
             }
 
         } catch (Exception ex) {
-            E.error("ResourceAccess - cant get " + path + " " + ex);
+            E.error("ResourceAccess - cannot get " + path + " " + ex);
             ex.printStackTrace();
         }
         return sret;
@@ -169,7 +169,7 @@ public class JUtil {
             in.close();
             out.close();
         } catch (Exception ex) {
-            E.warning("ResourceAccess - cant get " + respath + " " + ex);
+            E.warning("ResourceAccess - cannot get " + respath + " " + ex);
             ex.printStackTrace();
         }
     }
@@ -223,7 +223,7 @@ public class JUtil {
             Class<?> c = Class.forName(s);
             ret = c.newInstance();
         } catch (Exception ex) {
-            E.error("cant instantiate " + s + " " + ex);
+            E.error("cannot instantiate " + s + " " + ex);
             ex.printStackTrace();
         }
         return ret;
@@ -283,7 +283,7 @@ public class JUtil {
             //  E.info("unpacked jar to " + fout);
 
         } catch (Exception ex) {
-            E.error("cant unpack " + fjar + " : " + ex);
+            E.error("cannot unpack " + fjar + " : " + ex);
         }
     }
 
@@ -326,7 +326,7 @@ public class JUtil {
 
 
         } catch (Exception ex) {
-            E.error("cant extract resources - " + ex);
+            E.error("cannot extract resources - " + ex);
             ex.printStackTrace();
         }
     }

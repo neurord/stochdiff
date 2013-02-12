@@ -47,7 +47,7 @@ public class AWTUtil {
         if (fr instanceof JPanel) {
         ((JPanel)fr).paintComponent(gg);
         } else {
-        S.p("image saving error - cant handl component type " + fr);
+        S.p("image saving error - cannot handl component type " + fr);
         }
         //	 fr.printAll (gg);
         */
@@ -80,7 +80,7 @@ public class AWTUtil {
 
     public static Image getImage(Object ob, double f) {
         if (!(ob instanceof Image || ob instanceof Component)) {
-            E.error("cant get image of " + ob);
+            E.error("cannot get image of " + ob);
             return null;
         }
 
@@ -102,7 +102,7 @@ public class AWTUtil {
             if (fr instanceof JPanel) {
                ((JPanel)fr).paintComponent(gg);
             } else {
-               S.p("image saving error - cant handl component type " + fr);
+               S.p("image saving error - cannot handl component type " + fr);
             }
             //	 fr.printAll (gg);
             */

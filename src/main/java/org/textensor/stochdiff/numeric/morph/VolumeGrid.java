@@ -467,7 +467,7 @@ public class VolumeGrid {
                 sb.append(((CurvedVolumeElement)ve).getText3D());
 
             } else {
-                String msg = ("cant handle " + ve + " in element export");
+                String msg = ("cannot handle " + ve + " in element export");
                 throw new RuntimeException(msg);
             }
             ielt += 1;

@@ -60,7 +60,7 @@ public class InitialConditions implements AddableTo {
             fitConstraints = (FitConstraints)obj;
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

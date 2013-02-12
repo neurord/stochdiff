@@ -104,7 +104,7 @@ public class Icing3DViewer implements Visualizer {
             sceneGraphViewer.setSceneGraph(sgb.getSceneGraph(), null);
 
         } else {
-            E.error("cant build viewable from " + obj);
+            E.error("cannot build viewable from " + obj);
         }
     }
 

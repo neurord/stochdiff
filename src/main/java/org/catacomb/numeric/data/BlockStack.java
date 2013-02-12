@@ -186,7 +186,7 @@ public class BlockStack implements Named, TreeNode, Parent {
 
 
                 } else {
-                    E.error("cant handle array of type " + ctyp);
+                    E.error("cannot handle array of type " + ctyp);
                 }
 
             } else if (f.getType().equals(XYVectorScene.class)) {

@@ -108,7 +108,7 @@ public class DruTreePanel extends DruGCPanel implements TreeDisplay,
 
         E.missing("should action connect pivot choice");
 //      pivotChoice.setLabelActor(this);
-        E.missing("cant add to toolbar...");
+        E.missing("cannot add to toolbar...");
         // addToToolbar(pivotChoice);
     }
 
@@ -294,7 +294,7 @@ public class DruTreePanel extends DruGCPanel implements TreeDisplay,
 
         } else {
             if (breq) {
-                E.shortWarning("cant match " + sfc + " to a tree path in " + tree);
+                E.shortWarning("cannot match " + sfc + " to a tree path in " + tree);
             }
         }
     }

@@ -26,7 +26,7 @@ public class SurfaceDensitySet implements AddableTo {
         if (obj instanceof SurfaceDensity) {
             sds.add((SurfaceDensity)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

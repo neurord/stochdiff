@@ -17,7 +17,7 @@ public class FitConstraints implements AddableTo {
             }
             preserveTotals.add((PreserveTotal)obj);
         } else {
-            E.error("cant add: " + obj);
+            E.error("cannot add: " + obj);
         }
     }
 

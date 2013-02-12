@@ -55,7 +55,7 @@ public class IconWrapper extends FixedDrawingComponent {
     public void applyToShape(Shape shp) {
         // TODO who needs this? should it be the real icon??
         // - just a box for now...
-        E.missing(" cant apply icon wrapper to shape");
+        E.missing(" cannot apply icon wrapper to shape");
 
         double rx = 0.2;
         double ry = 0.2;

@@ -821,7 +821,7 @@ public final class Painter {
         if (b) {
 
         } else {
-            E.warning("cant do world width lines");
+            E.warning("cannot do world width lines");
         }
 
         if (width > 0.5) {

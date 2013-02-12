@@ -24,7 +24,7 @@ public class CollapsiblePanel extends Panel implements AddableTo {
         if (obj instanceof Realizer) {
             realizer = (Realizer)obj;
         } else {
-            E.error("cant add non-realizer " + obj + " to " + this);
+            E.error("cannot add non-realizer " + obj + " to " + this);
         }
     }
 

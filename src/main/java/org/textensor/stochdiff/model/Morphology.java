@@ -47,7 +47,7 @@ public class Morphology implements AddableTo {
             p_spineAllocations.add((SpineAllocation)obj);
 
         } else {
-            E.error("cant ad a " + obj.getClass() + " to a morphology");
+            E.error("cannot ad a " + obj.getClass() + " to a morphology");
         }
     }
 

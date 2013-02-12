@@ -29,7 +29,7 @@ public class MenuBar implements AddableTo, Realizer {
         if (obj instanceof Menu) {
             addMenu((Menu)obj);
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 

@@ -101,7 +101,7 @@ public class Splasher {
             }
 
         } catch (Exception ex) {
-            E.error("ResourceAccess - cant get " + path + " " + ex);
+            E.error("ResourceAccess - cannot get " + path + " " + ex);
             ex.printStackTrace();
         }
         return sret;

@@ -18,7 +18,7 @@ public class SpecieIDList implements AddableTo {
         if (obj instanceof Specie) {
             elements.add((Specie)obj);
         } else {
-            E.error("cant add " + obj + " to a specie list");
+            E.error("cannot add " + obj + " to a specie list");
         }
     }
 

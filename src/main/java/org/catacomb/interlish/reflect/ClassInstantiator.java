@@ -20,7 +20,7 @@ public class ClassInstantiator implements Instantiator {
             ret = c.newInstance();
 
         } catch (Exception e) {
-            E.error("cant instantiate " + cnm + " " + e);
+            E.error("cannot instantiate " + cnm + " " + e);
         }
         return ret;
     }
@@ -38,7 +38,7 @@ public class ClassInstantiator implements Instantiator {
             ret = con.newInstance(oa);
 
         } catch (Exception e) {
-            E.error("cant instantiate " + cnm + " " + e);
+            E.error("cannot instantiate " + cnm + " " + e);
         }
         return ret;
     }
@@ -56,7 +56,7 @@ public class ClassInstantiator implements Instantiator {
             ret = Class.forName(scl);
         } catch (Exception ex) {
             if (require) {
-                E.error("cant instantiate: " + scl + " " + ex);
+                E.error("cannot instantiate: " + scl + " " + ex);
             }
         }
         return ret;

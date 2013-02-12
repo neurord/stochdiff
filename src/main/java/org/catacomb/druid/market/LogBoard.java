@@ -16,7 +16,7 @@ public class LogBoard extends ProducerConsumerBoard {
 
 
         } else {
-            E.error("log board cant connect " + p + " and " + c);
+            E.error("log board cannot connect " + p + " and " + c);
         }
     }
 

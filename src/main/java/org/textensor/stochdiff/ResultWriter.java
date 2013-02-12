@@ -55,7 +55,7 @@ public class ResultWriter {
             }
             ready = true;
         } catch (Exception ex) {
-            E.error("cant create file writer " + ex);
+            E.error("cannot create file writer " + ex);
         }
     }
 
@@ -64,7 +64,7 @@ public class ResultWriter {
             try {
                 writer.write(sdat, 0, sdat.length());
             } catch (Exception ex) {
-                E.error("cant write: " + ex);
+                E.error("cannot write: " + ex);
             }
         }
     }
@@ -200,7 +200,7 @@ public class ResultWriter {
             fwk.delete();
 
         } catch (Exception ex) {
-            E.error("cant prune data file: " + ex);
+            E.error("cannot prune data file: " + ex);
         }
     }
 
@@ -272,7 +272,7 @@ public class ResultWriter {
             // fwk.delete();
 
         } catch (Exception ex) {
-            E.error("cant prune data file: " + ex);
+            E.error("cannot prune data file: " + ex);
         }
         */
     }

@@ -108,7 +108,7 @@ public class ReflectionInstantiator {
         }
 
         if (c == null) {
-            E.error("cant instantiate (class not found): " + scl);
+            E.error("cannot instantiate (class not found): " + scl);
             E.reportCached();
 
             for (int i = 0; i < npkg; i++) {
@@ -123,7 +123,7 @@ public class ReflectionInstantiator {
         } else {
             int imod = c.getModifiers();
             if (Modifier.isAbstract(imod)) {
-                E.error("cant instantiatie " + c + ":  it is an abstract class");
+                E.error("cannot instantiatie " + c + ":  it is an abstract class");
             } else {
 
                 try {
@@ -179,7 +179,7 @@ public class ReflectionInstantiator {
                 }
 
             } catch (Exception e) {
-                E.error("cant get field " + fnm + " on " + ob + " " + "excception= " + e);
+                E.error("cannot get field " + fnm + " on " + ob + " " + "excception= " + e);
             }
         }
 
@@ -197,7 +197,7 @@ public class ReflectionInstantiator {
 
             } else {
 
-                // System.out.println("error - cant get field " + fnm + " on " +
+                // System.out.println("error - cannot get field " + fnm + " on " +
                 // ob);
                 /*
                  * Field[] af = ob.getClass().getFields(); for (int i = 0; i <
@@ -419,7 +419,7 @@ public class ReflectionInstantiator {
                 ok = true;
             } catch (Exception e) {
                 ok = false;
-                E.error(" cant set field " + sf + " in " + ob + " from value " + arg + " " + e);
+                E.error(" cannot set field " + sf + " in " + ob + " from value " + arg + " " + e);
             }
         }
 
@@ -443,7 +443,7 @@ public class ReflectionInstantiator {
          *
          * Object avals = Array.newInstance(ccls, nv); for (int i = 0; i < nv;
          * i++) { Array.set(avals, i, vals.get(i)); } fld.set(obj, avals); } catch
-         * (Exception ex) { E.error(" - cant setaray field " + fld + " " + vals); }
+         * (Exception ex) { E.error(" - cannot setaray field " + fld + " " + vals); }
          */
     }
 

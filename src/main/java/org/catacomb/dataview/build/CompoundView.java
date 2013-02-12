@@ -30,7 +30,7 @@ public class CompoundView extends DVPanel implements AddableTo {
             panels.add((DVPanel)obj);
 
         } else {
-            E.error("cant add " + obj + " toi compound view");
+            E.error("cannot add " + obj + " toi compound view");
         }
     }
 

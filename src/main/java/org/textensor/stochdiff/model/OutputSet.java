@@ -22,7 +22,7 @@ public class OutputSet implements AddableTo {
             outputSpec.add((OutputSpecie)obj);
 
         } else {
-            E.error("cant add " + obj);
+            E.error("cannot add " + obj);
         }
     }
 
