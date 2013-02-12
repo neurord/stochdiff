@@ -16,9 +16,6 @@ public class ResultWriter {
 
     File outputFile;
 
-    public final static int TEXT = 1;
-    public final static int BINARY = 2;
-
     OutputStreamWriter writer;
     String fnroot = "";
 
@@ -45,26 +42,21 @@ public class ResultWriter {
         return continuation && outputFile.exists();
     }
 
-    public void init(String magic, int type) {
-        if (type == TEXT) {
-            try {
-                if (isContinuation()) {
-                    writer = new OutputStreamWriter(new FileOutputStream(outputFile, true));
+    public void init(String magic) {
+        try {
+            if (isContinuation()) {
+                writer = new OutputStreamWriter(new FileOutputStream(outputFile, true));
 
-                } else {
-                    writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                    if (magic != null) {
-                        writer.write(magic + "\n");
-                    }
+            } else {
+                writer = new OutputStreamWriter(new FileOutputStream(outputFile));
+                if (magic != null) {
+                    writer.write(magic + "\n");
                 }
-                ready = true;
-            } catch (Exception ex) {
-                E.error("cant create file writer " + ex);
             }
-        } else {
-            E.error("binary not handled yet...");
+            ready = true;
+        } catch (Exception ex) {
+            E.error("cant create file writer " + ex);
         }
-
     }
 
     public void writeString(String sdat) {
@@ -97,13 +89,13 @@ public class ResultWriter {
         }
     }
 
-    public ResultWriter getSibling(int type, String extn, String magic) {
-        ResultWriter ret = getRawSibling(type, extn);
-        ret.init(magic, type);
+    public ResultWriter getSibling(String extn, String magic) {
+        ResultWriter ret = getRawSibling(extn);
+        ret.init(magic);
         return ret;
     }
 
-    public ResultWriter getRawSibling(int type, String extn) {
+    public ResultWriter getRawSibling(String extn) {
         ResultWriter ret = siblings.get(extn);
 
         if (ret == null) {
@@ -119,7 +111,7 @@ public class ResultWriter {
 
 
     public File getSiblingFile(String extn) {
-        ResultWriter rw = getSibling(TEXT, extn, null);
+        ResultWriter rw = getSibling(extn, null);
         return rw.getFile();
     }
 
@@ -129,7 +121,7 @@ public class ResultWriter {
     }
 
     public void writeToSiblingFileAndClose(String txt, String extn) {
-        ResultWriter rw = getSibling(TEXT, extn, null);
+        ResultWriter rw = getSibling(extn, null);
         rw.writeString(txt);
         rw.close();
     }
@@ -143,12 +135,12 @@ public class ResultWriter {
     }
 
     public void writeToSiblingFile(String txt, String extn, String magic) {
-        ResultWriter rw = getSibling(TEXT, extn, magic);
+        ResultWriter rw = getSibling(extn, magic);
         rw.writeString(txt);
     }
 
     public void writeToFinalSiblingFile(String txt, String extn, String magic) {
-        ResultWriter rw = getSibling(TEXT, extn, magic);
+        ResultWriter rw = getSibling(extn, magic);
         rw.writeString(txt);
         rw.close();
     }

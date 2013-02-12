@@ -475,7 +475,7 @@ public abstract class BaseCalc {
 
     public void setResultWriter(ResultWriter rw) {
         resultWriter = rw;
-        resultWriter.init("cctdif2d", ResultWriter.TEXT); // others....
+        resultWriter.init("cctdif2d"); // others....
     }
 
     public abstract int run();

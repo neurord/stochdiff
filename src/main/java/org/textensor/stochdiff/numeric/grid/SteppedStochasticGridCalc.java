@@ -468,9 +468,9 @@ public class SteppedStochasticGridCalc extends BaseCalc {
                 int nt = st.countTokens();
 
                 if (resultWriter.isContinuation()) {
-                    ResultWriter sibrw = resultWriter.getRawSibling(ResultWriter.TEXT, sibsuf);
+                    ResultWriter sibrw = resultWriter.getRawSibling(sibsuf);
                     sibrw.pruneFrom("", 0, sdRun.getStartTime());
-                    sibrw.init(null, ResultWriter.TEXT);
+                    sibrw.init(null);
                 } else {
                     resultWriter.writeToSiblingFile(shead, sibsuf);
                 }
