@@ -10,6 +10,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import org.textensor.util.inst;
+
 public class ResultWriter {
 
     File outputFile;
@@ -24,7 +26,7 @@ public class ResultWriter {
     boolean closed = false;
     boolean continuation = false;
 
-    HashMap<String, ResultWriter> siblings;
+    final protected HashMap<String, ResultWriter> siblings = inst.newHashMap();
 
     public ResultWriter(File outFile) {
         outputFile = outFile;
@@ -88,49 +90,29 @@ public class ResultWriter {
                 E.error("data not written (earlier errors)");
             }
 
-            if (siblings != null) {
-                for (ResultWriter rw : siblings.values()) {
-                    rw.close();
-                }
-            }
+            for (ResultWriter rw : siblings.values())
+                rw.close();
+
             closed = true;
         }
     }
 
     public ResultWriter getSibling(int type, String extn, String magic) {
-        ResultWriter ret = null;
-        if (siblings == null) {
-            siblings = new HashMap<String, ResultWriter>();
-        }
-        if (siblings.containsKey(extn)) {
-            ret = siblings.get(extn);
-
-        } else {
-            String fnm = fnroot + extn;
-            File f = new File(outputFile.getParentFile(), fnm);
-            ret = new ResultWriter(f);
-            siblings.put(extn, ret);
-            ret.init(magic, type);
-        }
-
+        ResultWriter ret = getRawSibling(type, extn);
+        ret.init(magic, type);
         return ret;
     }
 
+    public ResultWriter getRawSibling(int type, String extn) {
+        ResultWriter ret = siblings.get(extn);
 
-    public ResultWriter getRawSibling(int type, String extn, String magic) {
-        ResultWriter ret = null;
-        if (siblings == null) {
-            siblings = new HashMap<String, ResultWriter>();
-        }
-        if (siblings.containsKey(extn)) {
-            ret = siblings.get(extn);
-
-        } else {
+        if (ret == null) {
             String fnm = fnroot + extn;
             File f = new File(outputFile.getParentFile(), fnm);
             ret = new ResultWriter(f);
             siblings.put(extn, ret);
         }
+
         return ret;
     }
 
@@ -182,11 +164,12 @@ public class ResultWriter {
         return ret;
     }
 
-
-
+    /**
+     * this expects each record to begin with max, and then have a time
+     * field as the idx'th element of the line. It keeps records as long
+     * as their time is &lt; value but discards the rest
+     */
     public void pruneFrom(String match, int idx, double value) {
-        // this expects each record to begin with max, and then have a time field as the idx'th element of the
-        // line. It keeps records as long as their time is < value but discards the rest
         continuation = true;
         File fcopy = outputFile.getAbsoluteFile();
         File fwk = new File(fcopy.getParentFile(), fcopy.getName()+".wk");
