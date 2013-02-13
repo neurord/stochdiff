@@ -6,29 +6,22 @@ public class ArrayUtil {
 
     public static double[] log(double[] d, double dzero) {
         double[] ret = new double[d.length];
-        for (int i = 0; i < d.length; i++) {
-            if (d[i] <= 0.) {
-                ret[i] = dzero;
-            } else {
-                ret[i] = Math.log(d[i]);
-            }
-        }
+        for (int i = 0; i < d.length; i++)
+            ret[i] = d[i] <= 0 ? dzero : Math.log(d[i]);
         return ret;
     }
 
     public static double[][] log(double[][] d, double dzero) {
         double[][] ret = new double[d.length][];
-        for (int i = 0; i < d.length; i++) {
+        for (int i = 0; i < d.length; i++)
             ret[i] = log(d[i], dzero);
-        }
         return ret;
     }
 
 
     public static int findBracket(double[] v, double x) {
-        if (v == null || v.length == 0) {
+        if (v == null || v.length == 0)
             return -1;
-        }
 
         int n = v.length;
         int ret = 0;
