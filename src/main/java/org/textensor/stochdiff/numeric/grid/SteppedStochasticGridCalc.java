@@ -51,7 +51,7 @@ import org.textensor.vis.CCViz3D;
  */
 
 public class SteppedStochasticGridCalc
-    extends BaseCalc implements GridCalc {
+    extends BaseCalc implements IGridCalc {
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),

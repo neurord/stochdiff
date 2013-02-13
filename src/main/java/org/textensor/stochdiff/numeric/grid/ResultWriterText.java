@@ -213,7 +213,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeGrid(VolumeGrid vgrid, double startTime, String[] fnmsOut, GridCalc source) {
+    public void writeGrid(VolumeGrid vgrid, double startTime, String[] fnmsOut, IGridCalc source) {
         assert vgrid.isCurved() || vgrid.isCuboid();
 
         if (!this.isContinuation())
@@ -242,7 +242,7 @@ public class ResultWriterText implements ResultWriter {
         }
     }
 
-    private String formatNumber(int i, int outj, GridCalc source) {
+    private String formatNumber(int i, int outj, IGridCalc source) {
         if (writeConcentration) {
             double conc =  source.getGridPartConc(i, outj);
             return stringd(conc);
@@ -252,7 +252,7 @@ public class ResultWriterText implements ResultWriter {
         }
     }
 
-    private String getGridConcsText(double time, int nel, int[] ispecout, GridCalc source) {
+    private String getGridConcsText(double time, int nel, int[] ispecout, IGridCalc source) {
         final String[] specieIDs = source.getSpecieIDs();
         StringBuffer sb = new StringBuffer();
         // TODO tag specific to integer quantities;
@@ -274,12 +274,12 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeGridConcs(double time, int nel, int ispecout[], GridCalc source) {
+    public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
         String concs = this.getGridConcsText(time, nel, ispecout, source);
         this.writeString(concs);
     }
 
-    private String getGridConcsPlainText_dumb(int filenum, double time, int nel, GridCalc source) {
+    private String getGridConcsPlainText_dumb(int filenum, double time, int nel, IGridCalc source) {
         final int[][] specIndexesOut = source.getSpecIndexesOut();
         final String[] regionLabels = source.getRegionLabels();
         final int[] eltRegions = source.getEltRegions();
@@ -297,7 +297,7 @@ public class ResultWriterText implements ResultWriter {
         return sb.toString();
     }
 
-    private String getGridConcsHeadings_dumb(int filenum, VolumeGrid vgrid, GridCalc source) {
+    private String getGridConcsHeadings_dumb(int filenum, VolumeGrid vgrid, IGridCalc source) {
         final int[][] specIndexesOut = source.getSpecIndexesOut();
         final String[] regionsOut = source.getRegionsOut();
         final String[] regionLabels = source.getRegionLabels();
@@ -350,7 +350,7 @@ public class ResultWriterText implements ResultWriter {
 
 
     @Override
-    public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, GridCalc source) {
+    public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {
         String text = getGridConcsPlainText_dumb(i, time, nel, source);
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }

@@ -21,7 +21,7 @@ import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
  * This is a continuous (deterministic) calculation to generate reference data.
  */
 
-public class DeterministicGridCalc extends BaseCalc implements GridCalc {
+public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
 
     Column mconc;
 
