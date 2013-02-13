@@ -35,15 +35,14 @@ public class OutputSet implements AddableTo {
     public String[] getNamesOfOutputSpecies() {
         int ns = outputSpec.size();
         String[] ret = new String[ns];
-        for (int i = 0; i < ns; i++) {
+        for (int i = 0; i < ns; i++)
             ret[i] = outputSpec.get(i).name;
 
-        }
         return ret;
     }
 
     public boolean hasRegion()  {
-        return (region != null);
+        return region != null;
     }
 
     public String getRegion() {
@@ -51,7 +50,7 @@ public class OutputSet implements AddableTo {
     }
 
     public boolean hasFname() {
-        return (filename != null);
+        return filename != null;
     }
 
     public String getFname() {

@@ -21,31 +21,8 @@ import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
  * This is a continuous (deterministic) calculation to generate reference data.
  */
 
-public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
+public class DeterministicGridCalc extends GridCalc {
 
-    Column mconc;
-
-    ReactionTable rtab;
-    VolumeGrid vgrid;
-    StimulationTable stimTab;
-
-    double dt;
-
-    int nel;
-    int nspec;
-    String[] specieIDs;
-    double[] volumes;
-    double[] fdiff;
-
-    // RO 5 13 2010
-    boolean[] submembranes;
-    String[] regionLabels;
-    // RO
-
-    int[][] neighbors;
-    double[][] couplingConstants;
-
-    int[][] stimtargets;
 //	int[] eltstims;
 //	double[] eltstimshare;
     //AB Dec 16 2012
@@ -53,8 +30,6 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
     int[][] eltstims;
     double[][] eltstimshare;
 
-    int[] eltregions;
-    double[] surfaceAreas;
 //AB 2012 Apr 3: change wkB to wktm1 which stands for wk(time-1)
     //purpose is to write out the present time array: wkA
     //this completely fixed the discrepancy between stoch and determ!!!
@@ -64,8 +39,6 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
 
     int nlog;
 
-    double stateSaveTime;
-
     public DeterministicGridCalc(SDRun sdm) {
         super(sdm);
     }
@@ -73,22 +46,9 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
     // the only task here is to allocate and initialize the workspace for
     // the calculation: three arrays for each species at each element;
     public final void init() {
-
-        stateSaveTime = sdRun.getStateSaveInterval();
-        if (stateSaveTime <= 0.0) {
-            stateSaveTime = 1.e9;
-        }
-
-
-        rtab = getReactionTable();
-        vgrid = getVolumeGrid();
-
-        nel = vgrid.getNElements();
+        super.init();
 
         nspec = rtab.getNSpecies();
-        specieIDs = rtab.getSpecieIDs();
-
-
 
         volumes = vgrid.getElementVolumes();
 
@@ -97,10 +57,6 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
         couplingConstants = vgrid.getPerElementCouplingConstants();
 
         extractOutputScheme(rtab); // see BaseCalc.java
-
-        submembranes = vgrid.getSubmembranes();
-        regionLabels = vgrid.getRegionLabels();
-        // RO
 
         stimTab = getStimulationTable();
         stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
@@ -129,7 +85,6 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
             }
         }
 
-        eltregions = vgrid.getRegionIndexes();
         surfaceAreas = vgrid.getExposedAreas();
 //AB 2012-apr 3 change wkB to wk[time-1]
         wkA = new double[nel][nspec];
@@ -190,17 +145,6 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
             }
         }
 
-    }
-
-    @Override
-    public double getGridPartConc(int i, int outj) {
-        return wkA[i][outj];
-    }
-
-    @Override
-    public int getGridPartNumb(int i, int outj) {
-        double val = getGridPartConc(i, outj);
-        return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 
     @SuppressWarnings("boxing")
@@ -424,22 +368,14 @@ public class DeterministicGridCalc extends BaseCalc implements IGridCalc {
     }
 
     @Override
-    public String[] getSpecieIDs() {
-        return this.specieIDs;
+    public double getGridPartConc(int i, int outj) {
+        return wkA[i][outj];
     }
 
     @Override
-    public String[] getRegionLabels() {
-        return this.regionLabels;
+    public int getGridPartNumb(int i, int outj) {
+        double val = getGridPartConc(i, outj);
+        return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 
-    @Override
-    public int[] getEltRegions() {
-        return this.eltregions;
-    }
-
-    @Override
-    public boolean[] getSubmembranes() {
-        return this.submembranes;
-    }
 }

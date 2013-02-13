@@ -28,9 +28,6 @@ import org.textensor.report.Debug;
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.numeric.chem.ReactionTable;
-import org.textensor.stochdiff.numeric.chem.StimulationTable;
-import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
@@ -50,8 +47,7 @@ import org.textensor.vis.CCViz3D;
  * location is not taken into account until the following step.
  */
 
-public class SteppedStochasticGridCalc
-    extends BaseCalc implements IGridCalc {
+public class SteppedStochasticGridCalc extends GridCalc {
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),
@@ -62,34 +58,8 @@ public class SteppedStochasticGridCalc
     public static final int SHARED_DIFF_PARTICLES = 4;
     public static final int NP = 30;         // AB Changed from 20 to 30. 2011.09.23
 
-    Column mconc;
-
-    ReactionTable rtab;
-    public VolumeGrid vgrid;
-
-    StimulationTable stimTab;
-
-    double dt;
-
-    public int nel;
-    int nspec;
-    public String[] specieIDs;
-
-    double[] volumes;
-    double[] lnvolumes;
-    double[] fdiff;
     double[] lnfdiff;
 
-    double[] surfaceAreas;
-
-    // WK 6 18 2007
-    public boolean[] submembranes;
-    public String[] regionLabels;
-    public int[] eltregions;
-    // WK
-
-    int[][] neighbors;
-    double[][] couplingConstants;
     double[][] lnCC;
 
     int[][] wkA;
@@ -112,8 +82,6 @@ public class SteppedStochasticGridCalc
     double[] rates;
     double[] lnrates;
 
-    int[][] stimtargets;
-
     double[] intlogs;
     double lndt;
 
@@ -129,25 +97,17 @@ public class SteppedStochasticGridCalc
     double[][] lnpSharedOut;
     double[][][] fSharedExit;
 
-    double stateSaveTime;
-
     public SteppedStochasticGridCalc(SDRun sdm) {
         super(sdm);
     }
 
     public final void init() {
+        super.init();
 
-        stateSaveTime = sdRun.getStateSaveInterval();
-        if (stateSaveTime <= 0.0) {
-            stateSaveTime = 1.e9;
-        }
-        stateSaveTime += sdRun.getStartTime();
+        //not in Determinstic: stateSaveTime += sdRun.getStartTime();
 
         // something to generate the random nunmbers
         random = new MersenneTwister(getCalculationSeed());
-
-        rtab = getReactionTable();
-        speciesIDs = rtab.getSpeciesIDs();
 
         nreaction = rtab.getNReaction();
         rates = rtab.getRates();
@@ -161,10 +121,6 @@ public class SteppedStochasticGridCalc
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
-
-        vgrid = getVolumeGrid();
-
-        nel = vgrid.getNElements();
 
         nspec = rtab.getNSpecies();
         specieIDs = rtab.getSpecieIDs();
@@ -182,11 +138,6 @@ public class SteppedStochasticGridCalc
 
         surfaceAreas = vgrid.getExposedAreas();
 
-        // WK 6 18 2007
-        submembranes = vgrid.getSubmembranes();
-        regionLabels = vgrid.getRegionLabels();
-        // WK
-
         fdiff = rtab.getDiffusionConstants();
         lnfdiff = ArrayUtil.log(fdiff, -999.);
 
@@ -202,7 +153,6 @@ public class SteppedStochasticGridCalc
         wkB = new int[nel][nspec];
         wkReac = new int[nreaction];
 
-        eltregions = vgrid.getRegionIndexes();
         double[][] regcon = getRegionConcentrations();
         double[][] regsd = getRegionSurfaceDensities();
 
@@ -1055,25 +1005,4 @@ public class SteppedStochasticGridCalc
         return val * NM_PER_PARTICLE_PUV / volumes[i];
     }
 
-
-    @Override
-    public String[] getSpecieIDs() {
-        return this.specieIDs;
-    }
-
-    @Override
-    public String[] getRegionLabels() {
-        return this.regionLabels;
-    }
-
-    @Override
-    public int[] getEltRegions() {
-        return this.eltregions;
-    }
-
-
-    @Override
-    public boolean[] getSubmembranes() {
-        return this.submembranes;
-    }
 }
