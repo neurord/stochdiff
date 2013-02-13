@@ -306,21 +306,6 @@ public abstract class FileUtil {
 
     }
 
-
-
-    public static File getSiblingFile(File fme, String ext) {
-        String fnm = fme.getName();
-        int ild = fnm.lastIndexOf(".");
-        if (ild > 1) {
-            fnm = fnm.substring(0, ild);
-        }
-        File fret = new File(fme.getParentFile(), fnm + ext);
-        return fret;
-
-    }
-
-
-
     public static ArrayList<String> getPathElements(File rootDir, File ftgt) {
 
         ArrayList<String> elts = new ArrayList<String>();

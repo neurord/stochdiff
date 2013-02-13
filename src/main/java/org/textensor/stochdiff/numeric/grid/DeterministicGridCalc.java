@@ -13,6 +13,7 @@ import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
 
 /*
  *
@@ -20,7 +21,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
  * This is a continuous (deterministic) calculation to generate reference data.
  */
 
-public class DeterministicGridCalc extends BaseCalc {
+public class DeterministicGridCalc extends BaseCalc implements GridCalc {
 
     Column mconc;
 
@@ -191,81 +192,16 @@ public class DeterministicGridCalc extends BaseCalc {
 
     }
 
-    @SuppressWarnings("boxing")
-    // RO 5 13 2010: Commented out in favor of new version above.
-    // private String getGridConcsText(double time) {
-    // StringBuffer sb = new StringBuffer();
-    // sb.append("gridConcentrations " + nel + " " + nspec + " " + time + " ");
-    // for (int i = 0; i < nspec; i++) {
-    // sb.append(specieIDs[i] + " ");
-    // }
-    // sb.append("\n");
-    //
-    // for (int i = 0; i < nel; i++) {
-    // // sb.append("");
-    // for (int j = 0; j < nspec; j++) {
-    // sb.append(String.format(" %g5 ", wkB[i][j]));
-    // }
-    // sb.append("\n");
-    // }
-    // return sb.toString();
-    // }
-    // RO
-    private String getGridConcsText(double time) {
-        StringBuffer sb = new StringBuffer();
-        // TODO tag specific to integer quantities;
-        int nspecout = ispecout.length;
-        if (nspecout == 0) {
-            return "";
-        }
-
-        sb.append("gridConcentrations " + nel + " " + nspecout + " " + time + " ");
-        for (int i = 0; i < nspecout; i++) {
-            sb.append(specieIDs[ispecout[i]] + " ");
-        }
-        sb.append("\n");
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < nspecout; j++) {
-                // rcc May 2010: this was wrong, was it just saving species j,
-                // not species ispecout[j]
-                // sb.append(stringd(wkA[i][j]));
-                if (writeConcentration) {
-                    sb.append(stringd(wkA[i][ispecout[j]]));
-
-                } else {
-                    sb.append(stringd(wkA[i][ispecout[j]] * volumes[i] * PARTICLES_PUVC));
-
-                }
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
+    @Override
+    public double getGridPartConc(int i, int outj) {
+        return wkA[i][outj];
     }
 
-    private String getGridConcsPlainText_dumb(int filenum, double time) {
-        StringBuffer sb = new StringBuffer();
-        // TODO tag specific to integer quantities;
-        sb.append(stringd(time));
-
-        for (int j = 0; j < specIndexesOut[filenum].length; j++) {
-            for (int i = 0; i < nel; i++) {
-                // WK 6 17 2007
-                if (regionsOut[filenum].equals("default") || regionsOut[filenum].equals(regionLabels[eltregions[i]])) {
-
-                    double wkv = wkA[i][specIndexesOut[filenum][j]];
-                    if (writeConcentration) {
-                        sb.append(stringd(wkv));
-                    } else {
-                        sb.append(stringd((PARTICLES_PUVC * wkv * volumes[i])));
-                    }
-
-                }
-            }
-        }
-        sb.append("\n");
-        return sb.toString();
+    @Override
+    public int getGridPartNumb(int i, int outj) {
+        double val = getGridPartConc(i, outj);
+        return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
-
 
     @SuppressWarnings("boxing")
     private String getStateText() {
@@ -284,27 +220,18 @@ public class DeterministicGridCalc extends BaseCalc {
         return sb.toString();
     }
 
-
-
-
-
-
     public final int run() {
         init();
-
-        if (resultWriter != null) {
-            resultWriter.writeString(vgrid.getAsText());
-            // RO 5 13 2010: follows template in SteppedStochasticGridCalc
-            resultWriter.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
-            for (int i = 0; i < fnmsOut.length; i++) {
-                resultWriter.writeToSiblingFile(getGridConcsHeadings_dumb(i), "-" + fnmsOut[i] + "-conc.txt");
-            }
-        }
-
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
 
+        if (resultWriter != null) {
+            resultWriter.writeGrid(vgrid, time, fnmsOut, this);
+
+            for (int i = 0; i < fnmsOut.length; i++)
+                resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
+        }
 
         E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
 
@@ -331,14 +258,14 @@ public class DeterministicGridCalc extends BaseCalc {
 
             // RO 5 13 2010: follows template in SteppedStochasticGridCalc
             if (time >= writeTime) {
-                if (resultWriter != null) {
-                    resultWriter.writeString(getGridConcsText(time));
-                }
+                if (resultWriter != null)
+                    resultWriter.writeGridConcs(time, nel, ispecout, this);
+
                 writeTime += sdRun.outputInterval;
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
-                    resultWriter.writeToSiblingFile(getGridConcsPlainText_dumb(i, time), "-" +fnmsOut[i] + "-conc.txt");
+                    resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
                     writeTimeArray[i] += Double.valueOf(dtsOut[i]);
                 }
             }
@@ -352,23 +279,13 @@ public class DeterministicGridCalc extends BaseCalc {
 
 
             if (time >= stateSaveTime) {
-                resultWriter.writeToSiblingFile(getStateText(), sdRun.stateSavePrefix +  "-" + Math.round(time) + ".nrds");
+                resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }
 
         long endTime = System.currentTimeMillis();
         E.info("total time " + (endTime - startTime) + "ms");
-        // RO
-        // RO 5 13 2010: Commented the following lines. Don't think they are
-        // needed anymore.
-        // iwr += 1;
-        // if (iwr % 5 == 0) {
-        // if (resultWriter != null) {
-        // resultWriter.writeString(getGridConcsText(time));
-        // }
-        // }
-        // RO
 
         return 0;
     }
@@ -506,46 +423,23 @@ public class DeterministicGridCalc extends BaseCalc {
         return 0;
     }
 
-    protected String getGridConcsHeadings_dumb(int filenum) {
-        StringBuffer sb = new StringBuffer();
+    @Override
+    public String[] getSpecieIDs() {
+        return this.specieIDs;
+    }
 
-        sb.append("time");
-        for (int j = 0; j < specIndexesOut[filenum].length; j++) {
-            for (int i = 0; i < nel; i++) {
-                // WK 6 17 2007
-                if (regionsOut[filenum].equals("default") || regionsOut[filenum].equals(regionLabels[eltregions[i]])) {
-                    sb.append(" Vol_" + i);
-                    sb.append("_" + regionLabels[eltregions[i]]);
+    @Override
+    public String[] getRegionLabels() {
+        return this.regionLabels;
+    }
 
-                    String tempLabel = vgrid.getLabel(i);
+    @Override
+    public int[] getEltRegions() {
+        return this.eltregions;
+    }
 
-                    if (vgrid.getGroupID(i) != null) {
-                        sb.append("." + vgrid.getGroupID(i));
-
-                    } else if (tempLabel != null) {
-                        if (tempLabel.indexOf(".") > 0) {
-                            sb.append("." + tempLabel.substring(0, tempLabel.indexOf(".")));
-                        }
-                    }
-                    if (submembranes[i] == true) {
-                        sb.append("_submembrane");
-                    } else {
-                        sb.append("_cytosol");
-                    }
-                    if (tempLabel != null) {
-                        if (tempLabel.indexOf(".") > 0) {
-                            sb.append("_" + tempLabel.substring(tempLabel.indexOf(".") + 1, tempLabel.length()));
-                        } else {
-                            sb.append("_" + vgrid.getLabel(i));
-                        }
-                    }
-                    // WK
-
-                    sb.append("_Spc_" + specieIDs[specIndexesOut[filenum][j]]);
-                }
-            }
-        }
-        sb.append("\n");
-        return sb.toString();
+    @Override
+    public boolean[] getSubmembranes() {
+        return this.submembranes;
     }
 }

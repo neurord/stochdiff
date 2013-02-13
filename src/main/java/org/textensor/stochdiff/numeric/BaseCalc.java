@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.ResultWriter;
 import org.textensor.stochdiff.disc.SpineLocator;
 import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
 import org.textensor.stochdiff.disc.TreeCurvedElementDiscretizer;
@@ -22,6 +21,8 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import org.textensor.stochdiff.numeric.grid.ResultWriter;
+import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.util.ArrayUtil;
 
 /**
@@ -116,28 +117,6 @@ public abstract class BaseCalc {
             E.error("Unrecognized action: only 'visualize' is supported");
         }
 
-    }
-
-
-
-
-
-    protected String stringd(double d) {
-        if (d == 0.0) {
-            return "0.0 ";
-        } else {
-            return String.format("%.5g ", d);
-        }
-    }
-
-    // <--RO 7 02 2008
-    // Saves as integers; used to save particles instead of concentrations
-    protected String stringi(int id) {
-        if (id == 0) {
-            return "00 ";
-        } else {
-            return String.format("%d ", id);
-        }
     }
 
     public void extractTables() {
@@ -484,7 +463,7 @@ public abstract class BaseCalc {
 
 
     public double[][] readInitialState(String fnm, int nel, int nspec, String[] specids) {
-        String sdata = resultWriter.readSibling(fnm);
+        String sdata = ((ResultWriterText)resultWriter).readSibling(fnm);
         SDState sds = StateReader.readStateString(sdata);
 
         double[][] ret = null;
@@ -507,5 +486,11 @@ public abstract class BaseCalc {
 
     }
 
+    public int[][] getSpecIndexesOut() {
+        return this.specIndexesOut;
+    }
 
+    public String[] getRegionsOut() {
+        return this.regionsOut;
+    }
 }
