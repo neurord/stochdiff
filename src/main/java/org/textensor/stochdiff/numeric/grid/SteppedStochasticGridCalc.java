@@ -34,6 +34,7 @@ import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
+import org.textensor.stochdiff.numeric.math.CachingRandomGenerator;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
@@ -144,7 +145,7 @@ public class SteppedStochasticGridCalc extends BaseCalc {
         stateSaveTime += sdRun.getStartTime();
 
         // something to generate the random nunmbers
-        random = new MersenneTwister(getCalculationSeed());
+        random = new CachingRandomGenerator(new MersenneTwister(getCalculationSeed()));
 
         rtab = getReactionTable();
         speciesIDs = rtab.getSpeciesIDs();
