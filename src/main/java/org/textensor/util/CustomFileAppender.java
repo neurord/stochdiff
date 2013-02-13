@@ -65,6 +65,12 @@ public final class CustomFileAppender extends AbstractAppender {
 
     public static void addFileAppender(String filename) {
         final CustomFileAppender instance = getInstance();
+        if (instance == null) {
+            LOGGER.error("CustomFileAppender hasn't been initalized, ignoring output "
+                         + filename);
+            return;
+        }
+
         final FileAppender appender =
             FileAppender.createAppender(filename, "false", "false", filename,
                                         "true", "false", "true",
