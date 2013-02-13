@@ -14,7 +14,7 @@ import org.textensor.report.E;
 
 
 
-public class MersenneTwister {
+public class MersenneTwister implements RandomGenerator {
 
     // Period parameters
     private static final int N = 624;
@@ -75,8 +75,7 @@ public class MersenneTwister {
         }
     }
 
-
-
+    @Override
     public final float random() {
         int y;
 
@@ -111,10 +110,7 @@ public class MersenneTwister {
         return (y >>> 8) / ((float)(1 << 24));
     }
 
-
-
-
-
+    @Override
     public final double gaussian() {
         double ret = 0.;
         if (haveGaussian) {
@@ -137,14 +133,11 @@ public class MersenneTwister {
         return ret;
     }
 
-
-
     private static double[] cof = {76.18009173, -86.50532033, 24.01409822,
                                    -1.231739516, 0.120858003e-2, -0.536382e-5
                                   };
 
-
-
+    @Override
     public final double gammln(double xx) {
         double x = xx - 1.0;
         double tmp = x + 5.5;
@@ -157,8 +150,7 @@ public class MersenneTwister {
         return -tmp+Math.log(2.50662827465*ser);
     }
 
-
-
+    @Override
     public final int poisson(double mean) {
         // In "Numerical Recipes" Ch 7-3 p.294
         double em = 0.;
@@ -195,7 +187,6 @@ public class MersenneTwister {
     }
 
 
-
     public static void main(String[] argv) {
 
         MersenneTwister mt = new MersenneTwister();
@@ -225,8 +216,6 @@ public class MersenneTwister {
         long t3 = System.currentTimeMillis();
 
         E.info("times: " + (t2 - t1) + " " + (t3 - t2) + " " + dg / nran + " " + dp / nran);
-
     }
-
 
 }
