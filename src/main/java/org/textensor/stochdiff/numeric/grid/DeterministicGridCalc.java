@@ -13,7 +13,6 @@ import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
-import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
 
 /*
  *
@@ -145,23 +144,6 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-    }
-
-    @SuppressWarnings("boxing")
-    private String getStateText() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("nrds " + nel + " " + specieIDs.length + "\n");
-        for (int i = 0; i < specieIDs.length; i++) {
-            sb.append(specieIDs[i] + " ");
-        }
-        sb.append("\n");
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < specieIDs.length; j++) {
-                sb.append(stringd(wkA[i][j]));
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
     }
 
     public final int run() {
@@ -364,7 +346,7 @@ public class DeterministicGridCalc extends GridCalc {
 
     public long getParticleCount() {
         // TODO Auto-generated method stub
-        return 0;
+        throw new RuntimeException("Not implemented");
     }
 
     @Override

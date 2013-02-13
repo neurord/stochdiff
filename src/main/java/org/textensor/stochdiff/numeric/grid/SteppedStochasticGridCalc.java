@@ -32,7 +32,6 @@ import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
-import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
 import org.textensor.util.ArrayUtil;
 import org.textensor.vis.CCViz3D;
 
@@ -312,25 +311,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
         }
     }
-
-    @SuppressWarnings("boxing")
-    private String getStateText() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("nrds " + nel + " " + specieIDs.length + "\n");
-        for (int i = 0; i < specieIDs.length; i++) {
-            sb.append(specieIDs[i] + " ");
-        }
-        sb.append("\n");
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < specieIDs.length; j++) {
-                sb.append(stringd((NM_PER_PARTICLE_PUV * wkA[i][j] / volumes[i])));
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-
 
     public final int run() {
         init();

@@ -6,6 +6,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
+import static org.textensor.stochdiff.numeric.grid.ResultWriterText.stringd;
 
 public abstract class GridCalc extends BaseCalc implements IGridCalc {
     Column mconc;
@@ -60,6 +61,23 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         // WK
 
         eltregions = vgrid.getRegionIndexes();
+    }
+
+    @SuppressWarnings("boxing")
+    protected String getStateText() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("nrds " + nel + " " + specieIDs.length + "\n");
+        for (int i = 0; i < specieIDs.length; i++) {
+            sb.append(specieIDs[i] + " ");
+        }
+        sb.append("\n");
+        for (int i = 0; i < nel; i++) {
+            for (int j = 0; j < specieIDs.length; j++) {
+                sb.append(stringd(this.getGridPartConc(i, j)));
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     @Override
