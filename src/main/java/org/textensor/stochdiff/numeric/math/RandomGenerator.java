@@ -5,4 +5,6 @@ public interface RandomGenerator {
     double gaussian();
     double gammln(double xx);
     int poisson(double mean);
+
+    RandomGenerator copy();
 }

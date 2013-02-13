@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.numeric.math;
 
+import java.util.Arrays;
+
 import org.textensor.report.E;
 
 /*
@@ -14,7 +16,7 @@ import org.textensor.report.E;
 
 
 
-public class MersenneTwister implements RandomGenerator {
+public class MersenneTwister extends MersenneDerived implements RandomGenerator {
 
     // Period parameters
     private static final int N = 624;
@@ -34,16 +36,22 @@ public class MersenneTwister implements RandomGenerator {
     private int mti; // mti==N+1 means mt[N] is not initialized
     private int mag01[];
 
-
     // a good initial seed (of int size, though stored in a long)
     // private static final long GOOD_SEED = 4357;
-
-
 
     private boolean haveGaussian;
     private double spareGaussian;
 
-
+    @Override
+    public MersenneTwister copy() {
+        MersenneTwister t = new MersenneTwister();
+        t.mt = Arrays.copyOf(this.mt, this.mt.length);
+        t.mti = this.mti;
+        t.mag01 = Arrays.copyOf(this.mag01, this.mag01.length);
+        t.haveGaussian = this.haveGaussian;
+        t.spareGaussian = this.spareGaussian;
+        return t;
+    }
 
     public MersenneTwister() {
         this(System.currentTimeMillis());
@@ -130,59 +138,6 @@ public class MersenneTwister implements RandomGenerator {
             spareGaussian = ran2 * fac;
             haveGaussian = true;
         }
-        return ret;
-    }
-
-    private static double[] cof = {76.18009173, -86.50532033, 24.01409822,
-                                   -1.231739516, 0.120858003e-2, -0.536382e-5
-                                  };
-
-    @Override
-    public final double gammln(double xx) {
-        double x = xx - 1.0;
-        double tmp = x + 5.5;
-        tmp -= (x+0.5) * Math.log(tmp);
-        double ser = 1.0;
-        for (int j = 0; j <= 5; j++) {
-            x += 1.0;
-            ser += cof[j]/x;
-        }
-        return -tmp+Math.log(2.50662827465*ser);
-    }
-
-    @Override
-    public final int poisson(double mean) {
-        // In "Numerical Recipes" Ch 7-3 p.294
-        double em = 0.;
-        if (mean < 12.0) {
-            double g=Math.exp(-mean);
-            em= -1;
-            double t=1.0;
-            do {
-                ++em;
-                t *= random();
-
-            } while (t > g);
-
-        } else {
-            double sq = Math.sqrt(2.0*mean);
-            double alxm=Math.log(mean);
-            double g = mean*alxm - gammln(mean+1.0);
-            double t = 0.;
-            double y = 0.;
-            do {
-                do {
-                    y = Math.tan(Math.PI * random());
-                    em = sq*y + mean;
-                }  while (em < 0.0);
-
-                em = Math.floor(em);
-                t = 0.9*(1.0 + y*y) * Math.exp(em*alxm - gammln(em + 1.0) -g);
-
-            } while (random() > t);
-        }
-
-        int ret = (int)(Math.round(em));
         return ret;
     }
 

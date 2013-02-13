@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 public abstract class inst {
     public static <T> LinkedList<T> newLinkedList() {
         return new LinkedList<T>();
@@ -48,5 +50,9 @@ public abstract class inst {
 
     public static <T> TreeSet<T> newTreeSet() {
         return new TreeSet<T>();
+    }
+
+    public static <T> ArrayBlockingQueue<T> newArrayBlockingQueue(int capacity) {
+        return new ArrayBlockingQueue<T>(capacity);
     }
 }
