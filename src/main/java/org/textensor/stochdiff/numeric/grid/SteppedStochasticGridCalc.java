@@ -29,6 +29,7 @@ import org.textensor.report.Debug;
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
+import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
@@ -94,7 +95,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
     double lndt;
 
     InterpolatingStepGenerator interpSG;
-    MersenneTwister random;
+    RandomGenerator random;
     int nwarn;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
     int ninfo;
