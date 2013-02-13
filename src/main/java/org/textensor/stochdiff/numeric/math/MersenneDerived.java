@@ -25,6 +25,9 @@ abstract class MersenneDerived implements RandomGenerator {
         return -tmp+Math.log(2.50662827465*ser);
     }
 
+    protected boolean haveGaussian;
+    protected double spareGaussian;
+
     @Override
     public final int poisson(double mean) {
         // In "Numerical Recipes" Ch 7-3 p.294
@@ -58,6 +61,29 @@ abstract class MersenneDerived implements RandomGenerator {
         }
 
         int ret = (int)(Math.round(em));
+        return ret;
+    }
+
+    @Override
+    public final double gaussian() {
+        double ret = 0.;
+        if (haveGaussian) {
+            ret = spareGaussian;
+            haveGaussian = false;
+        } else {
+            double r = -1;
+            double ran1 = 0;
+            double ran2 = 0;
+            while (r <= 0.0 || r >= 1.0) {
+                ran1 = 2 * random() - 1;
+                ran2 = 2 * random() - 1;
+                r = ran1 * ran1 + ran2 * ran2;
+            }
+            double fac = Math.sqrt(-2. * Math.log(r) / r);
+            ret = ran1 * fac;
+            spareGaussian = ran2 * fac;
+            haveGaussian = true;
+        }
         return ret;
     }
 
