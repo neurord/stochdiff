@@ -530,8 +530,11 @@ public class SteppedStochasticGridCalc extends BaseCalc {
 
         long endTime = System.currentTimeMillis();
         E.info("total time " + (endTime - startTime) + "ms");
-        return 0;
 
+        // Let the random generator wrap up.
+        this.random.close();
+
+        return 0;
     }
 
     // NB the following method is one of the only two that need optimizing

@@ -90,4 +90,6 @@ abstract class MersenneDerived implements RandomGenerator {
     @Override
     public abstract RandomGenerator copy();
 
+    @Override
+    public void close() {}
 }

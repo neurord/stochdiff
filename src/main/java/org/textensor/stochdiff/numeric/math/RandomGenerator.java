@@ -7,4 +7,5 @@ public interface RandomGenerator {
     int poisson(double mean);
 
     RandomGenerator copy();
+    void close();
 }

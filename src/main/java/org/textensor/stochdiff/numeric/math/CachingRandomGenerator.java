@@ -48,7 +48,7 @@ public class CachingRandomGenerator extends MersenneDerived {
     }
 
     protected void finalize() {
-        this.filler.stop();
+        this.close();
     }
 
     @Override
@@ -72,5 +72,10 @@ public class CachingRandomGenerator extends MersenneDerived {
     @Override
     public CachingRandomGenerator copy() {
         throw new RuntimeException("not implemented");
+    }
+
+    @Override
+    public void close() {
+        this.filler.stop();
     }
 }
