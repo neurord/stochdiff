@@ -35,6 +35,10 @@ public class CachingRandomGenerator extends MersenneDerived {
         this.filler.start();
     }
 
+    protected void finalize() {
+        this.filler.stop();
+    }
+
     @Override
     public float random() {
         return this.random.take();
