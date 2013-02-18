@@ -1,35 +1,22 @@
 package org.textensor.stochdiff.numeric.math;
 
+import static org.textensor.stochdiff.numeric.math.RandomMath.gammln;
+
 /**
  * Part of MersenneTwister which uses random() to generate it's results.
  */
-abstract class MersenneDerived implements RandomGenerator {
+abstract class Derived {
 
     private static double[] cof = {76.18009173, -86.50532033, 24.01409822,
                                    -1.231739516, 0.120858003e-2, -0.536382e-5
                                   };
 
-    @Override
     public abstract float random();
-
-    @Override
-    public final double gammln(double xx) {
-        double x = xx - 1.0;
-        double tmp = x + 5.5;
-        tmp -= (x+0.5) * Math.log(tmp);
-        double ser = 1.0;
-        for (int j = 0; j <= 5; j++) {
-            x += 1.0;
-            ser += cof[j]/x;
-        }
-        return -tmp+Math.log(2.50662827465*ser);
-    }
 
     protected boolean haveGaussian;
     protected double spareGaussian;
 
-    @Override
-    public final int poisson(double mean) {
+    public int poisson(double mean) {
         // In "Numerical Recipes" Ch 7-3 p.294
         double em = 0.;
         if (mean < 12.0) {
@@ -64,8 +51,7 @@ abstract class MersenneDerived implements RandomGenerator {
         return ret;
     }
 
-    @Override
-    public final double gaussian() {
+    public double gaussian() {
         double ret = 0.;
         if (haveGaussian) {
             ret = spareGaussian;
@@ -87,9 +73,5 @@ abstract class MersenneDerived implements RandomGenerator {
         return ret;
     }
 
-    @Override
-    public abstract RandomGenerator copy();
-
-    @Override
     public void close() {}
 }

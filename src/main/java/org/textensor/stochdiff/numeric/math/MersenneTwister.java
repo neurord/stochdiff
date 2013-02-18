@@ -16,7 +16,7 @@ import org.textensor.report.E;
 
 
 
-public class MersenneTwister extends MersenneDerived implements RandomGenerator {
+public class MersenneTwister extends Derived implements RandomGenerator {
 
     // Period parameters
     private static final int N = 624;
@@ -38,17 +38,6 @@ public class MersenneTwister extends MersenneDerived implements RandomGenerator 
 
     // a good initial seed (of int size, though stored in a long)
     // private static final long GOOD_SEED = 4357;
-
-    @Override
-    public MersenneTwister copy() {
-        MersenneTwister t = new MersenneTwister();
-        t.mt = Arrays.copyOf(this.mt, this.mt.length);
-        t.mti = this.mti;
-        t.mag01 = Arrays.copyOf(this.mag01, this.mag01.length);
-        t.haveGaussian = this.haveGaussian;
-        t.spareGaussian = this.spareGaussian;
-        return t;
-    }
 
     public MersenneTwister() {
         this(System.currentTimeMillis());
