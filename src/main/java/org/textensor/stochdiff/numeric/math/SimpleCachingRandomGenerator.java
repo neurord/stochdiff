@@ -11,9 +11,11 @@ public class SimpleCachingRandomGenerator
     static final Logger log =
         LogManager.getLogger(SimpleCachingRandomGenerator.class);
 
-    public static final int CAPACITY = 16*1024*1024;
+    public static final int DEFAULT_CAPACITY = 16*1024*1024;
+    final int capacity;
 
     protected float[] random = null;
+    protected int remaining = 0;
 
     protected class Filler extends CachingRandomGenerator.Filler {
         public Filler(RandomGenerator gen) {
@@ -22,7 +24,7 @@ public class SimpleCachingRandomGenerator
 
         @Override
         public boolean _run() {
-            float[] produce = new float[CAPACITY];
+            float[] produce = new float[capacity];
             for (int i = 0; i < produce.length; i++)
                 produce[i] = gen.random();
             try {
@@ -40,13 +42,19 @@ public class SimpleCachingRandomGenerator
         return new Filler(gen);
     }
 
-    public SimpleCachingRandomGenerator(final RandomGenerator gen) {
+    public SimpleCachingRandomGenerator(RandomGenerator gen, int capacity) {
         super(gen);
+        this.capacity = capacity;
+    }
+
+    public SimpleCachingRandomGenerator(RandomGenerator gen) {
+        this(gen, DEFAULT_CAPACITY);
     }
 
     @Override
     public float random() {
         if (this.remaining == 0) {
+            log.info("have {} arrays ready", this.queue.size());
             try {
                 this.random = this.queue.take();
                 this.remaining = this.random.length;

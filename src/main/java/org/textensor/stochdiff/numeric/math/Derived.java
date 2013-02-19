@@ -1,11 +1,15 @@
 package org.textensor.stochdiff.numeric.math;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import static org.textensor.stochdiff.numeric.math.RandomMath.gammln;
 
 /**
  * Part of MersenneTwister which uses random() to generate it's results.
  */
 abstract class Derived {
+    static final Logger log = LogManager.getLogger(Derived.class);
 
     private static double[] cof = {76.18009173, -86.50532033, 24.01409822,
                                    -1.231739516, 0.120858003e-2, -0.536382e-5
@@ -73,5 +77,7 @@ abstract class Derived {
         return ret;
     }
 
-    public void close() {}
+    public void close() {
+        log.info("close called");
+    }
 }

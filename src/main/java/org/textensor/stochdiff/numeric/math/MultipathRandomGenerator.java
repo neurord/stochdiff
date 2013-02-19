@@ -12,13 +12,15 @@ import org.textensor.util.ResizableArray;
 public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableArray[]> {
     static final Logger log = LogManager.getLogger(MultipathRandomGenerator.class);
 
-    public static final int CAPACITY = 16*1024*1024;
+    public static final int DEFAULT_CAPACITY = 16*1024*1024;
+    public static final double DEFAULT_FILL = 0.9;
+
+    final int capacity;
+    final double fill;
 
     protected ResizableArray.Float random = null;
     protected ResizableArray.Double gaussian = null;
     protected ResizableArray.Int gaussian_usage = null;
-
-    public static final int FILL = (int) (CAPACITY * 0.9);
 
     protected static class StoringGenerator
         extends Derived implements RandomGenerator
@@ -38,22 +40,28 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
         @Override
         public float random() {
-            if (this.randoms.remaining() > 0)
-                return this.randoms.take();
+            final int remaining = this.randoms.remaining();
+            if (remaining == 0) {
+                float random = this.g.random();
+                this.randoms.put(random);
+                MultipathRandomGenerator.log.debug("creating (remaining={} -> {})",
+                                                   remaining, this.randoms.remaining());
+            }
 
-            float random = this.g.random();
-            this.randoms.put(random);
-            return random;
+            MultipathRandomGenerator.log.debug("reusing (remaining={})", remaining);
+            return this.randoms.take();
         }
 
         @Override
         public double gaussian() {
-            int size = this.randoms.size();
+            int size = this.randoms.used();
             double gaussian = super.gaussian();
-            int used = this.randoms.size() - size;
+            int used = this.randoms.used() - size;
             this.gaussians.put(gaussian);
             this.gaussian_usage.put(used);
-            this.randoms.move(-used + 1);
+            MultipathRandomGenerator.log.debug("gaussian size={} used={}, moving {}",
+                                               size, used, -used+1);
+            this.randoms.take(-used+1);
             return gaussian;
         }
 
@@ -74,15 +82,18 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
         @Override
         public boolean _run() {
-            StoringGenerator store = new StoringGenerator(this.gen, CAPACITY);
+            StoringGenerator store = new StoringGenerator(this.gen, capacity);
 
-            for (int i = 0; store.randoms.size() < FILL; i++)
+            for (int i = 0; store.randoms.size() < fill; i++)
                 store.step();
 
-            ResizableArray[] ar = new ResizableArray[]
+            ResizableArray[] arrays = new ResizableArray[]
                 {store.randoms, store.gaussians, store.gaussian_usage};
+            for(ResizableArray array: arrays)
+                array.reset();
+
             try {
-                MultipathRandomGenerator.this.queue.put(ar);
+                MultipathRandomGenerator.this.queue.put(arrays);
             } catch(InterruptedException e) {
                 log.info("filler thread interrupted, wrapping up");
                 return false;
@@ -96,11 +107,19 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         return new Filler(gen);
     }
 
-    public MultipathRandomGenerator(final RandomGenerator gen) {
+    public MultipathRandomGenerator(RandomGenerator gen, int capacity, double fill) {
         super(gen);
+        this.capacity = capacity;
+        this.fill = fill;
+    }
+
+    public MultipathRandomGenerator(RandomGenerator gen) {
+        this(gen, DEFAULT_CAPACITY, DEFAULT_FILL);
     }
 
     public void _take() {
+        log.info("have {} arrays ready", this.queue.size());
+
         ResizableArray[] ar;
         try {
             ar = this.queue.take();
@@ -112,33 +131,54 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         this.gaussian = (ResizableArray.Double) ar[1];
         this.gaussian_usage = (ResizableArray.Int) ar[2];
 
-        assert this.gaussian.size() == this.gaussian_usage.size();
-        assert this.random.size() == this.gaussian.size()
-            + this.gaussian_usage.get(this.gaussian.size()-1);
+        assert this.gaussian.size() == this.gaussian_usage.size():
+            "gaussian.size()=" + this.gaussian.size() +
+            " g_usage.size()=" + this.gaussian_usage.size();
+        assert this.random.size() + 1 == this.gaussian.size()
+            + this.gaussian_usage.get(this.gaussian.size()-1):
+            "random.size()=" + this.random.size() +
+            " gaussian.size()=" + this.gaussian.size() +
+            " g_usage[-1]=" + this.gaussian_usage.get(this.gaussian.size()-1);
     }
 
     @Override
     public float random() {
-        if (this.random == null || this.random.remaining() == 0)
+        if (this.random == null || this.random.remaining() == 0) {
             this._take();
+            assert this.random.remaining() == this.random.size();
+            assert this.gaussian.remaining() == this.gaussian.size();
+        }
 
         assert this.random != null;
+        assert this.random.remaining() > 0:
+            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
+        assert this.gaussian != null;
+        assert this.gaussian.remaining() > 0:
+            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
-        this.gaussian.move(+1);
-        this.gaussian_usage.move(+1);
-        return this.random.take();
+        this.gaussian.take(1);
+        this.gaussian_usage.take(1);
+        return this.random.take(1);
     }
 
     @Override
     public double gaussian() {
-        if (this.random == null || this.random.remaining() == 0)
+        if (this.random == null || this.random.remaining() == 0) {
             this._take();
+            assert this.random.remaining() == this.random.size();
+            assert this.gaussian.remaining() == this.gaussian.size();
+        }
 
         assert this.random != null;
+        assert this.random.remaining() > 0:
+            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
+        assert this.gaussian != null;
+        assert this.gaussian.remaining() > 0:
+            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
         int usage = this.gaussian_usage.take(0);
-        this.gaussian_usage.move(usage);
-        this.random.move(usage);
+        this.gaussian_usage.take(usage);
+        this.random.take(usage);
         return this.gaussian.take(usage);
     }
 }

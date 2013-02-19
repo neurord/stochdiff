@@ -20,7 +20,6 @@ public abstract class CachingRandomGenerator<T>
         = inst.newArrayBlockingQueue(NRANDOMS);
 
     protected final Thread filler;
-    protected int remaining = 0;
 
     protected abstract class Filler implements Runnable {
         protected final RandomGenerator gen;
@@ -33,7 +32,8 @@ public abstract class CachingRandomGenerator<T>
             int count = 0;
             while(this._run()) {
                 if (count++ % 1 == 0)
-                    log.info("random queue has {} arrays",
+                    log.info("{}: random queue has {} arrays",
+                             CachingRandomGenerator.this.getClass().getSimpleName(),
                              queue.size());
             }
         }
@@ -56,6 +56,7 @@ public abstract class CachingRandomGenerator<T>
     @Override
     public void close() {
         this.filler.stop();
+        super.close();
     }
 
     public static RandomGenerator newRandomGenerator(long seed) {
