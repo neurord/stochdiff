@@ -36,8 +36,10 @@ public class TestRandomGenerators {
     {
         log.debug("running testRunningGaussian with {}", g);
         int length = 1024;
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++) {
+            log.debug("g={}", g);
             g.gaussian();
+        }
     }
 
     @Test(dataProvider="generators")

@@ -55,4 +55,8 @@ public abstract class inst {
     public static <T> ArrayBlockingQueue<T> newArrayBlockingQueue(int capacity) {
         return new ArrayBlockingQueue<T>(capacity);
     }
+
+    public static <T> T[] newArray(T... items) {
+        return items;
+    }
 }

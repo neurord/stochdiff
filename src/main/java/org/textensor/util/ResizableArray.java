@@ -7,8 +7,14 @@ public abstract class ResizableArray {
 
     public final int FACTOR = 2;
 
-    public ResizableArray(int capacity) {
+    public ResizableArray() {
         this.size = this.offset = 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s size=%d offset=%d",
+                             getClass().getSimpleName(), size, offset);
     }
 
     public int size() {
@@ -31,7 +37,6 @@ public abstract class ResizableArray {
         protected float[] data;
 
         public Float(int capacity) {
-            super(capacity);
             this.data = new float[capacity];
         }
 
@@ -60,13 +65,21 @@ public abstract class ResizableArray {
             assert offset < this.size;
             return this.data[offset];
         }
+
+        public Float cut(int size, int capacity) {
+            assert size <= this.size: "size=" + this.size + " requested=" + size;
+            assert this.offset <= size;
+            Float cut = new Float(capacity);
+            System.arraycopy(this.data, size, cut.data, 0, this.size - size);
+            this.size = size;
+            return cut;
+        }
     }
 
     public static class Double extends ResizableArray {
         protected double[] data;
 
         public Double(int capacity) {
-            super(capacity);
             this.data = new double[capacity];
         }
 
@@ -101,7 +114,6 @@ public abstract class ResizableArray {
         protected int[] data;
 
         public Int(int capacity) {
-            super(capacity);
             this.data = new int[capacity];
         }
 

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.textensor.util.ResizableArray;
+import org.textensor.util.inst;
 
 /**
  * Provide caching for a real random generator. Pregenerate
@@ -17,10 +18,19 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
     final int capacity;
     final double fill;
+    int deficit = 0;
 
     protected ResizableArray.Float random = null;
     protected ResizableArray.Double gaussian = null;
     protected ResizableArray.Int gaussian_usage = null;
+
+    @Override
+    public String toString() {
+        return String.format("%s capacity=%d fill=%f deficit=%d {%s, %s, %s}",
+                             getClass().getSimpleName(),
+                             capacity, fill, deficit,
+                             random, gaussian, gaussian_usage);
+    }
 
     protected static class StoringGenerator
         extends Derived implements RandomGenerator
@@ -30,10 +40,10 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         public final ResizableArray.Double gaussians;
         public final ResizableArray.Int gaussian_usage;
 
-        StoringGenerator(RandomGenerator g, int capacity) {
+        StoringGenerator(RandomGenerator g, int capacity, ResizableArray.Float randoms) {
             this.g = g;
 
-            this.randoms = new ResizableArray.Float(capacity);
+            this.randoms = randoms != null ? randoms : new ResizableArray.Float(capacity);
             this.gaussians = new ResizableArray.Double(capacity);
             this.gaussian_usage = new ResizableArray.Int(capacity);
         }
@@ -54,13 +64,14 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
         @Override
         public double gaussian() {
-            int size = this.randoms.used();
+            int oldusage = this.randoms.used();
             double gaussian = super.gaussian();
-            int used = this.randoms.used() - size;
+            int newusage = this.randoms.used();
+            int used = newusage - oldusage;
             this.gaussians.put(gaussian);
             this.gaussian_usage.put(used);
-            MultipathRandomGenerator.log.debug("gaussian size={} used={}, moving {}",
-                                               size, used, -used+1);
+            MultipathRandomGenerator.log.debug("gaussian oldusage={} newusage={}, moving {}",
+                                               oldusage, newusage, -used+1);
             this.randoms.take(-used+1);
             return gaussian;
         }
@@ -76,19 +87,24 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
     }
 
     protected class Filler extends CachingRandomGenerator.Filler {
+        ResizableArray.Float overflow = null;
+
         public Filler(RandomGenerator gen) {
             super(gen);
         }
 
         @Override
         public boolean _run() {
-            StoringGenerator store = new StoringGenerator(this.gen, capacity);
+            StoringGenerator store = new StoringGenerator(this.gen, capacity, this.overflow);
 
-            for (int i = 0; store.randoms.size() < fill; i++)
+            for (int i = 0; store.randoms.size() < fill * capacity; i++)
                 store.step();
 
-            ResizableArray[] arrays = new ResizableArray[]
-                {store.randoms, store.gaussians, store.gaussian_usage};
+            assert store.randoms.size() >= store.gaussians.size();
+            this.overflow = store.randoms.cut(store.gaussians.size(), capacity);
+
+            ResizableArray[] arrays =
+                inst.newArray(store.randoms, store.gaussians, store.gaussian_usage);
             for(ResizableArray array: arrays)
                 array.reset();
 
@@ -134,11 +150,18 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         assert this.gaussian.size() == this.gaussian_usage.size():
             "gaussian.size()=" + this.gaussian.size() +
             " g_usage.size()=" + this.gaussian_usage.size();
-        assert this.random.size() + 1 == this.gaussian.size()
-            + this.gaussian_usage.get(this.gaussian.size()-1):
-            "random.size()=" + this.random.size() +
-            " gaussian.size()=" + this.gaussian.size() +
-            " g_usage[-1]=" + this.gaussian_usage.get(this.gaussian.size()-1);
+
+        if (this.deficit > 0) {
+            // FIXME: this might fail with overflow exception if the deficit
+            // is large enough. A loop would be better, but probably seldom
+            // needed.
+            this.random.take(this.deficit);
+            this.gaussian.take(this.deficit);
+            this.gaussian_usage.take(this.deficit);
+            log.info("Reducing deficit of {} from budget {}",
+                      this.deficit, this.random.size());
+            this.deficit = 0;
+        }
     }
 
     @Override
@@ -165,8 +188,8 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
     public double gaussian() {
         if (this.random == null || this.random.remaining() == 0) {
             this._take();
-            assert this.random.remaining() == this.random.size();
-            assert this.gaussian.remaining() == this.gaussian.size();
+            assert this.random.remaining() <= this.random.size();
+            assert this.gaussian.remaining() <= this.gaussian.size();
         }
 
         assert this.random != null;
@@ -176,7 +199,10 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         assert this.gaussian.remaining() > 0:
             "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
-        int usage = this.gaussian_usage.take(0);
+        int wanted = this.gaussian_usage.take(0);
+        int usage = Math.min(this.random.remaining(), wanted);
+        if (usage < wanted)
+            this.deficit = wanted - usage;
         this.gaussian_usage.take(usage);
         this.random.take(usage);
         return this.gaussian.take(usage);
