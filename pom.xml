@@ -57,13 +57,26 @@
                 <id>print-classpath</id>
                 <phase>compile</phase>
                 <configuration>
-              <target>
-                        <property name="runtime_classpath" refid="maven.runtime.classpath"/>
-                        <echo message="runtime CLASSPATH=${runtime_classpath}"/>
-              </target>
+                  <target>
+                    <property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                    <echo message="runtime CLASSPATH=${runtime_classpath}"/>
+                  </target>
                 </configuration>
                 <goals>
-              <goal>run</goal>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>print-test-classpath</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target>
+                    <property name="test_classpath" refid="maven.test.classpath"/>
+                    <echo message="test CLASSPATH=${test_classpath}"/>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
                 </goals>
               </execution>
             </executions>
