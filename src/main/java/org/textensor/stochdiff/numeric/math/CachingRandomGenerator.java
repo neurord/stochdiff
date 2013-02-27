@@ -62,15 +62,12 @@ public abstract class CachingRandomGenerator<T>
     public static RandomGenerator newRandomGenerator(long seed) {
         final String generator = System.getProperty("stochdiff.random", "mersenne");
 
-        switch(generator) {
-        case "mersenne":
+        if (generator.equals("mersenne"))
             return new MersenneTwister(seed);
-        case "simplecaching":
+        if (generator.equals("simplecaching"))
             return new SimpleCachingRandomGenerator(new MersenneTwister(seed));
-        case "multicaching":
+        if (generator.equals("multicaching"))
             return new MultipathRandomGenerator(new MersenneTwister(seed));
-        default:
-            throw new RuntimeException("unknown random generator: " + generator);
-        }
+        throw new RuntimeException("unknown random generator: " + generator);
     }
 }
