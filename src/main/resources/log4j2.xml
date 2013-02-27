@@ -13,6 +13,7 @@
   </appenders>
   <loggers>
     <logger name="org.textensor.stochdiff.numeric.math.MultipathRandomGenerator" level="INFO" />
+    <logger name="org.textensor.stochdiff.numeric.math.TestRandomGenerators" level="INFO" />
     <root level="debug">
       <appender-ref ref="Console"/>
       <appender-ref ref="model-logfile"/>

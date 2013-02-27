@@ -71,6 +71,7 @@ public abstract class ResizableArray {
             assert this.offset <= size;
             Float cut = new Float(capacity);
             System.arraycopy(this.data, size, cut.data, 0, this.size - size);
+            cut.size = this.size - size;
             this.size = size;
             return cut;
         }
