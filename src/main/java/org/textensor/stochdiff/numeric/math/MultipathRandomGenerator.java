@@ -58,14 +58,9 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
             if (remaining == 0) {
                 random = this.g.random();
                 this.randoms.put(random);
-                MultipathRandomGenerator.log.trace("creating {} (remaining={} -> {})",
-                                                   random,
-                                                   remaining, this.randoms.remaining());
             }
 
             random = this.randoms.take();
-            MultipathRandomGenerator.log.trace("reusing {} (remaining={})",
-                                               random, remaining);
             return random;
         }
 
@@ -82,8 +77,6 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
             assert newnewusage == newusage;
             this.spare_gaussians.put(spare);
 
-            MultipathRandomGenerator.log.trace("gaussian oldusage={} newusage={}, moving {}",
-                                               oldusage, newusage, -used+1);
             this.randoms.take(-used+1);
             return gaussian;
         }
@@ -114,10 +107,6 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
             assert store.randoms.size() >= store.gaussians.size();
             this.overflow = store.randoms.cut(store.gaussians.size(), capacity);
-            log.debug("cutting to size {}={}, overflow {}",
-                      store.gaussians.size(),
-                      store.randoms.size(),
-                      this.overflow.size());
 
             ResizableArray[] arrays =
                 inst.newArray(store.randoms,
@@ -200,9 +189,9 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         assert this.gaussian.remaining() > 0:
             "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
-        this.gaussian.take(1);
-        this.gaussian_usage.take(1);
-        this.spare_gaussian.take(1);
+        this.gaussian.waste(1);
+        this.gaussian_usage.waste(1);
+        this.spare_gaussian.waste(1);
         return this.random.take(1);
     }
 
@@ -230,14 +219,12 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
         int usage = Math.min(this.random.remaining(), wanted);
         if (usage < wanted)
             this.deficit = wanted - usage;
-        this.gaussian_usage.take(usage);
-        this.random.take(usage);
+        this.gaussian_usage.waste(usage);
+        this.random.waste(usage);
         double ans = this.gaussian.take(usage);
         this.spareGaussian = this.spare_gaussian.take(usage);
         this.haveGaussian = true;
 
-        log.debug("taking gaussian: wanted={} usage={}, ans={}",
-                  wanted, usage, ans);
         return ans;
     }
 }

@@ -33,6 +33,10 @@ public abstract class ResizableArray {
         this.offset = 0;
     }
 
+    public void waste(int usage) {
+        this.offset += usage;
+    }
+
     public static class Float extends ResizableArray {
         protected float[] data;
 
