@@ -37,6 +37,7 @@ public class SimpleCachingRandomGenerator
                 return false;
             } catch(IllegalMonitorStateException e) {
                 log.warn("filler thread errored out, wrapping up", e);
+                return false;
             }
             return true;
         }

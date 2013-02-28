@@ -125,6 +125,9 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<Object[]> {
             } catch(InterruptedException e) {
                 log.info("filler thread interrupted, wrapping up");
                 return false;
+            } catch(IllegalMonitorStateException e) {
+                log.warn("filler thread errored out, wrapping up", e);
+                return false;
             }
             return true;
         }
