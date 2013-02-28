@@ -60,8 +60,14 @@ public abstract class ResizableArray {
                 throw new RuntimeException("overflow (offset=" + this.offset +
                                            " size=" + this.size + " usage=" + usage);
 
-            float ans = this.data[this.offset];
-            this.offset += usage;
+            final float ans;
+            if (usage < 0) {
+                this.offset += usage;
+                ans = this.data[this.offset];
+            } else {
+                ans = this.data[this.offset];
+                this.offset += usage;
+            }
             return ans;
         }
 
@@ -78,6 +84,10 @@ public abstract class ResizableArray {
             cut.size = this.size - size;
             this.size = size;
             return cut;
+        }
+
+        public float[] asArray() {
+            return Arrays.copyOf(this.data, this.size);
         }
     }
 
@@ -113,6 +123,10 @@ public abstract class ResizableArray {
             assert offset < this.size;
             return this.data[offset];
         }
+
+        public double[] asArray() {
+            return Arrays.copyOf(this.data, this.size);
+        }
     }
 
     public static class Int extends ResizableArray {
@@ -146,6 +160,10 @@ public abstract class ResizableArray {
         public int get(int offset) {
             assert offset < this.size;
             return this.data[offset];
+        }
+
+        public int[] asArray() {
+            return Arrays.copyOf(this.data, this.size);
         }
     }
 }

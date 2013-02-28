@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.numeric.math;
 
+import java.util.Arrays;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -10,7 +12,7 @@ import org.textensor.util.inst;
  * Provide caching for a real random generator. Pregenerate
  * numbers from flat and gaussian distributions.
  */
-public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableArray[]> {
+public class MultipathRandomGenerator extends CachingRandomGenerator<Object[]> {
     static final Logger log = LogManager.getLogger(MultipathRandomGenerator.class);
 
     public static final int DEFAULT_CAPACITY = 16*1024*1024;
@@ -18,37 +20,40 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
     final int capacity;
     final double fill;
-    int deficit = 0;
+    int deficit = 0, offset = 0;
 
-    protected ResizableArray.Float random = null;
-    protected ResizableArray.Double gaussian = null;
-    protected ResizableArray.Int gaussian_usage = null;
-    protected ResizableArray.Double spare_gaussian = null;
+    protected float[] random = null;
+    protected double[] gaussian = null;
+    protected double[] spare_gaussian = null;
+    protected int[] gaussian_usage = null;
 
     @Override
     public String toString() {
-        return String.format("%s capacity=%d fill=%f deficit=%d {%s, %s, %s, %s}",
+        return String.format("%s capacity=%d(%f) offset=%d deficit=%d {%s, %s, %s, %s}",
                              getClass().getSimpleName(),
-                             capacity, fill, deficit,
-                             random, gaussian, gaussian_usage, spare_gaussian);
+                             capacity, fill, offset, deficit,
+                             random.length, gaussian.length, spare_gaussian.length,
+                             gaussian_usage.length);
     }
 
     protected static class StoringGenerator
         extends Derived implements RandomGenerator
     {
+        static final Logger log = LogManager.getLogger(StoringGenerator.class);
+
         protected final RandomGenerator g;
         public final ResizableArray.Float randoms;
         public final ResizableArray.Double gaussians;
-        public final ResizableArray.Int gaussian_usage;
         public final ResizableArray.Double spare_gaussians;
+        public final ResizableArray.Int gaussian_usage;
 
         StoringGenerator(RandomGenerator g, int capacity, ResizableArray.Float randoms) {
             this.g = g;
 
             this.randoms = randoms != null ? randoms : new ResizableArray.Float(capacity);
             this.gaussians = new ResizableArray.Double(capacity);
-            this.gaussian_usage = new ResizableArray.Int(capacity);
             this.spare_gaussians = new ResizableArray.Double(capacity);
+            this.gaussian_usage = new ResizableArray.Int(capacity);
         }
 
         @Override
@@ -60,7 +65,7 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
                 this.randoms.put(random);
             }
 
-            random = this.randoms.take();
+            random = this.randoms.take(1);
             return random;
         }
 
@@ -108,11 +113,10 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
             assert store.randoms.size() >= store.gaussians.size();
             this.overflow = store.randoms.cut(store.gaussians.size(), capacity);
 
-            ResizableArray[] arrays =
-                inst.newArray(store.randoms,
-                              store.gaussians, store.gaussian_usage, store.spare_gaussians);
-            for(ResizableArray array: arrays)
-                array.reset();
+            Object[] arrays = inst.newArray(store.randoms.asArray(),
+                                            store.gaussians.asArray(),
+                                            store.spare_gaussians.asArray(),
+                                            store.gaussian_usage.asArray());
 
             try {
                 MultipathRandomGenerator.this.queue.put(arrays);
@@ -142,7 +146,7 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
     public void _take() {
         log.debug("have {} arrays ready", this.queue.size());
 
-        ResizableArray[] ar;
+        Object[] ar;
         try {
             ar = this.queue.take();
         } catch(InterruptedException e) {
@@ -151,48 +155,38 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
 
         assert ar.length == 4;
 
-        this.random = (ResizableArray.Float) ar[0];
-        this.gaussian = (ResizableArray.Double) ar[1];
-        this.gaussian_usage = (ResizableArray.Int) ar[2];
-        this.spare_gaussian = (ResizableArray.Double) ar[3];
+        this.random = (float[]) ar[0];
+        this.gaussian = (double[]) ar[1];
+        this.spare_gaussian = (double[]) ar[2];
+        this.gaussian_usage = (int[]) ar[3];
+        this.offset = 0;
 
-        assert this.gaussian.size() == this.gaussian_usage.size():
-            "gaussian.size()=" + this.gaussian.size() +
-            " g_usage.size()=" + this.gaussian_usage.size();
+        assert this.gaussian.length == this.gaussian_usage.length:
+            "gaussian.length=" + this.gaussian.length +
+            " g_usage.length=" + this.gaussian_usage.length;
 
         if (this.deficit > 0) {
             // FIXME: this might fail with overflow exception if the deficit
             // is large enough. A loop would be better, but probably seldom
             // needed.
-            this.random.take(this.deficit);
-            this.gaussian.take(this.deficit);
-            this.gaussian_usage.take(this.deficit);
-            this.spare_gaussian.take(this.deficit);
             log.debug("Reducing deficit of {} from budget {}",
-                      this.deficit, this.random.size());
+                      this.deficit, this.random.length);
+            this.offset += this.deficit;
             this.deficit = 0;
         }
     }
 
     @Override
     public float random() {
-        if (this.random == null || this.random.remaining() == 0) {
+        if (this.random == null || this.offset == this.random.length)
             this._take();
-            assert this.random.remaining() == this.random.size();
-            assert this.gaussian.remaining() == this.gaussian.size();
-        }
 
         assert this.random != null;
-        assert this.random.remaining() > 0:
-            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
+        assert this.random.length > this.offset:
+            "random.length=" + this.random.length + " offset=" + this.offset;
         assert this.gaussian != null;
-        assert this.gaussian.remaining() > 0:
-            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
-        this.gaussian.waste(1);
-        this.gaussian_usage.waste(1);
-        this.spare_gaussian.waste(1);
-        return this.random.take(1);
+        return this.random[this.offset++];
     }
 
     @Override
@@ -202,29 +196,23 @@ public class MultipathRandomGenerator extends CachingRandomGenerator<ResizableAr
             return this.spareGaussian;
         }
 
-        if (this.random == null || this.random.remaining() == 0) {
+        if (this.random == null || this.offset == this.random.length)
             this._take();
-            assert this.random.remaining() <= this.random.size();
-            assert this.gaussian.remaining() <= this.gaussian.size();
-        }
 
         assert this.random != null;
-        assert this.random.remaining() > 0:
-            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
+        assert this.random.length > this.offset:
+            "random.length=" + this.random.length + " offset=" + this.offset;
         assert this.gaussian != null;
-        assert this.gaussian.remaining() > 0:
-            "random.r=" + this.random.remaining() + " gaussian.r=" + this.gaussian.remaining();
 
-        int wanted = this.gaussian_usage.take(0);
-        int usage = Math.min(this.random.remaining(), wanted);
+        int wanted = this.gaussian_usage[this.offset];
+        int usage = Math.min(this.random.length - this.offset, wanted);
         if (usage < wanted)
             this.deficit = wanted - usage;
-        this.gaussian_usage.waste(usage);
-        this.random.waste(usage);
-        double ans = this.gaussian.take(usage);
-        this.spareGaussian = this.spare_gaussian.take(usage);
-        this.haveGaussian = true;
 
+        double ans = this.gaussian[this.offset];
+        this.haveGaussian = true;
+        this.spareGaussian = this.spare_gaussian[this.offset];
+        this.offset += usage;
         return ans;
     }
 }
