@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.textensor.util.ResizableArray;
+import org.textensor.util.Settings;
 import org.textensor.util.inst;
 
 /**
@@ -15,8 +16,9 @@ import org.textensor.util.inst;
 public class MultipathRandomGenerator extends CachingRandomGenerator<Object[]> {
     static final Logger log = LogManager.getLogger(MultipathRandomGenerator.class);
 
-    public static final int DEFAULT_CAPACITY = 16*1024*1024;
-    public static final double DEFAULT_FILL = 0.9;
+    public static final int DEFAULT_CAPACITY =
+        Settings.getProperty("stochdiff.random.size", 128*1024);
+    public static final double DEFAULT_FILL = 0.99;
 
     final int capacity;
     final double fill;

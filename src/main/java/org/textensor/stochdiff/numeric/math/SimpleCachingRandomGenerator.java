@@ -5,13 +5,16 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import org.textensor.util.Settings;
+
 public class SimpleCachingRandomGenerator
     extends CachingRandomGenerator<float[]>
 {
     static final Logger log =
         LogManager.getLogger(SimpleCachingRandomGenerator.class);
 
-    public static final int DEFAULT_CAPACITY = 16*1024*1024;
+    public static final int DEFAULT_CAPACITY =
+        Settings.getProperty("stochdiff.random.size", 128*1024);
     final int capacity;
 
     protected float[] random = null;
@@ -56,7 +59,7 @@ public class SimpleCachingRandomGenerator
     @Override
     public float random() {
         if (this.remaining == 0) {
-            log.info("have {} arrays ready", this.queue.size());
+            log.debug("have {} arrays ready", this.queue.size());
             try {
                 this.random = this.queue.take();
                 this.remaining = this.random.length;

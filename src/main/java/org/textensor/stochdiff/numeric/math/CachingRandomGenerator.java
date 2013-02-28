@@ -15,7 +15,7 @@ public abstract class CachingRandomGenerator<T>
 {
     static final Logger log = LogManager.getLogger(CachingRandomGenerator.class);
 
-    public static final int NRANDOMS = 4;
+    public static final int NRANDOMS = 2;
     protected final BlockingQueue<T> queue
         = inst.newArrayBlockingQueue(NRANDOMS);
 
@@ -32,9 +32,9 @@ public abstract class CachingRandomGenerator<T>
             int count = 0;
             while(this._run()) {
                 if (count++ % 1 == 0)
-                    log.info("{}: random queue has {} arrays",
-                             CachingRandomGenerator.this.getClass().getSimpleName(),
-                             queue.size());
+                    log.debug("{}: random queue has {} arrays",
+                              CachingRandomGenerator.this.getClass().getSimpleName(),
+                              queue.size());
             }
         }
 
