@@ -315,21 +315,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
     public final int run() {
         init();
 
-        if (resultWriter != null) { // XXX: seems that later on it is assumed nonnull
+        if (resultWriter != null) // XXX: seems that later on it is assumed nonnull
             resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
-
-            if(vgrid.isCurved()) { // XXX: this condition is bizzare
-                File ftri = ((ResultWriterText)resultWriter).getSiblingFile("-elements.tri");
-
-                if (runAction == VISUALIZE) {
-                    CCViz3D sdv = new CCViz3D();
-                    sdv.loadElements(ftri);
-                    E.info("loaded mesh in standalone viewer");
-                    sdv.show();
-                    return 1;
-                }
-            }
-        }
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
