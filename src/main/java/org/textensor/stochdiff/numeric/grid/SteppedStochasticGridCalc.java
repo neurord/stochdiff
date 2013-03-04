@@ -315,8 +315,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
     public final int run() {
         init();
 
-        if (resultWriter != null) // XXX: seems that later on it is assumed nonnull
-            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
+        assert resultWriter != null;
+        resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
@@ -341,8 +341,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         while (time < endtime) {
 
             if (time >= writeTime) {
-                if (resultWriter != null)
-                    resultWriter.writeGridConcs(time, nel, ispecout, this);
+                resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
             }

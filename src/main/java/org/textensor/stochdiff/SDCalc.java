@@ -42,14 +42,10 @@ public class SDCalc {
     public int run() {
         int ret = 0;
         bCalc = calculationType.getCalc(sdRun);
-        if (resultWriter != null) {
-            bCalc.setResultWriter(resultWriter);
-        }
+        bCalc.setResultWriter(resultWriter);
         ret = bCalc.run();
 
-        if (resultWriter != null) {
-            resultWriter.close();
-        }
+        resultWriter.close();
         return ret;
     }
 

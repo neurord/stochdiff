@@ -149,15 +149,15 @@ public class DeterministicGridCalc extends GridCalc {
     public final int run() {
         init();
 
+        assert resultWriter != null;
+
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
 
-        if (resultWriter != null) {
-            resultWriter.writeGrid(vgrid, time, fnmsOut, this);
+        resultWriter.writeGrid(vgrid, time, fnmsOut, this);
 
-            for (int i = 0; i < fnmsOut.length; i++)
-                resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
-        }
+        for (int i = 0; i < fnmsOut.length; i++)
+            resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
 
         E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
 
@@ -184,8 +184,7 @@ public class DeterministicGridCalc extends GridCalc {
 
             // RO 5 13 2010: follows template in SteppedStochasticGridCalc
             if (time >= writeTime) {
-                if (resultWriter != null)
-                    resultWriter.writeGridConcs(time, nel, ispecout, this);
+                resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
             }
