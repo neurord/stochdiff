@@ -24,6 +24,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.inst;
 
 /**
  * Units: concentrations are expressed in nM and volumes in cubic microns
@@ -61,7 +62,7 @@ public abstract class BaseCalc {
     double[][] regionConcentrations;
     double[][] regionSurfaceDensities;
 
-    protected ResultWriter resultWriter;
+    protected final ArrayList<ResultWriter> resultWriters = inst.newArrayList();
 
     String[] speciesList;
 
@@ -452,9 +453,9 @@ public abstract class BaseCalc {
         return volumeGrid;
     }
 
-    public void setResultWriter(ResultWriter rw) {
-        resultWriter = rw;
-        resultWriter.init("cctdif2d"); // others....
+    public void addResultWriter(ResultWriter rw) {
+        rw.init("cctdif2d"); // others....
+        this.resultWriters.add(rw);
     }
 
     public abstract int run();
@@ -463,7 +464,9 @@ public abstract class BaseCalc {
 
 
     public double[][] readInitialState(String fnm, int nel, int nspec, String[] specids) {
-        String sdata = ((ResultWriterText)resultWriter).readSibling(fnm);
+        // Assume that resultWriters[0] is a ResultWriterText.
+        // FIXME: remove this ugly hack.
+        String sdata = ((ResultWriterText)this.resultWriters.get(0)).readSibling(fnm);
         SDState sds = StateReader.readStateString(sdata);
 
         double[][] ret = null;

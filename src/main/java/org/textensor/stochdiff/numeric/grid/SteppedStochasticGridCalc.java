@@ -23,6 +23,7 @@ package org.textensor.stochdiff.numeric.grid;
 
 import java.io.File;
 import java.util.StringTokenizer;
+import java.util.Arrays;
 
 import org.textensor.report.Debug;
 import org.textensor.report.E;
@@ -315,11 +316,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
     public final int run() {
         init();
 
-        assert resultWriter != null;
-        resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
+        assert this.resultWriters.size() > 0;
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
+
+        for(ResultWriter resultWriter: this.resultWriters)
+            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
 
         E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
 
@@ -330,24 +333,21 @@ public class SteppedStochasticGridCalc extends GridCalc {
         // int iwr = 0;
         double writeTime = time - 1.e-9;
 
-        double[] writeTimeArray;
-        writeTimeArray = new double[fnmsOut.length];
-        for (int i = 0; i < fnmsOut.length; i++) {
-            writeTimeArray[i] = -1.e-9;
-            // System.out.println("writeTimeArray["+i+"] : " +
-            // writeTimeArray[i]);
-        }
+        double[] writeTimeArray = new double[fnmsOut.length];
+        Arrays.fill(writeTimeArray, -1.e-9);
 
         while (time < endtime) {
 
             if (time >= writeTime) {
-                resultWriter.writeGridConcs(time, nel, ispecout, this);
+                for(ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
-                    resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
+                    for(ResultWriter resultWriter: this.resultWriters)
+                        resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
                     writeTimeArray[i] += Double.valueOf(dtsOut[i]);
                 }
             }
@@ -360,7 +360,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
 
             if (time >= stateSaveTime) {
-                resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
+                for(ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }

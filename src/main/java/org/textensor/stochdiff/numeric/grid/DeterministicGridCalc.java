@@ -5,6 +5,8 @@
 //             the template from SteppedStochasticGridCalc in order to save files "*conc.txt"
 package org.textensor.stochdiff.numeric.grid;
 
+import java.util.Arrays;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
@@ -149,15 +151,17 @@ public class DeterministicGridCalc extends GridCalc {
     public final int run() {
         init();
 
-        assert resultWriter != null;
+        assert this.resultWriters.size() > 0;
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
 
-        resultWriter.writeGrid(vgrid, time, fnmsOut, this);
+        for(ResultWriter resultWriter: this.resultWriters)
+            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
 
         for (int i = 0; i < fnmsOut.length; i++)
-            resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
+            for(ResultWriter resultWriter: this.resultWriters)
+                resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
 
         E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
 
@@ -171,29 +175,26 @@ public class DeterministicGridCalc extends GridCalc {
         // RCC commenting this out to use desired output interval from model
         // spec.
         // sdRun.outputInterval = 100.0;
-        double[] writeTimeArray;
-        writeTimeArray = new double[fnmsOut.length];
-        for (int i = 0; i < fnmsOut.length; i++) {
-            writeTimeArray[i] = -1.e-9;
-            // System.out.println("writeTimeArray["+i+"] : " +
-            // writeTimeArray[i]);
-        }
+        double[] writeTimeArray = new double[fnmsOut.length];
+        Arrays.fill(writeTimeArray, -1.e-9);
+
         int iwr = 0;
         // RO
         while (time < endtime) {
 
             // RO 5 13 2010: follows template in SteppedStochasticGridCalc
             if (time >= writeTime) {
-                resultWriter.writeGridConcs(time, nel, ispecout, this);
+                for(ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
             }
-            for (int i = 0; i < fnmsOut.length; i++) {
+            for (int i = 0; i < fnmsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
-                    resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
+                    for(ResultWriter resultWriter: this.resultWriters)
+                        resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
                     writeTimeArray[i] += Double.valueOf(dtsOut[i]);
                 }
-            }
 
             time += advance(time);
 
@@ -204,7 +205,8 @@ public class DeterministicGridCalc extends GridCalc {
 
 
             if (time >= stateSaveTime) {
-                resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
+                for(ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }
