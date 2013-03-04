@@ -113,10 +113,9 @@ public abstract class FileUtil {
 
     public static String getRootName(File f) {
         String fnm = f.getName();
-        String root = fnm.substring(0, fnm.lastIndexOf("."));
-        return root;
+        int index = fnm.lastIndexOf(".");
+        return fnm.substring(0, index == -1 ? fnm.length() : index);
     }
-
 
 
     public static void writeBytes(byte[] ba, File f) {

@@ -16,12 +16,10 @@ import org.textensor.util.inst;
 
 public class ResultWriterText implements ResultWriter {
 
-    File outputFile;
+    final File outputFile;
 
     OutputStreamWriter writer;
-    String fnroot = "";
 
-    boolean ready;
     boolean closed = false;
     boolean continuation = false;
 
@@ -33,14 +31,6 @@ public class ResultWriterText implements ResultWriter {
         this.writeConcentration = writeConcentration;
 
         outputFile = outFile;
-        ready = false;
-
-        String fnm = outFile.getName();
-        int idot = fnm.lastIndexOf(".");
-        if (idot > 0)
-            fnroot = fnm.substring(0, idot);
-        else
-            fnroot = fnm;
     }
 
     public boolean isContinuation() {
@@ -57,14 +47,13 @@ public class ResultWriterText implements ResultWriter {
                 if (magic != null)
                     writer.write(magic + "\n");
             }
-            ready = true;
         } catch (Exception ex) {
             E.error("cannot create file writer " + ex);
         }
     }
 
     public void writeString(String sdat) {
-        if (ready) {
+        if (writer != null) {
             try {
                 writer.write(sdat, 0, sdat.length());
             } catch (Exception ex) {
@@ -77,13 +66,14 @@ public class ResultWriterText implements ResultWriter {
     public void close() {
         if (!closed) {
 
-            if (ready)
+            if (writer != null) {
                 try {
                     writer.close();
                 } catch (Exception ex) {
                     E.error("ex " + ex);
                 }
-            else
+                writer = null;
+            } else
                 E.error("data not written (earlier errors)");
 
             for (ResultWriterText rw : siblings.values())
@@ -103,7 +93,7 @@ public class ResultWriterText implements ResultWriter {
         ResultWriterText ret = siblings.get(extn);
 
         if (ret == null) {
-            String fnm = fnroot + extn;
+            String fnm = FileUtil.getRootName(this.outputFile) + extn;
             File f = new File(outputFile.getParentFile(), fnm);
             ret = new ResultWriterText(f, this.writeConcentration);
             siblings.put(extn, ret);
