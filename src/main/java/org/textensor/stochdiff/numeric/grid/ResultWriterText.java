@@ -37,11 +37,10 @@ public class ResultWriterText implements ResultWriter {
 
         String fnm = outFile.getName();
         int idot = fnm.lastIndexOf(".");
-        if (idot > 0) {
+        if (idot > 0)
             fnroot = fnm.substring(0, idot);
-        } else {
+        else
             fnroot = fnm;
-        }
     }
 
     public boolean isContinuation() {
@@ -53,12 +52,10 @@ public class ResultWriterText implements ResultWriter {
         try {
             if (isContinuation()) {
                 writer = new OutputStreamWriter(new FileOutputStream(outputFile, true));
-
             } else {
                 writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-                if (magic != null) {
+                if (magic != null)
                     writer.write(magic + "\n");
-                }
             }
             ready = true;
         } catch (Exception ex) {
@@ -80,15 +77,14 @@ public class ResultWriterText implements ResultWriter {
     public void close() {
         if (!closed) {
 
-            if (ready) {
+            if (ready)
                 try {
                     writer.close();
                 } catch (Exception ex) {
                     E.error("ex " + ex);
                 }
-            } else {
+            else
                 E.error("data not written (earlier errors)");
-            }
 
             for (ResultWriterText rw : siblings.values())
                 rw.close();
@@ -156,11 +152,11 @@ public class ResultWriterText implements ResultWriter {
     public String readSibling(String fnm) {
         String ret = null;
         File fin = new File(outputFile.getParentFile(), fnm);
-        if (fin.exists()) {
+        if (fin.exists())
             ret = FileUtil.readStringFromFile(fin);
-        } else {
+        else
             E.error("No such file " + fin.getAbsolutePath());
-        }
+
         return ret;
     }
 
@@ -185,14 +181,12 @@ public class ResultWriterText implements ResultWriter {
                     StringTokenizer st = new StringTokenizer(sl, " ");
                     if (st.countTokens() > idx) {
                         String stok = "";
-                        for (int i = 0; i <= idx; i++) {
+                        for (int i = 0; i <= idx; i++)
                             stok = st.nextToken();
-                        }
                         try {
                             double d = Double.parseDouble(stok);
-                            if (d >= value - 1.e-9) {
+                            if (d >= value - 1.e-9)
                                 break;
-                            }
                         } catch (NumberFormatException ex) {
                             // its ok - probably a header rather than a number
                         }
@@ -320,23 +314,21 @@ public class ResultWriterText implements ResultWriter {
 
                     if (vgrid.getGroupID(i) != null) {
                         sb.append("." + vgrid.getGroupID(i));
-
                     } else if (tempLabel != null) {
-                        if (tempLabel.indexOf(".") > 0) {
+                        if (tempLabel.indexOf(".") > 0)
                             sb.append("." + tempLabel.substring(0, tempLabel.indexOf(".")));
-                        }
                     }
-                    if (submembranes[i] == true) {
+                    if (submembranes[i] == true)
                         sb.append("_submembrane");
-                    } else {
+                    else
                         sb.append("_cytosol");
-                    }
+
                     if (tempLabel != null) {
-                        if (tempLabel.indexOf(".") > 0) {
-                            sb.append("_" + tempLabel.substring(tempLabel.indexOf(".") + 1, tempLabel.length()));
-                        } else {
+                        if (tempLabel.indexOf(".") > 0)
+                            sb.append("_" + tempLabel.substring(tempLabel.indexOf(".") + 1,
+                                                                tempLabel.length()));
+                        else
                             sb.append("_" + vgrid.getLabel(i));
-                        }
                     }
                     // WK
 
@@ -364,21 +356,19 @@ public class ResultWriterText implements ResultWriter {
 
     // let's park those two here for now
     public static String stringd(double d) {
-        if (d == 0.0) {
+        if (d == 0.0)
             return "0.0 ";
-        } else {
+        else
             return String.format("%.5g ", d);
-        }
     }
 
     // <--RO 7 02 2008
     // Saves as integers; used to save particles instead of concentrations
     public static String stringi(int id) {
-        if (id == 0) {
+        if (id == 0)
             return "00 ";
-        } else {
+        else
             return String.format("%d ", id);
-        }
     }
 
 }
