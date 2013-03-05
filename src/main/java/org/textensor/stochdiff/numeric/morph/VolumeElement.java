@@ -22,6 +22,10 @@ public abstract class VolumeElement {
 
     private int icache;
 
+    double alongArea;
+    double sideArea;
+    double topArea;
+
     ArrayList<ElementConnection> connections;
 
     Position[] boundary;
@@ -36,6 +40,31 @@ public abstract class VolumeElement {
 
     String groupID = null;
 
+
+    public void setAlongArea(double d) {
+        alongArea = d;
+
+    }
+
+    public double getAlongArea() {
+        return alongArea;
+    }
+
+    public void setSideArea(double d) {
+        sideArea = d;
+    }
+    public double getSideArea() {
+        return sideArea;
+    }
+
+
+    public void setTopArea(double d) {
+        topArea = d;
+    }
+
+    public double getTopArea() {
+        return topArea;
+    }
 
     public VolumeElement() {
         connections = new ArrayList<ElementConnection>();
@@ -151,11 +180,30 @@ public abstract class VolumeElement {
         return surfaceBoundary;
     }
 
+    public String getAsText() {
+        StringBuffer sb = new StringBuffer();
+        // export boundary if have it, ow just the center point;
+        if (boundary != null)
+            for (Position p : boundary)
+                sb.append(String.format(" (%.5g %.5g %.5g) ", p.getX(), p.getY(), p.getZ()));
+        else
+            sb.append(String.format(" (%.5g %.5g %.5g) ", cx, cy, cz));
 
+        return sb.toString();
+    }
 
-    public abstract String getAsText();
+    public String getHeadings() {
+        StringBuffer sb = new StringBuffer();
+        // export boundary if have it, ow just the center point;
+        if (boundary != null)
+            for (int i = 0; i < boundary.length; i++)
+                sb.append(" x" + i + " y" + i + " z" + i);
+        else
+            sb.append(" cx cy cz");
 
-    public abstract String getHeadings();
+        sb.append(" volume deltaZ");
+        return sb.toString();
+    }
 
     public String getAsPlainText() {
         StringBuffer sb = new StringBuffer();
