@@ -1,5 +1,6 @@
 package org.textensor.util;
 
+import java.util.Arrays;
 
 public class ArrayUtil {
 
@@ -97,5 +98,4 @@ public class ArrayUtil {
 
         return ret;
     }
-
 }

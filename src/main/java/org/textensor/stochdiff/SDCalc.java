@@ -8,6 +8,7 @@ import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
+import org.textensor.stochdiff.numeric.grid.ResultWriterHDF5;
 
 import org.textensor.util.inst;
 
@@ -27,6 +28,7 @@ public class SDCalc {
         String sr = sdRun.calculation;
 
         this.resultWriters.add(new ResultWriterText(outputFile, false));
+        this.resultWriters.add(new ResultWriterHDF5(outputFile));
 
 
         //        if (sdRun.continueOutput() && outputFile.exists() && sdRun.getStartTime() > 0)

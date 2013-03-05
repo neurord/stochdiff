@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 public abstract class inst {
     public static <T> LinkedList<T> newLinkedList() {
@@ -48,5 +50,17 @@ public abstract class inst {
 
     public static <T> TreeSet<T> newTreeSet() {
         return new TreeSet<T>();
+    }
+
+    public static <T> Vector<T> newVector() {
+        return new Vector<T>();
+    }
+
+    public static <T> Vector<T> newVector(T... items) {
+        return new Vector<T>(Arrays.asList(items));
+    }
+
+    public static <T> T[] newArray(T... args) {
+        return args;
     }
 }

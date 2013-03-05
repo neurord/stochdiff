@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Position;
-
+import org.textensor.util.inst;
 
 public abstract class VolumeElement {
     double cx;
@@ -155,15 +155,34 @@ public abstract class VolumeElement {
 
     public abstract String getAsText();
 
-
-    public abstract String getAsPlainText();
-
-
     public abstract String getHeadings();
 
+    public String getAsPlainText() {
+        StringBuffer sb = new StringBuffer();
+        double pp[] = this.getAsNumbers();
+        for(double p: pp)
+            sb.append(String.format(" %.5g", p));
+        return sb.toString();
+    }
 
-
-
+    public double[] getAsNumbers() {
+        // export boundary if have it, or just the center point;
+        if (boundary != null) {
+            double ans[] = new double[3 * boundary.length + 2];
+            int i = 0;
+            for (Position p: boundary) {
+                ans[i++] = p.getX();
+                ans[i++] = p.getY();
+                ans[i++] = p.getZ();
+            }
+            ans[i++] = volume;
+            ans[i++] = deltaZ;
+            assert i == ans.length;
+            return ans;
+        } else {
+            return new double[]{cx, cy, cz, volume, deltaZ};
+        }
+    }
 
     public void setGroupID(String lroot) {
         groupID = lroot;

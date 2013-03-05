@@ -4,14 +4,13 @@
 package org.textensor.stochdiff.numeric.morph;
 
 import java.util.ArrayList;
-
+import java.util.Vector;
 import java.util.HashMap;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.disc.CurvedVolumeSlice;
 import org.textensor.stochdiff.geom.Geom;
-//  import org.textensor.stochdiff.geom.Position;
-
+import org.textensor.util.inst;
 
 public class VolumeGrid {
 
@@ -305,7 +304,37 @@ public class VolumeGrid {
         return sb.toString();
     }
 
+    public Vector<Object> gridData() {
+        double[]
+            x0 = new double[nelement], y0 = new double[nelement], z0 = new double[nelement],
+            x1 = new double[nelement], y1 = new double[nelement], z1 = new double[nelement],
+            x2 = new double[nelement], y2 = new double[nelement], z2 = new double[nelement],
+            x3 = new double[nelement], y3 = new double[nelement], z3 = new double[nelement],
+            volume = new double[nelement], deltaZ = new double[nelement];
+        int i = 0;
+        for (VolumeElement el: elements) {
+            double pp[] = el.getAsNumbers();
+            x0[i] = pp[0];
+            y0[i] = pp[1];
+            z0[i] = pp[2];
+            x1[i] = pp[3];
+            y1[i] = pp[4];
+            z1[i] = pp[5];
+            x2[i] = pp[6];
+            y2[i] = pp[7];
+            z2[i] = pp[8];
+            x3[i] = pp[9];
+            y3[i] = pp[10];
+            z3[i] = pp[11];
+            volume[i] = pp[12];
+            deltaZ[i] = pp[13];
+            i++;
+            assert i == pp.length;
+        }
 
+        return inst.newVector(new Object[]
+            {x0, y0, z0, x1, y1, x1, x2, y2, z2, x3, y3, z3, volume, deltaZ});
+    }
 
     public String getLabel(int i) {
         return eltLabels[i];

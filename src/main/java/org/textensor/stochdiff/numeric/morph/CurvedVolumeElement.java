@@ -65,22 +65,6 @@ public class CurvedVolumeElement extends VolumeElement {
     }
 
     @SuppressWarnings("boxing")
-    public String getAsPlainText() {
-        StringBuffer sb = new StringBuffer();
-        // export boundary if have it, ow just the center point;
-        if (boundary != null) {
-            for (Position p : boundary) {
-                sb.append(String.format(" %.5g %.5g %.5g", p.getX(), p.getY(), p.getZ()));
-            }
-        } else {
-            sb.append(String.format(" %.5g %.5g %.5g", cx, cy, cz));
-        }
-        sb.append(String.format(" %.5g %.5g", volume, deltaZ));
-        return sb.toString();
-    }
-
-
-    @SuppressWarnings("boxing")
     public String getHeadings() {
         StringBuffer sb = new StringBuffer();
         // export boundary if have it, ow just the center point;
