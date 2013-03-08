@@ -35,7 +35,11 @@ git_describe=$(git describe --always)
 #     exit 5
 # fi
 
-docdirectory=target/site
+docdirectory=$(git config gh-pages.dir)
+if [ -z "$docdirectory" ]; then
+    echo "Fatal: git config gh-pages.dir not found"
+    exit 5
+fi
 
 # Add a .nojekyll file
 # This prevents the GitHub jekyll website generator from running
