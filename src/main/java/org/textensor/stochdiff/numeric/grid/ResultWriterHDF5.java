@@ -12,6 +12,7 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.h5.H5Datatype;
+import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.util.FileUtil;
@@ -25,6 +26,10 @@ public class ResultWriterHDF5 implements ResultWriter {
     final protected File outputFile;
     protected H5File output;
     protected Group sim;
+    protected H5ScalarDS concs = null;
+
+    public static final H5Datatype double_t =
+        new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
 
     public ResultWriterHDF5(File outFile) {
         this.outputFile = new File(FileUtil.getRootName(outFile) + ".h5");
@@ -33,28 +38,31 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     public void init(String magic) {
-        FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
-        assert fileFormat != null;
-        log.info("Opening output file {}", this.outputFile);
         try {
-            this.output = (H5File) fileFormat.create(this.outputFile.toString());
+            this._init(magic);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected void _init(String magic)
+        throws Exception
+    {
+        FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
+        assert fileFormat != null;
+        log.info("Opening output file {}", this.outputFile);
+        this.output = (H5File) fileFormat.create(this.outputFile.toString());
         assert this.output != null;
+
         try {
             this.output.open();
         } catch(Exception e) {
             log.error("Failed to open results file {}", this.outputFile);
-            throw new RuntimeException(e);
+            throw e;
         }
 
         Group root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
-        try {
-            this.sim = this.output.createGroup("simulation", root);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.sim = this.output.createGroup("simulation", root);
     }
 
     @Override
@@ -69,6 +77,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[], IGridCalc source) {
+        log.info("Writing grid at time {}", startTime);
         int n = vgrid.getNElements();
         long[]
             dims = {n,},
@@ -81,8 +90,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                 "volume", "deltaZ"};
 
         Datatype[] memberTypes = new Datatype[memberNames.length];
-        Arrays.fill(memberTypes,
-                    new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE));
+        Arrays.fill(memberTypes, double_t);
 
         Vector<Object> data = vgrid.gridData();
 
@@ -95,8 +103,64 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
+    protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
+        throws Exception
+    {
+        assert this.concs == null;
+
+        final String[] specieIDs = source.getSpecieIDs();
+
+        int nspecout = ispecout.length;
+        if (nspecout == 0)
+            return false;
+
+        /* times x nel x nspecout, but we write only for only time 'time' at one time */
+        long[] dims = {1, nel, nspecout};
+        long[] size = {H5F_UNLIMITED, nel, nspecout};
+        long[] chunks = {32, nel, nspecout};
+
+        this.concs = (H5ScalarDS) this.output.createScalarDS("concentrations", this.sim,
+                                                             double_t, dims, size, chunks,
+                                                             9, null);
+        this.concs.init();
+        return true;
+    }
+
+    public double[] getGridConcs(int nel, int ispecout[], IGridCalc source) {
+        double[] ans = new double[nel * ispecout.length];
+        int pos = 0;
+        for (int i = 0; i < nel; i++)
+            for (int j = 0; j < ispecout.length; j++)
+                ans[pos++] = source.getGridPartConc(i, ispecout[j]);
+        return ans;
+    }
+
     @Override
-    public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {}
+    public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
+        log.info("Writing grid concentrations at time {}", time);
+        try {
+            this._writeGridConcs(time, nel, ispecout, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) 
+        throws Exception
+    {
+        if (this.concs == null) {
+            if (!this.initConcs(nel, ispecout, source))
+                return;
+        } else {
+            long[] dims = this.concs.getDims();
+            dims[0] = dims[0] + 1;
+            this.concs.extend(dims);
+        }
+
+        double[] line = this.getGridConcs(nel, ispecout, source);
+
+        this.concs.write(line);
+    }
 
     @Override
     public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {}
