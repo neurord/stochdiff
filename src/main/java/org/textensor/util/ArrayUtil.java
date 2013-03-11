@@ -112,4 +112,10 @@ public class ArrayUtil {
 
         return ret;
     }
+
+    public static void copy(int[][] src, int dst[][]) {
+        assert src.length == dst.length;
+        for(int i = 0; i < src.length; i++)
+            System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
+    }
 }

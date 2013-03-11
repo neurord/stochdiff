@@ -421,16 +421,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         // initialize wkB to the current values.
         // It will hold the midstep values for the leapfrog, after diffusion
         // but before reactions.
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < nspec; j++) {
-                wkB[i][j] = wkA[i][j];
-                // if (wkB[i][j] < 0)
-                // System.out.println("ERROR - NEGATIVE POPULATION at volume_element "
-                // + i + ", specie " + j);
-                // E.error("ERROR - NEGATIVE POPULATION at volume_element " + i
-                // + ", specie " + j);
-            }
-        }
+        ArrayUtil.copy(wkA, wkB);
 
         // diffusion step;
         for (int iel = 0; iel < nel; iel++) {
@@ -469,11 +460,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         // for the reaction step, the source array is wkB and the
         // destination is wkA
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < nspec; j++) {
-                wkA[i][j] = wkB[i][j];
-            }
-        }
+        ArrayUtil.copy(wkB, wkA);
 
         // reaction step;
         for (int iel = 0; iel < nel; iel++) {
