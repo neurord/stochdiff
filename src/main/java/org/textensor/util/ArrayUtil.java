@@ -4,6 +4,13 @@ import java.util.Arrays;
 
 public class ArrayUtil {
 
+    public static int maxLength(String... array) {
+        int i = 0;
+        for (String s: array)
+            if (s.length() > i)
+                i = s.length();
+        return i;
+    }
 
     public static double[] log(double[] d, double dzero) {
         double[] ret = new double[d.length];

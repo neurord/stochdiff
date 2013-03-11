@@ -27,6 +27,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected H5File output;
     protected Group sim;
     protected H5ScalarDS concs = null;
+    protected H5ScalarDS conc_times = null;
+    protected H5ScalarDS species = null;
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
@@ -103,36 +105,72 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
+    protected void writeSpecies(int[] ispecout, IGridCalc source)
+        throws Exception
+    {
+        String[] specieIDs = source.getSpecieIDs();
+        String[] outSpecies = new String[ispecout.length];
+        for (int i = 0; i < ispecout.length; i++)
+            outSpecies[i] = specieIDs[ispecout[i]];
+
+        int maxlength = ArrayUtil.maxLength(outSpecies);
+        long[] dims = {outSpecies.length};
+
+        H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
+                                             Datatype.NATIVE, Datatype.NATIVE);
+
+        this.output.createScalarDS("species", this.sim,
+                                   string_t, dims, null, null,
+                                   0, outSpecies);
+    }
+
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
         throws Exception
     {
         assert this.concs == null;
+        assert this.conc_times == null;
 
-        final String[] specieIDs = source.getSpecieIDs();
+        this.writeSpecies(ispecout, source);
 
         int nspecout = ispecout.length;
         if (nspecout == 0)
             return false;
 
         /* times x nel x nspecout, but we write only for only time 'time' at one time */
-        long[] dims = {1, nel, nspecout};
-        long[] size = {H5F_UNLIMITED, nel, nspecout};
-        long[] chunks = {32, nel, nspecout};
+        {
+            long[] dims = {1, nel, nspecout};
+            long[] size = {H5F_UNLIMITED, nel, nspecout};
+            long[] chunks = {32, nel, nspecout};
 
-        this.concs = (H5ScalarDS) this.output.createScalarDS("concentrations", this.sim,
-                                                             double_t, dims, size, chunks,
-                                                             9, null);
-        this.concs.init();
+            this.concs = (H5ScalarDS)
+                this.output.createScalarDS("concentrations", this.sim,
+                                           double_t, dims, size, chunks,
+                                           9, null);
+            this.concs.init();
+        }
+
+        {
+            long[] dims = {1};
+            long[] size = {H5F_UNLIMITED};
+            long[] chunks = {1024};
+            double[] times = {0.0};
+
+            this.conc_times = (H5ScalarDS)
+                this.output.createScalarDS("times", this.sim,
+                                           double_t, dims, size, chunks,
+                                           9, times);
+            this.conc_times.init();
+        }
         return true;
     }
 
-    public double[] getGridConcs(int nel, int ispecout[], IGridCalc source) {
-        double[] ans = new double[nel * ispecout.length];
+    public void getGridConcs(double[] dst,
+                             int nel, int ispecout[], IGridCalc source) {
+        assert dst.length == nel * ispecout.length;
         int pos = 0;
         for (int i = 0; i < nel; i++)
             for (int j = 0; j < ispecout.length; j++)
-                ans[pos++] = source.getGridPartConc(i, ispecout[j]);
-        return ans;
+                dst[pos++] = source.getGridPartConc(i, ispecout[j]);
     }
 
     @Override
@@ -157,24 +195,34 @@ public class ResultWriterHDF5 implements ResultWriter {
             dims = this.concs.getDims();
             dims[0] = dims[0] + 1;
             this.concs.extend(dims);
+
+            long[] dims2 = this.conc_times.getDims();
+            dims2[0] = dims2[0] + 1;
+            this.conc_times.extend(dims);
         }
 
-        double[] line = this.getGridConcs(nel, ispecout, source);
+        {
+            long[] selected = this.concs.getSelectedDims();
+            long[] start = this.concs.getStartDims();
+            selected[0] = 1;
+            selected[1] = dims[1];
+            selected[2] = dims[2];
+            start[0] = dims[0] - 1;
 
-        long[] selected = this.concs.getSelectedDims();
-        long[] start = this.concs.getStartDims();
-        selected[0] = 1;
-        selected[1] = dims[1];
-        selected[2] = dims[2];
-        start[0] = dims[0] - 1;
+            double[] data = (double[]) this.concs.getData();
+            this.getGridConcs(data, nel, ispecout, source);
+            this.concs.write(data);
+        }
 
-        Object ret = this.concs.getData();
-        double[] retd = (double[]) ret;
-        assert retd.length == line.length;
-        for(int i = 0; i < line.length; i++)
-            retd[i] = line[i];
-
-        this.concs.write(retd);
+        {
+            long[] selected = this.conc_times.getSelectedDims();
+            long[] start = this.conc_times.getStartDims();
+            selected[0] = 1;
+            start[0] = dims[0] - 1;
+            double[] times = (double[]) this.conc_times.getData();
+            times[0] = time;
+            this.conc_times.write(times);
+        }
     }
 
     @Override
