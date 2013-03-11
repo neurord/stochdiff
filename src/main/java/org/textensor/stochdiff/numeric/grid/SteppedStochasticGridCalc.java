@@ -101,6 +101,18 @@ public class SteppedStochasticGridCalc extends GridCalc {
         super(sdm);
     }
 
+    protected int randomRound(double number) {
+        int i = (int) number;
+        double d = number - i;
+
+        // random allocation to implement the remainder
+        // (some cells get an extra particle, some don't)
+        if (random.random() < d)
+            i++;
+
+        return i;
+    }
+
     public final void init() {
         super.init();
 
@@ -161,45 +173,17 @@ public class SteppedStochasticGridCalc extends GridCalc {
             double v = volumes[i];
             double[] rcs = regcon[eltregions[i]];
 
-            for (int j = 0; j < nspec; j++) {
-                double rnp = v * rcs[j] * PARTICLES_PUVC;
-                int irnp = (int) rnp;
-                double drnp = rnp - irnp;
-
-                // random allocation to implement the remainder of the
-                // density (some cells get an extra particle, some dont)
-                if (random.random() < drnp) {
-                    irnp += 1;
-                }
-                wkA[i][j] = irnp;
-                wkB[i][j] = irnp;
-            }
+            for (int j = 0; j < nspec; j++)
+                wkA[i][j] = wkB[i][j] = randomRound(v * rcs[j] * PARTICLES_PUVC);
 
             double a = surfaceAreas[i];
             double[] scs = regsd[eltregions[i]];
             if (a > 0 && scs != null) {
-                for (int j = 0; j < nspec; j++) {
+                for (int j = 0; j < nspec; j++)
                     if (Double.isNaN(scs[j])) {
                         // means not specified by the user;
-
-                    } else {
-                        wkA[i][j] = 0;
-                        wkB[i][j] = 0;
-
-                        double rnp = a * scs[j] * PARTICLES_PUASD;
-                        int irnp = (int) rnp;
-                        double drnp = rnp - irnp;
-
-                        // random allocation to implement the remainder of the
-                        // density (some cells get an extra particle, some dont)
-                        if (random.random() < drnp) {
-                            irnp += 1;
-                        }
-                        wkA[i][j] += irnp;
-                        wkB[i][j] += irnp;
-                    }
-                }
-
+                    } else
+                        wkA[i][j] = wkB[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
             }
 
             /*
@@ -393,13 +377,10 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     int nk = stimtargets[i].length;
                     if (nk > 0) {
                         double as = astim[j] / nk;
-                        int ias = (int) as;
-                        double asr = as - ((int) as);
 
                         for (int k = 0; k < nk; k++) {
-                            int nin = (ias + (random.random() < asr ? 1 : 0));
+                            int nin = this.randomRound(as);
                             ninjected += nin;
-
                             wkA[stimtargets[i][k]][j] += nin;
                         }
                     }
