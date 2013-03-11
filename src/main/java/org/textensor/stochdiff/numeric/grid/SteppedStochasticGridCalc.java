@@ -36,6 +36,10 @@ import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
 import org.textensor.vis.CCViz3D;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+
 /*
  * Approximate stochastic calculation with a fixed timestep where
  * the number of reactions orruring in a volume and the number of particles
@@ -48,6 +52,7 @@ import org.textensor.vis.CCViz3D;
  */
 
 public class SteppedStochasticGridCalc extends GridCalc {
+    static final Logger log = LogManager.getLogger(SteppedStochasticGridCalc.class);
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),
@@ -504,37 +509,30 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         ngo = interpSG.nGo(n, lnp, random.random());
 
                     } else {
+                        final double exp = Math.exp(lnp);
+                        final double g = random.gaussian(), r = random.random();
+                        final String msg;
+
                         if (useBinomial()) {
-                            if (n * (Math.exp(lnp)) < NP) {
-                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random(),
-                                                                 random.poisson(n * (Math.exp(lnp))), NP);
-                                if (ngo < 0) {
-                                    ngo = 0;
-
-                                    System.out.println("in advance (reaction), if (n*Math.exp(lnp)) < " + NP
-                                                       + "): ngo is NEGATIVE.");
-                                    System.out.println("ngo: " + ngo + " n: " + n + " Math.exp(lnp): " + Math.exp(lnp));
-                                }
+                            if (n * exp < NP) {
+                                ngo = StepGenerator.gaussianStep(n, exp, g, r, random.poisson(n * exp), NP);
+                                msg = "n*Math.exp(lnp) < " + NP;
                             } else {
-                                ngo = StepGenerator.gaussianStep(n, Math.exp(lnp), random.gaussian(), random.random());
-                                if (ngo < 0) {
-                                    ngo = 0;
-
-                                    System.out.println("in advance (reaction), if (n*Math.exp(lnp)) >= " + NP
-                                                       + "): ngo is NEGATIVE.");
-                                    System.out.println("ngo: " + ngo + " n: " + n + " Math.exp(lnp): " + Math.exp(lnp));
-                                }
+                                ngo = StepGenerator.gaussianStep(n, exp, g, r);
+                                msg = "n*Math.exp(lnp) >= " + NP;
                             }
-
                         } else {
-                            ngo = StepGenerator.poissonStep(n, Math.exp(lnp), random.gaussian(), random.random());
-                            if (ngo < 0) {
-                                ngo = 0;
-
-                                System.out.println("in advance (reaction), if not using binomial: ngo is NEGATIVE.");
-                                System.out.println("ngo: " + ngo + " n: " + n + " Math.exp(lnp): " + Math.exp(lnp));
-                            }
+                            ngo = StepGenerator.poissonStep(n, exp, g, r);
+                            msg = "not using binomial";
                         }
+
+                        if (ngo < 0) {
+                            log.warning("in advance (reaction), when {}: ngo is NEGATIVE "
+                                        + "(ngo={}, n={}, Math.exp(lnp)={})",
+                                        msg, ngo, n, exp);
+                            ngo = 0;
+                        }
+
                     }
                     // WK 7 2 2008: if ngo is negative, exit.
                     // if (ngo < 0)
