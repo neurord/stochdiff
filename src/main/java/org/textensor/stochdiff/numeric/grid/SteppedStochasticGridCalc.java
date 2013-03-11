@@ -82,7 +82,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
     double[] rates;
     double[] lnrates;
 
-    double[] intlogs;
+    final double[] intlogs = ArrayUtil.logArray(10000, -99);
     double lndt;
 
     int ninjected = 0;
@@ -223,13 +223,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         dt = sdRun.fixedStepDt;
         lndt = Math.log(dt);
-
-        // take logs of integers once only and store;
-        intlogs = new double[10000];
-        intlogs[0] = -99;
-        for (int i = 1; i < intlogs.length; i++) {
-            intlogs[i] = Math.log(i);
-        }
 
         // final things we need is something to generate particle numbers
         // for steps of given n, p

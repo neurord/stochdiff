@@ -26,6 +26,13 @@ public class ArrayUtil {
         return ret;
     }
 
+    public static double[] logArray(int len, double zeroth) {
+        double[] ret = new double[len];
+        ret[0] = zeroth;
+        for (int i = 1; i < ret.length; i++)
+            ret[i] = Math.log(i);
+        return ret;
+    }
 
     public static int findBracket(double[] v, double x) {
         if (v == null || v.length == 0)
