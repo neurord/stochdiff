@@ -354,6 +354,32 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     }
 
+    protected int calculateNgo(String where, int n, double exp){
+        final double g = random.gaussian(), r = random.random();
+        final String msg;
+        final int ngo;
+
+        if (useBinomial()) {
+            if (n * exp < NP) {
+                ngo = StepGenerator.gaussianStep(n, exp, g, r, random.poisson(n * exp), NP);
+                msg = "n*exp < " + NP;
+            } else {
+                ngo = StepGenerator.gaussianStep(n, exp, g, r);
+                msg = "n*exp >= " + NP;
+            }
+        } else {
+            ngo = StepGenerator.poissonStep(n, exp, g, r);
+            msg = "not using binomial";
+        }
+
+        if (ngo >= 0)
+            return ngo;
+
+        log.warn("{} with {}: ngo is NEGATIVE (ngo={}, n={}, Math.exp(lnp)={})",
+                 where, msg, ngo, n, exp);
+        return 0;
+    }
+
     // NB the following method is one of the only two that need optimizing
     // (the other is nGo in the interpolating step generator)
     // things to do (in the c version)
@@ -502,38 +528,14 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
                 } else {
                     int ngo = 0;
-                    if (n == 1) {
+                    if (n == 1)
                         // TODO use table to get rid of exp
                         ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-                    } else if (n < StepGenerator.NMAX_STOCHASTIC) {
+                    else if (n < StepGenerator.NMAX_STOCHASTIC)
                         ngo = interpSG.nGo(n, lnp, random.random());
+                    else
+                        ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
 
-                    } else {
-                        final double exp = Math.exp(lnp);
-                        final double g = random.gaussian(), r = random.random();
-                        final String msg;
-
-                        if (useBinomial()) {
-                            if (n * exp < NP) {
-                                ngo = StepGenerator.gaussianStep(n, exp, g, r, random.poisson(n * exp), NP);
-                                msg = "n*Math.exp(lnp) < " + NP;
-                            } else {
-                                ngo = StepGenerator.gaussianStep(n, exp, g, r);
-                                msg = "n*Math.exp(lnp) >= " + NP;
-                            }
-                        } else {
-                            ngo = StepGenerator.poissonStep(n, exp, g, r);
-                            msg = "not using binomial";
-                        }
-
-                        if (ngo < 0) {
-                            log.warning("in advance (reaction), when {}: ngo is NEGATIVE "
-                                        + "(ngo={}, n={}, Math.exp(lnp)={})",
-                                        msg, ngo, n, exp);
-                            ngo = 0;
-                        }
-
-                    }
                     // WK 7 2 2008: if ngo is negative, exit.
                     // if (ngo < 0)
                     // {
@@ -551,10 +553,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     int navail = nend[ri0] / rs[0];
                     // AB changed navail > nend[ri1] / rs1 to navail < nend[ri1]
                     // / rs1
-                    if (ri1 >= 0 && navail > nend[ri1] / rs1) {
-
+                    if (ri1 >= 0 && navail > nend[ri1] / rs1)
                         navail = nend[ri1] / rs1;
-                    }
+
                     if (ngo > navail) {
                         // TODO as for diffusion, we've got more particles going
                         // than there actually are. Should regenerate all
@@ -629,7 +630,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         int inbr[] = neighbors[iel];
         double[] fshare = fSharedExit[iel][k];
 
-        int ngo = 0;
+        int ngo;
         int ngo_remaining = 0; // for independent diffusion step      ***KTB edit - this is number of molecules not yet diffused
         int num_molecules_diffused_so_far = 0;
 
@@ -642,55 +643,12 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
                 System.exit(3);
             }
-
         } else {
-            if (useBinomial()) {
-                // WK 7 2 2008: if n*p < 10, then use poission to get ngo;
-                // otherwise, use gaussian.
-                // RO 7 3 2008: changed from 10 to 20 because observed negative
-                // ngo
-                if (np0 * pSharedOut[iel][k] < NP) {
-                    // RO
-                    ngo = StepGenerator.gaussianStep(np0, pSharedOut[iel][k], random.gaussian(), random.random(),
-                                                     random.poisson(np0 * pSharedOut[iel][k]), NP);
-
-                    if (ngo < 0) {
-                        ngo = 0;
-
-                        System.out.println("in parallelAndSharedDiffusionStep, if (np0*pSharedOut[iel][k] < " + NP
-                                           + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " np0: " + np0 + " pSharedOut[iel][k]: "
-                                           + pSharedOut[iel][k]);
-                    }
-
-                } else {
-                    ngo = StepGenerator.gaussianStep(np0, pSharedOut[iel][k], random.gaussian(), random.random());
-                    if (ngo < 0) {
-                        ngo = 0;
-
-                        System.out.println("in parallelAndSharedDiffusionStep, if (np0*pSharedOut[iel][k] >= " + NP
-                                           + "): ngo is NEGATIVE.");
-                        System.out.println("ngo: " + ngo + " np0: " + np0 + " pSharedOut[iel][k]: "
-                                           + pSharedOut[iel][k]);
-                    }
-                    // WK
-                }
-            } else {
-                ngo = StepGenerator.poissonStep(np0, pSharedOut[iel][k], random.gaussian(), random.random());
-                if (ngo < 0) {
-                    ngo = 0;
-
-                    System.out.println("in parallelAndSharedDiffusionStep, if not using Binomial: ngo is NEGATIVE.");
-                    System.out.println("ngo: " + ngo + " np0: " + np0 + " pSharedOut[iel][k]: " + pSharedOut[iel][k]);
-                }
-            }
+            ngo = this.calculateNgo("parallelAndSharedDiffusionStep", np0, pSharedOut[iel][k]);
         }
 
-        // WK 7 2 2008: if ngo is negative, exit.
-        if (ngo < 0) {
-            // System.out.println("in parallelAndSharedDiffusionStep: ngo is NEGATIVE. Exiting...");
-            // System.exit(3);
-        }
+        assert ngo >= 0;
+
         // WK
         // if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
         // shared_diffusion
