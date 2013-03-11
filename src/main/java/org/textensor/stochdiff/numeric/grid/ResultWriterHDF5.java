@@ -148,18 +148,33 @@ public class ResultWriterHDF5 implements ResultWriter {
     public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) 
         throws Exception
     {
+        final long[] dims;
         if (this.concs == null) {
             if (!this.initConcs(nel, ispecout, source))
                 return;
+            dims = this.concs.getDims();;
         } else {
-            long[] dims = this.concs.getDims();
+            dims = this.concs.getDims();
             dims[0] = dims[0] + 1;
             this.concs.extend(dims);
         }
 
         double[] line = this.getGridConcs(nel, ispecout, source);
 
-        this.concs.write(line);
+        long[] selected = this.concs.getSelectedDims();
+        long[] start = this.concs.getStartDims();
+        selected[0] = 1;
+        selected[1] = dims[1];
+        selected[2] = dims[2];
+        start[0] = dims[0] - 1;
+
+        Object ret = this.concs.getData();
+        double[] retd = (double[]) ret;
+        assert retd.length == line.length;
+        for(int i = 0; i < line.length; i++)
+            retd[i] = line[i];
+
+        this.concs.write(retd);
     }
 
     @Override
