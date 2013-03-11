@@ -87,7 +87,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     double[] rates;
     double[] lnrates;
 
-    final double[] intlogs = ArrayUtil.logArray(10000, -99);
     double lndt;
 
     int ninjected = 0;
@@ -869,23 +868,19 @@ public class SteppedStochasticGridCalc extends GridCalc {
         }
     }
 
-    public final double intlog(int i) {
-        double ret = 0.;
-        if (i <= 0) {
-            ret = -99.;
-        } else {
-            ret = (i < intlogs.length ? intlogs[i] : Math.log(i));
-        }
-        return ret;
+    final private static double[] intlogs = ArrayUtil.logArray(10000, -99);
+    public final static double intlog(int i) {
+        if (i <= 0)
+            return intlogs[0];
+        else
+            return i < intlogs.length ? intlogs[i] : Math.log(i);
     }
 
     public long getParticleCount() {
         long ret = 0;
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < nspec; j++) {
+        for (int i = 0; i < nel; i++)
+            for (int j = 0; j < nspec; j++)
                 ret += wkA[i][j];
-            }
-        }
 
         E.info("number injected = " + ninjected);
         return ret;
