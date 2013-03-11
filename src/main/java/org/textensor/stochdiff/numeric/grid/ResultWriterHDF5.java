@@ -164,13 +164,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         return true;
     }
 
-    public void getGridConcs(double[] dst,
+    public void getGridNumbers(double[] dst,
                              int nel, int ispecout[], IGridCalc source) {
         assert dst.length == nel * ispecout.length;
         int pos = 0;
         for (int i = 0; i < nel; i++)
             for (int j = 0; j < ispecout.length; j++)
-                dst[pos++] = source.getGridPartConc(i, ispecout[j]);
+                dst[pos++] = source.getGridPartNumb(i, ispecout[j]);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             start[0] = dims[0] - 1;
 
             double[] data = (double[]) this.concs.getData();
-            this.getGridConcs(data, nel, ispecout, source);
+            this.getGridNumbers(data, nel, ispecout, source);
             this.concs.write(data);
         }
 
