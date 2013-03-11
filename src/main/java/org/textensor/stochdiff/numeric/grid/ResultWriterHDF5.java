@@ -105,6 +105,20 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
+    public void writeVector(String name, Group parent, String[] items)
+        throws Exception
+    {
+        int maxlength = ArrayUtil.maxLength(items);
+        long[] dims = {items.length};
+
+        H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
+                                             Datatype.NATIVE, Datatype.NATIVE);
+
+        this.output.createScalarDS(name, parent,
+                                   string_t, dims, null, null,
+                                   0, items);
+    }
+
     protected void writeSpecies(int[] ispecout, IGridCalc source)
         throws Exception
     {
@@ -113,15 +127,14 @@ public class ResultWriterHDF5 implements ResultWriter {
         for (int i = 0; i < ispecout.length; i++)
             outSpecies[i] = specieIDs[ispecout[i]];
 
-        int maxlength = ArrayUtil.maxLength(outSpecies);
-        long[] dims = {outSpecies.length};
+        this.writeVector("species", this.sim, outSpecies);
+    }
 
-        H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
-                                             Datatype.NATIVE, Datatype.NATIVE);
-
-        this.output.createScalarDS("species", this.sim,
-                                   string_t, dims, null, null,
-                                   0, outSpecies);
+    protected void writeRegionLabels(IGridCalc source)
+        throws Exception
+    {
+        String[] regions = source.getRegionLabels();
+        this.writeVector("regions", this.sim, regions);
     }
 
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
@@ -131,6 +144,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         assert this.conc_times == null;
 
         this.writeSpecies(ispecout, source);
+        this.writeRegionLabels(source);
 
         int nspecout = ispecout.length;
         if (nspecout == 0)
