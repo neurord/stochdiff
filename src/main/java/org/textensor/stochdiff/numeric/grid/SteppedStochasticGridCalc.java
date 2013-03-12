@@ -198,15 +198,12 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         if (sdRun.initialStateFile != null) {
             double[][] cc = readInitialState(sdRun.initialStateFile, nel, nspec, speciesIDs);
-            if (cc != null) {
-                for (int i = 0; i < nel; i++) {
-                    for (int j = 0; j < nspec; j++) {
-                        int np = (int) Math.round(cc[i][j] * volumes[i] / NM_PER_PARTICLE_PUV);
-                        wkA[i][j] = np;
-                        wkB[i][j] = np;
-                    }
-                }
-            }
+            if (cc != null)
+                for (int i = 0; i < nel; i++)
+                    for (int j = 0; j < nspec; j++)
+                        wkA[i][j] = wkB[i][j] =
+                            (int) Math.round(cc[i][j] * volumes[i] / NM_PER_PARTICLE_PUV);
+            // FIXME: why would a specified initialStateFile be ignored?
         }
 
         dt = sdRun.fixedStepDt;
@@ -233,15 +230,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
             fSharedExit = new double[nel][nspec][];
 
             int maxnn = 0;
-            for (int iel = 0; iel < nel; iel++) {
+            for (int iel = 0; iel < nel; iel++)
                 for (int k = 0; k < nspec; k++) {
                     int nn = neighbors[iel].length;
                     fSharedExit[iel][k] = new double[nn];
-                    if (nn > maxnn) {
+                    if (nn > maxnn)
                         maxnn = nn;
-                    }
                 }
-            }
             E.info("max no of neighbors for a single element is " + maxnn);
 
             for (int iel = 0; iel < nel; iel++) {
@@ -286,9 +281,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
                     pSharedOut[iel][k] = ptot;
                     lnpSharedOut[iel][k] = lnptot;
-                    for (int j = 0; j < nnbr; j++) {
+                    for (int j = 0; j < nnbr; j++)
                         fSharedExit[iel][k][j] = pcnbr[j] / ptot;
-                    }
                 }
             }
         }
@@ -427,7 +421,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         for (int iel = 0; iel < nel; iel++) {
 
             for (int k = 0; k < nspec; k++) {
-                if (lnfdiff[k] > -90) {
+                if (lnfdiff[k] > -90) { // FIXME: what is -90?
 
                     int np0 = wkA[iel][k];
 
@@ -435,16 +429,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
                         switch(algoID) {
                         case INDEPENDENT:
-                            // WK 8 28 2007
-                            // parallelDiffusionStep(iel, k);
-                            parallelAndSharedDiffusionStep(iel, k);
-                            // WK
-                            break;
                         case SHARED:
-                            // WK 9 11 2007
-                            // sharedDiffusionStep(iel, k);
                             parallelAndSharedDiffusionStep(iel, k);
-                            // WK
                             break;
                         case PARTICLE:
                             particleDiffusionStep(iel, k);
@@ -472,7 +458,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
             int[] nend = wkA[iel];
             for (int isp = 0; isp < nspecie; isp++) {
                 nend[isp] = nstart[isp];
-            }
+            } // XXX: is this necessary after ArrayUtil.copy above?
 
             for (int ireac = 0; ireac < nreaction; ireac++) {
                 // total number of possible reactions is the number of
@@ -591,9 +577,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         int pi1 = pi[1];
 
                         nend[pi0] += ngo * ps[0];
-                        if (pi1 >= 0) {
+                        if (pi1 >= 0)
                             nend[pi1] += ngo * ps[1];
-                        }
                     }
 
                     // TODO this "if (ri[1] >= 0)" business is not great
