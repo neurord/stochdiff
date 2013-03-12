@@ -11,8 +11,11 @@ import org.textensor.util.FileUtil;
 import org.textensor.xml.ReflectionInstantiator;
 import org.textensor.xml.XMLReader;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ModelReader {
+    static final Logger log = LogManager.getLogger(ModelReader.class);
 
     public static SDRun read(File modelFile) {
 
@@ -56,18 +59,17 @@ public class ModelReader {
 
     private static File getFile(File fparent, String rpath) {
         File ret = new File(fparent, rpath);
-        if (ret.exists()) {
-            // OK;
-        } else {
-            ret = new File(fparent, rpath + ".xml");
-            if (! ret.exists()) {
-                E.error("cannot find file " + rpath + " in folder " + fparent + " (tried plain and adding .xml)");
-            }
-        }
-        return ret;
+        if (ret.exists())
+            return ret;
+
+        ret = new File(fparent, rpath + ".xml");
+        if (ret.exists())
+            return ret;
+
+        log.error("cannot find file '{}' or '{}.xml' in folder '{}'",
+                  rpath, rpath, fparent != null ? fparent : '.');
+        throw new RuntimeException("cannot find file '" + rpath + "'");
     }
-
-
 
     private static Object readFile(File f, XMLReader xmlr) {
         Object ret = null;
