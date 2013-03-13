@@ -242,7 +242,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
             for (int iel = 0; iel < nel; iel++) {
                 for (int k = 0; k < nspec; k++) {
                     int inbr[] = neighbors[iel];
-                    double lngnbr[] = lnCC[iel];
                     int nnbr = inbr.length;
                     // int np0 = wkA[iel][k];
 
@@ -250,7 +249,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     double[] pcnbr = new double[nnbr];
 
                     for (int j = 0; j < nnbr; j++) {
-                        double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
+                        double lnpgo = lnfdiff[k] + lnCC[iel][j] + lndt - lnvolumes[iel];
                         // probability is dt * K_diff * contact_area /
                         // (center_to_center_distance * source_volume)
                         // gnbr contains the gometry: contact_area / distance
@@ -708,113 +707,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
             //
 
-        }
-    }
-
-    // WK
-
-    private final void parallelDiffusionStep(int iel, int k) {
-        int inbr[] = neighbors[iel];
-        double lngnbr[] = lnCC[iel];
-        int nnbr = inbr.length;
-        int np0 = wkA[iel][k];
-
-        for (int j = 0; j < nnbr; j++) {
-            // use logs here so the operations are all additions
-            // and the compiler should be able to be clever
-
-            double lnpgo = lnfdiff[k] + lngnbr[j] + lndt - lnvolumes[iel];
-            // probability is dt * K_diff * contact_area /
-            // (center_to_center_distance * source_volume)
-            // gnbr contains the gometry: contact_area / distance
-
-            if (lnpgo > -1.) {
-                if (nwarn < 4) {
-                    E.warning("p too large at element " + iel + " transition " + j + " to  " + inbr[j]
-                                   + " - capping " + Math.exp(lnpgo) + " coupling is " + lngnbr[j]);
-                    nwarn++;
-                }
-                lnpgo = -1.;
-            }
-
-            int ngo = 0;
-            if (np0 == 1) {
-                // TODO - use table anyway - avoid exp!
-                ngo = (random.random() < Math.exp(lnpgo) ? 1 : 0);
-            } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
-                ngo = interpSG.nGo(np0, lnpgo, random.random());
-            } else {
-                if (useBinomial()) {
-                    if (np0 * (Math.exp(lnpgo)) >= 10) {
-                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
-                    } else {
-                        ngo = StepGenerator.gaussianStep(np0, Math.exp(lnpgo), random.gaussian(), random.random(),
-                                                         random.poisson(np0 * (Math.exp(lnpgo))), NP);
-                    }
-                } else {
-                    ngo = StepGenerator.poissonStep(np0, Math.exp(lnpgo), random.gaussian(), random.random());
-                }
-            }
-
-            // System.out.println("iel j ngo " + iel + " " + j + " " + ngo + " "
-            // + np0);
-
-            if (ngo > wkB[iel][k]) {
-                if (nwarn < 10) {
-                    E.warning("ran out of particles - curtailing last transition from " + ngo + " to "
-                                   + wkB[iel][k] + " leaving point " + iel + " species " + k);
-                } else if (nwarn == 10) {
-                    E.info("Suppressing future warnings");
-                }
-                nwarn++;
-
-                ngo = wkB[iel][k];
-                // TODO probably worth flagging if this ever happens
-                // it means your steps could be too large
-                // MATH if it does happen, there is a consistent
-                // bias in that the last exit is the one that
-                // is curtailed. We should actually restart
-                // this set of jumps and get new fluxes to all
-                // neighbours
-            }
-
-            wkB[iel][k] -= ngo;
-            wkB[inbr[j]][k] += ngo;
-        }
-    }
-
-    private final void sharedDiffusionStep(int iel, int k) {
-
-        int np0 = wkA[iel][k];
-        int inbr[] = neighbors[iel];
-        // int nnbr = inbr.length;
-        double[] fshare = fSharedExit[iel][k];
-        double lnptot = lnpSharedOut[iel][k];
-
-        int ngo = 0;
-        if (np0 == 1) {
-            // TODO - use table anyway - avoid exp!
-            ngo = (random.random() < Math.exp(lnptot) ? 1 : 0);
-
-        } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
-            ngo = interpSG.nGo(np0, lnptot, random.random());
-
-        } else {
-            if (useBinomial()) {
-                ngo = StepGenerator.gaussianStep(np0, Math.exp(lnptot), random.gaussian(), random.random());
-            } else {
-                ngo = StepGenerator.poissonStep(np0, Math.exp(lnptot), random.gaussian(), random.random());
-            }
-        }
-
-        wkB[iel][k] -= ngo;
-        for (int i = 0; i < ngo; i++) {
-            double r = random.random();
-            int io = 0;
-            while (r > fshare[io]) {
-                io++;
-            }
-            wkB[inbr[io]][k] += 1;
         }
     }
 
