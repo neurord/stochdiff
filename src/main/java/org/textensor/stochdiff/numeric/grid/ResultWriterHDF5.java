@@ -198,7 +198,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) 
+    public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
         throws Exception
     {
         final long[] dims;

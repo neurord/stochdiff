@@ -239,9 +239,9 @@ public class VolumeGrid {
     }
 
     public int getNElements() {
-        if (volumes == null) {
-            E.error("grid not fixed - call fix explicitly");
-        }
+        if (volumes == null)
+            throw new RuntimeException("volumes not fixed");
+
         return nelement;
     }
 
@@ -254,12 +254,10 @@ public class VolumeGrid {
         return exposedAreas;
     }
 
-    //<--WK
     public boolean[] getSubmembranes()
     {
         return submembranes;
     }
-    //WK-->
 
     public int[][] getPerElementNeighbors() {
         return eltNbrs;

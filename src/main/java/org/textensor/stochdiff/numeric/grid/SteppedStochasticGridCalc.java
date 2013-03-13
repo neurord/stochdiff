@@ -487,17 +487,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 }
 
                 if (lnp > -1.) {
-                    if (nwarn < 5) {
-                        E.warning("p too large at element " + iel + " reaction " + ireac + " capping from "
-                                       + Math.exp(lnp) + " to " + " exp(-1.)");
-                        nwarn++;
-                    }
+                    if (++nwarn < 5)
+                        log.warn("p too large at element {} reaction {}: capping {} to exp(-1)",
+                                 iel, ireac, Math.exp(lnp));
                     lnp = -1.;
                 }
 
-                if (n <= 0) {
-
-                } else {
+                if (n > 0) {
                     int ngo = 0;
                     if (n == 1)
                         // TODO use table to get rid of exp
@@ -506,14 +502,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         ngo = interpSG.nGo(n, lnp, random.random());
                     else
                         ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
-
-                    // WK 7 2 2008: if ngo is negative, exit.
-                    // if (ngo < 0)
-                    // {
-                    // System.out.println("in advance: ngo is NEGATIVE. Exiting...");
-                    // System.exit(3);
-                    // }
-                    // WK
 
                     // update the new quantities in npn;
                     int ri0 = ri[0];
@@ -528,20 +516,16 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         navail = nend[ri1] / rs1;
 
                     if (ngo > navail) {
-                        // TODO as for diffusion, we've got more particles going
-                        // than there actually are. Should regenerate all
-                        // reactions on theis element
-                        // or use a binomial to share them out
-                        // or use a smaller timestep;
-
-                        if (nwarn < 10) {
-                            E.warning("reaction " + ireac + " ran out of particles - need " + ngo + " but have "
-                                           + navail);
-                            nwarn++;
-                        }
-
+                        /* TODO as for diffusion, we've got more particles going
+                         * than there actually are. Should regenerate all
+                         * reactions on this element
+                         * or use a binomial to share them out
+                         * or use a smaller timestep.
+                         */
+                        if (++nwarn < 10)
+                            log.warn("reaction {} ran out of particles - need {} but have {}",
+                                     ireac, ngo, navail);
                         ngo = navail;
-
                     }
 
                     // WK 9 25 2007: setting inc/decrements (i.e., ngo*xxx) to
@@ -601,8 +585,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
         double[] fshare = fSharedExit[iel][k];
 
         int ngo;
-        int ngo_remaining = 0; // for independent diffusion step      ***KTB edit - this is number of molecules not yet diffused
-        int num_molecules_diffused_so_far = 0;
 
         if (np0 == 1) {
             ngo = (random.random() < pSharedOut[iel][k] ? 1 : 0);
@@ -619,35 +601,33 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         assert ngo >= 0;
 
-        // WK
-        // if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
-        // shared_diffusion
-        // else then do independent_diffusion
-        if (ngo <= (inbr.length) * SHARED_DIFF_PARTICLES) // SHARED diffusion
-        {
+        /* if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
+         *    shared_diffusion
+         * else
+         *    do independent_diffusion
+        */
+        if (ngo <= (inbr.length) * SHARED_DIFF_PARTICLES) {
+            /* SHARED diffusion */
+
             wkB[iel][k] -= ngo;
             for (int i = 0; i < ngo; i++) {
                 double r = random.random();
                 int io = 0;
-                while (r > fshare[io]) {
+                while (r > fshare[io])
                     io++;
-                }
 
                 wkB[inbr[io]][k] += 1;
             }
-        } else // MULTINOMIAL diffusion
-        {
-            ngo_remaining = ngo;         //**KTB  ngo_remaining is number of particles not yet diffused.  initially this is ngo
-            //KTB 09-23-2011, use multi-nomial instead of separate binomials to calculate lnpgo, from ngo_remaining
-            // WK 9 11 2007
+        } else {
+            /* MULTINOMIAL diffusion */
+
+            int ngo_remaining = ngo;  // the number of particles not yet diffused
             double prev = 0;
             for (int j = 0; j < inbr.length - 1; j++) {
-                //double lnpgo = Math.log(fSharedExit[iel][k][j] - prev);  (KTB) old method - INDEPENDENT
-                //BHK and KTB implemented the multinomial using tables instead of gaussianStep for small N, and use symmetry of binomial 09/23/11
-                double pgoTmp = (fSharedExit[iel][k][j] - prev)/(fSharedExit[iel][k][inbr.length-1]-prev);
+                double pgoTmp = (fSharedExit[iel][k][j] - prev)/(fSharedExit[iel][k][inbr.length-1] - prev);
                 double lnpgo;
-                if ((pgoTmp > 0.5) && (ngo_remaining < StepGenerator.NMAX_STOCHASTIC))
-                    lnpgo = Math.log(1.0-pgoTmp);
+                if (pgoTmp > 0.5 && ngo_remaining < StepGenerator.NMAX_STOCHASTIC)
+                    lnpgo = Math.log(1.0 - pgoTmp);
                 else
                     lnpgo = Math.log(pgoTmp);
 
@@ -656,57 +636,46 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 //This next section uses the tables KTB
                 if (ngo_remaining < StepGenerator.NMAX_STOCHASTIC) {
                     if (ngo_remaining == 1)
-                    {
                         ngo = (random.random() < fSharedExit[iel][k][j] ? 1 : 0); //2011 BHK for ngo_remaining == 1
-                    }
                     else if (ngo_remaining == 0) // 2011 BHK, occaisionally will run out of particles on 2nd to last neighbor
-                    {
                         ngo = 0;
-                    }
-                    else
-                    {
+                    else {
                         if (pgoTmp <= 0.5)
                             ngo = interpSG.nGo(ngo_remaining, lnpgo, random.random()); // 2011 BHK
-                        else  //pgoTmp > 0.5
+                        else
                             ngo = ngo_remaining - interpSG.nGo(ngo_remaining, lnpgo, random.random());
                     }
-                }
-                else if (ngo_remaining * Math.exp(lnpgo) < NP) {
+                } else if (ngo_remaining * Math.exp(lnpgo) < NP)
                     ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random(),
                                                      random.poisson(ngo_remaining * Math.exp(lnpgo)), NP);
-                } else {
+                else
                     ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random());
-                }
+
                 if (ngo < 0) {
                     ngo = 0;
-                    System.out.println("in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo is NEGATIVE.");
+                    System.out.println("parallelAndSharedDiffusionStep multinomial: ngo is NEGATIVE.");
                     System.out.println("ngo: " + ngo + " ngo_remaining: " + ngo_remaining + "pgoTmp " + pgoTmp);
+                } else if (ngo > ngo_remaining) {
+                    if (++nngowarn < 10)
+                        log.warn("parallelAndSharedDiffusionStep multinomial: "
+                                 + "ngo = {} > {} = ngo_remaining, setting ngo=ngo_remaining ",
+                                 ngo, ngo_remaining);
+                    ngo = ngo_remaining;
                 }
-                else if (ngo > ngo_remaining) {
-                    if (nngowarn < 10)
-                    {
-                        System.out.println("in parallelAndSharedDiffusionStep, MULTINOMIAL: ngo > ngo_remaining, setting ngo=ngo_remaining ");
-                    }
-                    ngo=ngo_remaining; //BHK 2011
-                    nngowarn++;
-                }
-                // WK
 
                 wkB[iel][k] -= ngo;
                 wkB[inbr[j]][k] += ngo;
-                ngo_remaining-=ngo;
+                ngo_remaining -= ngo;
             } //end of loop through all but last neighbor
 
             ngo = ngo_remaining;
 
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
-            // WK 3/16/2010
-            if (wkB[iel][k] < 0) {
-                System.out.println("In INDEPENDENT DIFFUSION, wkB[iel][k] NEGATIVE!!!");
-            }
-            //
 
+            if (wkB[iel][k] < 0)
+                log.warn("parallelAndSharedDiffusionStep multinomial: wkB[iel][k] = {} is negative",
+                         wkB[iel][k]);
         }
     }
 
