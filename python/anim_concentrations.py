@@ -4,7 +4,6 @@ from __future__ import print_function, division
 import sys
 import os
 import glob
-import random
 import argparse
 import subprocess
 import numpy
@@ -61,7 +60,8 @@ def dottify(dst, connections, couplings):
         for j, coupl in zip(connections[i], couplings[i]):
             if j < 0:
                 break
-            print('\t{} -> {} [penwidth={}];'.format(i, j, 10*coupl + random.random()), file=dst)
+            coupl = min(max(numpy.log(coupl)+3, 0.3), 5)
+            print('\t{} -> {} [penwidth={}];'.format(i, j, coupl), file=dst)
     print('}', file=dst)
 
 def dot_connections(sim):
