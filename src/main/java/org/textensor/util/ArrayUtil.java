@@ -12,6 +12,39 @@ public class ArrayUtil {
         return i;
     }
 
+    public static int maxLength(double[]... array) {
+        int i = 0;
+        for (double[] a: array)
+            if (a.length > i)
+                i = a.length;
+        return i;
+    }
+
+    public static int maxLength(int[]... array) {
+        int i = 0;
+        for (int[] a: array)
+            if (a.length > i)
+                i = a.length;
+        return i;
+    }
+
+    public static double[] flatten(double[][] array, int columns) {
+        double[] flat = new double[array.length * columns];
+        for (int i = 0; i < array.length; i++)
+            System.arraycopy(array[i], 0, flat, i * columns, array[i].length);
+        return flat;
+    }
+
+    public static int[] flatten(int[][] array, int columns, int fill) {
+        int[] flat = new int[array.length * columns];
+        for (int i = 0; i < array.length; i++) {
+            System.arraycopy(array[i], 0, flat, i * columns, array[i].length);
+            Arrays.fill(flat, i * columns + array[i].length, (i + 1) * columns,
+                        fill);
+        }
+        return flat;
+    }
+
     public static double[] log(double[] d, double dzero) {
         double[] ret = new double[d.length];
         for (int i = 0; i < d.length; i++)

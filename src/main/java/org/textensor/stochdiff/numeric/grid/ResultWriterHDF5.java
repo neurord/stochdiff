@@ -33,6 +33,8 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
+    public static final H5Datatype int_t =
+        new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE);
 
     public ResultWriterHDF5(File outFile) {
         this.outputFile = new File(FileUtil.getRootName(outFile) + ".h5");
@@ -79,7 +81,19 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[], IGridCalc source) {
+    public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[], IGridCalc source)
+    {
+        try {
+            this._writeGrid(vgrid, startTime, fnmsOut, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void _writeGrid(VolumeGrid vgrid, double startTime,
+                              String fnmsOut[], IGridCalc source)
+        throws Exception
+    {
         log.info("Writing grid at time {}", startTime);
         int n = vgrid.getNElements();
         long[]
@@ -97,13 +111,37 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         Vector<Object> data = vgrid.gridData();
 
-        Dataset grid;
-        try {
-            grid = this.output.createCompoundDS("grid", this.sim, dims, null, chunks, gzip,
-                                                memberNames, memberTypes, null, data);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.output.createCompoundDS("grid", this.sim, dims, null, chunks, gzip,
+                                     memberNames, memberTypes, null, data);
+
+        writeArray("neighbors", this.sim, vgrid.getPerElementNeighbors(), -1);
+        writeArray("couplings", this.sim, vgrid.getPerElementCouplingConstants());
+    }
+
+    public void writeArray(String name, Group parent, double[][] items)
+        throws Exception
+    {
+        int maxlength = ArrayUtil.maxLength(items);
+        long[] dims = {items.length, maxlength};
+
+        double[] flat = ArrayUtil.flatten(items, maxlength);
+
+        this.output.createScalarDS(name, parent,
+                                   double_t, dims, null, null,
+                                   0, flat);
+    }
+
+    public void writeArray(String name, Group parent, int[][] items, int fill)
+        throws Exception
+    {
+        int maxlength = ArrayUtil.maxLength(items);
+        long[] dims = {items.length, maxlength};
+
+        int[] flat = ArrayUtil.flatten(items, maxlength, fill);
+
+        this.output.createScalarDS(name, parent,
+                                   int_t, dims, null, null,
+                                   0, flat);
     }
 
     public void writeVector(String name, Group parent, String[] items)
