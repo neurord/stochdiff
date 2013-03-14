@@ -30,6 +30,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected H5ScalarDS concs = null;
     protected H5ScalarDS conc_times = null;
     protected H5ScalarDS species = null;
+    protected H5ScalarDS reaction_events = null;
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
@@ -228,7 +229,6 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
-        log.info("Writing grid concentrations at time {}", time);
         try {
             this._writeGridConcs(time, nel, ispecout, source);
         } catch(Exception e) {
@@ -239,6 +239,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
         throws Exception
     {
+        log.info("Writing grid concentrations at time {}", time);
+
         final long[] dims;
         if (this.concs == null) {
             if (!this.initConcs(nel, ispecout, source))
@@ -275,6 +277,59 @@ public class ResultWriterHDF5 implements ResultWriter {
             double[] times = (double[]) this.conc_times.getData();
             times[0] = time;
             this.conc_times.write(times);
+        }
+
+        this.writeReactionEvents(time, source);
+    }
+
+    protected void initReactionEvents(int reactions)
+        throws Exception
+    {
+        assert this.reaction_events == null;
+
+        /* times x reactions */
+        {
+            long[] dims = {1, reactions};
+            long[] size = {H5F_UNLIMITED, reactions};
+            long[] chunks = {32, reactions};
+
+            this.reaction_events = (H5ScalarDS)
+                this.output.createScalarDS("reaction_events", this.sim,
+                                           int_t, dims, size, chunks,
+                                           9, null);
+            this.reaction_events.init();
+        }
+    }
+
+    protected void writeReactionEvents(double time, IGridCalc source)
+        throws Exception
+    {
+        final int[] events = source.getReactionEvents();
+        if (events == null)
+            return;
+
+        log.info("Writing reaction events at time {}", time);
+
+        final long[] dims;
+        if (this.reaction_events == null) {
+            this.initReactionEvents(events.length);
+            dims = this.reaction_events.getDims();
+        } else {
+            dims = this.reaction_events.getDims();
+            dims[0] = dims[0] + 1;
+            this.reaction_events.extend(dims);
+        }
+
+        {
+            long[] selected = this.reaction_events.getSelectedDims();
+            long[] start = this.reaction_events.getStartDims();
+            selected[0] = 1;
+            selected[1] = dims[1];
+            start[0] = dims[0] - 1;
+
+            int[] data = (int[]) this.reaction_events.getData();
+            System.arraycopy(events, 0, data, 0, events.length);
+            this.reaction_events.write(data);
         }
     }
 

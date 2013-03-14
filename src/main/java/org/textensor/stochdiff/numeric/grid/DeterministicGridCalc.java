@@ -361,4 +361,9 @@ public class DeterministicGridCalc extends GridCalc {
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 
+    @Override
+    public int[] getReactionEvents() {
+        /* not implemented yet */
+        return null;
+    }
 }

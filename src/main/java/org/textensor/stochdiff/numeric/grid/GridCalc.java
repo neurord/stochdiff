@@ -99,5 +99,4 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     public boolean[] getSubmembranes() {
         return this.submembranes;
     }
-
 }

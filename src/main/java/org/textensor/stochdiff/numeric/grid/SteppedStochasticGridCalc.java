@@ -89,6 +89,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     double lndt;
 
+    /** The number of events of each reaction since last writeGridConcs */
+    int reactionEvents[];
+
     int ninjected = 0;
 
     InterpolatingStepGenerator interpSG;
@@ -134,6 +137,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
+        reactionEvents = new int[reactantIndices.length];
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
@@ -317,6 +321,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
+                Arrays.fill(this.reactionEvents, 0);
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
@@ -381,7 +386,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     // - make nGo inlinable
 
     public double advance(double tnow) {
-
         // add in any injections
         double[][] stims = stimTab.getStimsForInterval(tnow, dt);
         for (int i = 0; i < stims.length; i++) {
@@ -494,7 +498,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 }
 
                 if (n > 0) {
-                    int ngo = 0;
+                    int ngo;
                     if (n == 1)
                         // TODO use table to get rid of exp
                         ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
@@ -563,6 +567,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         if (pi1 >= 0)
                             nend[pi1] += ngo * ps[1];
                     }
+
+                    this.reactionEvents[ireac] += ngo;
 
                     // TODO this "if (ri[1] >= 0)" business is not great
                     // it applies for the A+B->C case, where there is a
@@ -730,4 +736,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
         return val * NM_PER_PARTICLE_PUV / volumes[i];
     }
 
+    @Override
+    public int[] getReactionEvents() {
+        return this.reactionEvents;
+    }
 }

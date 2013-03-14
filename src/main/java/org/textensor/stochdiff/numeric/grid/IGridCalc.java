@@ -10,4 +10,6 @@ public interface IGridCalc {
     int[] getEltRegions();
     boolean[] getSubmembranes();
     String[] getRegionsOut();
+
+    int[] getReactionEvents();
 }
