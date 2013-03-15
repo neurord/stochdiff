@@ -228,7 +228,7 @@ public class KeyedList<V> implements ElementWriter {
         if (items.contains(old)) {
             superceded(old);
         }
-        // else do nothing, and dont complain;
+        // else do nothing, and don't complain;
     }
 
 

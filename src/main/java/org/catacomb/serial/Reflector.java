@@ -92,7 +92,7 @@ public class Reflector {
                 }
 
             } else if (Modifier.isFinal(modif) && Modifier.isStatic(modif)) {
-                // dont save these either;
+                // don't save these either;
 
             } else {
                 Object val = getFieldValue(field, obj);

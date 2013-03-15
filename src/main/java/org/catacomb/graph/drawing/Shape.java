@@ -606,7 +606,7 @@ public class Shape extends Polypoint
     }
 
     public void removeChild(TablePeer child) {
-        E.error("shapes dont have children");
+        E.error("shapes don't have children");
     }
 
     public void setSymmetry(int isym) {

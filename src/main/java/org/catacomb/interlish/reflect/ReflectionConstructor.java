@@ -292,7 +292,7 @@ public class ReflectionConstructor implements Constructor {
         }
 
 
-        // dont know the class - the parent may know it; (CASE 2)
+        // don't know the class - the parent may know it; (CASE 2)
         if (child == null && parent != null) { // / && hasField(parent, name)) {
             child = getField(parent, name);
         }
@@ -305,7 +305,7 @@ public class ReflectionConstructor implements Constructor {
         // or perhaps the open tag is a class name? (CASE 3)
         if (child == null) {
 
-            // ADHOC - dont really want this dependence - pull out providers for
+            // ADHOC - don't really want this dependence - pull out providers for
             // reflector?
 
             if (ResourceAccess.hasContentLoader()) {
@@ -388,7 +388,7 @@ public class ReflectionConstructor implements Constructor {
         }
 
         if (arg == null) {
-            // dont think this should be an error? - fine to set something to null on instantiation?
+            // don't think this should be an error? - fine to set something to null on instantiation?
             // E.error("reflection instantiator has null arg setting " + sf + " in " + ob);
             return true;
         }

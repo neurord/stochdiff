@@ -150,7 +150,7 @@ public class NumDataStore implements RunDataStore, Named, TreeRoot,
 
 
     public void addDataWatcher(DataWatcher dw) {
-        // dont change the array list - it may be reporting a change
+        // don't change the array list - it may be reporting a change
         ArrayList<DataWatcher> newdw = new ArrayList<DataWatcher>();
         newdw.addAll(dataWatchers);
         newdw.add(dw);

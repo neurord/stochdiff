@@ -274,7 +274,7 @@ public class SegmentGraphPoint extends PickablePoint {
         } else {
             for (int i = 0; i < nbrs.length; i++) {
                 if (nbrs[i].isMarked()) {
-                    // dont revisit;
+                    // don't revisit;
 
                 } else {
                     if (nbrs[i].recHighlightPath()) {

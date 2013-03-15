@@ -55,7 +55,7 @@ public class CheckSeenDialogController  implements Controller {
 
     public void showIfNotYetSeen(String label, String s, int[] xy) {
         if (AppPersist.hasValue("Seen", label)) {
-            // dont show it;
+            // don't show it;
 
             E.info("not showing panel - already shown");
 

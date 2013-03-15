@@ -18,7 +18,7 @@ public interface Marketplace {
     void addSupplier(String modality, Supplier sup);
 
 
-    // providers are like producers, but dont care if their product is unused
+    // providers are like producers, but don't care if their product is unused
     void addProvider(String modality, Provider p, String flavor);
 
 

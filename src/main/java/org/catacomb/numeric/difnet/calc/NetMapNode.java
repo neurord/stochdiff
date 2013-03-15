@@ -42,7 +42,7 @@ public final class NetMapNode {
         diag = 0.;
         rhs = 0.;
 
-        // may be worth separating out the stimulated nodes so we dont
+        // may be worth separating out the stimulated nodes so we don't
         // have to call this everywhere
         Stimulus stim = dnNode.getStimulus();
         if (stim != null) {

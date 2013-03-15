@@ -561,7 +561,7 @@ public final class GraphCanvas extends BasePanel
    public final void setCursorcp (int icp) {
       cursorcp = icp;
       if (cursorcp >= 0 && clickSs[cursorcp] != null) {
-	 // dont understand - this doesnt show up if done her not in paint;
+	 // don't understand - this doesnt show up if done her not in paint;
 	 //	 setToolTipText(clickSs[cursorcp]);
       }
    }

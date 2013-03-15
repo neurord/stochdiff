@@ -260,7 +260,7 @@ public class ReflectionInstantiator {
         }
 
 
-        // dont know the class - the parent may know it; (CASE 2)
+        // don't know the class - the parent may know it; (CASE 2)
         if (child == null && parent != null) { // / && hasField(parent, name)) {
             child = getField(parent, name);
         }

@@ -311,7 +311,7 @@ public class RelationTree implements PivotedTree {
             String srel = getPivotRelation();
 
             rnode = rnode.getParent(srel);
-            // dont expand out the child, make sure it is visble,
+            // don't expand out the child, make sure it is visble,
             // not its children. Also if the child is a leaf it would turn
             // the jtree expand path into a no-op if included in the path
 

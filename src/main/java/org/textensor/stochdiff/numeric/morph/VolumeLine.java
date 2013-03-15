@@ -263,7 +263,7 @@ public class VolumeLine {
                     va.coupleTo(vb, fol2 * va.getSideArea());
 
                 } else {
-                    // dont couple...
+                    // don't couple...
                 }
             }
         }

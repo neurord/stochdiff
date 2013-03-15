@@ -58,7 +58,7 @@ public class ScrollPanel extends Panel implements AddableTo {
                 dsp.setVerticalScrollbarAlways();
 
             } else {
-                E.error("dont recognize " + vertical);
+                E.error("don't recognize " + vertical);
             }
         }
 
@@ -76,7 +76,7 @@ public class ScrollPanel extends Panel implements AddableTo {
                 dsp.setHorizontalScrollbarAlways();
 
             } else {
-                E.error("dont recognize " + vertical);
+                E.error("don't recognize " + vertical);
             }
         }
 

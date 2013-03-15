@@ -251,7 +251,7 @@ public class SegmentSlicer {
             }
         }
 
-        // dont do them in the loop above because it could mess up the search for
+        // don't do them in the loop above because it could mess up the search for
         // later ones
         for (TreePoint[] tpa : cns) {
             E.info("patching in " + tpa[1] + " as child of nearest in parent segment: " + tpa[0]);

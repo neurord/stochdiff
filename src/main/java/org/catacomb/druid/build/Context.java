@@ -84,7 +84,7 @@ public class Context {
     public Marketplace getMarketplace() {
         if (hookupBoard == null) {
 
-            // dont use from parent context, either local or use the global one;
+            // don't use from parent context, either local or use the global one;
 
             hookupBoard = new HookupBoard();
 

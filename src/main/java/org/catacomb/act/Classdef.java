@@ -283,7 +283,7 @@ public class Classdef {
                 qf = " abstract ";
             }
             if (ms.isSuper()) {
-                // these dont get code generated - just there for the info
+                // these don't get code generated - just there for the info
                 // of what is available in the superclass
 
             } else {

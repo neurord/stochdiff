@@ -14,7 +14,7 @@ write-relative for files
 
 
 for zips, ok to read whole byte stream at open? - for now: maybe new
-type later for real archives (dont want all in one go)
+type later for real archives (don't want all in one go)
 
 basic entity is a byte array or a stream?
 

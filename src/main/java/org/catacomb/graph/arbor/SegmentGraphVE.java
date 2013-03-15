@@ -76,7 +76,7 @@ public class SegmentGraphVE implements BuildPaintInstructor, PickListener {
         if (iact >= 0) {
             setSelectAction(iact);
         } else {
-            E.error("dont know action " + s);
+            E.error("don't know action " + s);
         }
     }
 

@@ -67,7 +67,7 @@ public class Specie {
             ret = 1.;
 
         } else {
-            E.error("dont understand units " + su);
+            E.error("don't understand units " + su);
         }
         return ret;
     }

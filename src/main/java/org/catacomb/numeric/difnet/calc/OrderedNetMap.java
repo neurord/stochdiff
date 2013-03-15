@@ -71,7 +71,7 @@ public final class OrderedNetMap {
         // *** max six links per node;
         // leave out links from fixed nodes: could be lots of these (bath to
         // everything)
-        // and we dont need them
+        // and we don't need them
 
         NetMapLink[][] linksPerNode = new NetMapLink[nnode][6];
 
@@ -145,7 +145,7 @@ public final class OrderedNetMap {
 
         // there is nothing to be done for the links - wkLink has
         // references to all the NetMapLinks (no others were created), and
-        // the links dont use indices but have direct refs to the nodes
+        // the links don't use indices but have direct refs to the nodes
         link = wkLink;
     }
 

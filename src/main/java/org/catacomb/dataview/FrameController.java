@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 
-/// XXXXXXXXXXXXX dont use
+/// XXXXXXXXXXXXX don't use
 // this is being replaced by code in gui, but without direct
 // refs to dataviewController etc
 

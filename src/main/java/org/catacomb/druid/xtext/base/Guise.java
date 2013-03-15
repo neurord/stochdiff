@@ -58,7 +58,7 @@ public class Guise {
     }
 
 
-    // refac - dont want dep on canvas pkg;
+    // refac - don't want dep on canvas pkg;
     public Font getFont() {
         if (cachedFont == null || cacheTime.isBefore(touchTime)) {
             updateCache();

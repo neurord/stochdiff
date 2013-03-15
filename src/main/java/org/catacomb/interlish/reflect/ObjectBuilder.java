@@ -97,7 +97,7 @@ public class ObjectBuilder {
             populate(ret, elt);
 
         } else {
-            E.error("dont know what to do with element (no class, factory or provider) " + elt);
+            E.error("don't know what to do with element (no class, factory or provider) " + elt);
         }
 
         return ret;
