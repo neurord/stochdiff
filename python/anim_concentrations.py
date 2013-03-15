@@ -45,11 +45,16 @@ def draw(sim, save):
             else:
                 f.savefig('{}-{:06d}.png'.format(save, i))
                 print('.', end='')
+                sys.stdout.flush()
+        if save:
+            break
 
 def make_movie(save):
     command = '''mencoder -mf type=png:w=800:h=600:fps=25
                  -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o'''.split()
-    subprocess.check_call(command + [save, 'mf://*.png'.format(save)])
+    command += [save, 'mf://*.png'.format(save)]
+    print("running {}", command)
+    subprocess.check_call(command)
 
 def dottify(dst, connections, couplings):
     print('digraph Connections {', file=dst)
@@ -77,5 +82,5 @@ if __name__ == '__main__':
         draw(opts.file.root.simulation, opts.save)
         if opts.save:
             make_movie(opts.save)
-            for fname in glob.glob('{}-*.png'.format(save)):
+            for fname in glob.glob('{}-*.png'.format(opts.save)):
                 os.unlink(fname)
