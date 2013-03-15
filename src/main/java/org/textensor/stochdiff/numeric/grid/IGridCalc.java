@@ -12,4 +12,5 @@ public interface IGridCalc {
     String[] getRegionsOut();
 
     int[] getReactionEvents();
+    int[][][] getDiffusionEvents();
 }

@@ -366,4 +366,10 @@ public class DeterministicGridCalc extends GridCalc {
         /* not implemented yet */
         return null;
     }
+
+    @Override
+    public int[][][] getDiffusionEvents() {
+        /* not implemented yet */
+        return null;
+    }
 }

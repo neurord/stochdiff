@@ -151,4 +151,20 @@ public class ArrayUtil {
         for(int i = 0; i < src.length; i++)
             System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
     }
+
+    public static int[][][] zerosLike(int[][] orig, int otherdim) {
+        int[][][] ans = new int[orig.length][][];
+        for (int i = 0; i < orig.length; i++) {
+            ans[i] = new int[orig[i].length][];
+            for (int j = 0; j < ans[i].length; j++)
+                ans[i][j] = new int[otherdim];
+        }
+        return ans;
+    }
+
+    public static void fill(int[][][] arrays, int value) {
+        for (int[][] array: arrays)
+            for (int[] subarray: array)
+                Arrays.fill(array, value);
+    }
 }
