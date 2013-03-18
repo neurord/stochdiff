@@ -241,6 +241,11 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         {
             String[] targets = table.getTargetIDs();
+            if (targets.length == 0) {
+                log.info("not writing stimulation data (empty targets)");
+                return;
+            }
+
             Dataset ds = this.writeVector("target_names", stim, targets);
             setAttribute(ds, "TITLE", "names of stimulation targets");
             setAttribute(ds, "LAYOUT", "[nstimulations]");
