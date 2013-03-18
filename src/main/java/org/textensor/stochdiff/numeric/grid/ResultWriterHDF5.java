@@ -6,10 +6,12 @@ import java.util.Vector;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
+import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.FileFormat;
+import ncsa.hdf.object.HObject;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.h5.H5Datatype;
 import ncsa.hdf.object.h5.H5ScalarDS;
@@ -30,7 +32,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected Group model;
     protected Group sim;
     protected H5ScalarDS concs = null;
-    protected H5ScalarDS conc_times = null;
+    protected H5ScalarDS times = null;
     protected H5ScalarDS species = null;
     protected H5ScalarDS reaction_events = null;
     protected H5ScalarDS diffusion_events = null;
@@ -39,6 +41,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
     public static final H5Datatype int_t =
         new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE);
+    public static final H5Datatype short_str_t =
+        new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
     public ResultWriterHDF5(File outFile) {
         this.outputFile = new File(FileUtil.getRootName(outFile) + ".h5");
@@ -72,7 +76,9 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         Group root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
         this.model = this.output.createGroup("model", root);
+        setAttribute(this.model, "TITLE", "model parameters");
         this.sim = this.output.createGroup("simulation", root);
+        setAttribute(this.sim, "TITLE", "results of the simulation");
     }
 
     @Override
@@ -116,16 +122,40 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         Vector<Object> data = vgrid.gridData();
 
-        this.output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
-                                     memberNames, memberTypes, null, data);
+        Dataset grid =
+            this.output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
+                                         memberNames, memberTypes, null, data);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  "grid", xJoined(dims), "", xJoined(chunks));
+        setAttribute(grid, "TITLE", "voxels");
+        setAttribute(grid, "LAYOUT", "[nel x {xyz, xyz, xyz, xyz, volume, deltaZ}]");
 
-        writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
-        writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
+        {
+            Dataset ds =
+                writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
+            setAttribute(ds, "TITLE", "adjacency mapping between voxels");
+            setAttribute(ds, "LAYOUT", "[nel x neighbors*]");
+            setAttribute(ds, "UNITS", "indexes");
+        }
+        {
+            Dataset ds =
+                writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
+            setAttribute(ds, "TITLE", "coupling rate between voxels");
+            setAttribute(ds, "LAYOUT", "[nel x neighbors*]");
+            setAttribute(ds, "UNITS", "nm^2 / nm ?");
+        }
     }
 
-    public void writeArray(String name, Group parent, double[][] items)
+    protected void setAttribute(HObject obj, String name, String value)
+        throws Exception
+    {
+        Attribute attr = new Attribute(name, short_str_t,
+                                       new long[] {}, new String[] {value});
+        obj.writeMetadata(attr);
+        log.info("Wrote metadata on {} {}={}", obj, name, value);
+    }
+
+    public Dataset writeArray(String name, Group parent, double[][] items)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -133,14 +163,15 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         double[] flat = ArrayUtil.flatten(items, maxlength);
 
-        this.output.createScalarDS(name, parent,
-                                   double_t, dims, null, null,
-                                   0, flat);
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                double_t, dims, null, null,
+                                                0, flat);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
+        return ds;
     }
 
-    public void writeArray(String name, Group parent, int[][] items, int fill)
+    public Dataset writeArray(String name, Group parent, int[][] items, int fill)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -148,14 +179,15 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         int[] flat = ArrayUtil.flatten(items, maxlength, fill);
 
-        this.output.createScalarDS(name, parent,
-                                   int_t, dims, null, null,
-                                   0, flat);
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                int_t, dims, null, null,
+                                                0, flat);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
+        return ds;
     }
 
-    public void writeVector(String name, Group parent, String[] items)
+    public Dataset writeVector(String name, Group parent, String[] items)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -164,11 +196,12 @@ public class ResultWriterHDF5 implements ResultWriter {
         H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
                                              Datatype.NATIVE, Datatype.NATIVE);
 
-        this.output.createScalarDS(name, parent,
-                                   string_t, dims, null, null,
-                                   0, items);
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                string_t, dims, null, null,
+                                                0, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
+        return ds;
     }
 
     protected void writeSpecies(int[] ispecout, IGridCalc source)
@@ -179,21 +212,27 @@ public class ResultWriterHDF5 implements ResultWriter {
         for (int i = 0; i < ispecout.length; i++)
             outSpecies[i] = specieIDs[ispecout[i]];
 
-        this.writeVector("species", this.model, outSpecies);
+        Dataset ds = this.writeVector("species", this.model, outSpecies);
+        setAttribute(ds, "TITLE", "names of saved species");
+        setAttribute(ds, "LAYOUT", "[nspecies]");
+        setAttribute(ds, "UNITS", "text");
     }
 
     protected void writeRegionLabels(IGridCalc source)
         throws Exception
     {
         String[] regions = source.getRegionLabels();
-        this.writeVector("regions", this.model, regions);
+        Dataset ds = this.writeVector("regions", this.model, regions);
+        setAttribute(ds, "TITLE", "names of regions");
+        setAttribute(ds, "LAYOUT", "[nregions]");
+        setAttribute(ds, "UNITS", "text");
     }
 
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
         throws Exception
     {
         assert this.concs == null;
-        assert this.conc_times == null;
+        assert this.times == null;
 
         this.writeSpecies(ispecout, source);
         this.writeRegionLabels(source);
@@ -215,6 +254,9 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.concs.init();
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "concentrations", xJoined(dims), xJoined(size), xJoined(chunks));
+            setAttribute(this.concs, "TITLE", "concentrations of species in voxels over time");
+            setAttribute(this.concs, "LAYOUT", "[snapshot x nel x nspecout]");
+            setAttribute(this.concs, "UNITS", "count");
         }
 
         {
@@ -223,13 +265,16 @@ public class ResultWriterHDF5 implements ResultWriter {
             long[] chunks = {1024};
             double[] times = {0.0};
 
-            this.conc_times = (H5ScalarDS)
+            this.times = (H5ScalarDS)
                 this.output.createScalarDS("times", this.sim,
                                            double_t, dims, size, chunks,
                                            9, times);
-            this.conc_times.init();
+            this.times.init();
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "times", xJoined(dims), xJoined(size), xJoined(chunks));
+            setAttribute(this.times, "TITLE", "times when snapshots were written");
+            setAttribute(this.times, "LAYOUT", "[times]");
+            setAttribute(this.times, "UNITS", "ms");
         }
         return true;
     }
@@ -267,9 +312,9 @@ public class ResultWriterHDF5 implements ResultWriter {
             dims[0] = dims[0] + 1;
             this.concs.extend(dims);
 
-            long[] dims2 = this.conc_times.getDims();
+            long[] dims2 = this.times.getDims();
             dims2[0] = dims2[0] + 1;
-            this.conc_times.extend(dims);
+            this.times.extend(dims);
         }
 
         {
@@ -286,13 +331,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         {
-            long[] selected = this.conc_times.getSelectedDims();
-            long[] start = this.conc_times.getStartDims();
+            long[] selected = this.times.getSelectedDims();
+            long[] start = this.times.getStartDims();
             selected[0] = 1;
             start[0] = dims[0] - 1;
-            double[] times = (double[]) this.conc_times.getData();
+            double[] times = (double[]) this.times.getData();
             times[0] = time;
-            this.conc_times.write(times);
+            this.times.write(times);
         }
 
         this.writeReactionEvents(time, source);
@@ -310,13 +355,17 @@ public class ResultWriterHDF5 implements ResultWriter {
             long[] size = {H5F_UNLIMITED, reactions};
             long[] chunks = {32, reactions};
 
-            this.reaction_events = (H5ScalarDS)
+            H5ScalarDS ds =  (H5ScalarDS)
                 this.output.createScalarDS("reaction_events", this.sim,
                                            int_t, dims, size, chunks,
                                            9, null);
-            this.reaction_events.init();
+            ds.init();
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "reaction_events", xJoined(dims), xJoined(size), xJoined(chunks));
+            setAttribute(ds, "TITLE", "actual reaction counts since last snapshot");
+            setAttribute(ds, "LAYOUT", "[times x reactions]");
+            setAttribute(ds, "UNITS", "count");
+            this.reaction_events = ds;
         }
     }
 
@@ -363,13 +412,17 @@ public class ResultWriterHDF5 implements ResultWriter {
             long[] size = {H5F_UNLIMITED, elements, species, neighbors};
             long[] chunks = {4, elements, species, neighbors};
 
-            this.diffusion_events = (H5ScalarDS)
+            H5ScalarDS ds = (H5ScalarDS)
                 this.output.createScalarDS("diffusion_events", this.sim,
                                            int_t, dims, size, chunks,
                                            9, null);
-            this.diffusion_events.init();
+            ds.init();
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "diffusion_events", xJoined(dims), xJoined(size), xJoined(chunks));
+            setAttribute(ds, "TITLE", "actual diffusion counts since last snapshot");
+            setAttribute(ds, "LAYOUT", "[times x nel x species x neighbors]");
+            setAttribute(ds, "UNITS", "count");
+            this.diffusion_events = ds;
         }
     }
 
