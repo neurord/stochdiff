@@ -2,7 +2,11 @@ package org.textensor.util;
 
 import java.util.Arrays;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class ArrayUtil {
+    static final Logger log = LogManager.getLogger(ArrayUtil.class);
 
     public static int maxLength(String... array) {
         int i = 0;
@@ -28,6 +32,15 @@ public class ArrayUtil {
         return i;
     }
 
+    public static int maxLength(int[][]... array) {
+        int i = 0;
+        for (int[][] a: array)
+            for (int[] b: a)
+                if (b.length > i)
+                    i = b.length;
+        return i;
+    }
+
     public static double[] flatten(double[][] array, int columns) {
         double[] flat = new double[array.length * columns];
         for (int i = 0; i < array.length; i++)
@@ -43,6 +56,65 @@ public class ArrayUtil {
                         fill);
         }
         return flat;
+    }
+
+    public static int[] flatten(int[][][] array, int columns, int fill) {
+        int rows = array.length > 0 ? array[0].length : 0;
+        int[] flat = new int[array.length * rows * columns];
+        return _flatten(flat, array, columns, fill);
+    }
+
+    protected static int[] _flatten(int[] flat,
+                                    int[][][] array, int columns, int fill) {
+        int rows = array.length > 0 ? array[0].length : 0;
+        assert flat.length == array.length * rows * columns;
+
+        for (int i = 0; i < array.length; i++) {
+            assert array[i].length == rows;
+            for (int j = 0; j < rows; j++) {
+                int offset = (i * rows + j) * columns;
+                // System.out.println("" + i + " " + j + " " + offset + " " +
+                //                    array[i][j].length);
+                System.arraycopy(array[i][j], 0, flat, offset,
+                                 array[i][j].length);
+                Arrays.fill(flat, offset + array[i][j].length,
+                            offset + columns, fill);
+            }
+        }
+        return flat;
+    }
+
+    public static String xJoined(int[] dims) {
+        if (dims.length == 0)
+            return "";
+        String s = "" + dims[0];
+        for (int i = 1; i < dims.length; i++)
+            s += "·" + dims[i];
+        return s;
+    }
+
+    public static String xJoined(long[] dims) {
+        if (dims.length == 0)
+            return "";
+        String s = "" + dims[0];
+        for (int i = 1; i < dims.length; i++)
+            s += "·" + dims[i];
+        return s;
+    }
+
+    public static int[] flatten(int[] flat,
+                                   int[][][] array, int columns, int fill) {
+        try {
+            return _flatten(flat, array, columns, fill);
+        } catch(RuntimeException e) {
+            log.error("flat[{}] vs. array[{}x{}x{}], columns={}",
+                      flat.length,
+                      array.length,
+                      array.length > 0 ? array[0].length : '?',
+                      array.length > 0 && array[0].length > 0 ? array[0][0].length : '?',
+                      columns);
+            throw e;
+        }
     }
 
     public static double[] log(double[] d, double dzero) {
@@ -130,20 +202,14 @@ public class ArrayUtil {
     }
 
     public static boolean arraysMatch(String[] a, String[] b) {
-        boolean ret = false;
-        if (a.length == b.length) {
-            ret = true;
-            for (int i = 0; i < a.length; i++) {
-                if (a[i].equals(b[i])) {
-                    // ok
-                } else {
-                    ret = false;
-                }
-            }
+        if (a.length != b.length)
+            return false;
 
-        }
+        for (int i = 0; i < a.length; i++)
+            if (!a[i].equals(b[i]))
+                return false;
 
-        return ret;
+        return true;
     }
 
     public static void copy(int[][] src, int dst[][]) {
@@ -152,19 +218,9 @@ public class ArrayUtil {
             System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
     }
 
-    public static int[][][] zerosLike(int[][] orig, int otherdim) {
-        int[][][] ans = new int[orig.length][][];
-        for (int i = 0; i < orig.length; i++) {
-            ans[i] = new int[orig[i].length][];
-            for (int j = 0; j < ans[i].length; j++)
-                ans[i][j] = new int[otherdim];
-        }
-        return ans;
-    }
-
     public static void fill(int[][][] arrays, int value) {
         for (int[][] array: arrays)
             for (int[] subarray: array)
-                Arrays.fill(array, value);
+                Arrays.fill(subarray, value);
     }
 }

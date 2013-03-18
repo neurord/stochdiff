@@ -91,7 +91,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     /** The number of events of each reaction since last writeGridConcs */
     int reactionEvents[];
-    /** The number of diffused particles since last writeGridConcs */
+    /** The number of diffused particles since last writeGridConcs
+     * Shape is [nel x nspecies x neighbors]. The third dimension is
+     * "rugged". */
     int diffusionEvents[][][];
 
     int ninjected = 0;
@@ -166,7 +168,12 @@ public class SteppedStochasticGridCalc extends GridCalc {
         neighbors = vgrid.getPerElementNeighbors();
         couplingConstants = vgrid.getPerElementCouplingConstants();
         lnCC = ArrayUtil.log(couplingConstants, -999.);
-        diffusionEvents = ArrayUtil.zerosLike(neighbors, nspec);
+        diffusionEvents = new int[nel][nspec][];
+        for (int iel = 0; iel < nel; iel++)
+            for (int k = 0; k < nspec; k++) {
+                int nn = neighbors[iel].length;
+                diffusionEvents[iel][k] = new int[nn];
+            }
 
         stimTab = getStimulationTable();
         stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
@@ -232,6 +239,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
             } else {
                 E.info("Using PER PARTICLE destination allocation");
             }
+            // FIXME: what about independent
+
             lnpSharedOut = new double[nel][nspec];
             pSharedOut = new double[nel][nspec];
             fSharedExit = new double[nel][nspec][];
@@ -627,7 +636,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     io++;
 
                 wkB[inbr[io]][k] ++;
-                this.diffusionEvents[iel][io][k] ++;
+                this.diffusionEvents[iel][k][io] ++;
             }
         } else {
             /* MULTINOMIAL diffusion */
@@ -676,7 +685,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
                 wkB[iel][k] -= ngo;
                 wkB[inbr[j]][k] += ngo;
-                this.diffusionEvents[iel][j][k] += ngo;
+                this.diffusionEvents[iel][k][j] += ngo;
                 ngo_remaining -= ngo;
             } //end of loop through all but last neighbor
 
@@ -684,7 +693,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
-            this.diffusionEvents[iel][inbr.length - 1][k] += ngo;
+            this.diffusionEvents[iel][k][inbr.length - 1] += ngo;
 
             if (wkB[iel][k] < 0)
                 log.warn("parallelAndSharedDiffusionStep multinomial: wkB[iel][k] = {} is negative",
@@ -710,7 +719,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     io++;
                 }
                 wkB[inbr[io]][k] += 1;
-                this.diffusionEvents[iel][io][k] ++;
+                this.diffusionEvents[iel][k][io] ++;
             }
         }
     }

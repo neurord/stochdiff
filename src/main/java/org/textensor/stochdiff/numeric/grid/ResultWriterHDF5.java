@@ -17,6 +17,7 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.util.FileUtil;
 import org.textensor.util.ArrayUtil;
+import static org.textensor.util.ArrayUtil.xJoined;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +32,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected H5ScalarDS conc_times = null;
     protected H5ScalarDS species = null;
     protected H5ScalarDS reaction_events = null;
+    protected H5ScalarDS diffusion_events = null;
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
@@ -114,6 +116,8 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         this.output.createCompoundDS("grid", this.sim, dims, null, chunks, gzip,
                                      memberNames, memberTypes, null, data);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 "grid", xJoined(dims), "", xJoined(chunks));
 
         writeArray("neighbors", this.sim, vgrid.getPerElementNeighbors(), -1);
         writeArray("couplings", this.sim, vgrid.getPerElementCouplingConstants());
@@ -130,6 +134,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.output.createScalarDS(name, parent,
                                    double_t, dims, null, null,
                                    0, flat);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
     }
 
     public void writeArray(String name, Group parent, int[][] items, int fill)
@@ -143,6 +149,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.output.createScalarDS(name, parent,
                                    int_t, dims, null, null,
                                    0, flat);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
     }
 
     public void writeVector(String name, Group parent, String[] items)
@@ -157,6 +165,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.output.createScalarDS(name, parent,
                                    string_t, dims, null, null,
                                    0, items);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
     }
 
     protected void writeSpecies(int[] ispecout, IGridCalc source)
@@ -201,6 +211,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                                            double_t, dims, size, chunks,
                                            9, null);
             this.concs.init();
+            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                     "concentrations", xJoined(dims), xJoined(size), xJoined(chunks));
         }
 
         {
@@ -214,6 +226,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                                            double_t, dims, size, chunks,
                                            9, times);
             this.conc_times.init();
+            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                     "times", xJoined(dims), xJoined(size), xJoined(chunks));
         }
         return true;
     }
@@ -239,7 +253,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
         throws Exception
     {
-        log.info("Writing grid concentrations at time {}", time);
+        log.info("Writing concentrations at time {}", time);
 
         final long[] dims;
         if (this.concs == null) {
@@ -280,6 +294,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         this.writeReactionEvents(time, source);
+        this.writeDiffusionEvents(time, source);
     }
 
     protected void initReactionEvents(int reactions)
@@ -298,6 +313,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                                            int_t, dims, size, chunks,
                                            9, null);
             this.reaction_events.init();
+            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                     "reaction_events", xJoined(dims), xJoined(size), xJoined(chunks));
         }
     }
 
@@ -308,7 +325,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        log.info("Writing reaction events at time {}", time);
+        log.debug("Writing reaction events at time {}", time);
 
         final long[] dims;
         if (this.reaction_events == null) {
@@ -330,6 +347,63 @@ public class ResultWriterHDF5 implements ResultWriter {
             int[] data = (int[]) this.reaction_events.getData();
             System.arraycopy(events, 0, data, 0, events.length);
             this.reaction_events.write(data);
+        }
+    }
+
+    protected void initDiffusionEvents(int elements, int neighbors, int species)
+        throws Exception
+    {
+        assert this.diffusion_events == null;
+
+        /* times x reactions */
+        {
+            long[] dims = {1, elements, species, neighbors};
+            long[] size = {H5F_UNLIMITED, elements, species, neighbors};
+            long[] chunks = {4, elements, species, neighbors};
+
+            this.diffusion_events = (H5ScalarDS)
+                this.output.createScalarDS("diffusion_events", this.sim,
+                                           int_t, dims, size, chunks,
+                                           9, null);
+            this.diffusion_events.init();
+            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                     "diffusion_events", xJoined(dims), xJoined(size), xJoined(chunks));
+        }
+    }
+
+    protected void writeDiffusionEvents(double time, IGridCalc source)
+        throws Exception
+    {
+        final int[][][] events = source.getDiffusionEvents();
+        if (events == null)
+            return;
+
+        log.debug("Writing diffusion events at time {}", time);
+
+        final long[] dims;
+        if (this.diffusion_events == null) {
+            int maxneighbors = ArrayUtil.maxLength(events);
+            this.initDiffusionEvents(events.length, events[0].length,
+                                     maxneighbors);
+            dims = this.diffusion_events.getDims();
+        } else {
+            dims = this.diffusion_events.getDims();
+            dims[0] = dims[0] + 1;
+            this.diffusion_events.extend(dims);
+        }
+
+        {
+            long[] selected = this.diffusion_events.getSelectedDims();
+            long[] start = this.diffusion_events.getStartDims();
+            selected[0] = 1;
+            selected[1] = dims[1];
+            selected[2] = dims[2];
+            selected[3] = dims[3];
+            start[0] = dims[0] - 1;
+
+            int[] data = (int[]) this.diffusion_events.getData();
+            ArrayUtil.flatten(data, events, (int) dims[2], 0);
+            this.diffusion_events.write(data);
         }
     }
 
