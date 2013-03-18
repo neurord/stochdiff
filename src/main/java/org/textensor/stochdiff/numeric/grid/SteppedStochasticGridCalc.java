@@ -69,7 +69,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     int[][] wkA;
     int[][] wkB;
-    int[] wkReac;
 
     int[][] nparticle;
 
@@ -181,7 +180,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
         // workspace for the calculation
         wkA = new int[nel][nspec];
         wkB = new int[nel][nspec];
-        wkReac = new int[nreaction];
 
         double[][] regcon = getRegionConcentrations();
         double[][] regsd = getRegionSurfaceDensities();
