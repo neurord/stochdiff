@@ -27,6 +27,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     final protected File outputFile;
     protected H5File output;
+    protected Group model;
     protected Group sim;
     protected H5ScalarDS concs = null;
     protected H5ScalarDS conc_times = null;
@@ -70,6 +71,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         Group root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
+        this.model = this.output.createGroup("model", root);
         this.sim = this.output.createGroup("simulation", root);
     }
 
@@ -114,13 +116,13 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         Vector<Object> data = vgrid.gridData();
 
-        this.output.createCompoundDS("grid", this.sim, dims, null, chunks, gzip,
+        this.output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
                                      memberNames, memberTypes, null, data);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  "grid", xJoined(dims), "", xJoined(chunks));
 
-        writeArray("neighbors", this.sim, vgrid.getPerElementNeighbors(), -1);
-        writeArray("couplings", this.sim, vgrid.getPerElementCouplingConstants());
+        writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
+        writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
     }
 
     public void writeArray(String name, Group parent, double[][] items)
@@ -177,14 +179,14 @@ public class ResultWriterHDF5 implements ResultWriter {
         for (int i = 0; i < ispecout.length; i++)
             outSpecies[i] = specieIDs[ispecout[i]];
 
-        this.writeVector("species", this.sim, outSpecies);
+        this.writeVector("species", this.model, outSpecies);
     }
 
     protected void writeRegionLabels(IGridCalc source)
         throws Exception
     {
         String[] regions = source.getRegionLabels();
-        this.writeVector("regions", this.sim, regions);
+        this.writeVector("regions", this.model, regions);
     }
 
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)

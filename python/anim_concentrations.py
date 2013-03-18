@@ -17,18 +17,17 @@ parser.add_argument('file', type=tables.openFile)
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
 
-def draw(sim, save):
+def draw(model, sim, save):
     concs = sim.concentrations
-    N = numpy.arange(sim.species.shape[0])
+    N = numpy.arange(model.species.shape[0])
     V = numpy.arange(concs.shape[0])
-    times = sim.times
 
     f = pyplot.figure()
     f.clear()
     ax = f.gca()
     ax.set_xlabel("species")
     ax.xaxis.set_ticks(N)
-    ax.xaxis.set_ticklabels(sim.species, rotation=70)
+    ax.xaxis.set_ticklabels(model.species, rotation=70)
     ax.set_ylabel("voxel#")
     im = ax.imshow(concs[0], origin='lower',
                    extent=(0, concs.shape[2], 0, concs.shape[1]),
@@ -38,7 +37,7 @@ def draw(sim, save):
 
     while True:
         for i in range(0, concs.shape[0]):
-            ax.set_title("step {:>3}, t = {:8.4f} ms".format(i, times[i]))
+            ax.set_title("step {:>3}, t = {:8.4f} ms".format(i, sim.times[i]))
             im.set_data(concs[i])
             if not save:
                 f.canvas.draw()
@@ -69,17 +68,15 @@ def dottify(dst, connections, couplings):
             print('\t{} -> {} [penwidth={}];'.format(i, j, coupl), file=dst)
     print('}', file=dst)
 
-def dot_connections(sim):
-    connections = sim.root.simulation.neighbors
-    couplings = sim.root.simulation.couplings
-    dottify(sys.stdout, connections, couplings)
+def dot_connections(model):
+    dottify(sys.stdout, model.neighbors, model.couplings)
 
 if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
-        dot_connections(opts.file)
+        dot_connections(opts.file.root.model)
     else:
-        draw(opts.file.root.simulation, opts.save)
+        draw(opts.file.root.model, opts.file.root.simulation, opts.save)
         if opts.save:
             make_movie(opts.save)
             for fname in glob.glob('{}-*.png'.format(opts.save)):
