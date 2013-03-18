@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.numeric.grid;
 
+import org.textensor.stochdiff.numeric.chem.StimulationTable;
+
 public interface IGridCalc {
     int getGridPartNumb(int i, int outj);
     double getGridPartConc(int i, int outj);
@@ -13,4 +15,8 @@ public interface IGridCalc {
 
     int[] getReactionEvents();
     int[][][] getDiffusionEvents();
+
+    StimulationTable getStimulationTable();
+    int[][] getStimulationTargets();
+    int[][] getStimulationEvents();
 }

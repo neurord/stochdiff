@@ -90,10 +90,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     /** The number of events of each reaction since last writeGridConcs */
     int reactionEvents[];
-    /** The number of diffused particles since last writeGridConcs
+    /** The number of diffused particles since last writeGridConcs.
      * Shape is [nel x nspecies x neighbors]. The third dimension is
      * "rugged". */
     int diffusionEvents[][][];
+    /** The number of injected particles since last writeGridConcs.
+     * Shape is [nel x nspecies]. */
+    int stimulationEvents[][];
 
     int ninjected = 0;
 
@@ -176,6 +179,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         stimTab = getStimulationTable();
         stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
+        stimulationEvents = new int[nel][nspec];
 
         // workspace for the calculation
         wkA = new int[nel][nspec];
@@ -331,8 +335,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     resultWriter.writeGridConcs(time, nel, ispecout, this);
 
                 writeTime += sdRun.outputInterval;
-                Arrays.fill(this.reactionEvents, 0);
+                ArrayUtil.fill(this.stimulationEvents, 0);
                 ArrayUtil.fill(this.diffusionEvents, 0);
+                Arrays.fill(this.reactionEvents, 0);
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
@@ -418,8 +423,10 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
                         for (int k = 0; k < nk; k++) {
                             int nin = this.randomRound(as);
+                            int tgt = stimtargets[i][k];
                             ninjected += nin;
-                            wkA[stimtargets[i][k]][j] += nin;
+                            wkA[tgt][j] += nin;
+                            this.stimulationEvents[tgt][j] += nin;
                         }
                     }
                 }
@@ -759,5 +766,15 @@ public class SteppedStochasticGridCalc extends GridCalc {
     @Override
     public int[][][] getDiffusionEvents() {
         return this.diffusionEvents;
+    }
+
+    @Override
+    public int[][] getStimulationTargets() {
+        return this.stimtargets;
+    }
+
+    @Override
+    public int[][] getStimulationEvents() {
+        return this.stimulationEvents;
     }
 }

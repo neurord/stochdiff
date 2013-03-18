@@ -372,4 +372,15 @@ public class DeterministicGridCalc extends GridCalc {
         /* not implemented yet */
         return null;
     }
+
+    @Override
+    public int[][] getStimulationTargets() {
+        return this.stimtargets;
+    }
+
+    @Override
+    public int[][] getStimulationEvents() {
+        /* not implemented yet */
+        return null;
+    }
 }

@@ -48,37 +48,49 @@ public class ArrayUtil {
         return flat;
     }
 
-    public static int[] flatten(int[][] array, int columns, int fill) {
-        int[] flat = new int[array.length * columns];
+    public static int[] flatten(int[][] array, long columns, int fill) {
+        int[] flat = new int[array.length * (int) columns];
+        return _flatten(flat, array, columns, fill);
+    }
+
+    public static int[] _flatten(int[] flat,
+                                 int[][] array, long columns, int fill) {
+        assert flat.length == array.length * columns;
         for (int i = 0; i < array.length; i++) {
-            System.arraycopy(array[i], 0, flat, i * columns, array[i].length);
-            Arrays.fill(flat, i * columns + array[i].length, (i + 1) * columns,
-                        fill);
+            System.arraycopy(array[i], 0, flat, i * (int) columns, array[i].length);
+            if (array[i].length < columns)
+                /* work around apparent bug in Arrays.fill, where writing an
+                 * empty range to the end of flat fails. */
+                Arrays.fill(flat,
+                            i * (int) columns + array[i].length,
+                            (i + 1) * (int) columns,
+                            fill);
         }
         return flat;
     }
 
-    public static int[] flatten(int[][][] array, int columns, int fill) {
+
+    public static int[] flatten(int[][][] array, long columns, int fill) {
         int rows = array.length > 0 ? array[0].length : 0;
-        int[] flat = new int[array.length * rows * columns];
+        int[] flat = new int[array.length * rows * (int) columns];
         return _flatten(flat, array, columns, fill);
     }
 
-    protected static int[] _flatten(int[] flat,
-                                    int[][][] array, int columns, int fill) {
+    public static int[] _flatten(int[] flat,
+                                    int[][][] array, long columns, int fill) {
         int rows = array.length > 0 ? array[0].length : 0;
         assert flat.length == array.length * rows * columns;
 
         for (int i = 0; i < array.length; i++) {
             assert array[i].length == rows;
             for (int j = 0; j < rows; j++) {
-                int offset = (i * rows + j) * columns;
+                int offset = (i * rows + j) * (int) columns;
                 // System.out.println("" + i + " " + j + " " + offset + " " +
                 //                    array[i][j].length);
                 System.arraycopy(array[i][j], 0, flat, offset,
                                  array[i][j].length);
                 Arrays.fill(flat, offset + array[i][j].length,
-                            offset + columns, fill);
+                            offset + (int) columns, fill);
             }
         }
         return flat;
@@ -216,6 +228,11 @@ public class ArrayUtil {
         assert src.length == dst.length;
         for(int i = 0; i < src.length; i++)
             System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
+    }
+
+    public static void fill(int[][] array, int value) {
+        for (int[] subarray: array)
+            Arrays.fill(subarray, value);
     }
 
     public static void fill(int[][][] arrays, int value) {
