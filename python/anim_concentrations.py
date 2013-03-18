@@ -8,9 +8,6 @@ import argparse
 import subprocess
 import numpy
 import tables
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file', type=tables.openFile)
@@ -18,6 +15,7 @@ parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
 
 def draw(model, sim, save):
+    from matplotlib import pyplot
     concs = sim.concentrations
     N = numpy.arange(model.species.shape[0])
     V = numpy.arange(concs.shape[0])
@@ -76,6 +74,10 @@ if __name__ == '__main__':
     if opts.connections:
         dot_connections(opts.file.root.model)
     else:
+        import matplotlib
+        if opts.save:
+            matplotlib.use('Agg')
+
         draw(opts.file.root.model, opts.file.root.simulation, opts.save)
         if opts.save:
             make_movie(opts.save)
