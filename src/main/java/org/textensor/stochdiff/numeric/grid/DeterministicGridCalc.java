@@ -280,9 +280,6 @@ public class DeterministicGridCalc extends GridCalc {
 //AB 12-19-11	create the coninc outside of the pinj loop, to accumulate injections from multiple stimuli
             double[] concinc=new double[nspec];
             int concnull=1;
-            for (int k=0; k<nspec; k++) {
-                concinc[k]=0.0;
-            }
             double fconc = NM_PER_PARTICLE_PUV / volumes[iel];
 //AB 12-19-11 need to create loop over all the stimulations, and
 //			create pinj for each stimulation (not just the first one)
