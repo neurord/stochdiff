@@ -381,7 +381,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected void initStimulationEvents(int elements, int species)
         throws Exception
     {
-        assert this.reaction_events == null;
+        assert this.stimulation_events == null;
 
         /* times x elements x species */
         {
@@ -498,16 +498,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected void initReactionEvents(int reactions)
+    protected void initReactionEvents(int elements, int reactions)
         throws Exception
     {
         assert this.reaction_events == null;
 
         /* times x reactions */
         {
-            long[] dims = {1, reactions};
-            long[] size = {H5F_UNLIMITED, reactions};
-            long[] chunks = {32, reactions};
+            long[] dims = {1, elements, reactions};
+            long[] size = {H5F_UNLIMITED, elements, reactions};
+            long[] chunks = {32, elements, reactions};
 
             H5ScalarDS ds =  (H5ScalarDS)
                 this.output.createScalarDS("reaction_events", this.sim,
@@ -517,7 +517,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "reaction_events", xJoined(dims), xJoined(size), xJoined(chunks));
             setAttribute(ds, "TITLE", "actual reaction counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times x reactions]");
+            setAttribute(ds, "LAYOUT", "[times x elements x reactions]");
             setAttribute(ds, "UNITS", "count");
             this.reaction_events = ds;
         }
@@ -526,7 +526,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected void writeReactionEvents(double time, IGridCalc source)
         throws Exception
     {
-        final int[] events = source.getReactionEvents();
+        final int[][] events = source.getReactionEvents();
         if (events == null)
             return;
 
@@ -534,7 +534,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         final long[] dims;
         if (this.reaction_events == null) {
-            this.initReactionEvents(events.length);
+            this.initReactionEvents(events.length, events[0].length);
             dims = this.reaction_events.getDims();
         } else {
             dims = this.reaction_events.getDims();
@@ -547,10 +547,11 @@ public class ResultWriterHDF5 implements ResultWriter {
             long[] start = this.reaction_events.getStartDims();
             selected[0] = 1;
             selected[1] = dims[1];
+            selected[2] = dims[2];
             start[0] = dims[0] - 1;
 
             int[] data = (int[]) this.reaction_events.getData();
-            System.arraycopy(events, 0, data, 0, events.length);
+            ArrayUtil._flatten(data, events, dims[2], 0);
             this.reaction_events.write(data);
         }
     }

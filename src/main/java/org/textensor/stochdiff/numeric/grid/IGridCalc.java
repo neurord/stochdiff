@@ -13,7 +13,7 @@ public interface IGridCalc {
     boolean[] getSubmembranes();
     String[] getRegionsOut();
 
-    int[] getReactionEvents();
+    int[][] getReactionEvents();
     int[][][] getDiffusionEvents();
 
     StimulationTable getStimulationTable();

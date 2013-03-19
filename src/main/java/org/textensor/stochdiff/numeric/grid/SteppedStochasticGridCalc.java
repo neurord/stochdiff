@@ -88,8 +88,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     double lndt;
 
-    /** The number of events of each reaction since last writeGridConcs */
-    int reactionEvents[];
+    /** The number of events of each reaction since last writeGridConcs.
+     * Shapes is [nel x nreactions]. */
+    int reactionEvents[][];
     /** The number of diffused particles since last writeGridConcs.
      * Shape is [nel x nspecies x neighbors]. The third dimension is
      * "rugged". */
@@ -143,7 +144,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
-        reactionEvents = new int[nreaction];
+        reactionEvents = new int[nel][nreaction];
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
@@ -337,7 +338,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 writeTime += sdRun.outputInterval;
                 ArrayUtil.fill(this.stimulationEvents, 0);
                 ArrayUtil.fill(this.diffusionEvents, 0);
-                Arrays.fill(this.reactionEvents, 0);
+                ArrayUtil.fill(this.reactionEvents, 0);
             }
             for (int i = 0; i < fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
@@ -586,7 +587,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                             nend[pi1] += ngo * ps[1];
                     }
 
-                    this.reactionEvents[ireac] += ngo;
+                    this.reactionEvents[iel][ireac] += ngo;
 
                     // TODO this "if (ri[1] >= 0)" business is not great
                     // it applies for the A+B->C case, where there is a
@@ -759,7 +760,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
     }
 
     @Override
-    public int[] getReactionEvents() {
+    public int[][] getReactionEvents() {
         return this.reactionEvents;
     }
 

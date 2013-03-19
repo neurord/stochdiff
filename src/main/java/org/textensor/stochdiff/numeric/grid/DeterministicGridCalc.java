@@ -362,7 +362,7 @@ public class DeterministicGridCalc extends GridCalc {
     }
 
     @Override
-    public int[] getReactionEvents() {
+    public int[][] getReactionEvents() {
         /* not implemented yet */
         return null;
     }
