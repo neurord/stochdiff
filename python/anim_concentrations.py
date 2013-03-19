@@ -20,68 +20,81 @@ parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 
 class Drawer(object):
-    def __init__(self, species, times, data, save, title=''):
-        from matplotlib import pyplot
+    def __init__(self, f, ax, species, times, data, title=''):
         from matplotlib.colors import LogNorm
-        pyplot.ion()
 
         N = numpy.arange(species.shape[0])
         V = numpy.arange(data.shape[0])
         self.data = data
         self.times = times
-        self.save = save
         self.title = title
+        self.ax = ax
 
-        self.figure = f = pyplot.figure()
-        f.clear()
-        ax = f.gca()
         ax.set_xlabel("species")
         ax.xaxis.set_ticks(N + 0.5)
         ax.xaxis.set_ticklabels(species, rotation=70)
         ax.set_ylabel("voxel#")
         # matplotlib gets confused if we draw all zeros
         initial = data.sum(axis=(1,2)).argmax()
+        if data[initial].max() == 0:
+            # work around colorbar issues
+            data[initial, 0, 0] = 1
         self.image = ax.imshow(data[initial], origin='lower',
                                extent=(0, data.shape[2], 0, data.shape[1]),
                                interpolation='spline16', aspect='auto',
                                norm=LogNorm())
         f.colorbar(self.image)
-        f.tight_layout()
-        if not save:
-            f.show()
 
     def update(self, i):
-        ax = self.figure.gca()
-        ax.set_title("{}   step {:>3}, t = {:8.4f} ms"
-                     .format(self.title, i, self.times[i]))
+        self.ax.set_title("{}   step {:>3}, t = {:8.4f} ms"
+                          .format(self.title, i, self.times[i]))
         self.image.set_data(self.data[i])
-        if not self.save:
-            self.figure.canvas.draw()
-        else:
-            self.figure.savefig('{}-{:06d}.png'.format(self.save, i))
 
 class DrawerSet(object):
     def __init__(self, model, sim, opts):
+        from matplotlib import pyplot
+        pyplot.ion()
+
+        self.save = opts.save
+
+        self.figure = f = pyplot.figure(figsize=(12, 9))
+        f.clear()
+
         self.drawers = []
         species = model.species
         times = sim.times
+        num = opts.particles + opts.stimulation + opts.diffusion + opts.reaction
+        shape = [(1,1), (2,1), (2,2), (2,2)][num - 1]
+        pos = 1
+
         if opts.particles:
+            ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.concentrations[:]
-            self.drawers += [Drawer(species, times, data, opts.save,
+            self.drawers += [Drawer(f, ax, species, times, data,
                                     title='Particle numbers')]
+            pos += 1
         if opts.stimulation:
+            ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.stimulation_events[:]
-            self.drawers += [Drawer(species, times, data, opts.save,
+            self.drawers += [Drawer(f, ax, species, times, data,
                                     title='Stimulation events')]
+            pos += 1
         if opts.diffusion:
+            ax = f.add_subplot(shape[0], shape[1], pos)
             # reduce dimensionality by summing over all neighbours
             data = sim.diffusion_events[:].sum(axis=-1)
-            self.drawers += [Drawer(species, times, data, opts.save,
+            self.drawers += [Drawer(f, ax, species, times, data,
                                     title='Diffusion events')]
+            pos += 1
         if opts.reaction:
+            ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.reaction_events[:]
-            self.drawers += [Drawer(species, times, data, opts.save,
+            self.drawers += [Drawer(f, ax, species, times, data,
                                     title='Reaction events')]
+
+        f.tight_layout()
+        if not opts.save:
+            f.show()
 
         items = range(data.shape[0])
         if opts.save:
@@ -93,8 +106,12 @@ class DrawerSet(object):
         for i in self.range:
             for drawer in self.drawers:
                 drawer.update(i)
-            print('.', end='')
-            sys.stdout.flush()
+            if not self.save:
+                self.figure.canvas.draw()
+            else:
+                self.figure.savefig('{}-{:06d}.png'.format(self.save, i))
+                print('.', end='')
+                sys.stdout.flush()
 
 def make_movie(save):
     command = '''mencoder -mf type=png:w=800:h=600:fps=25
