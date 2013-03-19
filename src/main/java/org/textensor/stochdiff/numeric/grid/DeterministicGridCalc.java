@@ -10,8 +10,6 @@ import java.util.Arrays;
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.numeric.chem.ReactionTable;
-import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;

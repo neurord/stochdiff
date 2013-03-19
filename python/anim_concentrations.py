@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding:utf-8 -*-
 from __future__ import print_function, division
 
 import sys
@@ -14,6 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('file', type=tables.openFile)
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
+parser.add_argument('--reactions', action='store_true')
 parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
@@ -120,7 +122,11 @@ def make_movie(save):
     print("running {}", command)
     subprocess.check_call(command)
 
-def dottify(dst, connections, couplings):
+def _conn(dst, a, b, penwidth=None):
+    w = ' [penwidth={}]'.format(penwidth) if penwidth is not None else ''
+    print('\t"{}" -> "{}"{};'.format(a, b, w), file=dst)
+
+def _connections(dst, connections, couplings):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
@@ -130,16 +136,50 @@ def dottify(dst, connections, couplings):
             if j < 0:
                 break
             coupl = min(max(numpy.log(coupl)+3, 0.3), 5)
-            print('\t{} -> {} [penwidth={}];'.format(i, j, coupl), file=dst)
+            _conn(dst, i, j, coupl)
     print('}', file=dst)
 
 def dot_connections(model):
-    dottify(sys.stdout, model.neighbors, model.couplings)
+    _connections(sys.stdout, model.neighbors, model.couplings)
+
+def _reaction_name(rr, rr_s, pp, pp_s, species):
+    return ' ⇌ '.join(
+        ('+'.join('{}{}'.format(s if s > 1 else '', species[r])
+                  for r, s in zip(rr_, ss_)
+                  if r >= 0)
+         for rr_, ss_ in ((rr, rr_s), (pp, pp_s))))
+
+def _productions(dst, species, reactants, r_stochio, products, p_stochio):
+    print('digraph Reactions {', file=dst)
+    print('\trankdir=LR;', file=dst)
+    print('\tsplines=true;', file=dst)
+    print('\tnode [color=green,style=filled,fillcolor=lightgreen];', file=dst)
+    for rr, rr_s, pp, pp_s in zip(reactants, r_stochio,
+                                  products, p_stochio):
+        name = _reaction_name(rr, rr_s, pp, pp_s, species)
+        print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
+        for j, s in zip(rr, rr_s):
+            if j < 0:
+                break
+            _conn(dst, species[j], name)
+        for j, s in zip(pp, pp_s):
+            if j < 0:
+                break
+            _conn(dst, name, species[j])
+        print()
+    print('}', file=dst)
+
+def dot_productions(model):
+    _productions(sys.stdout, model.species,
+                 model.reactions.reactants, model.reactions.reactant_stochiometry,
+                 model.reactions.products, model.reactions.product_stochiometry)
 
 if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
         dot_connections(opts.file.root.model)
+    elif opts.reactions:
+        dot_productions(opts.file.root.model)
     else:
         import matplotlib
         if opts.save:

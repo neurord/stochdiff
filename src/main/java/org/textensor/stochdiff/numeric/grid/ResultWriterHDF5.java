@@ -18,6 +18,7 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
+import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.FileUtil;
 import org.textensor.util.ArrayUtil;
 import static org.textensor.util.ArrayUtil.xJoined;
@@ -146,7 +147,9 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "LAYOUT", "[nel x neighbors*]");
             setAttribute(ds, "UNITS", "nm^2 / nm ?");
         }
+
         this.writeStimulationData(source);
+        this.writeReactionData(source);
     }
 
     protected void setAttribute(HObject obj, String name, String value)
@@ -236,8 +239,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         StimulationTable table = source.getStimulationTable();
 
-        Group stim = this.output.createGroup("stimulation", this.model);
-        setAttribute(stim, "TITLE", "stimulation parameters");
+        Group group = this.output.createGroup("stimulation", this.model);
+        setAttribute(group, "TITLE", "stimulation parameters");
 
         {
             String[] targets = table.getTargetIDs();
@@ -246,7 +249,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 return;
             }
 
-            Dataset ds = this.writeVector("target_names", stim, targets);
+            Dataset ds = this.writeVector("target_names", group, targets);
             setAttribute(ds, "TITLE", "names of stimulation targets");
             setAttribute(ds, "LAYOUT", "[nstimulations]");
             setAttribute(ds, "UNITS", "text");
@@ -254,9 +257,47 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         {
             int[][] targets = source.getStimulationTargets();
-            Dataset ds = this.writeArray("targets", stim, targets, -1);
+            Dataset ds = this.writeArray("targets", group, targets, -1);
             setAttribute(ds, "TITLE", "stimulated voxels");
             setAttribute(ds, "LAYOUT", "[??? x ???]");
+            setAttribute(ds, "UNITS", "indexes");
+        }
+    }
+
+    protected void writeReactionData(IGridCalc source)
+        throws Exception
+    {
+        ReactionTable table = source.getReactionTable();
+
+        Group group = this.output.createGroup("reactions", this.model);
+        setAttribute(group, "TITLE", "reaction scheme");
+
+        {
+            int[][] indices = table.getReactantIndices();
+            Dataset ds = this.writeArray("reactants", group, indices, -1);
+            setAttribute(ds, "TITLE", "reactant indices");
+            setAttribute(ds, "LAYOUT", "[nreact x nreactants*]");
+            setAttribute(ds, "UNITS", "indexes");
+        }
+        {
+            int[][] indices = table.getProductIndices();
+            Dataset ds = this.writeArray("products", group, indices, -1);
+            setAttribute(ds, "TITLE", "product indices");
+            setAttribute(ds, "LAYOUT", "[nreact x nproducts*]");
+            setAttribute(ds, "UNITS", "indexes");
+        }
+        {
+            int[][] stochio = table.getReactantStochiometry();
+            Dataset ds = this.writeArray("reactant_stochiometry", group, stochio, -1);
+            setAttribute(ds, "TITLE", "reactant stochiometry");
+            setAttribute(ds, "LAYOUT", "[nreact x nreactants*]");
+            setAttribute(ds, "UNITS", "indexes");
+        }
+        {
+            int[][] stochio = table.getProductStochiometry();
+            Dataset ds = this.writeArray("product_stochiometry", group, stochio, -1);
+            setAttribute(ds, "TITLE", "product stochiometry");
+            setAttribute(ds, "LAYOUT", "[nreact x nproducts*]");
             setAttribute(ds, "UNITS", "indexes");
         }
     }
