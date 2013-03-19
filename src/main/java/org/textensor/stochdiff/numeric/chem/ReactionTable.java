@@ -338,18 +338,12 @@ public class ReactionTable {
     public int getSpecieIndex(String specieID) {
         String[] sa = getSpeciesIDs();
 
-        int iret = -1;
-        for (int i = 0; i < nspecie; i++) {
-            if (sa[i].equals(specieID)) {
-                iret = i;
-                break;
-            }
-        }
-        if (iret < 0) {
-            E.error("cannot find specie " + specieID + " required for stimulation");
-            E.dump("specs", sa);
-        }
-        return iret;
+        for (int i = 0; i < nspecie; i++)
+            if (sa[i].equals(specieID))
+                return i;
+        E.dump("specs", sa);
+        throw new RuntimeException("cannot find specie " + specieID +
+                                   " required for stimulation");
     }
 
 
