@@ -437,7 +437,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected void initDiffusionEvents(int elements, int neighbors, int species)
+    protected void initDiffusionEvents(int elements, int species, int neighbors)
         throws Exception
     {
         assert this.diffusion_events == null;
@@ -493,7 +493,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             start[0] = dims[0] - 1;
 
             int[] data = (int[]) this.diffusion_events.getData();
-            ArrayUtil._flatten(data, events, dims[2], 0);
+            ArrayUtil._flatten(data, events, dims[3], 0);
             this.diffusion_events.write(data);
         }
     }
