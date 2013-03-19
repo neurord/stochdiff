@@ -13,37 +13,52 @@ parser = argparse.ArgumentParser()
 parser.add_argument('file', type=tables.openFile)
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
+parser.add_argument('--diffusion', action='store_true')
 
-def draw(model, sim, save):
+def draw(model, sim, opts):
     from matplotlib import pyplot
-    concs = sim.concentrations
+    from matplotlib.colors import LogNorm
+    pyplot.ion()
+    if not opts.diffusion:
+        data = sim.concentrations[:]
+        title = 'Particle numbers'
+    else:
+        # reduce dimensionality by summing over all neighbours
+        data = sim.diffusion_events[:].sum(axis=-1)
+        title = 'Diffusion events'
     N = numpy.arange(model.species.shape[0])
-    V = numpy.arange(concs.shape[0])
+    V = numpy.arange(data.shape[0])
 
     f = pyplot.figure()
     f.clear()
     ax = f.gca()
     ax.set_xlabel("species")
-    ax.xaxis.set_ticks(N)
+    ax.xaxis.set_ticks(N + 0.5)
     ax.xaxis.set_ticklabels(model.species, rotation=70)
     ax.set_ylabel("voxel#")
-    im = ax.imshow(concs[0], origin='lower',
-                   extent=(0, concs.shape[2], 0, concs.shape[1]),
-                   interpolation='spline16', aspect='auto')
-    if not save:
+    # matplotlib gets confused if we draw all zeros
+    initial = data.sum(axis=(1,2)).argmax()
+    im = ax.imshow(data[initial], origin='lower',
+                   extent=(0, data.shape[2], 0, data.shape[1]),
+                   interpolation='spline16', aspect='auto',
+                   norm=LogNorm())
+    f.colorbar(im)
+    f.tight_layout()
+    if not opts.save:
         f.show()
 
     while True:
-        for i in range(0, concs.shape[0]):
-            ax.set_title("step {:>3}, t = {:8.4f} ms".format(i, sim.times[i]))
-            im.set_data(concs[i])
-            if not save:
+        for i in range(0, data.shape[0]):
+            ax.set_title("{}   step {:>3}, t = {:8.4f} ms"
+                         .format(title, i, sim.times[i]))
+            im.set_data(data[i])
+            if not opts.save:
                 f.canvas.draw()
             else:
-                f.savefig('{}-{:06d}.png'.format(save, i))
+                f.savefig('{}-{:06d}.png'.format(opts.save, i))
                 print('.', end='')
                 sys.stdout.flush()
-        if save:
+        if opts.save:
             break
 
 def make_movie(save):
@@ -78,7 +93,7 @@ if __name__ == '__main__':
         if opts.save:
             matplotlib.use('Agg')
 
-        draw(opts.file.root.model, opts.file.root.simulation, opts.save)
+        draw(opts.file.root.model, opts.file.root.simulation, opts)
         if opts.save:
             make_movie(opts.save)
             for fname in glob.glob('{}-*.png'.format(opts.save)):
