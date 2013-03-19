@@ -4,6 +4,7 @@ from __future__ import print_function, division
 import sys
 import os
 import glob
+import itertools
 import argparse
 import subprocess
 import numpy
@@ -13,53 +14,87 @@ parser = argparse.ArgumentParser()
 parser.add_argument('file', type=tables.openFile)
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
+parser.add_argument('--particles', action='store_true')
+parser.add_argument('--stimulation', action='store_true')
+parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 
-def draw(model, sim, opts):
-    from matplotlib import pyplot
-    from matplotlib.colors import LogNorm
-    pyplot.ion()
-    if not opts.diffusion:
-        data = sim.concentrations[:]
-        title = 'Particle numbers'
-    else:
-        # reduce dimensionality by summing over all neighbours
-        data = sim.diffusion_events[:].sum(axis=-1)
-        title = 'Diffusion events'
-    N = numpy.arange(model.species.shape[0])
-    V = numpy.arange(data.shape[0])
+class Drawer(object):
+    def __init__(self, species, times, data, save, title=''):
+        from matplotlib import pyplot
+        from matplotlib.colors import LogNorm
+        pyplot.ion()
 
-    f = pyplot.figure()
-    f.clear()
-    ax = f.gca()
-    ax.set_xlabel("species")
-    ax.xaxis.set_ticks(N + 0.5)
-    ax.xaxis.set_ticklabels(model.species, rotation=70)
-    ax.set_ylabel("voxel#")
-    # matplotlib gets confused if we draw all zeros
-    initial = data.sum(axis=(1,2)).argmax()
-    im = ax.imshow(data[initial], origin='lower',
-                   extent=(0, data.shape[2], 0, data.shape[1]),
-                   interpolation='spline16', aspect='auto',
-                   norm=LogNorm())
-    f.colorbar(im)
-    f.tight_layout()
-    if not opts.save:
-        f.show()
+        N = numpy.arange(species.shape[0])
+        V = numpy.arange(data.shape[0])
+        self.data = data
+        self.times = times
+        self.save = save
+        self.title = title
 
-    while True:
-        for i in range(0, data.shape[0]):
-            ax.set_title("{}   step {:>3}, t = {:8.4f} ms"
-                         .format(title, i, sim.times[i]))
-            im.set_data(data[i])
-            if not opts.save:
-                f.canvas.draw()
-            else:
-                f.savefig('{}-{:06d}.png'.format(opts.save, i))
-                print('.', end='')
-                sys.stdout.flush()
+        self.figure = f = pyplot.figure()
+        f.clear()
+        ax = f.gca()
+        ax.set_xlabel("species")
+        ax.xaxis.set_ticks(N + 0.5)
+        ax.xaxis.set_ticklabels(species, rotation=70)
+        ax.set_ylabel("voxel#")
+        # matplotlib gets confused if we draw all zeros
+        initial = data.sum(axis=(1,2)).argmax()
+        self.image = ax.imshow(data[initial], origin='lower',
+                               extent=(0, data.shape[2], 0, data.shape[1]),
+                               interpolation='spline16', aspect='auto',
+                               norm=LogNorm())
+        f.colorbar(self.image)
+        f.tight_layout()
+        if not save:
+            f.show()
+
+    def update(self, i):
+        ax = self.figure.gca()
+        ax.set_title("{}   step {:>3}, t = {:8.4f} ms"
+                     .format(self.title, i, self.times[i]))
+        self.image.set_data(self.data[i])
+        if not self.save:
+            self.figure.canvas.draw()
+        else:
+            self.figure.savefig('{}-{:06d}.png'.format(self.save, i))
+
+class DrawerSet(object):
+    def __init__(self, model, sim, opts):
+        self.drawers = []
+        species = model.species
+        times = sim.times
+        if opts.particles:
+            data = sim.concentrations[:]
+            self.drawers += [Drawer(species, times, data, opts.save,
+                                    title='Particle numbers')]
+        if opts.stimulation:
+            data = sim.stimulation_events[:]
+            self.drawers += [Drawer(species, times, data, opts.save,
+                                    title='Stimulation events')]
+        if opts.diffusion:
+            # reduce dimensionality by summing over all neighbours
+            data = sim.diffusion_events[:].sum(axis=-1)
+            self.drawers += [Drawer(species, times, data, opts.save,
+                                    title='Diffusion events')]
+        if opts.reaction:
+            data = sim.reaction_events[:]
+            self.drawers += [Drawer(species, times, data, opts.save,
+                                    title='Reaction events')]
+
+        items = range(data.shape[0])
         if opts.save:
-            break
+            self.range = items
+        else:
+            self.range = itertools.cycle(items)
+
+    def animate(self):
+        for i in self.range:
+            for drawer in self.drawers:
+                drawer.update(i)
+            print('.', end='')
+            sys.stdout.flush()
 
 def make_movie(save):
     command = '''mencoder -mf type=png:w=800:h=600:fps=25
@@ -93,7 +128,9 @@ if __name__ == '__main__':
         if opts.save:
             matplotlib.use('Agg')
 
-        draw(opts.file.root.model, opts.file.root.simulation, opts)
+        ss = DrawerSet(opts.file.root.model, opts.file.root.simulation, opts)
+        ss.animate()
+
         if opts.save:
             make_movie(opts.save)
             for fname in glob.glob('{}-*.png'.format(opts.save)):
