@@ -91,7 +91,8 @@ class DrawerSet(object):
         if opts.reaction:
             ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.reaction_events[:]
-            self.drawers += [Drawer(f, ax, species, times, data,
+            names = reaction_name(range(data.shape[2]), model)
+            self.drawers += [Drawer(f, ax, names, times, data,
                                     title='Reaction events')]
 
         f.tight_layout()
@@ -143,11 +144,21 @@ def dot_connections(model):
     _connections(sys.stdout, model.neighbors, model.couplings)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
-    return ' ⇌ '.join(
+    return u' ⇌ '.join(
         ('+'.join('{}{}'.format(s if s > 1 else '', species[r])
                   for r, s in zip(rr_, ss_)
                   if r >= 0)
          for rr_, ss_ in ((rr, rr_s), (pp, pp_s))))
+
+def reaction_name(num, model):
+    single = isinstance(num, int)
+    l = [_reaction_name(model.reactions.reactants[num],
+                        model.reactions.reactant_stochiometry[num],
+                        model.reactions.products[num],
+                        model.reactions.product_stochiometry[num],
+                        model.species)
+         for num in ([num] if single else num)]
+    return l[0] if single else numpy.array(l)
 
 def _productions(dst, species, reactants, r_stochio, products, p_stochio):
     print('digraph Reactions {', file=dst)
