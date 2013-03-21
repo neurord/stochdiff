@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
-from __future__ import print_function, division
+from __future__ import print_function, division, unicode_literals
 
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import os
 import glob
 import itertools
@@ -144,7 +146,7 @@ def dot_connections(model):
     _connections(sys.stdout, model.neighbors, model.couplings)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
-    return u' ⇌ '.join(
+    return ' ⇌ '.join(
         ('+'.join('{}{}'.format(s if s > 1 else '', species[r])
                   for r, s in zip(rr_, ss_)
                   if r >= 0)
