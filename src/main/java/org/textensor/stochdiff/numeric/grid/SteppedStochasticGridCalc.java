@@ -83,7 +83,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int[][] reactantStochiometry;
     int[][] productStochiometry;
 
-    double[] rates;
     double[] lnrates;
 
     double lndt;
@@ -136,11 +135,10 @@ public class SteppedStochasticGridCalc extends GridCalc {
         random = new MersenneTwister(getCalculationSeed());
 
         nreaction = rtab.getNReaction();
-        rates = rtab.getRates();
 
         // Debug.dump("rates", rates);
 
-        lnrates = ArrayUtil.log(rates, -999.);
+        lnrates = ArrayUtil.log(rtab.getRates(), -999.);
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
