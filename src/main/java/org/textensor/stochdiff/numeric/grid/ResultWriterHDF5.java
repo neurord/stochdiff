@@ -210,6 +210,19 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
+    public Dataset writeVector(String name, Group parent, double[] items)
+        throws Exception
+    {
+        long[] dims = {items.length};
+
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                double_t, dims, null, null,
+                                                0, items);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
+        return ds;
+    }
+
     protected void writeSpecies(int[] ispecout, IGridCalc source)
         throws Exception
     {
@@ -299,6 +312,14 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "TITLE", "product stochiometry");
             setAttribute(ds, "LAYOUT", "[nreact x nproducts*]");
             setAttribute(ds, "UNITS", "indexes");
+        }
+
+        {
+            double[] rates = table.getRates();
+            Dataset ds = this.writeVector("rates", group, rates);
+            setAttribute(ds, "TITLE", "reaction rates");
+            setAttribute(ds, "LAYOUT", "[nreact]");
+            setAttribute(ds, "UNITS", "transitions/ms");
         }
     }
 

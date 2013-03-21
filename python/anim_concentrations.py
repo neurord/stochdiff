@@ -125,6 +125,9 @@ def make_movie(save):
     print("running {}", command)
     subprocess.check_call(command)
 
+def _logclip(x, offset):
+    return numpy.clip(numpy.log(x + 1e-10) + offset, 0.3, 5)
+
 def _conn(dst, a, b, penwidth=None):
     w = ' [penwidth={}]'.format(penwidth) if penwidth is not None else ''
     print('\t"{}" -> "{}"{};'.format(a, b, w), file=dst)
@@ -138,7 +141,7 @@ def _connections(dst, connections, couplings):
         for j, coupl in zip(connections[i], couplings[i]):
             if j < 0:
                 break
-            coupl = min(max(numpy.log(coupl)+3, 0.3), 5)
+            coupl = _logclip(coupl, 3)
             _conn(dst, i, j, coupl)
     print('}', file=dst)
 
@@ -162,30 +165,31 @@ def reaction_name(num, model):
          for num in ([num] if single else num)]
     return l[0] if single else numpy.array(l)
 
-def _productions(dst, species, reactants, r_stochio, products, p_stochio):
+def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates):
     print('digraph Reactions {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=green,style=filled,fillcolor=lightgreen];', file=dst)
-    for rr, rr_s, pp, pp_s in zip(reactants, r_stochio,
-                                  products, p_stochio):
+    for rr, rr_s, pp, pp_s, rate in zip(reactants, r_stochio,
+                                        products, p_stochio, rates):
         name = _reaction_name(rr, rr_s, pp, pp_s, species)
         print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
         for j, s in zip(rr, rr_s):
             if j < 0:
                 break
-            _conn(dst, species[j], name)
+            _conn(dst, species[j], name, _logclip(rate, 10))
         for j, s in zip(pp, pp_s):
             if j < 0:
                 break
-            _conn(dst, name, species[j])
+            _conn(dst, name, species[j], _logclip(rate, 10))
         print()
     print('}', file=dst)
 
 def dot_productions(model):
     _productions(sys.stdout, model.species,
                  model.reactions.reactants, model.reactions.reactant_stochiometry,
-                 model.reactions.products, model.reactions.product_stochiometry)
+                 model.reactions.products, model.reactions.product_stochiometry,
+                 model.reactions.rates)
 
 if __name__ == '__main__':
     opts = parser.parse_args()
