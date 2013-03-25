@@ -470,8 +470,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         // reaction step;
         for (int iel = 0; iel < nel; iel++) {
-            double lnvol = lnvolumes[iel];
-
             // start and end quantities for each species in a single
             // volume
             int[] nstart = wkB[iel];
@@ -480,125 +478,130 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 nend[isp] = nstart[isp];
             } // XXX: is this necessary after ArrayUtil.copy above?
 
-            for (int ireac = 0; ireac < nreaction; ireac++) {
-                // total number of possible reactions is the number of
-                // particles in the smallest reactant population
-
-                int[] ri = reactantIndices[ireac];
-                int[] pi = productIndices[ireac];
-
-                int[] rs = reactantStochiometry[ireac];
-                int[] ps = productStochiometry[ireac];
-
-                double lnp = lnrates[ireac] + lndt;
-
-                int n = nstart[ri[0]];
-
-                if (ri[1] >= 0) {
-                    int nk = nstart[ri[1]];
-
-                    if (nk < n) {
-                        lnp += intlog(n);
-                        n = nk;
-                    } else {
-                        lnp += intlog(nk);
-                    }
-                    lnp -= lnvol;
-                    lnp -= LN_PARTICLES_PUVC;
-                }
-
-                if (lnp > -1.) {
-                    if (++nwarn < 5)
-                        log.warn("p too large at element {} reaction {}: capping {} to exp(-1)",
-                                 iel, ireac, Math.exp(lnp));
-                    lnp = -1.;
-                }
-
-                if (n > 0) {
-                    int ngo;
-                    if (n == 1)
-                        // TODO use table to get rid of exp
-                        ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-                    else if (n < StepGenerator.NMAX_STOCHASTIC)
-                        ngo = interpSG.nGo(n, lnp, random.random());
-                    else
-                        ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
-
-                    // update the new quantities in npn;
-                    int ri0 = ri[0];
-                    int ri1 = ri[1];
-                    int rs0 = rs[0];
-                    int rs1 = rs[1];
-
-                    int navail = nend[ri0] / rs[0];
-                    // AB changed navail > nend[ri1] / rs1 to navail < nend[ri1]
-                    // / rs1
-                    if (ri1 >= 0 && navail > nend[ri1] / rs1)
-                        navail = nend[ri1] / rs1;
-
-                    if (ngo > navail) {
-                        /* TODO as for diffusion, we've got more particles going
-                         * than there actually are. Should regenerate all
-                         * reactions on this element
-                         * or use a binomial to share them out
-                         * or use a smaller timestep.
-                         */
-                        if (++nwarn < 10)
-                            log.warn("reaction {} ran out of particles - need {} but have {}",
-                                     ireac, ngo, navail);
-                        ngo = navail;
-                    }
-
-                    // WK 9 25 2007: setting inc/decrements (i.e., ngo*xxx) to
-                    // zero explicitly
-                    // to avoid floating point error
-                    if (ngo == 0) {
-                        int pi0 = pi[0];
-                        int pi1 = pi[1];
-                        nend[ri0] -= 0;
-                        if (ri1 >= 0)
-                            nend[ri1] -= 0;
-                        nend[pi0] += 0;
-                        if (pi1 >= 0)
-                            nend[pi1] += 0;
-                    } else {
-                        // WK
-                        nend[ri0] -= ngo * rs0;
-
-                        if (ri1 >= 0) {
-                            nend[ri1] -= ngo * rs1;
-                        }
-                        // WK 3/16/2010
-                        if (nend[ri0] < 0) {
-                            System.out.println("nend[ri0] is NEGATIVE!");
-                        }
-                        if (ri1 >= 0 && nend[ri1] < 0) {
-                            System.out.println("nend[ri1] is NEGATIVE!");
-                        }
-                        // WK
-
-                        int pi0 = pi[0];
-                        int pi1 = pi[1];
-
-                        nend[pi0] += ngo * ps[0];
-                        if (pi1 >= 0)
-                            nend[pi1] += ngo * ps[1];
-                    }
-
-                    this.reactionEvents[iel][ireac] += ngo;
-
-                    // TODO this "if (ri[1] >= 0)" business is not great
-                    // it applies for the A+B->C case, where there is a
-                    // second reactant. We could probably do better by
-                    // unrolling the four cases into separate blocks according
-                    // to the reaction type
-                    // - a good case for code generation.
-                }
-            }
+            for (int ireac = 0; ireac < nreaction; ireac++)
+                reactionStep(nstart, nend, iel, ireac);
         }
 
         // now wkA contains the actual numbers again;
         return dt;
+    }
+
+    protected void reactionStep(int[] nstart, int[] nend, int iel, int ireac) {
+        // total number of possible reactions is the number of
+        // particles in the smallest reactant population
+
+        final double lnvol = lnvolumes[iel];
+
+        int[] ri = reactantIndices[ireac];
+        int[] pi = productIndices[ireac];
+
+        int[] rs = reactantStochiometry[ireac];
+        int[] ps = productStochiometry[ireac];
+
+        double lnp = lnrates[ireac] + lndt;
+
+        int n = nstart[ri[0]];
+
+        if (ri[1] >= 0) {
+            int nk = nstart[ri[1]];
+
+            if (nk < n) {
+                lnp += intlog(n);
+                n = nk;
+            } else {
+                lnp += intlog(nk);
+            }
+            lnp -= lnvol;
+            lnp -= LN_PARTICLES_PUVC;
+        }
+
+        if (lnp > -1.) {
+            if (++nwarn < 5)
+                log.warn("p too large at element {} reaction {}: capping {} to exp(-1)",
+                         iel, ireac, Math.exp(lnp));
+            lnp = -1.;
+        }
+
+        if (n > 0) {
+            int ngo;
+            if (n == 1)
+                // TODO use table to get rid of exp
+                ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
+            else if (n < StepGenerator.NMAX_STOCHASTIC)
+                ngo = interpSG.nGo(n, lnp, random.random());
+            else
+                ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
+
+            // update the new quantities in npn;
+            int ri0 = ri[0];
+            int ri1 = ri[1];
+            int rs0 = rs[0];
+            int rs1 = rs[1];
+
+            int navail = nend[ri0] / rs[0];
+            // AB changed navail > nend[ri1] / rs1 to navail < nend[ri1]
+            // / rs1
+            if (ri1 >= 0 && navail > nend[ri1] / rs1)
+                navail = nend[ri1] / rs1;
+
+            if (ngo > navail) {
+                /* TODO as for diffusion, we've got more particles going
+                 * than there actually are. Should regenerate all
+                 * reactions on this element
+                 * or use a binomial to share them out
+                 * or use a smaller timestep.
+                 */
+                if (++nwarn < 10)
+                    log.warn("reaction {} ran out of particles - need {} but have {}",
+                             ireac, ngo, navail);
+                ngo = navail;
+            }
+
+            // WK 9 25 2007: setting inc/decrements (i.e., ngo*xxx) to
+            // zero explicitly
+            // to avoid floating point error
+            if (ngo == 0) {
+                int pi0 = pi[0];
+                int pi1 = pi[1];
+                nend[ri0] -= 0;
+                if (ri1 >= 0)
+                    nend[ri1] -= 0;
+                nend[pi0] += 0;
+                if (pi1 >= 0)
+                    nend[pi1] += 0;
+            } else {
+                // WK
+                nend[ri0] -= ngo * rs0;
+
+                if (ri1 >= 0) {
+                    nend[ri1] -= ngo * rs1;
+                }
+                // WK 3/16/2010
+                if (nend[ri0] < 0) {
+                    System.out.println("nend[ri0] is NEGATIVE!");
+                }
+                if (ri1 >= 0 && nend[ri1] < 0) {
+                    System.out.println("nend[ri1] is NEGATIVE!");
+                }
+                // WK
+
+                int pi0 = pi[0];
+                int pi1 = pi[1];
+
+                nend[pi0] += ngo * ps[0];
+                if (pi1 >= 0)
+                    nend[pi1] += ngo * ps[1];
+            }
+
+            this.reactionEvents[iel][ireac] += ngo;
+
+            // TODO this "if (ri[1] >= 0)" business is not great
+            // it applies for the A+B->C case, where there is a
+            // second reactant. We could probably do better by
+            // unrolling the four cases into separate blocks according
+            // to the reaction type
+            // - a good case for code generation.
+        }
     }
 
     // WK 8 28 2007
