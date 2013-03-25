@@ -101,20 +101,16 @@ class DrawerSet(object):
         if not opts.save:
             f.show()
 
-        items = range(data.shape[0])
-        if opts.save:
-            self.range = items
-        else:
-            self.range = itertools.cycle(items)
+        self.items = range(data.shape[0])
 
-    def animate(self):
-        for i in self.range:
+    def animate(self, indexes):
+        for i in indexes:
             for drawer in self.drawers:
                 drawer.update(i)
             if not self.save:
                 self.figure.canvas.draw()
             else:
-                self.figure.savefig('{}-{:06d}.png'.format(self.save, i))
+                self.figure.savefig('{}-{:06}.png'.format(self.save, i))
                 print('.', end='')
                 sys.stdout.flush()
 
@@ -209,7 +205,8 @@ if __name__ == '__main__':
             matplotlib.use('Agg')
 
         ss = DrawerSet(opts.file.root.model, opts.file.root.simulation, opts)
-        ss.animate()
+        indexes = ss.items if opts.save else itertools.cycle(ss.items)
+        ss.animate(indexes)
 
         if opts.save:
             make_movie(opts.save)
