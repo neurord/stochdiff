@@ -128,11 +128,16 @@ def make_movie(save):
 def _logclip(x, offset):
     return numpy.clip(numpy.log(x + 1e-10) + offset, 0.3, 5)
 
-def _conn(dst, a, b, penwidth=None):
-    w = ' [penwidth={}]'.format(penwidth) if penwidth is not None else ''
-    print('\t"{}" -> "{}"{};'.format(a, b, w), file=dst)
+def dot_opts(**opts):
+    opts = ['{}={}'.format(k, v)
+            for k, v in opts.items() if v is not None]
+    return ' [{}]'.format(','.join(opts)) if opts else ''
 
-def _connections(dst, connections, couplings):
+def _conn(dst, a, b, penwidth=None, label=None):
+    opts = dot_opts(penwidth=penwidth, label=label)
+    print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
+
+def _connections(dst, regions, connections, couplings):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
@@ -142,11 +147,12 @@ def _connections(dst, connections, couplings):
             if j < 0:
                 break
             coupl = _logclip(coupl, 3)
-            _conn(dst, i, j, coupl)
+            _conn(dst, regions[i], regions[j], coupl)
     print('}', file=dst)
 
 def dot_connections(model):
-    _connections(sys.stdout, model.neighbors, model.couplings)
+    regions = model.regions[1:] # skip "default" in first position
+    _connections(sys.stdout, regions, model.neighbors, model.couplings)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
