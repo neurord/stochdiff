@@ -108,18 +108,6 @@ public class ReactionTable {
     }
 
 
-    public void setCatalyzedReactionData(int ireact, int na, int nb, int icat, int[][] aidx,
-                                         int[][] bidx, double rate) {
-        /*
-         * nreactant[ireact] = na; nproduct[ireact] = nb; for (int i = 0; i < na;
-         * i++) { reactantIndices[ireact][i] = aidx[i]; } for (int i = 0; i < nb;
-         * i++) { productIndices[ireact][i] = bidx[i]; } rates[ireact] = rate;
-         */
-        E.missing();
-    }
-
-
-
     public void setSpeciesIDs(String[] sa) {
         speciesIDs = sa;
     }

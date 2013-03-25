@@ -21,8 +21,6 @@ public class Reaction implements AddableTo {
     private ArrayList<Reactant> p_reactants;
     private ArrayList<Product> p_products;
 
-    public Catalyst catalyst;
-
     public double forwardRate;
     public double reverseRate;
 
@@ -32,8 +30,6 @@ public class Reaction implements AddableTo {
 
     private ArrayList<Specie> r_reactants;
     private ArrayList<Specie> r_products;
-    private Specie r_catalyst;
-
 
     public void add(Object obj) {
         if (obj instanceof Reactant) {
@@ -46,9 +42,6 @@ public class Reaction implements AddableTo {
                 p_products = new ArrayList<Product>();
             }
             p_products.add((Product)obj);
-
-        } else if (obj instanceof Catalyst) {
-            catalyst = (Catalyst)obj;
 
         } else {
             E.error("cannot add " + obj);
@@ -73,9 +66,6 @@ public class Reaction implements AddableTo {
             r_products = parseRefs(p_products, sphm);
         } else {
             E.error("no reactants? ");
-        }
-        if (catalyst != null) {
-            r_catalyst = sphm.get(catalyst.getSpecieID());
         }
     }
 
@@ -131,16 +121,6 @@ public class Reaction implements AddableTo {
         }
         return ret;
     }
-
-
-    public void writeCatalyzedToTable(ReactionTable rtab, int ir) {
-        int nr = r_reactants.size();
-        int np= r_products.size();
-        int icat = r_catalyst.getIndex();
-        rtab.setCatalyzedReactionData(ir, nr, np, icat,
-                                      getIndices(r_reactants, p_reactants),  getIndices(r_products, p_products), michaelisConstant);
-    }
-
 
 
     public void writeForwardToTable(ReactionTable rtab, int ir) {
