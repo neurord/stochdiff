@@ -24,7 +24,7 @@ parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 
 class Drawer(object):
-    def __init__(self, f, ax, species, times, data, title=''):
+    def __init__(self, f, ax, xlabel, names, times, data, title=''):
         from matplotlib.colors import LogNorm
 
         N = numpy.arange(species.shape[0])
@@ -34,7 +34,7 @@ class Drawer(object):
         self.title = title
         self.ax = ax
 
-        ax.set_xlabel("species")
+        ax.set_xlabel(xlabel)
         ax.xaxis.set_ticks(N + 0.5)
         ax.xaxis.set_ticklabels(species, rotation=70)
         ax.set_ylabel("voxel#")
@@ -74,27 +74,27 @@ class DrawerSet(object):
         if opts.particles:
             ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.concentrations[:]
-            self.drawers += [Drawer(f, ax, species, times, data,
+            self.drawers += [Drawer(f, ax, 'species', species, times, data,
                                     title='Particle numbers')]
             pos += 1
         if opts.stimulation:
             ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.stimulation_events[:]
-            self.drawers += [Drawer(f, ax, species, times, data,
+            self.drawers += [Drawer(f, ax, 'species', species, times, data,
                                     title='Stimulation events')]
             pos += 1
         if opts.diffusion:
             ax = f.add_subplot(shape[0], shape[1], pos)
             # reduce dimensionality by summing over all neighbours
             data = sim.diffusion_events[:].sum(axis=-1)
-            self.drawers += [Drawer(f, ax, species, times, data,
+            self.drawers += [Drawer(f, ax, 'species', species, times, data,
                                     title='Diffusion events')]
             pos += 1
         if opts.reaction:
             ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.reaction_events[:]
             names = reaction_name(range(data.shape[2]), model)
-            self.drawers += [Drawer(f, ax, names, times, data,
+            self.drawers += [Drawer(f, ax, 'reactions', names, times, data,
                                     title='Reaction events')]
 
         f.tight_layout()
