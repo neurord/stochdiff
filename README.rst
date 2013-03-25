@@ -22,18 +22,20 @@ Times are expressed in milliseconds and distances in microns. Concentrations are
 
 Reactions Scheme File
 ---------------------
-The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The format is
-         <Specie name=”name” id=”id” kdiff=”constant” kdiffunit=mu2/s” />
+
+The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The format is::
+
+     <Specie name=”name” id=”id” kdiff=”constant” kdiffunit=mu2/s” />
 
 Two examples follow:
 
-1.  example for diffusing molecule specification:
+1.  example for diffusing molecule specification::
 
-         <Specie name="IP3"    id="IP3"    kdiff="100"   kdiffunit = "mu2/s"/>
+     <Specie name="IP3"    id="IP3"    kdiff="100"   kdiffunit = "mu2/s"/>
 
-2.  examples for non-diffusing molecule specification:
+2.  examples for non-diffusing molecule specification::
 
-         <Specie name="PIP2"   id="PIP2"   kdiff="0"     kdiffunit = "mu2/s"/>
+     <Specie name="PIP2"   id="PIP2"   kdiff="0"     kdiffunit = "mu2/s"/>
 
 The second part of the reaction file is a listing of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. If there is more than one reactant, a statement is provided for each one. If there is more than one product, a statement is provided for each one. The format is::
 
@@ -68,6 +70,7 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
 
 Stochiometry
 ~~~~~~~~~~~~
+
 It is possible to specify a “psuedo” 2nd order reaction, in which two molecules bind with 1st order kinectics.  E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
    <Reactant specieID="cAMP" n="2"/>
@@ -111,6 +114,7 @@ Branching segments are allowed.  Branches are made by creating two segments begi
 
 Spines
 ~~~~~~
+
 The SpineType and SpineAllocation statements allow a spine profile to be defined once and then applied to the surface of a structure.  This allows for random placement of spine templates according to a specified density in a constrained region/segment of the defined morphology. Multiple spine types can be defined, e.g. to randomly distributed long, thin spines among short, stubby spines.
 
 The SpineType statement assigns an id to a spine type. It is followed by several Section statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an at variable indicating the distance from the dendrite at which that radius begins to apply, an optional regionClass designation, and an optional label. An example follows::
@@ -133,6 +137,7 @@ See purkmorph.xml, purkmoprhsml.xml and purkmorph2.xml for 1 and 2 compartment m
 
 Initial conditions File
 -----------------------
+
 The initial conditions file specifies the initial  concentrations or densities of molecules. The file must contain one general concentration set, which applies to everything unless overridden. Each statement names the species and provides a value for its concentration, entered in nanoMoles per litre. An example follows::
 
      <ConcentrationSet>
@@ -174,13 +179,14 @@ Since particles can only be injected, and not withdrawn, to produce transient el
 
 Injection to spines is also possible by specifying which spine as follows::
 
-     <InjectionStim specieID="a" injectionSite="sa1[3,4,5].pointA">
-          <onset>5.0</onset>
-          <duration>10.0</duration>
-          <rate>200</rate>
-     </InjectionStim>
+    <InjectionStim specieID="a" injectionSite="sa1[3,4,5].pointA">
+         <onset>5.0</onset>
+         <duration>10.0</duration>
+         <rate>200</rate>
+    </InjectionStim>
 
 The square brackets can contain:
+
   * a number i - matches just the specified point in the i'th spine
   * a comma-separated list of numbers - matches the points on those spines
   * a range specified with a colon, such as [1:4]. If the lower or upper limit is missing it is taken to be 0 or the population size respectively.
