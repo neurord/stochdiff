@@ -14,7 +14,7 @@ import numpy
 import tables
 
 parser = argparse.ArgumentParser()
-parser.add_argument('file', type=tables.openFile)
+parser.add_argument('file')
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
@@ -114,6 +114,39 @@ class DrawerSet(object):
                 print('.', end='')
                 sys.stdout.flush()
 
+def animate_drawing(opts):
+    file = tables.openFile(opts.file)
+    ss = DrawerSet(file.root.model, file.root.simulation, opts)
+    indexes = itertools.cycle(ss.items)
+    ss.animate(indexes)
+
+def save_drawings(opts, suboffset=None, subtotal=1):
+    import matplotlib
+    if opts.save:
+        matplotlib.use('Agg')
+
+    file = tables.openFile(opts.file)
+    ss = DrawerSet(file.root.model, file.root.simulation, opts)
+    if opts.save:
+        if suboffset is None:
+            indexes = ss.items
+        else:
+            indexes = ss.items[suboffset::subtotal]
+    else:
+        indexes = itertools.cycle(ss.items)
+    ss.animate(indexes)
+
+def _save_drawings(args):
+    save_drawings(*args)
+
+def save_drawings_multi(opts):
+    import multiprocessing as mp
+
+    n = mp.cpu_count()
+    pool = mp.Pool(processes=n)
+    args = [(opts, i, n) for i in range(n)]
+    pool.map(_save_drawings, args)
+
 def make_movie(save):
     command = '''mencoder -mf type=png:w=800:h=600:fps=25
                  -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o'''.split()
@@ -146,7 +179,9 @@ def _connections(dst, regions, connections, couplings):
             _conn(dst, regions[i], regions[j], coupl)
     print('}', file=dst)
 
-def dot_connections(model):
+def dot_connections(filename):
+    file = tables.openFile(filename)
+    model = file.root.model
     regions = model.regions[1:] # skip "default" in first position
     _connections(sys.stdout, regions, model.neighbors, model.couplings)
 
@@ -187,7 +222,9 @@ def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates)
         print()
     print('}', file=dst)
 
-def dot_productions(model):
+def dot_productions(filename):
+    file = tables.openFile(filename)
+    model = file.root.model
     _productions(sys.stdout, model.species,
                  model.reactions.reactants, model.reactions.reactant_stochiometry,
                  model.reactions.products, model.reactions.product_stochiometry,
@@ -196,19 +233,14 @@ def dot_productions(model):
 if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
-        dot_connections(opts.file.root.model)
+        dot_connections(opts.file)
     elif opts.reactions:
-        dot_productions(opts.file.root.model)
+        dot_productions(opts.file)
     else:
-        import matplotlib
-        if opts.save:
-            matplotlib.use('Agg')
-
-        ss = DrawerSet(opts.file.root.model, opts.file.root.simulation, opts)
-        indexes = ss.items if opts.save else itertools.cycle(ss.items)
-        ss.animate(indexes)
-
-        if opts.save:
+        if not opts.save:
+            animate_drawing(opts)
+        else:
+            save_drawings_multi(opts)
             make_movie(opts.save)
             for fname in glob.glob('{}-*.png'.format(opts.save)):
                 os.unlink(fname)
