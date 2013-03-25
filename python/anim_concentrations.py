@@ -13,6 +13,15 @@ import subprocess
 import numpy
 import tables
 
+def parse_geometry(g):
+    x,s,y = g.partition('x')
+    x = float(x)
+    if y:
+        y = float(y)
+    else:
+        y = x * 3/4
+    return (x, y)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('file')
 parser.add_argument('--save')
@@ -22,12 +31,14 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
+parser.add_argument('--geometry', type=parse_geometry, default=(12, 9))
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
         from matplotlib.colors import LogNorm
 
-        N = numpy.arange(species.shape[0])
+        n = names.shape[0]
+        N = numpy.arange(n)
         V = numpy.arange(data.shape[0])
         self.data = data
         self.times = times
@@ -36,7 +47,8 @@ class Drawer(object):
 
         ax.set_xlabel(xlabel)
         ax.xaxis.set_ticks(N + 0.5)
-        ax.xaxis.set_ticklabels(species, rotation=70)
+        size = 9 if n < 10 else 8 if n < 20 else 7
+        ax.xaxis.set_ticklabels(names, rotation=70, size=size)
         ax.set_ylabel("voxel#")
         # matplotlib gets confused if we draw all zeros
         initial = data.sum(axis=(1,2)).argmax()
@@ -61,8 +73,7 @@ class DrawerSet(object):
 
         self.save = opts.save
 
-        self.figure = f = pyplot.figure(figsize=(12, 9))
-        f.clear()
+        self.figure = f = pyplot.figure(figsize=opts.geometry)
 
         self.drawers = []
         species = model.species
