@@ -31,15 +31,24 @@ The reaction file has two parts. The first part is a listing of all molecule spe
 
 Two examples follow:
 
-1.  example for diffusing molecule specification::
+1.  example for diffusing molecule specification:
+
+.. code-block:: xml
 
      <Specie name="IP3"    id="IP3"    kdiff="100"   kdiffunit = "mu2/s"/>
 
-2.  examples for non-diffusing molecule specification::
+2.  examples for non-diffusing molecule specification:
+
+.. code-block:: xml
 
      <Specie name="PIP2"   id="PIP2"   kdiff="0"     kdiffunit = "mu2/s"/>
 
-The second part of the reaction file is a listing of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. If there is more than one reactant, a statement is provided for each one. If there is more than one product, a statement is provided for each one. The format is::
+Reactions
+~~~~~~~~~
+
+The second part of the reaction file is a listing of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. If there is more than one reactant, a statement is provided for each one. If there is more than one product, a statement is provided for each one. The format is:
+
+.. code-block:: xml
 
     <Reaction name=”name” id=”id”>
         <Reactant specieID=”id”/>
@@ -49,7 +58,9 @@ The second part of the reaction file is a listing of all reactions. There are se
         <Q10> value </Q10>
     </Reaction>
 
-Enzyme reactions are specified as two bimolecular reactions, with the enzyme regenerated in the second step. An example of an enzyme reaction follows::
+Enzyme reactions are specified as two bimolecular reactions, with the enzyme regenerated in the second step. An example of an enzyme reaction follows:
+
+.. code-block:: xml
 
     <Reaction name = "PLCaG+PIP2--PLCPIP2 reac" id="PLCaG+PIP2--PLCPIP2_id">
         <Reactant specieID="PLCaG"                         />
@@ -75,6 +86,8 @@ Stochiometry
 
 It is possible to specify a “psuedo” 2nd order reaction, in which two molecules bind with 1st order kinectics.  E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
+.. code-block:: xml
+
    <Reactant specieID="cAMP" n="2"/>
 
 which uses the optional "n=2" attribute to specify that two cAMP molecules participate in the reaction (it defaults to 1 if not set). In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
@@ -82,28 +95,35 @@ which uses the optional "n=2" attribute to specify that two cAMP molecules parti
 See Purkreactions.xml (no diffusion), and PurkreactionsDif.xml (with diffusion) for more examples.
 
 .. note::
- Having a non-zero diffusion constant in a model with a single compartment/ single voxel will fail.
+
+   Having a non-zero diffusion constant in a model with a single compartment/ single voxel will fail.
 
 Morphology File
 ---------------
 
 The morphology file specifies the morphology of the segments (which may be subdivided into smaller subvolumes for simulation). There are three program statements for each segment. In the first, each segment is given a unique identifier and may be give a region name, which does not have to be unique. Regions are used to group segments with the same initial conditions. The other two statements define the beginning coordinates, ending coordinates,  radius, and an optional label. The label can be used as a site at which molecules are injected into the system, but labels cannot be used with "start on" specifications.
 
-In general, segments are specified with a starting x,y,z and radius, and an ending x,y,z and radius::
+In general, segments are specified with a starting x,y,z and radius, and an ending x,y,z and radius:
+
+.. code-block:: xml
 
      <Segment  id="seg1" region="dendrite">
          <start x="1.0"     y="1.0"   z="0.0"  r="0.75"  label="pointA"  />
          <end   x="1.0"     y="3.0"   z="0.0"  r="0.75"  />
      </Segment>
 
-If a second segment is to be connected to the first it should start relative to the first compartment::
+If a second segment is to be connected to the first it should start relative to the first compartment:
+
+.. code-block:: xml
 
      <Segment  id="seg2" region="soma">
          <start on="seg1"  at="end"/>
          <end   x="1.0"   y="4.0" z="0.0" r="1.5"/>
      </Segment>
 
-When two segments are connected, they need not have the same radius at the point of connection. In this case, a radius value must be specified when defining a new segment, as in the following example::
+When two segments are connected, they need not have the same radius at the point of connection. In this case, a radius value must be specified when defining a new segment, as in the following example:
+
+.. code-block:: xml
 
      <Segment id="seg2" region="branch1">
          <start on="seg1" at="end" r="0.3" />
@@ -119,7 +139,9 @@ Spines
 
 The SpineType and SpineAllocation statements allow a spine profile to be defined once and then applied to the surface of a structure.  This allows for random placement of spine templates according to a specified density in a constrained region/segment of the defined morphology. Multiple spine types can be defined, e.g. to randomly distributed long, thin spines among short, stubby spines.
 
-The SpineType statement assigns an id to a spine type. It is followed by several Section statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an at variable indicating the distance from the dendrite at which that radius begins to apply, an optional regionClass designation, and an optional label. An example follows::
+The SpineType statement assigns an id to a spine type. It is followed by several Section statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an at variable indicating the distance from the dendrite at which that radius begins to apply, an optional regionClass designation, and an optional label. An example follows:
+
+.. code-block:: xml
 
     <SpineType id="spineA">
         <Section width="0.2" at="0.0" />
@@ -129,7 +151,9 @@ The SpineType statement assigns an id to a spine type. It is followed by several
         <Section width="0.1" at="1.3" label="pointA" />
     </SpineType>
 
-The SpineAllocation statement assigns an id, specifies a spine type, specifies the region to which spines will be added, and the density of spines in that region. The LengthDensity is the average number of spines per micron of dendrite length. Alternatively you can specify areaDensity, which is the number per unit area. An example follows::
+The SpineAllocation statement assigns an id, specifies a spine type, specifies the region to which spines will be added, and the density of spines in that region. The LengthDensity is the average number of spines per micron of dendrite length. Alternatively you can specify areaDensity, which is the number per unit area. An example follows:
+
+.. code-block:: xml
 
     <SpineAllocation id="sa1" spineType="spineA" region="region1" lengthDensity="1.1" />
 
@@ -140,7 +164,9 @@ See purkmorph.xml, purkmoprhsml.xml and purkmorph2.xml for 1 and 2 compartment m
 Initial conditions File
 -----------------------
 
-The initial conditions file specifies the initial  concentrations or densities of molecules. The file must contain one general concentration set, which applies to everything unless overridden. Each statement names the species and provides a value for its concentration, entered in nanoMoles per litre. An example follows::
+The initial conditions file specifies the initial  concentrations or densities of molecules. The file must contain one general concentration set, which applies to everything unless overridden. Each statement names the species and provides a value for its concentration, entered in nanoMoles per litre. An example follows:
+
+.. code-block:: xml
 
      <ConcentrationSet>
          <NanoMolarity specieID="glu"     value="0"  />
@@ -149,7 +175,9 @@ The initial conditions file specifies the initial  concentrations or densities 
 
 In addition, further sets can be defined with a "region" attributed added after the "ConcentrationSet" . This should correspond to a specified region from the morphology file and indicates the parts of the structure to which the conditions apply. This only makes sense for non-diffusing molecules.
 
-For membrane localized molecules, it is possible to specify initial conditions as a density (picomoles per square meter) which places these molecules only in the submembrane voxels of the morphology.  The value attribute for a PicoSD element is the number of picomoles per square metre. For comparison with the volume concentrations, a surface density of 1 picomole/m^2, if spread over a layer 1 micron deep, gives a 1 nanoMolar solution. To average one particle per square micron, you need a PicoSD value of about 1.6.  If a region is specified, then that initial condition applies only to that region.  If no region is specified, then the initial condition applies to all submembrane voxels.  The following example includes the optional ``region="dendrite"`` to show its use::
+For membrane localized molecules, it is possible to specify initial conditions as a density (picomoles per square meter) which places these molecules only in the submembrane voxels of the morphology.  The value attribute for a PicoSD element is the number of picomoles per square metre. For comparison with the volume concentrations, a surface density of 1 picomole/m^2, if spread over a layer 1 micron deep, gives a 1 nanoMolar solution. To average one particle per square micron, you need a PicoSD value of about 1.6.  If a region is specified, then that initial condition applies only to that region.  If no region is specified, then the initial condition applies to all submembrane voxels.  The following example includes the optional ``region="dendrite"`` to show its use:
+
+.. code-block:: xml
 
      <SurfaceDensitySet region="dendrite">
           <PicoSD  specieID="GaGTP"  value="003.729"    />
@@ -163,7 +191,9 @@ Stimulation File
 
 The stimulation file specifies the time and location of injection of molecules (which is optional) during a simulation. For example, calcium influx from extracellular space might occur or glutamate might be released from a neighboring terminal. Each program statement must specify the molecule injected and its site of injection. The injectionSite needs to be a labeld point, either a spine (below) or labeled segment.  The injection into a segment occurs in the middle mesh element of the labeled end of the segment.  Additional required statements provide onset (in msec), duration (in msec) and rate (particles/msec). Optional statements can be used to specify a train of input by providing two more parameters: period, and end.
 
-Multiple trains are possible with two more parameters: intertrain interval and number of trains::
+Multiple trains are possible with two more parameters — intertrain interval and number of trains:
+
+.. code-block:: xml
 
      <InjectionStim specieID="glu"  injectionSite="pointA">
          <onset>              100             </onset>
@@ -179,7 +209,9 @@ Note that the intertrain interval specifies the interval between repetition of t
 
 Since particles can only be injected, and not withdrawn, to produce transient elevations in concentration it may be necessary to inject a "binding partner" and add a reaction between the injected particle and the binding partner to lower the concentration of the unbound injected molecule.
 
-Injection to spines is also possible by specifying which spine as follows::
+Injection to spines is also possible by specifying which spine as follows:
+
+.. code-block:: xml
 
     <InjectionStim specieID="a" injectionSite="sa1[3,4,5].pointA">
          <onset>5.0</onset>
@@ -189,17 +221,20 @@ Injection to spines is also possible by specifying which spine as follows::
 
 The square brackets can contain:
 
-  * a number i - matches just the specified point in the i'th spine
-  * a comma-separated list of numbers - matches the points on those spines
-  * a range specified with a colon, such as [1:4]. If the lower or upper limit is missing it is taken to be 0 or the population size respectively.
-  * an asterisk, [*] to match the whole population.
+* a number `i` - matches just the specified point in the i-th spine
+* a comma-separated list of numbers - matches the points on those spines
+* a range specified with a colon, such as [1:4]. If the lower or upper limit is missing it is taken to be 0 or the population size respectively.
+* an asterisk, [*] to match the whole population.
 
-.. note:: Injecting into a non-existent spine will fail.
+.. note::
+
+    Injecting into a non-existent spine will fail.
 
 See Purksmlstim.xml, Purkstim.xml, and Purkdifstim.xml for examples
 
 Output scheme File
 ------------------
+
 The output file specifies the file to which output is written and which molecules from which compartments are output at which dt.  Multiple output blocks are allowed, for example if you want some molecules output more frequently than others, or from different regions.
 
 Every OutputSet block must have in its definition one (and only) instance of:
@@ -208,7 +243,9 @@ Where filename is a string that specifies a sufix appended to the main output fi
 Additionally, every OutputSet block might have one (and only) instance of:
 *     region or;
 *     dt
-A separate statement in each outputset block is used to indicate molecules to be included in the output file. For example::
+A separate statement in each outputset block is used to indicate molecules to be included in the output file. For example:
+
+.. code-block:: xml
 
      <OutputSet filename = "dt01sml"  region="dendrite" dt="1.0">
          <OutputSpecie                 name="glu"  />
@@ -224,7 +261,7 @@ The Model file is the “master file”, and serves to identify the files for ot
 
 **The first part of this files specifies the other files**
 
-::
+.. code-block:: xml
 
      <reactionSchemeFile> Purkreactions      </reactionSchemeFile>
      <morphologyFile>     Purkmorph2         </morphologyFile>
@@ -236,21 +273,29 @@ The reactions, morphology, and initial conditions represent the model.  The stim
 
 **The remainder of the file specifies various run parameters**
 
-A geometry statement is used to specify how the morphology is interpreted. 2D implies that there are mutliple voxels in x and y directions, but only a single layer of voxels in the z dimension.  Thus, there is a 3 dimensional volume, but diffusion occurs in 2 dimensions only.  For 2D, you also specify the depth of the voxel.  This parameter is ignored for 3D::
+A geometry statement is used to specify how the morphology is interpreted. 2D implies that there are mutliple voxels in x and y directions, but only a single layer of voxels in the z dimension.  Thus, there is a 3 dimensional volume, but diffusion occurs in 2 dimensions only.  For 2D, you also specify the depth of the voxel.  This parameter is ignored for 3D:
+
+.. code-block:: xml
 
     <geometry>2D</geometry>
     <depth2D>0.5</depth2D>
 
-A runtime statement is used to specify run time in milliseconds::
+A runtime statement is used to specify run time in milliseconds:
+
+.. code-block:: xml
 
     <runtime>                    2000                 </runtime>
 
-A required simulationSeed statement specifies the seed for the random number generator. If spines are placed randomly, a separate random number generator is used, and a spineSeed statement must be added::
+A required simulationSeed statement specifies the seed for the random number generator. If spines are placed randomly, a separate random number generator is used, and a spineSeed statement must be added:
+
+.. code-block:: xml
 
     <spineSeed>123</spineSeed>
     <simulationSeed>123</simulationSeed>
 
-The discretization statement indicates how to subdivide the segments, i.e. the size of voxels or subvolumes used in running simulations. Smaller sizes require more calculations and result in a longer run time. Three different statements can be used within a discretization statement. The defaultMaxElementSide specifies the largest size (in microns) for each side of the subvolume in each segment. This is the default, and can be overriden by the "MaxElementSide region" statement, which specifies a region and the size of its voxels. The value supplied will be used only for that region. The spineDeltaX statement specifies the size of subvolumes in spines. Spines have a one dimensional discretization. An example follows::
+The discretization statement indicates how to subdivide the segments, i.e. the size of voxels or subvolumes used in running simulations. Smaller sizes require more calculations and result in a longer run time. Three different statements can be used within a discretization statement. The defaultMaxElementSide specifies the largest size (in microns) for each side of the subvolume in each segment. This is the default, and can be overriden by the "MaxElementSide region" statement, which specifies a region and the size of its voxels. The value supplied will be used only for that region. The spineDeltaX statement specifies the size of subvolumes in spines. Spines have a one dimensional discretization. An example follows:
+
+.. code-block:: xml
 
     <discretization>
         <!-- discretization for spines, microns -->
@@ -263,19 +308,28 @@ The discretization statement indicates how to subdivide the segments, i.e. the s
 
 The actual size of the elements depends on the total radius or length of the compartment, and also the constraint that there are an odd number of voxels across the radius of the structure. The maxelementsize is approximately the maximum that you will achieve.  I.e., with a MaxElemetSide of 0.4, you may generate subvolumes of size 0.33, depending on the size of the compartment. It calculates the length of compartment, divided by MaxElementSide.  Then, it determines the number of subvolumes along the length by rounding the results.  Then, it divides length by number of compartments to yield the actual element size.  Thus, you can end up with a value slightly larger than max element size.
 
-.. warning:: If maxelementsize is large enough to create only a single voxel in the height dimension (single submembrane voxel and no cytosolic voxels) then the initial condition specification "surfaceDensitySet" will give half the total number of molecules compared to smaller maxelementsize producing two submembrane voxels with 1 or more cytosolic voxels.
+.. warning::
 
-The timestep statement specifies the time step, in milliseconds, used in fixed step calculations::
+    If maxelementsize is large enough to create only a single voxel in the height dimension
+    (single submembrane voxel and no cytosolic voxels) then the initial condition specification
+    "surfaceDensitySet" will give half the total number of molecules compared to smaller
+    maxelementsize producing two submembrane voxels with 1 or more cytosolic voxels.
+
+The timestep statement specifies the time step, in milliseconds, used in fixed step calculations:
+
+.. code-block:: xml
 
     <fixedStepDt>  0.01     </fixedStepDt>
 
-The outputQuantity statement specifies whether quantity of molecules in the output is number of molecules (NUMBER) or concentration (CONCENTRATION)::
+The outputQuantity statement specifies whether quantity of molecules in the output is number of molecules (NUMBER) or concentration (CONCENTRATION):
+
+.. code-block:: xml
 
     <outputQuantity>NUMBER</outputQuantity>
 
 The outputInterval statement specifies the frequency (time interval) for writing out the complete state of the system.  This file can be read by ccviz.
 
-::
+.. code-block:: xml
 
    <outputInterval>1</outputInterval>
 
@@ -288,7 +342,9 @@ If you run Purkmodel.xml, the output should match the XPPAUT output from filenam
 Running a Simulation
 --------------------
 
-To run a simulation from the command line the following command should be issued::
+To run a simulation from the command line the following command should be issued:
+
+.. code-block:: bash
 
    java - jar NeuroRD.jar model.xml model.out >> model.log
 
