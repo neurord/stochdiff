@@ -23,7 +23,9 @@ Times are expressed in milliseconds and distances in microns. Concentrations are
 Reactions Scheme File
 ---------------------
 
-The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The format is::
+The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The format is:
+
+.. code-block:: xml
 
      <Specie name=”name” id=”id” kdiff=”constant” kdiffunit=mu2/s” />
 
