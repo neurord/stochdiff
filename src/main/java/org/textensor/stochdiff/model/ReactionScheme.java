@@ -12,12 +12,10 @@ import org.textensor.util.inst;
 
 public class ReactionScheme implements AddableTo {
 
-    private ArrayList<Specie> species = inst.newArrayList();
-    private HashMap<String, Specie> specieHM = inst.newHashMap();
+    private final ArrayList<Specie> species = inst.newArrayList();
+    private final HashMap<String, Specie> specieHM = inst.newHashMap();
 
-    private ArrayList<Reaction> reactions = inst.newArrayList();
-
-    private Specie[] specieArray;  // fixed in the order used for calculations;
+    private final ArrayList<Reaction> reactions = inst.newArrayList();
 
     static <T,V> void hmPut(HashMap<T, V> hm, T key, V value) {
         V old = hm.put(key, value);
@@ -66,13 +64,12 @@ public class ReactionScheme implements AddableTo {
         int nspecie = species.size();
         ReactionTable rtab = new ReactionTable(2 * nreaction, nspecie);
 
-
         int ir = 0;
         for (Reaction r :  reactions) {
-            r.writeForwardToTable(rtab, ir);
-            ir++;
-            r.writeReverseToTable(rtab, ir);
-            ir++;
+            int[][] reactants = r.getReactantIndices();
+            int[][] products = r.getProductIndices();
+            rtab.setReactionData(ir++, reactants, products, r.forwardRate);
+            rtab.setReactionData(ir++, products, reactants, r.reverseRate);
         }
 
         rtab.setSpeciesIDs(getSpeciesIDs());

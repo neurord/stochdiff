@@ -15,13 +15,11 @@ public class Reaction implements AddableTo {
     public String name;
     public String id;
 
-    private ArrayList<Reactant> p_reactants = inst.newArrayList();
-    private ArrayList<Product> p_products = inst.newArrayList();
+    private final ArrayList<Reactant> p_reactants = inst.newArrayList();
+    private final ArrayList<Product> p_products = inst.newArrayList();
 
     public double forwardRate;
     public double reverseRate;
-
-    public double michaelisConstant;
 
     public double Q10;
 
@@ -58,8 +56,14 @@ public class Reaction implements AddableTo {
         return ret;
     }
 
-    private int[][] getIndices(ArrayList<Specie> spa,
-                               ArrayList<? extends SpecieRef> refs) {
+    /**
+     * Returns an array [2 x nspecies] containing species and
+     * their counts (n) in reaction. This is the "fake" multiplicity,
+     * which does not influence propensity, only the number of molecules
+     * destroyed or produced in the reaction.
+     */
+    private static int[][] getIndices(ArrayList<Specie> spa,
+                                      ArrayList<? extends SpecieRef> refs) {
         int n = spa.size();
         int[][] ret = new int[2][n];
 
@@ -72,18 +76,23 @@ public class Reaction implements AddableTo {
         return ret;
     }
 
-
-    public void writeForwardToTable(ReactionTable rtab, int ir) {
-        rtab.setReactionData(ir, getIndices(r_reactants, p_reactants),
-                             getIndices(r_products, p_products), forwardRate);
+    /**
+     * Returns an array [2 x nspecies] containing reactants and
+     * their counts (n) in reaction. This is the "fake" multiplicity,
+     * which does not influence propensity, only the number of molecules
+     * destroyed or produced in the reaction.
+     */
+    public int[][] getReactantIndices() {
+        return getIndices(this.r_reactants, this.p_reactants);
     }
 
-
-    public void writeReverseToTable(ReactionTable rtab, int ir) {
-        rtab.setReactionData(ir, getIndices(r_products, p_products),
-                             getIndices(r_reactants, p_reactants), reverseRate);
-
+    /**
+     * Returns an array [2 x nspecies] containing products and
+     * their counts (n) in reaction. This is the "fake" multiplicity,
+     * which does not influence propensity, only the number of molecules
+     * destroyed or produced in the reaction.
+     */
+    public int[][] getProductIndices() {
+        return getIndices(this.r_products, this.p_products);
     }
-
-
 }
