@@ -7,63 +7,43 @@ import java.util.HashMap;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
+import org.textensor.util.inst;
 
 
 public class ReactionScheme implements AddableTo {
 
-    public ArrayList<Specie> species;
-    HashMap<String, Specie> specieHM;
+    private ArrayList<Specie> species = inst.newArrayList();
+    private HashMap<String, Specie> specieHM = inst.newHashMap();
 
-    public ArrayList<Reaction> reactions;
-    HashMap<String, Reaction> reactionHM;
+    private ArrayList<Reaction> reactions = inst.newArrayList();
 
     private Specie[] specieArray;  // fixed in the order used for calculations;
 
-    public ReactionScheme() {
-        species = new ArrayList<Specie>();
-        reactions = new ArrayList<Reaction>();
+    static <T,V> void hmPut(HashMap<T, V> hm, T key, V value) {
+        V old = hm.put(key, value);
+        if (old != null)
+            throw new RuntimeException("overwriting key " + key + " with new value");
     }
-
 
     public void add(Object obj) {
         if (obj instanceof Specie) {
-            species.add((Specie)obj);
+            Specie sp = (Specie) obj;
+            sp.setIndex(this.species.size());
+            this.species.add(sp);
+            hmPut(this.specieHM, sp.getID(), sp);
         } else if (obj instanceof Reaction) {
             reactions.add((Reaction)obj);
         } else {
-            E.error("cannot add " + obj + " to reaction scheme ");
+            throw new RuntimeException("cannot add " + obj + " to reaction scheme ");
         }
     }
-
 
     public void resolve() {
-        for (Reaction r : reactions) {
-            r.resolve(getSpecieHM());
-        }
+        for (Reaction r : reactions)
+            r.resolve(this.specieHM);
     }
 
-
-    public ArrayList<Specie> getSpecieList() {
-        return species;
-    }
-
-    public ArrayList<Reaction> getReactionList() {
-        return reactions;
-    }
-
-
-    public HashMap<String, Specie> getSpecieHM() {
-        if (specieHM == null) {
-            specieHM = new HashMap<String, Specie>();
-            for (Specie sp : species) {
-                specieHM.put(sp.getID(), sp);
-            }
-        }
-        return specieHM;
-    }
-
-
-    public String[] getSpeciesIDList() {
+    protected String[] getSpeciesIDs() {
         String[] ret = new String[species.size()];
         int ict = 0;
         for (Specie sp : species) {
@@ -72,8 +52,7 @@ public class ReactionScheme implements AddableTo {
         return ret;
     }
 
-
-    public double[] getDiffusionConstants() {
+    protected double[] getDiffusionConstants() {
         double[] ret = new double[species.size()];
         int ict = 0;
         for (Specie sp : species) {
@@ -82,24 +61,7 @@ public class ReactionScheme implements AddableTo {
         return ret;
     }
 
-
-    public void indexSpecies() {
-        // TODO - can optimize the order here;
-        specieArray = new Specie[species.size()];
-        int ict = 0;
-        for (Specie sp : species) {
-            specieArray[ict] = sp;
-            sp.setIndex(ict);
-            ict += 1;
-        }
-    }
-
-
-
     public ReactionTable makeReactionTable() {
-        if (specieArray == null) {
-            indexSpecies();
-        }
         int nreaction = reactions.size();
         int nspecie = species.size();
         ReactionTable rtab = new ReactionTable(2 * nreaction, nspecie);
@@ -113,13 +75,9 @@ public class ReactionScheme implements AddableTo {
             ir++;
         }
 
-        rtab.setSpeciesIDs(getSpeciesIDList());
+        rtab.setSpeciesIDs(getSpeciesIDs());
         rtab.setDiffusionConstants(getDiffusionConstants());
 
         return rtab;
     }
-
-
-
-
 }
