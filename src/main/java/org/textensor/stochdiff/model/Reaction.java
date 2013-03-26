@@ -8,18 +8,15 @@ import java.util.StringTokenizer;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
-
+import org.textensor.util.inst;
 
 public class Reaction implements AddableTo {
 
     public String name;
     public String id;
 
-    public String reactants;
-    public String products;
-
-    private ArrayList<Reactant> p_reactants;
-    private ArrayList<Product> p_products;
+    private ArrayList<Reactant> p_reactants = inst.newArrayList();
+    private ArrayList<Product> p_products = inst.newArrayList();
 
     public double forwardRate;
     public double reverseRate;
@@ -32,93 +29,46 @@ public class Reaction implements AddableTo {
     private ArrayList<Specie> r_products;
 
     public void add(Object obj) {
-        if (obj instanceof Reactant) {
-            if (p_reactants == null) {
-                p_reactants = new ArrayList<Reactant>();
-            }
-            p_reactants.add((Reactant)obj);
-        } else if (obj instanceof Product) {
-            if (p_products == null) {
-                p_products = new ArrayList<Product>();
-            }
-            p_products.add((Product)obj);
-
-        } else {
-            E.error("cannot add " + obj);
-        }
-
+        if (obj instanceof Reactant)
+            this.p_reactants.add((Reactant)obj);
+        else if (obj instanceof Product)
+            this.p_products.add((Product)obj);
+        else
+            throw new RuntimeException("cannot add " + obj);
     }
-
 
     public void resolve(HashMap<String, Specie> sphm) {
-        if (reactants != null) {
-            r_reactants = parseList(reactants, sphm);
-
-        } else if (p_reactants != null) {
-            r_reactants = parseRefs(p_reactants, sphm);
-        } else {
-            E.error("no reactants? ");
-        }
-
-        if (products != null) {
-            r_products = parseList(reactants, sphm);
-        } else if (p_products != null) {
-            r_products = parseRefs(p_products, sphm);
-        } else {
-            E.error("no reactants? ");
-        }
+        if (this.p_reactants.isEmpty() || this.p_products.isEmpty())
+            throw new RuntimeException("no reactants in reaction " + name);
+        this.r_reactants = parseRefs(this.p_reactants, sphm);
+        this.r_products = parseRefs(this.p_products, sphm);
     }
-
-
-    private ArrayList<Specie> parseList(String lst, HashMap<String, Specie> sphm) {
-
-        ArrayList<Specie> ret = new ArrayList<Specie>();
-        StringTokenizer st = new StringTokenizer(lst, " ,");
-        while (st.hasMoreTokens()) {
-            String tok = st.nextToken();
-            if (sphm.containsKey(tok)) {
-                ret.add(sphm.get(tok));
-            } else {
-                E.error("reaction " + name + " mentions unknown specie " + tok);
-            }
-
-        }
-        return ret;
-    }
-
-
 
     private ArrayList<Specie> parseRefs(ArrayList<? extends SpecieRef> asr,
                                         HashMap<String, Specie> sphm) {
 
-        ArrayList<Specie> ret = new ArrayList<Specie>();
+        ArrayList<Specie> ret = inst.newArrayList();
         for (SpecieRef sr : asr) {
-
-            if (sphm.containsKey(sr.getSpecieID())) {
-                ret.add(sphm.get(sr.getSpecieID()));
-            } else {
-                E.error("reaction " + name + " mentions unknown specie " + sr);
-            }
-
+            Specie sr2 = sphm.get(sr.getSpecieID());
+            if (sr2 == null)
+                throw new RuntimeException
+                    ("reaction " + name + " mentions unknown specie " + sr);
+            ret.add(sr2);
         }
         return ret;
     }
 
-
-
-
-    private int[][] getIndices(ArrayList<Specie> spa, ArrayList<? extends SpecieRef> refs) {
+    private int[][] getIndices(ArrayList<Specie> spa,
+                               ArrayList<? extends SpecieRef> refs) {
         int n = spa.size();
         int[][] ret = new int[2][n];
-        for (int i = 0; i < n; i++) {
+
+        for (int i = 0; i < n; i++)
             ret[0][i] = spa.get(i).getIndex();
-            ret[1][i] = 1;
-        }
-        if (refs != null) {
-            for (int i = 0; i < n; i++) {
-                ret[1][i] = refs.get(i).getN();
-            }
-        }
+
+        for (int i = 0; i < n; i++)
+            ret[1][i] = refs.get(i).getN();
+
         return ret;
     }
 
