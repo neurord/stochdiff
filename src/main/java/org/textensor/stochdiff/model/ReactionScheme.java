@@ -41,7 +41,7 @@ public class ReactionScheme implements AddableTo {
             r.resolve(this.specieHM);
     }
 
-    protected String[] getSpeciesIDs() {
+    protected String[] getSpecieIDs() {
         String[] ret = new String[species.size()];
         int ict = 0;
         for (Specie sp : species) {
@@ -72,7 +72,7 @@ public class ReactionScheme implements AddableTo {
             rtab.setReactionData(ir++, products, reactants, r.reverseRate);
         }
 
-        rtab.setSpeciesIDs(getSpeciesIDs());
+        rtab.setSpeciesIDs(getSpecieIDs());
         rtab.setDiffusionConstants(getDiffusionConstants());
 
         return rtab;

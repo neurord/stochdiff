@@ -46,10 +46,6 @@ public class ReactionTable {
     }
 
 
-    public String[] getSpecieIDs() {
-        return speciesIDs;
-    }
-
     public void print() {
         StringBuffer sb = new StringBuffer();
         sb.append("nspecie = " + nspecie + "  nreaction = " + nreaction + "\n");
@@ -113,7 +109,7 @@ public class ReactionTable {
     }
 
 
-    public String[] getSpeciesIDs() {
+    public String[] getSpecieIDs() {
         return speciesIDs;
     }
 
@@ -324,7 +320,7 @@ public class ReactionTable {
 
 
     public int getSpecieIndex(String specieID) {
-        String[] sa = getSpeciesIDs();
+        String[] sa = getSpecieIDs();
 
         for (int i = 0; i < nspecie; i++)
             if (sa[i].equals(specieID))

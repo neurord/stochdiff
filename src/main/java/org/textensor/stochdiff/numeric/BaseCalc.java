@@ -132,7 +132,7 @@ public abstract class BaseCalc {
         stimulationTable = stim.makeStimulationTable(reactionTable);
 
         InitialConditions icons = sdRun.getInitialConditions();
-        speciesList = reactionTable.getSpeciesIDs();
+        speciesList = reactionTable.getSpecieIDs();
         // -------------------------
         // OutputScheme output = sdRun.getOutputScheme();
         // -------------------------
@@ -216,7 +216,7 @@ public abstract class BaseCalc {
         specNamesOut = new String[nos][];
         specIndexesOut = new int[nos][];
 
-        String[] specieIDs = rtab.getSpeciesIDs();
+        String[] specieIDs = rtab.getSpecieIDs();
         int nspec = specieIDs.length;
 
         E.info("extracting output scheme " + os.outputSets.size() + " " + nspec);
