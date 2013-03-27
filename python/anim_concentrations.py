@@ -182,6 +182,8 @@ def _connections(dst, regions, connections, couplings):
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=blue,style=filled,fillcolor=lightblue];', file=dst)
+    for region in regions:
+        print('\t"{}";'.format(region), file=dst)
     for i in range(connections.shape[0]):
         for j, coupl in zip(connections[i], couplings[i]):
             if j < 0:
@@ -230,6 +232,8 @@ def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates)
             if j < 0:
                 break
             _conn(dst, name, species[j], _logclip(rate, 10))
+        if not len(rr) and not len(pp):
+            print('\t"{}";'.format(name), file=dst)
         print()
     print('}', file=dst)
 
