@@ -8,17 +8,15 @@ import java.util.HashMap;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 
+import org.textensor.util.inst;
+
 public class OutputScheme implements AddableTo
 {
-    public ArrayList<OutputSet> outputSets;
+    public final ArrayList<OutputSet> outputSets = inst.newArrayList();
     public HashMap<String, OutputSet> outputSetHM;
 
     public void add(Object obj)
     {
-        if (outputSets == null)
-        {
-            outputSets = new ArrayList<OutputSet>();
-        }
         if (obj instanceof OutputSet)
         {
             OutputSet outset = (OutputSet)obj;
