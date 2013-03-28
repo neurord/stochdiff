@@ -14,8 +14,6 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.disc.SpineLocator;
 import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
 import org.textensor.stochdiff.disc.TreeCurvedElementDiscretizer;
-import org.textensor.stochdiff.inter.SDState;
-import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.stochdiff.model.*;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
@@ -461,32 +459,6 @@ public abstract class BaseCalc {
     public abstract int run();
 
     public abstract long getParticleCount();
-
-    public double[][] readInitialState(String fnm, int nel, int nspec, String[] specids) {
-        // Assume that resultWriters[0] is a ResultWriterText.
-        // FIXME: remove this ugly hack.
-        String sdata = ((ResultWriterText)this.resultWriters.get(0)).readSibling(fnm);
-        SDState sds = StateReader.readStateString(sdata);
-
-        double[][] ret = null;
-        if (sds.nel == nel && sds.nspec == nspec) {
-            if (ArrayUtil.arraysMatch(sds.specids, specids)) {
-                ret = sds.getData();
-            } else {
-                E.error("initial conditions species mismatch ");
-                for (int i = 0; i < specids.length; i++) {
-                    E.info("species " + i + " " + specids[i] + " " + sds.specids[i]);
-                }
-            }
-        } else {
-            E.error("initial conditions file does not match model: elements " + nel + ", " + sds.nel +
-                    "  species: " + nspec + ", " + sds.nspec);
-        }
-
-
-        return ret;
-
-    }
 
     public int[][] getSpecIndexesOut() {
         return this.specIndexesOut;

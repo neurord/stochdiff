@@ -39,6 +39,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected H5ScalarDS stimulation_events = null;
     protected H5ScalarDS diffusion_events = null;
     protected H5ScalarDS reaction_events = null;
+    protected Dataset saved_state = null;
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
@@ -322,6 +323,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "UNITS", "transitions/ms");
         }
     }
+
 
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
         throws Exception
@@ -651,6 +653,85 @@ public class ResultWriterHDF5 implements ResultWriter {
     @Override
     public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {}
 
+    protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
+        throws Exception
+    {
+        int[][] state = {};
+        if (this.saved_state == null) {
+            Dataset ds = this.writeArray("state", this.sim, state, -1);
+            setAttribute(ds, "TITLE", "saved state");
+            setAttribute(ds, "LAYOUT", "[nelements x nspecies]");
+            setAttribute(ds, "UNITS", "count");
+
+            this.saved_state = ds;
+        } else {
+            int[] data = (int[]) this.saved_state.getData();
+            int columns = state[0].length; /* should all be the same */
+            ArrayUtil._flatten(data, state, columns, -1);
+            this.saved_state.write(data);
+        }
+    }
+
+    protected void writeSavedStateD(int nel, int nspecie, IGridCalc source)
+        throws Exception
+    {
+        double[][] state = {};
+        if (this.saved_state == null) {
+            Dataset ds = this.writeArray("state", this.sim, state);
+            setAttribute(ds, "TITLE", "saved state");
+            setAttribute(ds, "LAYOUT", "[nelements x nspecies]");
+            setAttribute(ds, "UNITS", "nm/l ?");
+
+            this.saved_state = ds;
+        } else {
+            double[] data = (double[]) this.saved_state.getData();
+            int columns = state[0].length; /* should all be the same */
+            ArrayUtil._flatten(data, state, columns);
+            this.saved_state.write(data);
+        }
+    }
+
     @Override
-    public void saveState(double time, String prefix, String state) {}
+    public void saveState(double time, String prefix, IGridCalc source) {
+        log.debug("state saved at t={} ms", time);
+        try {
+            int nel = source.getNumberElements();
+            int nspecie = source.getSpecieIDs().length;
+            if (source.preferConcs())
+                this.writeSavedStateD(nel, nspecie, source);
+            else
+                this.writeSavedStateI(nel, nspecie, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object _loadState(String filename, IGridCalc source)
+        throws Exception
+    {
+        // FIXME: This is totally not going to work, because we delete
+        // the file on creation...
+        Dataset obj = (Dataset) this.output.get("/simulation/state");
+        int nel = source.getNumberElements();
+        int nspecie = source.getSpecieIDs().length;
+        if (obj == null)
+            throw new RuntimeException("state hasn't been saved");
+        if (source.preferConcs()) {
+            double[] data = (double[]) obj.getData();
+            return ArrayUtil.shape(data, nel, nspecie);
+        } else {
+            int[] data = (int[]) obj.getData();
+            return ArrayUtil.shape(data, nel, nspecie);
+        }
+    }
+
+    @Override
+    public Object loadState(String filename, IGridCalc source) {
+        try {
+            return _loadState(filename, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -7,12 +7,16 @@ public interface IGridCalc {
     int getGridPartNumb(int i, int outj);
     double getGridPartConc(int i, int outj);
 
+    boolean preferConcs();
+
     String[] getSpecieIDs();
     int[][] getSpecIndexesOut();
     String[] getRegionLabels();
     int[] getEltRegions();
     boolean[] getSubmembranes();
     String[] getRegionsOut();
+
+    int getNumberElements();
 
     int[][] getReactionEvents();
     int[][][] getDiffusionEvents();

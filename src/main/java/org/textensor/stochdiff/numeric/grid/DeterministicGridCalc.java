@@ -14,6 +14,8 @@ import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
+import org.textensor.util.ArrayUtil;
+
 /*
  *
  * Dufort-Frankel reaction diffusion implementation.
@@ -21,6 +23,9 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
  */
 
 public class DeterministicGridCalc extends GridCalc {
+
+    @Override
+    public boolean preferConcs(){ return true; }
 
 //	int[] eltstims;
 //	double[] eltstimshare;
@@ -131,19 +136,11 @@ public class DeterministicGridCalc extends GridCalc {
         }
 
         if (sdRun.initialStateFile != null) {
-            double[][] cc = readInitialState(sdRun.initialStateFile, nel, nspec, specieIDs);
-            if (cc != null) {
-                for (int i = 0; i < nel; i++) {
-                    for (int j = 0; j < nspec; j++) {
-                        double c = cc[i][j];
-                        wkA[i][j] = c;
-                        //AB 2012-apr 3 change wkB to wk[time-1]
-                        wktm1[i][j] = c;
-                    }
-                }
-            }
+            double[][] cc = (double[][])
+                resultWriters.get(0).loadState(sdRun.initialStateFile, this);
+            ArrayUtil.copy(cc, this.wkA);
+            ArrayUtil.copy(cc, this.wktm1);
         }
-
     }
 
     public final int run() {
@@ -204,7 +201,7 @@ public class DeterministicGridCalc extends GridCalc {
 
             if (time >= stateSaveTime) {
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
+                    resultWriter.saveState(time, sdRun.stateSavePrefix, this);
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }

@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
-
+import org.textensor.stochdiff.inter.SDState;
+import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.util.inst;
+import org.textensor.util.ArrayUtil;
 
 public class ResultWriterText implements ResultWriter {
 
@@ -338,11 +340,32 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void saveState(double time, String prefix, String state) {
+    public void saveState(double time, String prefix, IGridCalc source) {
+        String state = getStateText(source);
         this.writeToFinalSiblingFile(state, prefix + Math.round(time) + ".nrds");
-        
     }
 
+    protected String getStateText(IGridCalc source) {
+        String[] specieIDs = source.getSpecieIDs();
+        int nel = source.getNumberElements();
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("nrds " + nel + " " + specieIDs.length + "\n");
+        for (int i = 0; i < specieIDs.length; i++) {
+            sb.append(specieIDs[i] + " ");
+        }
+        sb.append("\n");
+        for (int i = 0; i < nel; i++) {
+            for (int j = 0; j < specieIDs.length; j++) {
+                if (source.preferConcs())
+                    sb.append(stringd(source.getGridPartConc(i, j)));
+                else
+                    sb.append(stringi(source.getGridPartNumb(i, j)));
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 
     // let's park those two here for now
     public static String stringd(double d) {
@@ -361,4 +384,41 @@ public class ResultWriterText implements ResultWriter {
             return String.format("%d ", id);
     }
 
+    public double[][] _readInitialState(String fnm, int nel, int nspec, String[] specids) {
+        String sdata = this.readSibling(fnm);
+        SDState sds = StateReader.readStateString(sdata);
+
+        double[][] ret = null;
+        if (sds.nel == nel && sds.nspec == nspec) {
+            if (ArrayUtil.arraysMatch(sds.specids, specids)) {
+                ret = sds.getData();
+            } else {
+                E.error("initial conditions species mismatch ");
+                for (int i = 0; i < specids.length; i++) {
+                    E.info("species " + i + " " + specids[i] + " " + sds.specids[i]);
+                }
+            }
+        } else {
+            throw new RuntimeException("initial conditions file does not match model: elements "
+                                       + nel + ", " + sds.nel +
+                                       "  species: " + nspec + ", " + sds.nspec);
+        }
+
+        return ret;
+    }
+
+    public Object loadState(String fnm, IGridCalc source) {
+            int nel = source.getNumberElements();
+            String[] species = source.getSpecieIDs();
+            double[][] state = this._readInitialState(fnm, nel, species.length, species);
+            if (source.preferConcs())
+                return state;
+            else {
+                int[][] nums = new int[nel][species.length];
+                for (int i = 0; i < nums.length; i++)
+                    for (int j = 0; j < nums[0].length; j++)
+                        nums[i][j] = (int) Math.round(state[i][j]);
+                return nums;
+            }
+    }
 }

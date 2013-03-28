@@ -54,6 +54,9 @@ import org.apache.logging.log4j.LogManager;
 public class SteppedStochasticGridCalc extends GridCalc {
     static final Logger log = LogManager.getLogger(SteppedStochasticGridCalc.class);
 
+    @Override
+    public boolean preferConcs(){ return false; }
+
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),
     // (1) if the number of molecules to duffuse is less than
@@ -212,13 +215,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
         }
 
         if (sdRun.initialStateFile != null) {
-            double[][] cc = readInitialState(sdRun.initialStateFile, nel, nspec, speciesIDs);
-            if (cc != null)
-                for (int i = 0; i < nel; i++)
-                    for (int j = 0; j < nspec; j++)
-                        wkA[i][j] = wkB[i][j] =
-                            (int) Math.round(cc[i][j] * volumes[i] / NM_PER_PARTICLE_PUV);
-            // FIXME: why would a specified initialStateFile be ignored?
+            int[][] cc = (int[][]) resultWriters.get(0).loadState(sdRun.initialStateFile, this);
+            ArrayUtil.copy(cc, this.wkA);
+            ArrayUtil.copy(cc, this.wkB);
         }
 
         dt = sdRun.fixedStepDt;
@@ -355,7 +354,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
             if (time >= stateSaveTime) {
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, sdRun.stateSavePrefix, getStateText());
+                    resultWriter.saveState(time, sdRun.stateSavePrefix, this);
                 stateSaveTime += sdRun.getStateSaveInterval();
             }
         }

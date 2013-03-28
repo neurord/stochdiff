@@ -43,6 +43,11 @@ public class ArrayUtil {
 
     public static double[] flatten(double[][] array, int columns) {
         double[] flat = new double[array.length * columns];
+        return _flatten(flat, array, columns);
+    }
+
+    public static double[] _flatten(double[] flat,
+                                    double[][] array, int columns) {
         for (int i = 0; i < array.length; i++)
             System.arraycopy(array[i], 0, flat, i * columns, array[i].length);
         return flat;
@@ -230,6 +235,12 @@ public class ArrayUtil {
             System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
     }
 
+    public static void copy(double[][] src, double dst[][]) {
+        assert src.length == dst.length;
+        for(int i = 0; i < src.length; i++)
+            System.arraycopy(src[i], 0, dst[i], 0, dst[i].length);
+    }
+
     public static void fill(int[][] array, int value) {
         for (int[] subarray: array)
             Arrays.fill(subarray, value);
@@ -239,5 +250,19 @@ public class ArrayUtil {
         for (int[][] array: arrays)
             for (int[] subarray: array)
                 Arrays.fill(subarray, value);
+    }
+
+    public static int[][] shape(int[] flat, int rows, int cols) {
+        int[][] ans = new int[rows][cols];
+        for (int i = 0; i < rows; i++)
+            System.arraycopy(flat, rows * i, ans[i], 0, cols);
+        return ans;
+    }
+
+    public static double[][] shape(double[] flat, int rows, int cols) {
+        double[][] ans = new double[rows][cols];
+        for (int i = 0; i < rows; i++)
+            System.arraycopy(flat, rows * i, ans[i], 0, cols);
+        return ans;
     }
 }
