@@ -63,6 +63,16 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         eltregions = vgrid.getRegionIndexes();
     }
 
+    @Override
+    public long getParticleCount() {
+        long ret = 0;
+        for (int i = 0; i < nel; i++)
+            for (int j = 0; j < nspec; j++)
+                ret += this.getGridPartNumb(i, j);
+
+        return ret;
+    }
+
     @SuppressWarnings("boxing")
     protected String getStateText() {
         StringBuffer sb = new StringBuffer();

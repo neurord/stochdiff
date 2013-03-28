@@ -340,19 +340,14 @@ public class DeterministicGridCalc extends GridCalc {
         col.writeTo(concs); // TODO noop?
     }
 
-    public long getParticleCount() {
-        // TODO Auto-generated method stub
-        throw new RuntimeException("Not implemented");
+    @Override
+    public double getGridPartConc(int i, int j) {
+        return wkA[i][j];
     }
 
     @Override
-    public double getGridPartConc(int i, int outj) {
-        return wkA[i][outj];
-    }
-
-    @Override
-    public int getGridPartNumb(int i, int outj) {
-        double val = getGridPartConc(i, outj);
+    public int getGridPartNumb(int i, int j) {
+        double val = getGridPartConc(i, j);
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 

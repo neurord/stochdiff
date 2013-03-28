@@ -462,7 +462,6 @@ public abstract class BaseCalc {
 
     public abstract long getParticleCount();
 
-
     public double[][] readInitialState(String fnm, int nel, int nspec, String[] specids) {
         // Assume that resultWriters[0] is a ResultWriterText.
         // FIXME: remove this ugly hack.

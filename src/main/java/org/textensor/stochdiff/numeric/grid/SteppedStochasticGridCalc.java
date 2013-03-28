@@ -360,10 +360,12 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
         }
 
-        long endTime = System.currentTimeMillis();
-        E.info("total time " + (endTime - startTime) + "ms");
-        return 0;
+        log.info("number injected = " + ninjected);
 
+        long endTime = System.currentTimeMillis();
+        log.info("total time {} ms", endTime - startTime);
+
+        return 0;
     }
 
     protected int calculateNgo(String where, int n, double exp){
@@ -739,24 +741,14 @@ public class SteppedStochasticGridCalc extends GridCalc {
             return i < intlogs.length ? intlogs[i] : Math.log(i);
     }
 
-    public long getParticleCount() {
-        long ret = 0;
-        for (int i = 0; i < nel; i++)
-            for (int j = 0; j < nspec; j++)
-                ret += wkA[i][j];
-
-        E.info("number injected = " + ninjected);
-        return ret;
+    @Override
+    public int getGridPartNumb(int i, int j) {
+        return wkA[i][j];
     }
 
     @Override
-    public int getGridPartNumb(int i, int outj) {
-        return wkA[i][outj];
-    }
-
-    @Override
-    public double getGridPartConc(int i, int outj) {
-        int val = getGridPartNumb(i, outj);
+    public double getGridPartConc(int i, int j) {
+        int val = getGridPartNumb(i, j);
         return val * NM_PER_PARTICLE_PUV / volumes[i];
     }
 
