@@ -473,8 +473,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        log.debug("Writing stimulation events at time {}", time);
-
         final long[] dims;
         if (this.stimulation_events == null) {
             this.initStimulationEvents(events.length, events[0].length);
@@ -484,6 +482,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             dims[0] = dims[0] + 1;
             this.stimulation_events.extend(dims);
         }
+
+        log.debug("Writing stimulation events at time {}", time);
 
         {
             long[] selected = this.stimulation_events.getSelectedDims();
@@ -499,10 +499,21 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected void initDiffusionEvents(int elements, int species, int neighbors)
+    private boolean initDiffusionEvents_warning = false;
+
+    protected boolean initDiffusionEvents(int elements, int species, int neighbors)
         throws Exception
     {
         assert this.diffusion_events == null;
+
+        if (elements == 0 || species == 0 || neighbors == 0) {
+            if (!initDiffusionEvents_warning) {
+                log.info("Diffusion events are {}x{}x{}", elements, species, neighbors);
+                log.warn("No diffusion events, not writing anything");
+                initDiffusionEvents_warning = true;
+            }
+            return false;
+        }
 
         /* times x reactions */
         {
@@ -522,6 +533,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "UNITS", "count");
             this.diffusion_events = ds;
         }
+
+        return true;
     }
 
     protected void writeDiffusionEvents(double time, IGridCalc source)
@@ -531,19 +544,21 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        log.debug("Writing diffusion events at time {}", time);
-
         final long[] dims;
         if (this.diffusion_events == null) {
             int maxneighbors = ArrayUtil.maxLength(events);
-            this.initDiffusionEvents(events.length, events[0].length,
-                                     maxneighbors);
+            boolean have = this.initDiffusionEvents(events.length, events[0].length,
+                                                    maxneighbors);
+            if (!have)
+                return;
             dims = this.diffusion_events.getDims();
         } else {
             dims = this.diffusion_events.getDims();
             dims[0] = dims[0] + 1;
             this.diffusion_events.extend(dims);
         }
+
+        log.debug("Writing diffusion events at time {}", time);
 
         {
             long[] selected = this.diffusion_events.getSelectedDims();
@@ -560,10 +575,20 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected void initReactionEvents(int elements, int reactions)
+    private boolean initReactionEvents_warning = false;
+
+    protected boolean initReactionEvents(int elements, int reactions)
         throws Exception
     {
         assert this.reaction_events == null;
+
+        if (elements == 0 || reactions == 0) {
+            if (!initReactionEvents_warning) {
+                log.warn("No reaction events, not writing anything");
+                initReactionEvents_warning = true;
+            }
+            return false;
+        }
 
         /* times x reactions */
         {
@@ -583,6 +608,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "UNITS", "count");
             this.reaction_events = ds;
         }
+
+        return true;
     }
 
     protected void writeReactionEvents(double time, IGridCalc source)
@@ -592,17 +619,19 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        log.debug("Writing reaction events at time {}", time);
-
         final long[] dims;
         if (this.reaction_events == null) {
-            this.initReactionEvents(events.length, events[0].length);
+            boolean have = this.initReactionEvents(events.length, events[0].length);
+            if (!have)
+                return;
             dims = this.reaction_events.getDims();
         } else {
             dims = this.reaction_events.getDims();
             dims[0] = dims[0] + 1;
             this.reaction_events.extend(dims);
         }
+
+        log.debug("Writing reaction events at time {}", time);
 
         {
             long[] selected = this.reaction_events.getSelectedDims();
