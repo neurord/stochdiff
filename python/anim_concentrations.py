@@ -13,6 +13,8 @@ import subprocess
 import numpy
 import tables
 
+# TODO: support --time in animations
+
 def geometry(g):
     x,s,y = g.partition('x')
     x = float(x)
@@ -26,6 +28,27 @@ def str_list(arg):
     parts = arg.split(',')
     return parts
 
+def time_range(arg):
+    a, b, c = arg.partition('-')
+    if not b:
+        raise ValueError("either t₁-t₂, t₁-, or -t₂ must be used")
+    a = float(a) if a else None
+    c = float(c) if c else None
+    return (a, c)
+
+def filter_times(limits, times):
+    a = 0
+    if limits[0] is not None:
+        while times[a] < limits[0]:
+            a += 1
+    if limits[1] is not None:
+        b = a
+        while times[b] < limits[1]:
+            b += 1
+    else:
+        b = None
+    return slice(a, b)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('file')
 parser.add_argument('--save')
@@ -37,6 +60,7 @@ parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list)
+parser.add_argument('--time', type=time_range, default=(None, None))
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -271,12 +295,14 @@ def _history(simul, species, indices, times, concentrations, title):
     ax.legend(loc='best')
     pyplot.show(block=True)
 
-def plot_history(filename, species):
+def plot_history(filename, species, time):
     file = tables.openFile(filename)
     model = file.root.model
     simul = file.root.simulation
     indices = specie_indices(species, model.species)
-    _history(simul, model.species, indices, simul.times, simul.concentrations,
+    when = filter_times(time, simul.times)
+    _history(simul, model.species, indices,
+             simul.times[when], simul.concentrations[when],
              title=filename)
 
 if __name__ == '__main__':
@@ -286,7 +312,7 @@ if __name__ == '__main__':
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history:
-        plot_history(opts.file, opts.history)
+        plot_history(opts.file, opts.history, opts.time)
     else:
         if not opts.save:
             animate_drawing(opts)
