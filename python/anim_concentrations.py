@@ -13,7 +13,7 @@ import subprocess
 import numpy
 import tables
 
-def parse_geometry(g):
+def geometry(g):
     x,s,y = g.partition('x')
     x = float(x)
     if y:
@@ -21,6 +21,10 @@ def parse_geometry(g):
     else:
         y = x * 3/4
     return (x, y)
+
+def str_list(arg):
+    parts = arg.split(',')
+    return parts
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file')
@@ -31,7 +35,8 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
-parser.add_argument('--geometry', type=parse_geometry, default=(12, 9))
+parser.add_argument('--geometry', type=geometry, default=(12, 9))
+parser.add_argument('--history', type=str_list)
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -245,12 +250,43 @@ def dot_productions(filename):
                  model.reactions.products, model.reactions.product_stochiometry,
                  model.reactions.rates)
 
+def specie_indices(items, species):
+    species = list(species)
+    return numpy.array([species.index(i) for i in items])
+
+def _history(simul, species, indices, times, concentrations, title):
+    from matplotlib import pyplot
+
+    full_title = 'particle numbers in {}: species {}'.format(title,
+                                                             ', '.join(species))
+    f = pyplot.figure(figsize=opts.geometry)
+    f.canvas.set_window_title(full_title)
+
+    ax = f.gca()
+    ax.set_xlabel('t / ms')
+    ax.set_ylabel('particle numbers')
+    for sp, color, name in zip(indices, itertools.cycle('rgbkcmy'), species):
+        for vox in range(concentrations.shape[1]):
+            ax.plot(times, concentrations[:, vox, sp], color=color, label=name)
+    ax.legend(loc='best')
+    pyplot.show(block=True)
+
+def plot_history(filename, species):
+    file = tables.openFile(filename)
+    model = file.root.model
+    simul = file.root.simulation
+    indices = specie_indices(species, model.species)
+    _history(simul, model.species, indices, simul.times, simul.concentrations,
+             title=filename)
+
 if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
         dot_connections(opts.file)
     elif opts.reactions:
         dot_productions(opts.file)
+    elif opts.history:
+        plot_history(opts.file, opts.history)
     else:
         if not opts.save:
             animate_drawing(opts)
