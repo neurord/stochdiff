@@ -19,6 +19,7 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.util.ArrayUtil;
@@ -289,27 +290,16 @@ public abstract class BaseCalc {
 
         // E.info("subvolume grid size is: " + min_grid_size);
 
-
-        int vgg = VolumeGrid.GEOM_2D;
-
-        // REFAC - elsewhere;
-        String sg = sdRun.geometry;
-        if (sg != null) {
-            if (sg.toLowerCase().equals("2d")) {
-                vgg = VolumeGrid.GEOM_2D;
-
-            } else if (sg.toLowerCase().equals("3d")) {
-                vgg = VolumeGrid.GEOM_3D;
-            } else {
-                E.warning("unrecognized geometry " + sg + " should be 2D or 3D");
-            }
-        }
+        final geometry_t vgg;
+        if (sdRun.geometry != null)
+            vgg = geometry_t.fromString(sdRun.geometry);
+        else
+            vgg = geometry_t.GEOM_2D;
 
         double d2d = sdRun.depth2D;
         if (d2d <= 0.) {
             d2d = 0.5;
         }
-
 
         if (disc.curvedElements()) {
             TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);

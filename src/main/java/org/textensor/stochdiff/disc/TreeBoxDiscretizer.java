@@ -4,6 +4,7 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.TreeWriter;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 
 import java.io.File;
 
@@ -20,8 +21,8 @@ public class TreeBoxDiscretizer {
     }
 
 
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM, double[] surfaceLayers, int geom,
-                                double d2d) {
+    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM,
+                                double[] surfaceLayers, geometry_t geom, double d2d) {
 
 
         TreePoint base = srcPoints[0];
@@ -41,19 +42,18 @@ public class TreeBoxDiscretizer {
 
         VolumeGrid vgrid = null;
 
-        if (geom == VolumeGrid.GEOM_2D) {
+        switch(geom) {
+        case GEOM_2D:
             LineBoxer lb = new LineBoxer(slicedPoints, surfaceLayers, d2d);
             vgrid = lb.buildGrid(d, resHM);
-
-        } else if (geom == VolumeGrid.GEOM_3D) {
+            break;
+        case GEOM_3D:
             DiscBoxer db = new DiscBoxer(slicedPoints, surfaceLayers);
             vgrid = db.buildGrid(d, resHM);
-
-        } else {
-            E.error("unrecognized geometry");
+            break;
+        default:
+            throw new RuntimeException("unknown geometry");
         }
         return vgrid;
     }
-
-
 }

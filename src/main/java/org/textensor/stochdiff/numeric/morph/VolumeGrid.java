@@ -14,10 +14,19 @@ import org.textensor.util.inst;
 
 public class VolumeGrid {
 
-    public static final int GEOM_2D = 0;
-    public static final int GEOM_3D = 1;
-
     ArrayList<VolumeElement> elements;
+    public enum geometry_t {
+        GEOM_2D,
+        GEOM_3D;
+
+        public static geometry_t fromString(String sg) {
+            if (sg.toLowerCase().equals("2d"))
+                return GEOM_2D;
+            if (sg.toLowerCase().equals("3d"))
+                return GEOM_3D;
+            throw new RuntimeException("unrecognized geometry " + sg + " should be 2D or 3D");
+        }
+    }
 
     HashMap<String, ArrayList<VolumeElement>> regionHM;
 
