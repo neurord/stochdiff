@@ -399,7 +399,7 @@ public class NumDataStore implements RunDataStore, Named, TreeRoot,
     }
 
     public Object[] getObjectPath(String s, boolean b) {
-        return (ndsAccessor.getObjectPath(s)).toArray(new Object[0]);
+        return ndsAccessor.getObjectPath(s).toArray();
     }
 
 

@@ -40,8 +40,7 @@ public class QuantityList<V> {
     }
 
     public Object[] getObjectItemArray() {
-        Object[] ret = items.toArray(new Object[items.size()]);
-        return ret;
+        return items.toArray();
     }
 
 

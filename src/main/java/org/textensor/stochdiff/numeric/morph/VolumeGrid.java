@@ -14,7 +14,6 @@ import org.textensor.util.inst;
 
 public class VolumeGrid {
 
-    ArrayList<VolumeElement> elements;
     public enum geometry_t {
         GEOM_2D,
         GEOM_3D;
@@ -28,9 +27,9 @@ public class VolumeGrid {
         }
     }
 
-    HashMap<String, ArrayList<VolumeElement>> regionHM;
+    ArrayList<VolumeElement> elements = inst.newArrayList();
 
-
+    HashMap<String, ArrayList<VolumeElement>> regionHM = inst.newHashMap();
 
     int nelement;
     String[] eltLabels;
@@ -58,14 +57,6 @@ public class VolumeGrid {
 
     boolean hasCuboids = false;
     boolean hasCurveds = false;
-
-
-    public VolumeGrid() {
-        elements = new ArrayList<VolumeElement>();
-
-        regionHM = new HashMap<String, ArrayList<VolumeElement>>();
-    }
-
 
     public void importSlices(ArrayList<VolumeSlice> gridAL) {
         hasCuboids = true;
@@ -191,7 +182,7 @@ public class VolumeGrid {
               */
             ve.cache(i);
         }
-        regionLabels = rA.toArray(new String[rA.size()]);
+        regionLabels = rA.toArray(new String[0]);
 
         makeAreaHM();
 

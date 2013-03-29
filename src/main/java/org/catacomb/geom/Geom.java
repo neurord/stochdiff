@@ -147,7 +147,7 @@ public class Geom {
 
     public static Position[] getBoundary(ArrayList<Position> apts) {
         // TODO - actually do it!
-        Position[] pa = apts.toArray(new Position[apts.size()]);
+        Position[] pa = apts.toArray(new Position[0]);
         return pa;
     }
 

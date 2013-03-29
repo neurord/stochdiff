@@ -54,7 +54,7 @@ public class DruCheckboxListPanel extends DruGCPanel implements ListDisplay, Lab
 
 
     public void setItems(ArrayList<? extends Object> obal) {
-        Object[] obar = obal.toArray(new Object[obal.size()]);
+        Object[] obar = obal.toArray();
         dList.setItems(obar);
 
         if (listWatcher != null) {

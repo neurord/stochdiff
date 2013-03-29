@@ -74,7 +74,7 @@ public class SceneGraphBuilder {
              */
             ala.add(a);
         }
-        return ala.toArray(new Appearance[ala.size()]);
+        return ala.toArray(new Appearance[0]);
     }
 
 

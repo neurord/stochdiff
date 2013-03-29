@@ -186,7 +186,7 @@ public class RelationNode extends ArrayListNode {
         } else {
 
             RelationNode[] ach;
-            ach = (children.toArray(new RelationNode[0]));
+            ach = children.toArray(new RelationNode[0]);
             for (int i = 0; i < ach.length; i++) {
                 ach[i].subtreeify(this, rest, rel);
             }
