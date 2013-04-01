@@ -59,7 +59,7 @@ parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
-parser.add_argument('--history', type=str_list)
+parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--time', type=time_range, default=(None, None))
 
 class Drawer(object):
@@ -299,7 +299,10 @@ def plot_history(filename, species, time):
     file = tables.openFile(filename)
     model = file.root.model
     simul = file.root.simulation
-    indices = specie_indices(species, model.species)
+    if species:
+        indices = specie_indices(species, model.species)
+    else:
+        indices = numpy.arange(len(model.species))
     when = filter_times(time, simul.times)
     _history(simul, model.species[indices], indices,
              simul.times[when], simul.concentrations[when],
@@ -311,7 +314,7 @@ if __name__ == '__main__':
         dot_connections(opts.file)
     elif opts.reactions:
         dot_productions(opts.file)
-    elif opts.history:
+    elif opts.history is not None:
         plot_history(opts.file, opts.history, opts.time)
     else:
         if not opts.save:
