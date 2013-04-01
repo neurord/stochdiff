@@ -301,7 +301,7 @@ def plot_history(filename, species, time):
     simul = file.root.simulation
     indices = specie_indices(species, model.species)
     when = filter_times(time, simul.times)
-    _history(simul, model.species, indices,
+    _history(simul, model.species[indices], indices,
              simul.times[when], simul.concentrations[when],
              title=filename)
 
