@@ -38,4 +38,15 @@ public abstract class TestUtil {
                                      Arrays.toString(a) + ", " +
                                      Arrays.toString(b));
     }
+
+    public static void assertApproxEquals(double a, double b,
+                                          double relative, double absolute) {
+        double diff = Math.abs(a-b);
+        if (absolute >= 0 && diff <= absolute)
+            return;
+        if (relative >= 0 && diff <= relative * a || diff <= relative * b)
+            return;
+        throw new AssertionError("two numbers are not equal enough: " + a + ", " + b
+                                 + " rel=" + relative + " abs=" + absolute);
+    }
 }
