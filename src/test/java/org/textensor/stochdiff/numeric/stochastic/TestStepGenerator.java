@@ -1,10 +1,12 @@
-package org.textensor.stochdiff;
+package org.textensor.stochdiff.numeric.stochastic;
 
 import java.util.Random;
+import java.util.ArrayList;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
-import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+import org.textensor.util.inst;
 
 import static org.testng.Assert.assertEquals;
 import static org.textensor.util.TestUtil.assertArrayEquals;

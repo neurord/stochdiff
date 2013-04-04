@@ -1,16 +1,22 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
+import static java.lang.String.format;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
-
+/**
+ * Table of cumulative probabilities of a certain number of successes
+ * from the total number of events when the probability of success is
+ * given.
+ */
 public final class NGoTable {
 
-    private double lnp;
-    private int n;
+    public final double lnp;
+    public final int n;
 
-    private double[] cprob; // cumulative probabilities
+    private final double[] cprob; // cumulative probabilities
     private int ncprob;
 
     private distribution_t mode;
@@ -21,8 +27,7 @@ public final class NGoTable {
         this.mode = mode;
 
         double p = Math.exp(lnp);
-        double q = 1. - p;
-        double lnq = Math.log(q);
+        double lnq = Math.log(1 - p);
 
         switch (mode) {
         case BINOMIAL: {
@@ -196,53 +201,28 @@ public final class NGoTable {
         return ret;
     }
 
-
-
-
-
-
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[n=" + n + " p=" + Math.exp(lnp) +
+            " njmax=" + ncprob + " mode=" + mode + "]";
+    }
 
     /*
      * The rest is just for testing that the results are sensible
      */
 
     public void print() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("n=" + n + " p="+ Math.exp(lnp) +
-                  " njmax=" + ncprob + " mode=" + mode + "\n");
-        sb.append("p(n < i): ");
-        for (int i = 0; i < ncprob; i++) {
-            sb.append(cprob[i] + ", ");
-        }
-        sb.append("\n");
+        System.out.print(this.toString() + "\np(n < i): ");
+        for (int i = 0; i < ncprob; i++)
+            System.out.print(format("%.3g, ", cprob[i]));
 
-        sb.append("ngo, rngo for ten equally spaced randoms starting at 0.001 ");
+        System.out.print("\nngo, rngo for ten equally spaced randoms starting at 0.001 ");
         for (int i = 0; i < 10; i++) {
             double r = 0.001 + 0.99 * (i / 9.);
-            sb.append("(" + nGo(r) + ",  " + rnGo(r) + ") ");
+            System.out.print(format("(%d, %.3g) ", nGo(r), rnGo(r)));
         }
-        sb.append("\n");
-        System.out.println(sb.toString());
+        System.out.print("\n\n");
     }
-
-
-
-
-
-    private void lookupCheck() {
-        for (int i = 0; i <= 50; i++) {
-            double r = (1. * i) / 50.;
-            int n1 = nGo(r);
-            int n2 = nGoBS(r);
-            if (n1 != n2) {
-                E.error("different results in lookup check " + n + " " +
-                        Math.exp(lnp) + " " + n1 + " " + n2);
-            }
-        }
-    }
-
-
-
 
     private long lookupTimeSeq() {
         long t0 = System.currentTimeMillis();
@@ -276,40 +256,6 @@ public final class NGoTable {
         long t1 = System.currentTimeMillis();
         return (t1 - t0);
     }
-
-
-
-    private static void lookupTest() {
-        long tstot = 0;
-        long tbtot = 0;
-        long tctot = 0;
-
-        distribution_t m = BINOMIAL;
-
-        for (int i = 10; i <= 90; i+= 10) {
-            for (int ip = -6; ip < -1; ip++) {
-                double lp = 2. * ip;
-                NGoTable jc = new NGoTable(i, lp, m);
-
-                jc.lookupCheck();
-
-                long ts = jc.lookupTimeSeq();
-                long tb = jc.lookupTimeBS();
-                long tc = jc.lookupTimeSwitch();
-
-                tstot += ts;
-                tbtot += tb;
-                tctot += tc;
-                double p = Math.exp(lp);
-                System.out.println("timings " + i + " " + p + " " +
-                                   ts + " " + tb + " " + tc);
-
-            }
-        }
-
-        E.info("seq " + tstot + "   bs " + tbtot + " " + tctot);
-    }
-
 
     private static void dumpExamples() {
         new NGoTable(10, Math.log(0.1), BINOMIAL).print();

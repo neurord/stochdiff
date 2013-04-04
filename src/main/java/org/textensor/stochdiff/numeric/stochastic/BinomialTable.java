@@ -3,7 +3,7 @@ package org.textensor.stochdiff.numeric.stochastic;
 
 public class BinomialTable extends ProbabilityTable {
 
-    private final static int NMAX = 140;
+    static public final int NMAX = 140;
 
     private static BinomialTable instance;
 
@@ -31,41 +31,25 @@ public class BinomialTable extends ProbabilityTable {
 
         for (int i = 2; i < NMAX; i++) {
             int nel = i/2 + 1;
-            double[] row = new double[nel];
             double[] abv = ncmtbl[i-1];
+            double[] row = ncmtbl[i] = new double[nel];
             row[0] = 1;
-            for (int j = 1; j < nel; j++) {
+            for (int j = 1; j < nel; j++)
                 row[j] = abv[j-1] + (j < abv.length ? abv[j] : abv[j-1]);
-            }
-            ncmtbl[i] = row;
         }
     }
-
-
-
 
     public double ncm(int n, int m) {
-        double ret = 0;
-        if (m > n-m) {
-            ret = ncmtbl[n][n-m];
-        } else {
-            ret = ncmtbl[n][m];
-        }
-        return ret;
+        return ncmtbl[n][m > n-m ? n-m : m];
     }
-
-
 
     public void print(int n) {
         for (int i = 0; i < n; i++) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("row " + i + "  ");
+            System.out.print("row " + i + "  ");
             double[] c = ncmtbl[i];
-            for (int j = 0; j < c.length; j++) {
-                sb.append(c[j]);
-                sb.append(" ");
-            }
-            System.out.println(sb);
+            for (int j = 0; j < c.length; j++)
+                System.out.print("" + c[j] + " ");
+            System.out.println();
         }
     }
 
