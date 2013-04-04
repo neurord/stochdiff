@@ -7,25 +7,22 @@ import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
 public final class NGoTable {
 
-    double lnp;
-    int nparticle;
+    private double lnp;
+    private int n;
 
-    double[] cprob; // cumulative probabilities
-    int ncprob;
+    private double[] cprob; // cumulative probabilities
+    private int ncprob;
 
-    distribution_t mode;
+    private distribution_t mode;
 
-    public NGoTable(int n, double lnp0, distribution_t mode) {
-        lnp = lnp0;
-        nparticle = n;
+    public NGoTable(int n, double lnp, distribution_t mode) {
+        this.lnp = lnp;
+        this.n = n;
         this.mode = mode;
 
         double p = Math.exp(lnp);
         double q = 1. - p;
         double lnq = Math.log(q);
-
-
-
 
         switch (mode) {
         case BINOMIAL: {
@@ -76,7 +73,7 @@ public final class NGoTable {
 
         case POISSON: {
 
-            double lambda = n * Math.exp(lnp0);
+            double lambda = n * Math.exp(lnp);
             double emlambda = Math.exp(-1. * lambda);
 
 
@@ -118,12 +115,8 @@ public final class NGoTable {
         }; break;
 
         default:
-
-            E.warning("unrecognized distribution " + mode);
+            throw new RuntimeException("unrecognized distribution " + mode);
         }
-
-
-
     }
 
 
@@ -149,15 +142,6 @@ public final class NGoTable {
      * given the actual data (and maybe generate code for it)
      */
 
-
-
-    public int nGoSeq(double r) {
-        int ret = 0;
-        while (cprob[ret] < r) {
-            ret += 1;
-        }
-        return ret;
-    }
 
 
     public int nGoBS(double r) {
@@ -224,7 +208,7 @@ public final class NGoTable {
 
     public void print() {
         StringBuffer sb = new StringBuffer();
-        sb.append("n=" + nparticle + " p="+ Math.exp(lnp) +
+        sb.append("n=" + n + " p="+ Math.exp(lnp) +
                   " njmax=" + ncprob + " mode=" + mode + "\n");
         sb.append("p(n < i): ");
         for (int i = 0; i < ncprob; i++) {
@@ -248,10 +232,10 @@ public final class NGoTable {
     private void lookupCheck() {
         for (int i = 0; i <= 50; i++) {
             double r = (1. * i) / 50.;
-            int n1 = nGoSeq(r);
+            int n1 = nGo(r);
             int n2 = nGoBS(r);
             if (n1 != n2) {
-                E.error("different results in lookup check " + nparticle + " " +
+                E.error("different results in lookup check " + n + " " +
                         Math.exp(lnp) + " " + n1 + " " + n2);
             }
         }
@@ -265,7 +249,7 @@ public final class NGoTable {
         double rnx = 1.e7;
         int njt = 0;
         for (int i = 0; i < rnx; i++) {
-            njt += nGoSeq(i / rnx);
+            njt += nGo(i / rnx);
         }
         long t1 = System.currentTimeMillis();
         return (t1 - t0);

@@ -6,6 +6,8 @@ import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
 import static java.lang.String.format;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * Step generator for the case that the calculation may include
@@ -19,17 +21,16 @@ import static java.lang.String.format;
 
 
 public class InterpolatingStepGenerator extends StepGenerator {
+    static final Logger log = LogManager.getLogger(InterpolatingStepGenerator.class);
 
     public final double lnpmin = Math.log(1.e-8);
     public final double lnpmax = Math.log(0.5);
 
-    public final static double deltalnp = 0.03;  //0.3;
+    public final static double deltalnp = 0.03;
 
 
 
-    NGoTable[][] pnTable;
-
-    int nppts;
+    final NGoTable[][] pnTable;
 
     private static InterpolatingStepGenerator bInstance;
     private static InterpolatingStepGenerator pInstance;
@@ -51,23 +52,16 @@ public class InterpolatingStepGenerator extends StepGenerator {
     }
 
     public InterpolatingStepGenerator(distribution_t mode) {
-        E.info(format("Using a %s step generator", mode));
-
-        nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
+        int nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
         pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
 
-        fullInit(mode);
-    }
+        log.info("Using {} step generator with {}·{} tables",
+                 mode, pnTable.length, pnTable[0].length);
 
-
-    // initialize all the tables - may not all be used ever -
-    // could evaluate them as required
-    private void fullInit(distribution_t mode) {
         for (int i = 0; i <= nppts; i++) {
             double lnp = lnpmin + i * deltalnp;
-            for (int j = 2; j <= StepGenerator.NMAX_STOCHASTIC; j++) {
+            for (int j = 2; j <= StepGenerator.NMAX_STOCHASTIC; j++)
                 pnTable[i][j] = new NGoTable(j, lnp, mode);
-            }
         }
     }
 
@@ -98,7 +92,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
 
         } else {
-            if (ia+1 > nppts) {
+            if (ia+1 > pnTable.length) {
                 E.error("ia too big " + n + " " + lnp + " " + r);
             }
 
@@ -113,6 +107,9 @@ public class InterpolatingStepGenerator extends StepGenerator {
             }
         }
 
+        if (Double.isInfinite(lnp) && ngo > 0)
+            log.error("n={} lnp={} r={} ia={} f={} ngo={}",
+                      n, lnp, r, ia, f, ngo);
 
         return ngo;
     }

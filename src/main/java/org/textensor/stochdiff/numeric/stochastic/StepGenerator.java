@@ -55,9 +55,11 @@ public abstract class StepGenerator {
     //WK-->
 
 
-    // this just uses the poisson variance in combination with a gaussian random
-    // The alternative is to use a real poisson variable with the desired mean, but the
-    // cost is substantially greater (ten times or so)
+    /**
+     * This just uses the poisson variance in combination with a gaussian random.
+     * The alternative is to use a real poisson variable with the desired mean, but the
+     * cost is substantially greater (ten times or so).
+     */
     public static int poissonStep(int n, double p, double grv, double urv) {
         double rngo = n * p + grv * Math.sqrt(n * p); //WK: removed Math.round per RC's email on 5-17-2007
         int ngo = (int)rngo;
