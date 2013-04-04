@@ -56,18 +56,18 @@ public class ResultWriterHDF5 implements ResultWriter {
     @Override
     public void init(String magic) {
         try {
-            this._init(magic);
+            this._init();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected void _init(String magic)
+    protected void _init()
         throws Exception
     {
         FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
         assert fileFormat != null;
-        log.info("Opening output file {}", this.outputFile);
+        log.debug("Opening output file {}", this.outputFile);
         this.output = (H5File) fileFormat.create(this.outputFile.toString());
         assert this.output != null;
 
@@ -109,7 +109,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                               String fnmsOut[], IGridCalc source)
         throws Exception
     {
-        log.info("Writing grid at time {}", startTime);
+        log.debug("Writing grid at time {}", startTime);
         int n = vgrid.getNElements();
         long[]
             dims = {n,},
@@ -159,7 +159,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         Attribute attr = new Attribute(name, short_str_t,
                                        new long[] {}, new String[] {value});
         obj.writeMetadata(attr);
-        log.info("Wrote metadata on {} {}={}", obj, name, value);
+        log.debug("Wrote metadata on {} {}={}", obj, name, value);
     }
 
     public Dataset writeArray(String name, Group parent, double[][] items)
@@ -397,7 +397,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
         throws Exception
     {
-        log.info("Writing concentrations at time {}", time);
+        log.debug("Writing concentrations at time {}", time);
 
         final long[] dims;
         if (this.concs == null) {
