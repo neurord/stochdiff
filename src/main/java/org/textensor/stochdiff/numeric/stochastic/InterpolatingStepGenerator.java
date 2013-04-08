@@ -83,38 +83,22 @@ public class InterpolatingStepGenerator extends StepGenerator {
      */
 
     public int nGo(int n, double lnp, double r) {
+        if (n > NMAX_STOCHASTIC)
+            throw new RuntimeException("n too large (" + n + ")");
+
+        if (Double.isInfinite(lnp))
+            return 0;
+
         int ia = (int)((lnp - lnpmin) / deltalnp);
         double f = (lnp - (lnpmin + ia * deltalnp)) / deltalnp;
         if (ia < 0) {
             ia = 0;
             f = 0.;
         }
-        int ngo = 0;
 
-        if (n > NMAX_STOCHASTIC) {
-            E.error("n too large");
-
-
-
-        } else {
-            if (ia+1 > pnTable.length) {
-                E.error("ia too big " + n + " " + lnp + " " + r);
-            }
-
-            double rna = pnTable[ia][n].rnGo(r);
-            double rnb = pnTable[ia+1][n].rnGo(r);
-            ngo = (int)(f * rnb + (1. - f) * rna);
-
-            //if (ngo != 0)
-            {
-                //    System.out.println(n + " " + lnp + " " + ngo);
-                // System.out.println(ia + " " + lnp + " " + (lnpmin + ia*deltalnp) + " " + (lnpmin + (ia+1)*deltalnp));
-            }
-        }
-
-        if (Double.isInfinite(lnp) && ngo > 0)
-            log.error("n={} lnp={} r={} ia={} f={} ngo={}",
-                      n, lnp, r, ia, f, ngo);
+        double rna = pnTable[ia][n].rnGo(r);
+        double rnb = pnTable[ia+1][n].rnGo(r);
+        int ngo = (int)(f * rnb + (1. - f) * rna);
 
         return ngo;
     }
