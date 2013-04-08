@@ -60,6 +60,8 @@ parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
+parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
+parser.add_argument('--xscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--time', type=time_range, default=(None, None))
 
 class Drawer(object):
@@ -278,7 +280,7 @@ def specie_indices(items, species):
     species = list(species)
     return numpy.array([species.index(i) for i in items])
 
-def _history(simul, species, indices, times, concentrations, title):
+def _history(simul, species, indices, times, concentrations, title, opts):
     from matplotlib import pyplot
 
     full_title = 'particle numbers in {}: species {}'.format(title,
@@ -286,16 +288,17 @@ def _history(simul, species, indices, times, concentrations, title):
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
-    ax = f.gca()
+    ax = f.gca(xscale=opts.xscale, yscale=opts.yscale)
     ax.set_xlabel('t / ms')
     ax.set_ylabel('particle numbers')
     for sp, color, name in zip(indices, itertools.cycle('rgbkcmy'), species):
         for vox in range(concentrations.shape[1]):
-            ax.plot(times, concentrations[:, vox, sp], color=color, label=name)
+            x, y = times, concentrations[:, vox, sp]
+            ax.plot(x, y, color=color, label=name)
     ax.legend(loc='best')
     pyplot.show(block=True)
 
-def plot_history(filename, species, time):
+def plot_history(filename, species, opts):
     file = tables.openFile(filename)
     model = file.root.model
     simul = file.root.simulation
@@ -303,10 +306,10 @@ def plot_history(filename, species, time):
         indices = specie_indices(species, model.species)
     else:
         indices = numpy.arange(len(model.species))
-    when = filter_times(time, simul.times)
+    when = filter_times(opts.time, simul.times)
     _history(simul, model.species[indices], indices,
              simul.times[when], simul.concentrations[when],
-             title=filename)
+             title=filename, opts=opts)
 
 if __name__ == '__main__':
     opts = parser.parse_args()
@@ -315,7 +318,7 @@ if __name__ == '__main__':
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history is not None:
-        plot_history(opts.file, opts.history, opts.time)
+        plot_history(opts.file, opts.history, opts)
     else:
         if not opts.save:
             animate_drawing(opts)
