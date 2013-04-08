@@ -28,9 +28,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
     public final static double deltalnp = 0.03;
 
-
-
-    final NGoTable[][] pnTable;
+    private final NGoTable[][] pnTable;
 
     private static InterpolatingStepGenerator bInstance;
     private static InterpolatingStepGenerator pInstance;
@@ -51,7 +49,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
         return pInstance;
     }
 
-    public InterpolatingStepGenerator(distribution_t mode) {
+    private InterpolatingStepGenerator(distribution_t mode) {
         int nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
         pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
 
@@ -65,6 +63,13 @@ public class InterpolatingStepGenerator extends StepGenerator {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s.%s[%d·%d tables, %.3g:%.3g:%.3g]",
+                             getClass().getSimpleName(),
+                             pnTable[0][2].mode, pnTable.length, pnTable[0].length,
+                             lnpmin, lnpmax, deltalnp);
+    }
 
     /*
      * TODO - this is by no means optimal. It shouldn't cost much

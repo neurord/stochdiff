@@ -19,7 +19,7 @@ public final class NGoTable {
     private final double[] cprob; // cumulative probabilities
     private int ncprob;
 
-    private distribution_t mode;
+    public final distribution_t mode;
 
     public NGoTable(int n, double lnp, distribution_t mode) {
         this.lnp = lnp;

@@ -141,7 +141,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         // Debug.dump("rates", rates);
 
-        lnrates = ArrayUtil.log(rtab.getRates(), -999.);
+        lnrates = ArrayUtil.log(rtab.getRates());
+        log.info("lnrates: {}", lnrates);
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
@@ -153,7 +154,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
         nspec = rtab.getNSpecies();
         specieIDs = rtab.getSpecieIDs();
         volumes = vgrid.getElementVolumes();
-        lnvolumes = ArrayUtil.log(volumes, -999.);
+        lnvolumes = ArrayUtil.log(volumes);
+        log.info("lnvolumes: {}", lnvolumes);
 
         // RO
         // ----------------------
@@ -167,11 +169,11 @@ public class SteppedStochasticGridCalc extends GridCalc {
         surfaceAreas = vgrid.getExposedAreas();
 
         fdiff = rtab.getDiffusionConstants();
-        lnfdiff = ArrayUtil.log(fdiff, -999.);
+        lnfdiff = ArrayUtil.log(fdiff);
 
         neighbors = vgrid.getPerElementNeighbors();
         couplingConstants = vgrid.getPerElementCouplingConstants();
-        lnCC = ArrayUtil.log(couplingConstants, -999.);
+        lnCC = ArrayUtil.log(couplingConstants);
         diffusionEvents = new int[nel][nspec][];
         for (int iel = 0; iel < nel; iel++)
             for (int k = 0; k < nspec; k++) {
@@ -525,13 +527,21 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         if (n > 0) {
             int ngo;
-            if (n == 1)
+            final int b;
+            if (n == 1) {
                 // TODO use table to get rid of exp
                 ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-            else if (n < StepGenerator.NMAX_STOCHASTIC)
+                b = 1;
+            } else if (n < StepGenerator.NMAX_STOCHASTIC) {
                 ngo = interpSG.nGo(n, lnp, random.random());
-            else
+                b = 2;
+            } else {
                 ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
+                b = 3;
+            }
+
+            if (rtab.getRates()[ireac] == 0 && ngo > 0)
+                log.warn("n={} -> ngo={} (lnp={}) b={}", n, ngo, lnp, b);
 
             // update the new quantities in npn;
             int ri0 = ri[0];
@@ -592,9 +602,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 nend[pi0] += ngo * ps[0];
                 if (pi1 >= 0)
                     nend[pi1] += ngo * ps[1];
-            }
 
-            this.reactionEvents[iel][ireac] += ngo;
+                this.reactionEvents[iel][ireac] += ngo;
+            }
 
             // TODO this "if (ri[1] >= 0)" business is not great
             // it applies for the A+B->C case, where there is a
@@ -732,7 +742,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         }
     }
 
-    final private static double[] intlogs = ArrayUtil.logArray(10000, -99);
+    final private static double[] intlogs = ArrayUtil.logArray(10000);
     public final static double intlog(int i) {
         if (i <= 0)
             return intlogs[0];

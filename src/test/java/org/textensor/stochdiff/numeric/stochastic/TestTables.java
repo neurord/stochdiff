@@ -48,7 +48,7 @@ public class TestTables {
     }
 
     @DataProvider
-    public Object[][] modes() {
+    public static Object[][] modes() {
         ArrayList<Object[]> t = inst.newArrayList();
         for (distribution_t mode: distribution_t.values())
             t.add(new Object[] {mode});

@@ -134,23 +134,23 @@ public class ArrayUtil {
         }
     }
 
-    public static double[] log(double[] d, double dzero) {
+    public static double[] log(double[] d) {
         double[] ret = new double[d.length];
         for (int i = 0; i < d.length; i++)
-            ret[i] = d[i] <= 0 ? dzero : Math.log(d[i]);
+            ret[i] = d[i] == 0 ? Float.NEGATIVE_INFINITY : Math.log(d[i]);
         return ret;
     }
 
-    public static double[][] log(double[][] d, double dzero) {
+    public static double[][] log(double[][] d) {
         double[][] ret = new double[d.length][];
         for (int i = 0; i < d.length; i++)
-            ret[i] = log(d[i], dzero);
+            ret[i] = log(d[i]);
         return ret;
     }
 
-    public static double[] logArray(int len, double zeroth) {
+    public static double[] logArray(int len) {
         double[] ret = new double[len];
-        ret[0] = zeroth;
+        ret[0] = Float.NEGATIVE_INFINITY;
         for (int i = 1; i < ret.length; i++)
             ret[i] = Math.log(i);
         return ret;
