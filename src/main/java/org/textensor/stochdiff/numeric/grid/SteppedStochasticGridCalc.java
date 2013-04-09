@@ -514,8 +514,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
             } else {
                 lnp += intlog(nk);
             }
-            lnp -= lnvol;
-            lnp -= LN_PARTICLES_PUVC;
+            lnp -= lnvol + LN_PARTICLES_PUVC;
         }
 
         if (lnp > -1.) {
@@ -568,33 +567,18 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 ngo = navail;
             }
 
-            // WK 9 25 2007: setting inc/decrements (i.e., ngo*xxx) to
-            // zero explicitly
-            // to avoid floating point error
-            if (ngo == 0) {
-                int pi0 = pi[0];
-                int pi1 = pi[1];
-                nend[ri0] -= 0;
-                if (ri1 >= 0)
-                    nend[ri1] -= 0;
-                nend[pi0] += 0;
-                if (pi1 >= 0)
-                    nend[pi1] += 0;
-            } else {
+            if (ngo > 0) {
                 // WK
                 nend[ri0] -= ngo * rs0;
 
-                if (ri1 >= 0) {
+                if (ri1 >= 0)
                     nend[ri1] -= ngo * rs1;
-                }
-                // WK 3/16/2010
-                if (nend[ri0] < 0) {
-                    System.out.println("nend[ri0] is NEGATIVE!");
-                }
-                if (ri1 >= 0 && nend[ri1] < 0) {
-                    System.out.println("nend[ri1] is NEGATIVE!");
-                }
-                // WK
+
+                if (nend[ri0] < 0)
+                    log.warn("nend[ri0] is NEGATIVE!");
+
+                if (ri1 >= 0 && nend[ri1] < 0)
+                    log.warn("nend[ri1] is NEGATIVE!");
 
                 int pi0 = pi[0];
                 int pi1 = pi[1];
