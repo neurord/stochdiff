@@ -517,11 +517,11 @@ public class SteppedStochasticGridCalc extends GridCalc {
             lnp -= lnvol + LN_PARTICLES_PUVC;
         }
 
-        if (lnp > -1.) {
+        if (lnp > 0) {
             if (++nwarn < 5)
-                log.warn("p too large at element {} reaction {}: capping {} to exp(-1)",
+                log.warn("p too large at element {} reaction {}: capping {} to exp(0)",
                          iel, ireac, Math.exp(lnp));
-            lnp = -1.;
+            lnp = 0;
         }
 
         if (n > 0) {
