@@ -504,16 +504,19 @@ public class SteppedStochasticGridCalc extends GridCalc {
         double lnp = lnrates[ireac] + lndt;
 
         int n = nstart[ri[0]];
+        int ns = n / rs[0];
+        for (int k = 1; k < ri.length; k++) {
+            int nk = nstart[ri[k]];
+            int nks = nk / rs[k];
 
-        if (ri[1] >= 0) {
-            int nk = nstart[ri[1]];
-
-            if (nk < n) {
+            if (nks < ns) {
                 lnp += intlog(n);
                 n = nk;
+                ns = nks;
             } else {
                 lnp += intlog(nk);
             }
+
             lnp -= lnvol + LN_PARTICLES_PUVC;
         }
 
@@ -524,35 +527,32 @@ public class SteppedStochasticGridCalc extends GridCalc {
             lnp = 0;
         }
 
-        if (n > 0) {
+        if (ns > 0) {
             int ngo;
             final int b;
-            if (n == 1) {
+            if (ns == 1) {
                 // TODO use table to get rid of exp
                 ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
                 b = 1;
-            } else if (n < StepGenerator.NMAX_STOCHASTIC) {
-                ngo = interpSG.nGo(n, lnp, random.random());
+            } else if (ns < StepGenerator.NMAX_STOCHASTIC) {
+                ngo = interpSG.nGo(ns, lnp, random.random());
                 b = 2;
             } else {
-                ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
+                ngo = this.calculateNgo("advance(reaction)", ns, Math.exp(lnp));
                 b = 3;
             }
 
             if (rtab.getRates()[ireac] == 0 && ngo > 0)
-                log.warn("n={} -> ngo={} (lnp={}) b={}", n, ngo, lnp, b);
+                log.warn("ns={} -> ngo={} (lnp={}) b={}", ns, ngo, lnp, b);
 
-            // update the new quantities in npn;
-            int ri0 = ri[0];
-            int ri1 = ri[1];
-            int rs0 = rs[0];
-            int rs1 = rs[1];
+            /* Update the new quantities in npn */
 
-            int navail = nend[ri0] / rs[0];
-            // AB changed navail > nend[ri1] / rs1 to navail < nend[ri1]
-            // / rs1
-            if (ri1 >= 0 && navail > nend[ri1] / rs1)
-                navail = nend[ri1] / rs1;
+            int navail = nend[ri[0]] / rs[0];
+            for (int k = 1; k < ri.length; k++) {
+                int navail2 = nend[ri[k]] / rs[k];
+                if (navail2 < navail)
+                    navail = navail2;
+            }
 
             if (ngo > navail) {
                 /* TODO as for diffusion, we've got more particles going
@@ -568,34 +568,22 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
 
             if (ngo > 0) {
-                // WK
-                nend[ri0] -= ngo * rs0;
+                for (int k = 0; k < ri.length; k++)
+                    nend[ri[k]] -= ngo * rs[k];
 
-                if (ri1 >= 0)
-                    nend[ri1] -= ngo * rs1;
+                for (int k = 0; k < pi.length; k++)
+                    nend[pi[k]] += ngo * ps[k];
 
-                if (nend[ri0] < 0)
-                    log.warn("nend[ri0] is NEGATIVE!");
+                for (int k = 0; k < ri.length; k++)
+                    if (nend[ri[k]] < 0)
+                        log.error("nend is negative: {}", nend);
 
-                if (ri1 >= 0 && nend[ri1] < 0)
-                    log.warn("nend[ri1] is NEGATIVE!");
-
-                int pi0 = pi[0];
-                int pi1 = pi[1];
-
-                nend[pi0] += ngo * ps[0];
-                if (pi1 >= 0)
-                    nend[pi1] += ngo * ps[1];
+                for (int k = 0; k < pi.length; k++)
+                    if (nend[pi[k]] < 0)
+                        log.error("nend is negative: {}", nend);
 
                 this.reactionEvents[iel][ireac] += ngo;
             }
-
-            // TODO this "if (ri[1] >= 0)" business is not great
-            // it applies for the A+B->C case, where there is a
-            // second reactant. We could probably do better by
-            // unrolling the four cases into separate blocks according
-            // to the reaction type
-            // - a good case for code generation.
         }
     }
 

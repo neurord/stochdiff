@@ -61,7 +61,6 @@ parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
-parser.add_argument('--xscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--time', type=time_range, default=(None, None))
 
 class Drawer(object):
@@ -117,7 +116,7 @@ class DrawerSet(object):
             ax = f.add_subplot(shape[0], shape[1], pos)
             data = sim.concentrations[:]
             self.drawers += [Drawer(f, ax, 'species', species, times, data,
-                                    title='Particle numbers')]
+                                    title='Number of particles')]
             pos += 1
         if opts.stimulation:
             ax = f.add_subplot(shape[0], shape[1], pos)
@@ -288,7 +287,7 @@ def _history(simul, species, indices, times, concentrations, title, opts):
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
-    ax = f.gca(xscale=opts.xscale, yscale=opts.yscale)
+    ax = f.gca(yscale=opts.yscale)
     ax.set_xlabel('t / ms')
     ax.set_ylabel('particle numbers')
     for sp, color, name in zip(indices, itertools.cycle('rgbkcmy'), species):

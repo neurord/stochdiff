@@ -10,7 +10,11 @@ import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class Reaction implements AddableTo {
+    static final Logger log = LogManager.getLogger(Reaction.class);
 
     public String name;
     public String id;
@@ -37,7 +41,7 @@ public class Reaction implements AddableTo {
 
     public void resolve(HashMap<String, Specie> sphm) {
         if (this.p_reactants.isEmpty() || this.p_products.isEmpty())
-            throw new RuntimeException("no reactants in reaction " + name);
+            log.warn("no reactants in reaction {}", name);
         this.r_reactants = parseRefs(this.p_reactants, sphm);
         this.r_products = parseRefs(this.p_products, sphm);
     }

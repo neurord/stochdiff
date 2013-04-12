@@ -153,8 +153,4 @@ public class InterpolatingStepGenerator extends StepGenerator {
         pnTable[ia][n].print();
         pnTable[ia+1][n].print();
     }
-
-
-
-
 }

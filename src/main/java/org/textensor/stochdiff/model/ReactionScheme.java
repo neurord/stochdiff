@@ -9,8 +9,11 @@ import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ReactionScheme implements AddableTo {
+    static final Logger log = LogManager.getLogger(ReactionScheme.class);
 
     private final ArrayList<Specie> species = inst.newArrayList();
     private final HashMap<String, Specie> specieHM = inst.newHashMap();
@@ -60,17 +63,36 @@ public class ReactionScheme implements AddableTo {
     }
 
     public ReactionTable makeReactionTable() {
-        int nreaction = reactions.size();
-        int nspecie = species.size();
-        ReactionTable rtab = new ReactionTable(2 * nreaction, nspecie);
+        int n  = 0;
+        for (Reaction r: reactions)
+            /* There's always a forward reaction, but if a
+             * reaction has no products, there's no reverse reaction.
+             * If a reaction has 0 rate, we can skip that too. */
+            n += (r.forwardRate > 0 ? 1 : 0) +
+                (r.getProductIndices()[0].length > 0 &&
+                 r.reverseRate > 0 ? 1 : 0);
 
-        int ir = 0;
+        log.info("Running with {} reactions (forward and reverse)", n);
+
+        ReactionTable rtab = new ReactionTable(n, species.size());
+
+        int i = 0;
         for (Reaction r :  reactions) {
             int[][] reactants = r.getReactantIndices();
             int[][] products = r.getProductIndices();
-            rtab.setReactionData(ir++, reactants, products, r.forwardRate);
-            rtab.setReactionData(ir++, products, reactants, r.reverseRate);
+
+            if (r.forwardRate > 0)
+                rtab.setReactionData(i++, reactants, products, r.forwardRate);
+
+            if (r.reverseRate > 0)
+                if (products[1].length > 0)
+                    rtab.setReactionData(i++, products, reactants, r.reverseRate);
+                else
+                    throw new RuntimeException("reaction with non-zero rate but no reactants: "
+                                               + r.id);
         }
+
+        assert i == n: "ir=" + i + " n=" + n;
 
         rtab.setSpeciesIDs(getSpecieIDs());
         rtab.setDiffusionConstants(getDiffusionConstants());

@@ -4,103 +4,77 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+import static java.lang.String.format;
 
 public class ReactionTable {
+    static final Logger log = LogManager.getLogger(ReactionTable.class);
 
-    int nreaction;
-    public int nspecie;
-    String[] speciesIDs;
-    double[] diffusionConstants;
+    public final int nreaction;
+    public final int nspecie;
 
-    int[][] reactantIndices;
-    int[][] productIndices;
+    private String[] speciesIDs;
+    private double[] diffusionConstants;
 
-    int[][] reactantStochiometry;
-    int[][] productStochiometry;
+    private final int[][] reactantIndices;
+    private final int[][] productIndices;
 
-    double[] rates;
+    private final int[][] reactantStochiometry;
+    private final int[][] productStochiometry;
+
+    private final double[] rates;
+
+    private Matrix productionMatrix;
 
 
-    Matrix productionMatrix;
+    public ReactionTable(int nreaction, int nspecie) {
+        this.nreaction = nreaction;
+        this.nspecie = nspecie;
 
+        this.reactantIndices = new int[nreaction][];
+        this.productIndices = new int[nreaction][];
 
-    public ReactionTable(int nr, int ns) {
-        nreaction = nr;
-        nspecie = ns;
+        this.reactantStochiometry = new int[nreaction][];
+        this.productStochiometry = new int[nreaction][];
 
-        reactantIndices = new int[nreaction][2];
-        productIndices = new int[nreaction][2];
-
-        reactantStochiometry = new int[nreaction][2];
-        productStochiometry = new int[nreaction][2];
-
-        for (int i = 0; i < nreaction; i++) {
-            for (int j = 0; j < 2; j++) {
-                reactantIndices[i][j] = -1;
-                productIndices[i][j] = -1;
-            }
-        }
-
-        rates = new double[nreaction];
-
+        this.rates = new double[nreaction];
     }
 
 
     public void print() {
         StringBuffer sb = new StringBuffer();
         sb.append("nspecie = " + nspecie + "  nreaction = " + nreaction + "\n");
-        for (int i = 0; i < nreaction; i++) {
-            sb.append("reaction " + i + ":      ");
-            sb.append("" + reactantIndices[i][0]);
-            sb.append(" (" + reactantStochiometry[i][0] + ")");
-            if (reactantIndices[i][1] >= 0) {
-                sb.append(" + " + reactantIndices[i][1]);
-                sb.append(" (" + reactantStochiometry[i][1] + ")");
-            }
-
+        for (int r = 0; r < nreaction; r++) {
+            sb.append("reaction " + r + ":      ");
+            for (int i = 0; i < reactantIndices[r].length; i++)
+                sb.append(format("%s%d (%d/%d)",
+                                 reactantIndices[r][i],
+                                 reactantStochiometry[r][i],
+                                 reactantPowers[r][i],
+                                 i == 0 ? "" : ", "));
             sb.append(" --> ");
-            sb.append("" + productIndices[i][0]);
-            sb.append(" (" + productStochiometry[i][0] + ")");
-            if (productIndices[i][1] >= 0) {
-                sb.append(" + " + productIndices[i][1]);
-                sb.append(" (" + productStochiometry[i][1] + ")");
-            }
-            sb.append("   rate " + rates[i] + " \n");
+            for (int i = 0; i < productIndices[r].length; i++)
+                sb.append(format("%s%d (%d)",
+                                 productIndices[r][i],
+                                 productStochiometry[r][i],
+                                 i == 0 ? "" : ", "));
+            sb.append("   rate " + rates[r] + " \n");
         }
-        E.info(sb.toString());
+        log.info(sb);
     }
 
-
-
     public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate) {
-        // restrict to max 2 reactants, 2 products - faster than general case;
+        log.info("nreaction={} nspecie={} ireact={} aix={} bidx={} rate={}",
+                 nreaction, nspecie, ireact, aidx, bidx, rate);
+        reactantIndices[ireact] = aidx[0];
+        reactantStochiometry[ireact] = aidx[1];
 
+        productIndices[ireact] = bidx[0];
+        productStochiometry[ireact] = bidx[1];
 
-        reactantIndices[ireact][0] = aidx[0][0];
-        reactantStochiometry[ireact][0] = aidx[1][0];
-        if (aidx[0].length > 1) {
-            reactantIndices[ireact][1] = aidx[0][1];
-            reactantStochiometry[ireact][1] = aidx[1][1];
-        }
-
-        productIndices[ireact][0] = bidx[0][0];
-        productStochiometry[ireact][0] = bidx[1][0];
-        if (bidx[0].length > 1) {
-            productIndices[ireact][1] = bidx[0][1];
-            productStochiometry[ireact][1] = bidx[1][1];
-        }
         rates[ireact] = rate;
-
-
-        if (aidx.length > 2) {
-            E.error("cannot handle reactions with more than two reactants");
-        }
-        if (bidx.length > 2) {
-            E.error("cannot handle reactions with more than two products");
-        }
-
-
-
     }
 
 
