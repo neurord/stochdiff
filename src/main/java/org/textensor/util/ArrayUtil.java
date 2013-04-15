@@ -246,6 +246,11 @@ public class ArrayUtil {
             Arrays.fill(subarray, value);
     }
 
+    public static void fill(double[][] array, double value) {
+        for (double[] subarray: array)
+            Arrays.fill(subarray, value);
+    }
+
     public static void fill(int[][][] arrays, int value) {
         for (int[][] array: arrays)
             for (int[] subarray: array)

@@ -107,13 +107,10 @@ public class ReactionTable {
         double[] c = mconc.getData();
         double[] vr = new double[nreaction];
         for (int ireac = 0; ireac < nreaction; ireac++) {
-            int[] si = reactantIndices[ireac];
-
             double r = rates[ireac];
-            r *= c[si[0]];
-            if (si[1] >= 0) {
-                r *= c[si[1]];
-            }
+            for (int index: reactantIndices[ireac])
+                r *= c[index];
+
             vr[ireac] = r;
         }
         return new Column(vr);
@@ -124,18 +121,13 @@ public class ReactionTable {
         if (productionMatrix == null) {
             double[][] a = new double[nspecie][nreaction];
             for (int ireac = 0; ireac < nreaction; ireac++) {
-                int[] si = reactantIndices[ireac];
-                a[si[0]][ireac] -= 1;
-                if (si[1] >= 0) {
-                    a[si[1]][ireac] -= 1;
-                }
+                for (int index: reactantIndices[ireac])
+                    a[index][ireac] -= 1;
 
+                for (int index: productIndices[ireac])
+                    a[index][ireac] += 1;
 
-                int[] pi = productIndices[ireac];
-                a[pi[0]][ireac] += 1;
-                if (pi[1] >= 0) {
-                    a[pi[1]][ireac] += 1;
-                }
+                // FIXME: what about stochiometry?!!!
             }
             productionMatrix = new Matrix(a);
         }
@@ -153,78 +145,46 @@ public class ReactionTable {
             int[] pi = productIndices[ireac];
 
             double r = rates[ireac];
-            r *= c[si[0]];
-            if (si[1] >= 0) {
-                r *= c[si[1]];
-            }
+            for (int index: reactantIndices[ireac])
+                r *= c[index];
 
-            vr[si[0]] -= r;
-            if (si[1] >= 0) {
-                vr[si[1]] -= r;
-            }
+            for (int index: reactantIndices[ireac])
+                vr[index] -= r;
 
-            vr[pi[0]] += r;
-            if (pi[1] >= 0) {
-                vr[pi[1]] += r;
-            }
+            for (int index: productIndices[ireac])
+                vr[index] += r;
+
+            // FIXME: what about stochiometry?!!!
         }
         return new Column(vr);
     }
 
 
     /*
-     * This is the matrix M such that delta C = productionColumn + M delta C
+     * This is the matrix M such that ΔC = productionColumn + M ΔC
      */
 
     public Matrix getIncrementRateMatrix(Column mconc) {
+        double[] c = mconc.getData();
         double[][] d = new double[nspecie][nspecie];
 
-        double[] c = mconc.getData();
-
-        for (int ireac = 0; ireac < nreaction; ireac++) {
-            int[] si = reactantIndices[ireac];
-            int[] pi = productIndices[ireac];
-
-            {
+        for (int ireac = 0; ireac < nreaction; ireac++)
+            for (int index: reactantIndices[ireac]) {
                 double r = rates[ireac];
-                if (si[1] >= 0) {
-                    r *= c[si[1]];
-                }
-                int isrc = si[0];
 
-                d[si[0]][isrc] -= r;
-                if (si[1] >= 0) {
-                    d[si[1]][isrc] -= r;
-                }
+                for (int index2: reactantIndices[ireac])
+                    if (index2 != index)
+                        r *= c[index2];
+
+                for (int index2: reactantIndices[ireac])
+                    d[index2][index] -= r;
 
                 // TODO - identify A+A reactions etc and multiply by combinatorial
                 // factor!!!!!!!!;
-                d[pi[0]][isrc] += r;
-                if (pi[1] >= 0) {
-                    d[pi[1]][isrc] += r;
-                }
+                for (int index2: productIndices[ireac])
+                    d[index2][index] += r;
             }
 
-            if (si[1] >= 0) {
-                double r = rates[ireac];
-                r *= c[si[0]];
-                int isrc = si[1];
-
-                d[si[0]][isrc] -= r;
-                if (si[1] >= 0) {
-                    d[si[1]][isrc] -= r;
-                }
-
-                // TODO - identify A+A reactions etc and multiply by combinatorial
-                // factor!!!!!!!!;
-                d[pi[0]][isrc] += r;
-                if (pi[1] >= 0) {
-                    d[pi[1]][isrc] += r;
-                }
-
-
-            }
-        }
         return new Matrix(d);
     }
 
@@ -239,24 +199,15 @@ public class ReactionTable {
         double[] ret = vdc.getData();
 
         for (int ireac = 0; ireac < nreaction; ireac++) {
-            int[] srcIdx = reactantIndices[ireac];
-            int[] prodIdx = productIndices[ireac];
-
             double r = rates[ireac];
-            r *= ctot[srcIdx[0]];
-            if (srcIdx[1] >= 0) {
-                r *= ctot[srcIdx[1]];
-            }
-            ret[srcIdx[0]] += r;
-            if (srcIdx[1] >= 0) {
-                ret[srcIdx[1]] += r;
-            }
+            for (int index: reactantIndices[ireac])
+                r *= ctot[index];
 
-            ret[prodIdx[0]] -= r;
-            if (prodIdx[1] >= 0) {
-                ret[prodIdx[1]] += r;
-            }
+            for (int index: reactantIndices[ireac])
+                ret[index] += r;
 
+            for (int index: productIndices[ireac])
+                ret[index] -= r;
         }
         return vret;
     }

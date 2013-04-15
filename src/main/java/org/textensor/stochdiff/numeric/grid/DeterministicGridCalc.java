@@ -16,13 +16,16 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 import org.textensor.util.ArrayUtil;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 /*
  *
  * Dufort-Frankel reaction diffusion implementation.
  * This is a continuous (deterministic) calculation to generate reference data.
  */
-
 public class DeterministicGridCalc extends GridCalc {
+    static final Logger log = LogManager.getLogger(DeterministicGridCalc.class);
 
     @Override
     public boolean preferConcs(){ return true; }
@@ -217,13 +220,10 @@ public class DeterministicGridCalc extends GridCalc {
         // wkA is time t, wktm1 time t-1, wkC the next step, t+1
 
         // initialize next step values to zero;
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < nspec; j++) {
-                wkC[i][j] = 0.;
-            }
-        }
+        ArrayUtil.fill(wkC, 0);
+
         // source terms;
-        // should increment injectiosn sites by 2 * the injected quantity;
+        // should increment injection sites by 2 * the injected quantity;
 
         double[] zl = new double[nspec];
         double[] zr = new double[nspec];
@@ -273,29 +273,27 @@ public class DeterministicGridCalc extends GridCalc {
         // reaction step;
         for (int iel = 0; iel < nel; iel++) {
 //AB 12-19-11	create the coninc outside of the pinj loop, to accumulate injections from multiple stimuli
-            double[] concinc=new double[nspec];
-            int concnull=1;
+            double[] concinc = null;
+            boolean concnull = true;
             double fconc = NM_PER_PARTICLE_PUV / volumes[iel];
 //AB 12-19-11 need to create loop over all the stimulations, and
 //			create pinj for each stimulation (not just the first one)
             for (int stimnum=0; stimnum<stims.length; stimnum++) {
                 if (eltstims[stimnum][iel] >= 0) {
-                    concnull=0;
-                    double[] pinj=stims[stimnum];
+                    if (concinc == null)
+                        concinc = new double[nspec];
+
+                    double[] pinj = stims[stimnum];
 
                     for (int i = 0; i < pinj.length; i++) {
                         concinc[i] += pinj[i] * fconc * eltstimshare[stimnum][iel];
-                        if (concinc[i] < 0) {
-                            E.error("negative concentration? " + concinc[i]);
-                        }
+                        if (concinc[i] < 0)
+                            log.error("negative concentration: {}", concinc);
                     }
                 }
             }
-            if (concnull==0) {
-                reacStep(wkC[iel], dt, concinc);
-            } else {
-                reacStep(wkC[iel], dt, null);
-            }
+
+            reacStep(wkC[iel], dt, concnull ? null : concinc);
         }
 
         // cycle the solution arrays
