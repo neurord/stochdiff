@@ -5,19 +5,19 @@ public class SpecieRef {
 
     public String specieID;
 
-    public int n;
+    public int n = 1;
 
-    public SpecieRef() {
-        n = 1;
-    }
+    public int power = 1;
 
-    public int getN() {
+    public int getStochiometry() {
         return n;
     }
 
+    public int getPower() {
+        return power;
+    }
 
     public String getSpecieID() {
         return specieID;
     }
-
 }

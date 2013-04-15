@@ -68,14 +68,15 @@ public class Reaction implements AddableTo {
      */
     private static int[][] getIndices(ArrayList<Specie> spa,
                                       ArrayList<? extends SpecieRef> refs) {
+
         int n = spa.size();
-        int[][] ret = new int[2][n];
+        int[][] ret = new int[3][n];
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             ret[0][i] = spa.get(i).getIndex();
-
-        for (int i = 0; i < n; i++)
-            ret[1][i] = refs.get(i).getN();
+            ret[1][i] = refs.get(i).getStochiometry();
+            ret[2][i] = refs.get(i).getPower();
+        }
 
         return ret;
     }

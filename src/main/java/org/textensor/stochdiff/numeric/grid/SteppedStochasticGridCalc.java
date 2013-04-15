@@ -86,6 +86,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int[][] reactantStochiometry;
     int[][] productStochiometry;
 
+    int[][] reactantPowers;
+
     double[] lnrates;
 
     double lndt;
@@ -150,6 +152,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
+        reactantPowers = rtab.getReactantPowers();
 
         nspec = rtab.getNSpecies();
         specieIDs = rtab.getSpecieIDs();
@@ -505,20 +508,24 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         int n = nstart[ri[0]];
         int ns = n / rs[0];
+        int p = reactantPowers[ireac][0];
         for (int k = 1; k < ri.length; k++) {
             int nk = nstart[ri[k]];
             int nks = nk / rs[k];
+            int pk = reactantPowers[ireac][k];
 
             if (nks < ns) {
-                lnp += intlog(n);
+                lnp += intlog(n) * p;
                 n = nk;
                 ns = nks;
+                p = pk;
             } else {
-                lnp += intlog(nk);
+                lnp += intlog(nk) * pk;
             }
 
             lnp -= lnvol + LN_PARTICLES_PUVC;
         }
+        lnp += (p - 1) * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
 
         if (lnp > 0) {
             if (++nwarn < 5)

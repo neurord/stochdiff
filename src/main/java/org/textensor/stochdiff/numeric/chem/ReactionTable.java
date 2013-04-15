@@ -24,6 +24,8 @@ public class ReactionTable {
     private final int[][] reactantStochiometry;
     private final int[][] productStochiometry;
 
+    private final int[][] reactantPowers;
+
     private final double[] rates;
 
     private Matrix productionMatrix;
@@ -38,6 +40,8 @@ public class ReactionTable {
 
         this.reactantStochiometry = new int[nreaction][];
         this.productStochiometry = new int[nreaction][];
+
+        this.reactantPowers = new int[nreaction][];
 
         this.rates = new double[nreaction];
     }
@@ -70,6 +74,7 @@ public class ReactionTable {
                  nreaction, nspecie, ireact, aidx, bidx, rate);
         reactantIndices[ireact] = aidx[0];
         reactantStochiometry[ireact] = aidx[1];
+        reactantPowers[ireact] = aidx[2];
 
         productIndices[ireact] = bidx[0];
         productStochiometry[ireact] = bidx[1];
@@ -243,6 +248,9 @@ public class ReactionTable {
         return productStochiometry;
     }
 
+    public int[][] getReactantPowers() {
+        return reactantPowers;
+    }
 
     public int getSpecieIndex(String specieID) {
         String[] sa = getSpecieIDs();
