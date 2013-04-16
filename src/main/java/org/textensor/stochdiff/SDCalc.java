@@ -10,10 +10,14 @@ import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.stochdiff.numeric.grid.ResultWriterHDF5;
 
+import org.textensor.util.Settings;
 import org.textensor.util.inst;
 
-public class SDCalc {
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
+public class SDCalc {
+    static final Logger log = LogManager.getLogger(SDCalc.class);
 
     SDCalcType calculationType;
 
@@ -27,9 +31,21 @@ public class SDCalc {
         sdRun = sdr;
         String sr = sdRun.calculation;
 
-        this.resultWriters.add(new ResultWriterText(outputFile, false));
-        this.resultWriters.add(new ResultWriterHDF5(outputFile));
+        final String[] writers = Settings.getPropertyList("stochdiff.writers",
+                                                          "text");
 
+        for (String type: writers) {
+            final ResultWriter writer;
+            if (type.equals("text"))
+                writer = new ResultWriterText(outputFile, false);
+            else if (type.equals("h5"))
+                writer = new ResultWriterHDF5(outputFile);
+            else {
+                log.error("Unknown writer '{}'", type);
+                throw new RuntimeException("uknown writer: " + type);
+            }
+            this.resultWriters.add(writer);
+        }
 
         //        if (sdRun.continueOutput() && outputFile.exists() && sdRun.getStartTime() > 0)
         //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
