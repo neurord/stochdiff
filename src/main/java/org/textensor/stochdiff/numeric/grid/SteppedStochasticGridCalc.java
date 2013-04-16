@@ -86,6 +86,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int[][] reactantStochiometry;
     int[][] productStochiometry;
 
+    /**
+     * Propensity powers for true second- and higher-order reactions.
+     */
     int[][] reactantPowers;
 
     double[] lnrates;
@@ -492,6 +495,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
         return dt;
     }
 
+    protected double ln_propensity(int n, int p) {
+        double ans = 0;
+        for (int i = 0; i < p; i++)
+            ans += intlog(n / (p - i));
+        return ans;
+    }
+
     protected void reactionStep(int[] nstart, int[] nend, int iel, int ireac) {
         // total number of possible reactions is the number of
         // particles in the smallest reactant population
@@ -515,7 +525,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
             int pk = reactantPowers[ireac][k];
 
             if (nks < ns) {
-                lnp += intlog(n) * p;
+                lnp += ln_propensity(n, p);
                 n = nk;
                 ns = nks;
                 p = pk;
@@ -525,7 +535,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
             lnp -= lnvol + LN_PARTICLES_PUVC;
         }
-        lnp += (p - 1) * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
+        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
 
         if (lnp > 0) {
             if (++nwarn < 5)

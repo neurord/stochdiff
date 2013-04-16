@@ -238,16 +238,23 @@ public class ReactionTable {
         return productIndices;
     }
 
-
+    /**
+     * The number of particles destroyed in the reaction (by specie).
+     */
     public int[][] getReactantStochiometry() {
         return reactantStochiometry;
     }
 
-
+    /**
+     * The number of particles created in the reaction (by specie).
+     */
     public int[][] getProductStochiometry() {
         return productStochiometry;
     }
 
+    /**
+     * Propensity powers for true second- and higher-order reactions.
+     */
     public int[][] getReactantPowers() {
         return reactantPowers;
     }

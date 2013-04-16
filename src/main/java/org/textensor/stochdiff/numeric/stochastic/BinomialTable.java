@@ -43,12 +43,16 @@ public class BinomialTable extends ProbabilityTable {
         return ncmtbl[n][m > n-m ? n-m : m];
     }
 
+    public long ncm_l(int n, int m) {
+        return Math.round(ncm(n, m));
+    }
+
     public void print(int n) {
         for (int i = 0; i < n; i++) {
             System.out.print("row " + i + "  ");
-            double[] c = ncmtbl[i];
-            for (int j = 0; j < c.length; j++)
-                System.out.print("" + c[j] + " ");
+
+            for (int j = 0; j < i; j++)
+                System.out.print("" + ncm_l(i, j) + " ");
             System.out.println();
         }
     }
