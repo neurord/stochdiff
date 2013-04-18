@@ -326,8 +326,9 @@ public class VolumeGrid {
             z3[i] = pp[11];
             volume[i] = pp[12];
             deltaZ[i] = pp[13];
+            assert 14 == pp.length;
+
             i++;
-            assert i == pp.length;
         }
 
         return inst.newVector(new Object[]

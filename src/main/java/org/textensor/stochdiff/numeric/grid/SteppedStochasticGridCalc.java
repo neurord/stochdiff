@@ -551,7 +551,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 // TODO use table to get rid of exp
                 ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
                 b = 1;
-            } else if (ns < StepGenerator.NMAX_STOCHASTIC) {
+            } else if (ns <= StepGenerator.NMAX_STOCHASTIC) {
                 ngo = interpSG.nGo(ns, lnp, random.random());
                 b = 2;
             } else {

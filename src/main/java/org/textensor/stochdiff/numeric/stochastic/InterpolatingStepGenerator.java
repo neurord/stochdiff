@@ -23,10 +23,12 @@ import org.apache.logging.log4j.LogManager;
 public class InterpolatingStepGenerator extends StepGenerator {
     static final Logger log = LogManager.getLogger(InterpolatingStepGenerator.class);
 
-    public final double lnpmin = Math.log(1.e-8);
-    public final double lnpmax = Math.log(0.5);
+    public final int NRANGES = 600;
 
-    public final static double deltalnp = 0.03;
+    public final double lnpmin = Math.log(1.e-8);
+    public final double lnpmax = -1.e-11;
+
+    public final double deltalnp = (lnpmax-lnpmin) / NRANGES;
 
     private final NGoTable[][] pnTable;
 
@@ -34,31 +36,29 @@ public class InterpolatingStepGenerator extends StepGenerator {
     private static InterpolatingStepGenerator pInstance;
 
 
-
     public static InterpolatingStepGenerator getBinomialGenerator() {
-        if (bInstance == null) {
+        if (bInstance == null)
             bInstance = new InterpolatingStepGenerator(BINOMIAL);
-        }
+
         return bInstance;
     }
 
     public static InterpolatingStepGenerator getPoissonGenerator() {
-        if (pInstance == null) {
+        if (pInstance == null)
             pInstance = new InterpolatingStepGenerator(POISSON);
-        }
+
         return pInstance;
     }
 
     private InterpolatingStepGenerator(distribution_t mode) {
-        int nppts = (int)((lnpmax - lnpmin) / deltalnp + 2);
-        pnTable = new NGoTable[nppts+1][StepGenerator.NMAX_STOCHASTIC+1];
+        pnTable = new NGoTable[NRANGES+1][StepGenerator.NMAX_STOCHASTIC+1];
 
-        log.info("Using {} step generator with {}·{} tables",
+        log.info("Using {} step generator with {}×{} tables",
                  mode, pnTable.length, pnTable[0].length);
 
-        for (int i = 0; i <= nppts; i++) {
+        for (int i = 0; i <= NRANGES; i++) {
             double lnp = lnpmin + i * deltalnp;
-            for (int j = 2; j <= StepGenerator.NMAX_STOCHASTIC; j++)
+            for (int j = 2; j < pnTable[0].length; j++)
                 pnTable[i][j] = new NGoTable(j, lnp, mode);
         }
     }
@@ -86,15 +86,18 @@ public class InterpolatingStepGenerator extends StepGenerator {
         if (n > NMAX_STOCHASTIC)
             throw new RuntimeException("n too large (" + n + ")");
 
-        if (Double.isInfinite(lnp))
+        double lnp2 = (lnp - lnpmin) / deltalnp;
+        if (Double.isInfinite(lnp2))
             return 0;
 
-        int ia = (int)((lnp - lnpmin) / deltalnp);
+        int ia = (int) lnp2;
+        if (ia < 0)
+            return 0;
+
+        if (ia > pnTable.length - 2)
+            ia = pnTable.length - 2;
+
         double f = (lnp - (lnpmin + ia * deltalnp)) / deltalnp;
-        if (ia < 0) {
-            ia = 0;
-            f = 0.;
-        }
 
         double rna = pnTable[ia][n].rnGo(r);
         double rnb = pnTable[ia+1][n].rnGo(r);
@@ -142,7 +145,6 @@ public class InterpolatingStepGenerator extends StepGenerator {
     }
 
     public void dumpTable(int n, double lnp) {
-        // TODO Auto-generated method stub
         int ia = (int)((lnp - lnpmin) / deltalnp);
         double f = (lnp - (lnpmin + ia * deltalnp)) / deltalnp;
         if (ia < 0) {
