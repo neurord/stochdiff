@@ -57,7 +57,11 @@ public class ResultWriterHDF5 implements ResultWriter {
     public void init(String magic) {
         try {
             this._init();
+        } catch(UnsatisfiedLinkError e) {
+            log.warn("java.library.path: {}", System.getProperty("java.library.path"));
+            throw new RuntimeException(e);
         } catch(Exception e) {
+            log.warn("java.library.path: {}", System.getProperty("java.library.path"));
             throw new RuntimeException(e);
         }
     }
@@ -66,7 +70,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         throws Exception
     {
         FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
-        assert fileFormat != null;
+        if (fileFormat == null)
+            throw new UnsatisfiedLinkError("hdf5");
+
         log.debug("Opening output file {}", this.outputFile);
         this.output = (H5File) fileFormat.create(this.outputFile.toString());
         assert this.output != null;
