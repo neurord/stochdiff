@@ -223,6 +223,11 @@ public class SteppedStochasticGridCalc extends GridCalc {
         }
 
         if (sdRun.initialStateFile != null) {
+            if (this.resultWriters.size() == 0) {
+                log.error("Unable to read state because writers are disabled");
+                throw new RuntimeException("Unable to read state because writers are disabled");
+            }
+
             int[][] cc = (int[][]) resultWriters.get(0).loadState(sdRun.initialStateFile, this);
             ArrayUtil.copy(cc, this.wkA);
             ArrayUtil.copy(cc, this.wkB);
@@ -313,8 +318,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     public final int run() {
         init();
-
-        assert this.resultWriters.size() > 0;
 
         double time = sdRun.getStartTime();
         double endtime = sdRun.getEndTime();
