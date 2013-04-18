@@ -60,8 +60,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
-
-        log.info("Using result writer {} for {}", this.getClass().getSimpleName(), this.outputFile);
     }
 
     protected void _init()

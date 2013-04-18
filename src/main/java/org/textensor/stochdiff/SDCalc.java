@@ -36,11 +36,13 @@ public class SDCalc {
 
         for (String type: writers) {
             final ResultWriter writer;
-            if (type.equals("text"))
+            if (type.equals("text")) {
                 writer = new ResultWriterText(outputFile, false);
-            else if (type.equals("h5"))
+                log.info("Using text writer for {}", outputFile);
+            } else if (type.equals("h5")) {
                 writer = new ResultWriterHDF5(outputFile);
-            else {
+                log.info("Using HDF5 writer for {}", outputFile);
+            } else {
                 log.error("Unknown writer '{}'", type);
                 throw new RuntimeException("uknown writer: " + type);
             }

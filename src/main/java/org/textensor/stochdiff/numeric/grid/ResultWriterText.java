@@ -56,8 +56,6 @@ public class ResultWriterText implements ResultWriter {
         } catch (Exception ex) {
             E.error("cannot create file writer " + ex);
         }
-
-        log.info("Using result writer {} for {}", this.getClass().getSimpleName(), this.outputFile);
     }
 
     public void writeString(String sdat) {
