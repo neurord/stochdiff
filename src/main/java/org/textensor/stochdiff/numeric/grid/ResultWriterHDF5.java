@@ -50,7 +50,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     public ResultWriterHDF5(File outFile) {
         this.outputFile = new File(FileUtil.getRootName(outFile) + ".h5");
-        log.info("Writing HDF5 to {}", this.outputFile);
+        log.debug("Writing HDF5 to {}", this.outputFile);
     }
 
     @Override
@@ -60,6 +60,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+
+        log.info("Using result writer {} for {}", this.getClass().getSimpleName(), this.outputFile);
     }
 
     protected void _init()

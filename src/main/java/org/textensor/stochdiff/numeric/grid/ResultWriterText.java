@@ -16,7 +16,11 @@ import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class ResultWriterText implements ResultWriter {
+    static final Logger log = LogManager.getLogger(ResultWriterText.class);
 
     final File outputFile;
 
@@ -52,6 +56,8 @@ public class ResultWriterText implements ResultWriter {
         } catch (Exception ex) {
             E.error("cannot create file writer " + ex);
         }
+
+        log.info("Using result writer {} for {}", this.getClass().getSimpleName(), this.outputFile);
     }
 
     public void writeString(String sdat) {
