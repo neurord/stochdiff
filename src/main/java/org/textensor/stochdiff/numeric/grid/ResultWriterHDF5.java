@@ -30,12 +30,11 @@ import org.apache.logging.log4j.LogManager;
 public class ResultWriterHDF5 implements ResultWriter {
     static final Logger log = LogManager.getLogger(ResultWriterHDF5.class);
 
-    static final boolean have_libraries;
     static {
-        boolean a = LibUtil.loadLibrary("jhdf");
-        boolean b = LibUtil.loadLibrary("jhdf5");
-
-        have_libraries = a && b;
+        LibUtil.addLibraryPaths("/usr/lib64/jhdf",
+                                "/usr/lib64/jhdf5",
+                                "/usr/lib/jhdf",
+                                "/usr/lib/jhdf5");
     }
 
     final protected File outputFile;
@@ -64,10 +63,6 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     public void init(String magic) {
-        if (!have_libraries) {
-            log.error("Trying to use ResultWriterHDF5 but libraries are not available");
-            throw new UnsatisfiedLinkError("hdf5");
-        }
         try {
             this._init();
         } catch(UnsatisfiedLinkError e) {

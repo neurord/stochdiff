@@ -1,50 +1,41 @@
 package org.textensor.util;
 
+import java.util.Arrays;
+import java.io.File;
+import java.lang.reflect.Field;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class LibUtil {
     static final Logger log = LogManager.getLogger(LibUtil.class);
 
-    static boolean tryLoad(String filename) {
-        log.debug("Trying to load {}", filename);
-        try {
-            System.load(filename);
-            log.info("Successfully loaded {}", filename);
-        } catch (Exception e) {
-            return false;
-        } catch (UnsatisfiedLinkError e) {
-            return false;
-        }
-
-        return true;
-    }
-
     /**
-     * Load a native library
+     * Add a path to java.library.path
      */
-    static public boolean loadLibrary(String name) {
-        String os = System.getProperty("os.name");
-        if (os.equals("Linux")) {
-            // Check for 64-bit library availability
-            // prior to 32-bit library availability.
-            if (tryLoad("/usr/lib64/" + name + "/lib" + name + ".so"))
-                return true;
+    static public void addLibraryPaths(String... paths) {
+        String var = System.getProperty("java.library.path");
 
-            if (tryLoad("/usr/lib/" + name + "/lib" + name + ".so"))
-                return true;
-        } else {
-            try {
-                System.loadLibrary(name);
-                log.info("Successfully loaded {}", name);
-                return true;
-            } catch (Throwable t) {
-                // This is bad news, the program is doomed at this point
-                t.printStackTrace();
-            }
+        for(String path: paths) {
+            if (Arrays.asList(var.split(File.pathSeparator)).contains(path))
+                continue;
+
+            var = var.isEmpty() ? path : var + File.pathSeparator + path;
+
+            log.debug("Added {} to java.library.path", path);
         }
 
-        log.error("Failed to load lib{}", name);
-        return false;
+        System.setProperty("java.library.path", var);
+
+        /*
+         * http://blog.cedarsoft.com/2010/11/setting-java-library-path-programmatically/
+         */
+        try {
+            Field fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
+            fieldSysPath.setAccessible(true);
+            fieldSysPath.set(null, null);
+        } catch(Exception e) {
+            log.warn("Failed to do the magic thing to sys_paths");
+        }
     }
 }
