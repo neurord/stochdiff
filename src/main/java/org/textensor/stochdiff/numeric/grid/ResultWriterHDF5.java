@@ -22,12 +22,21 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.FileUtil;
 import org.textensor.util.ArrayUtil;
 import static org.textensor.util.ArrayUtil.xJoined;
+import org.textensor.util.LibUtil;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class ResultWriterHDF5 implements ResultWriter {
     static final Logger log = LogManager.getLogger(ResultWriterHDF5.class);
+
+    static final boolean have_libraries;
+    static {
+        boolean a = LibUtil.loadLibrary("jhdf");
+        boolean b = LibUtil.loadLibrary("jhdf5");
+
+        have_libraries = a && b;
+    }
 
     final protected File outputFile;
     protected H5File output;
@@ -55,6 +64,10 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     public void init(String magic) {
+        if (!have_libraries) {
+            log.error("Trying to use ResultWriterHDF5 but libraries are not available");
+            throw new UnsatisfiedLinkError("hdf5");
+        }
         try {
             this._init();
         } catch(UnsatisfiedLinkError e) {
