@@ -146,74 +146,6 @@ public class DeterministicGridCalc extends GridCalc {
         }
     }
 
-    public final int run() {
-        init();
-
-        assert this.resultWriters.size() > 0;
-
-        double time = sdRun.getStartTime();
-        double endtime = sdRun.getEndTime();
-
-        for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
-
-        for (int i = 0; i < fnmsOut.length; i++)
-            for(ResultWriter resultWriter: this.resultWriters)
-                resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
-
-        E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
-
-        double tlog = 5.;
-
-        long startTime = System.currentTimeMillis();
-
-        // int iwr = 0;
-        double writeTime = -1.e-9;
-
-        // RCC commenting this out to use desired output interval from model
-        // spec.
-        // sdRun.outputInterval = 100.0;
-        double[] writeTimeArray = new double[fnmsOut.length];
-        Arrays.fill(writeTimeArray, -1.e-9);
-
-        int iwr = 0;
-        // RO
-        while (time < endtime) {
-
-            // RO 5 13 2010: follows template in SteppedStochasticGridCalc
-            if (time >= writeTime) {
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeGridConcs(time, nel, ispecout, this);
-
-                writeTime += sdRun.outputInterval;
-            }
-            for (int i = 0; i < fnmsOut.length; i++)
-                if (time >= writeTimeArray[i]) {
-                    for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
-                    writeTimeArray[i] += Double.valueOf(dtsOut[i]);
-                }
-
-            time += advance(time);
-
-            if (time > tlog) {
-                E.info("time " + time + " dt=" + dt);
-                tlog += Math.max(50 * sdRun.outputInterval, 5);
-            }
-
-
-            if (time >= stateSaveTime) {
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, sdRun.stateSavePrefix, this);
-                stateSaveTime += sdRun.getStateSaveInterval();
-            }
-        }
-
-        long endTime = System.currentTimeMillis();
-        E.info("total time " + (endTime - startTime) + "ms");
-
-        return 0;
-    }
 
     public double advance(double time) {
         // diffusion terms;
@@ -344,28 +276,5 @@ public class DeterministicGridCalc extends GridCalc {
     public int getGridPartNumb(int i, int j) {
         double val = getGridPartConc(i, j);
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
-    }
-
-    @Override
-    public int[][] getReactionEvents() {
-        /* not implemented yet */
-        return null;
-    }
-
-    @Override
-    public int[][][] getDiffusionEvents() {
-        /* not implemented yet */
-        return null;
-    }
-
-    @Override
-    public int[][] getStimulationTargets() {
-        return this.stimtargets;
-    }
-
-    @Override
-    public int[][] getStimulationEvents() {
-        /* not implemented yet */
-        return null;
     }
 }

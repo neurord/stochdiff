@@ -95,19 +95,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     double lndt;
 
-    /** The number of events of each reaction since last writeGridConcs.
-     * Shapes is [nel x nreactions]. */
-    int reactionEvents[][];
-    /** The number of diffused particles since last writeGridConcs.
-     * Shape is [nel x nspecies x neighbors]. The third dimension is
-     * "rugged". */
-    int diffusionEvents[][][];
-    /** The number of injected particles since last writeGridConcs.
-     * Shape is [nel x nspecies]. */
-    int stimulationEvents[][];
-
-    int ninjected = 0;
-
     InterpolatingStepGenerator interpSG;
     MersenneTwister random;
     int nwarn;
@@ -314,68 +301,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 }
             }
         }
-    }
-
-    public final int run() {
-        init();
-
-        double time = sdRun.getStartTime();
-        double endtime = sdRun.getEndTime();
-
-        for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
-
-        E.info("Running from time=" + time + "ms to time=" + endtime + "ms");
-
-        double tlog = 5.;
-
-        long startTime = System.currentTimeMillis();
-
-        // int iwr = 0;
-        double writeTime = time - 1.e-9;
-
-        double[] writeTimeArray = new double[fnmsOut.length];
-        Arrays.fill(writeTimeArray, -1.e-9);
-
-        while (time < endtime) {
-
-            if (time >= writeTime) {
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeGridConcs(time, nel, ispecout, this);
-
-                writeTime += sdRun.outputInterval;
-                ArrayUtil.fill(this.stimulationEvents, 0);
-                ArrayUtil.fill(this.diffusionEvents, 0);
-                ArrayUtil.fill(this.reactionEvents, 0);
-            }
-            for (int i = 0; i < fnmsOut.length; i++) {
-                if (time >= writeTimeArray[i]) {
-                    for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
-                    writeTimeArray[i] += Double.valueOf(dtsOut[i]);
-                }
-            }
-
-            time += advance(time);
-
-            if (time > tlog) {
-                E.info("time " + time + " dt=" + dt);
-                tlog += Math.max(50 * sdRun.outputInterval, 5);
-            }
-
-            if (time >= stateSaveTime) {
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, sdRun.stateSavePrefix, this);
-                stateSaveTime += sdRun.getStateSaveInterval();
-            }
-        }
-
-        log.info("number injected = " + ninjected);
-
-        long endTime = System.currentTimeMillis();
-        log.info("total time {} ms", endTime - startTime);
-
-        return 0;
     }
 
     protected int calculateNgo(String where, int n, double exp){
@@ -751,25 +676,5 @@ public class SteppedStochasticGridCalc extends GridCalc {
     public double getGridPartConc(int i, int j) {
         int val = getGridPartNumb(i, j);
         return val * NM_PER_PARTICLE_PUV / volumes[i];
-    }
-
-    @Override
-    public int[][] getReactionEvents() {
-        return this.reactionEvents;
-    }
-
-    @Override
-    public int[][][] getDiffusionEvents() {
-        return this.diffusionEvents;
-    }
-
-    @Override
-    public int[][] getStimulationTargets() {
-        return this.stimtargets;
-    }
-
-    @Override
-    public int[][] getStimulationEvents() {
-        return this.stimulationEvents;
     }
 }
