@@ -293,7 +293,7 @@ public class ResultWriterText implements ResultWriter {
         final String[] regionsOut = source.getRegionsOut();
         final String[] regionLabels = vgrid.getRegionLabels();
         final String[] specieIDs = source.getSpecieIDs();
-        final boolean[] submembranes = source.getSubmembranes();
+        final boolean[] submembranes = vgrid.getSubmembranes();
         final int[] eltRegions = source.getEltRegions();
 
         StringBuffer sb = new StringBuffer();

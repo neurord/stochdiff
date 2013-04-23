@@ -29,8 +29,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     double[] lnvolumes;
     double[] fdiff;
 
-    public boolean[] submembranes;
-
     int[][] neighbors;
     double[][] couplingConstants;
 
@@ -70,10 +68,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         specieIDs = rtab.getSpecieIDs();
 
         nel = this.getVolumeGrid().getNElements();
-
-        // WK 6 18 2007
-        submembranes = this.getVolumeGrid().getSubmembranes();
-        // WK
 
         eltregions = this.getVolumeGrid().getRegionIndexes();
     }
@@ -163,11 +157,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     @Override
     public int[] getEltRegions() {
         return this.eltregions;
-    }
-
-    @Override
-    public boolean[] getSubmembranes() {
-        return this.submembranes;
     }
 
     @Override

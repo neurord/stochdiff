@@ -1,6 +1,3 @@
-//6 18 2007: WK added a variable (submembranes[]) and a function (getSubmembranes());
-//			 the variable is init and set in the fix() function.
-//written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
 import java.util.ArrayList;

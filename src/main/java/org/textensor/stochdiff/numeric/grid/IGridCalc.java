@@ -13,7 +13,6 @@ public interface IGridCalc {
     String[] getSpecieIDs();
     int[][] getSpecIndexesOut();
     int[] getEltRegions();
-    boolean[] getSubmembranes();
     String[] getRegionsOut();
 
     VolumeGrid getVolumeGrid();
