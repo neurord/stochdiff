@@ -255,7 +255,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected void writeRegionLabels(IGridCalc source)
         throws Exception
     {
-        String[] regions = source.getRegionLabels();
+        String[] regions = source.getVolumeGrid().getRegionLabels();
         Dataset ds = this.writeVector("regions", this.model, regions);
         setAttribute(ds, "TITLE", "names of regions");
         setAttribute(ds, "LAYOUT", "[nregions]");

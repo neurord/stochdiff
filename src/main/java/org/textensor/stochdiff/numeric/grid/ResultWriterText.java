@@ -18,7 +18,6 @@ import org.textensor.util.ArrayUtil;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
 public class ResultWriterText implements ResultWriter {
     static final Logger log = LogManager.getLogger(ResultWriterText.class);
 
@@ -273,7 +272,7 @@ public class ResultWriterText implements ResultWriter {
 
     private String getGridConcsPlainText_dumb(int filenum, double time, int nel, IGridCalc source) {
         final int[][] specIndexesOut = source.getSpecIndexesOut();
-        final String[] regionLabels = source.getRegionLabels();
+        final String[] regionLabels = source.getVolumeGrid().getRegionLabels();
         final int[] eltRegions = source.getEltRegions();
         final String[] regionsOut = source.getRegionsOut();
 
@@ -292,7 +291,7 @@ public class ResultWriterText implements ResultWriter {
     private String getGridConcsHeadings_dumb(int filenum, VolumeGrid vgrid, IGridCalc source) {
         final int[][] specIndexesOut = source.getSpecIndexesOut();
         final String[] regionsOut = source.getRegionsOut();
-        final String[] regionLabels = source.getRegionLabels();
+        final String[] regionLabels = vgrid.getRegionLabels();
         final String[] specieIDs = source.getSpecieIDs();
         final boolean[] submembranes = source.getSubmembranes();
         final int[] eltRegions = source.getEltRegions();

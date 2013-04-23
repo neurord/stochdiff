@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
@@ -17,7 +16,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     static final Logger log = LogManager.getLogger(GridCalc.class);
 
     ReactionTable rtab;
-    public VolumeGrid vgrid;
 
     StimulationTable stimTab;
 
@@ -32,7 +30,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     double[] fdiff;
 
     public boolean[] submembranes;
-    public String[] regionLabels;
 
     int[][] neighbors;
     double[][] couplingConstants;
@@ -72,15 +69,13 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         rtab = getReactionTable();
         specieIDs = rtab.getSpecieIDs();
 
-        vgrid = getVolumeGrid();
-        nel = vgrid.getNElements();
+        nel = this.getVolumeGrid().getNElements();
 
         // WK 6 18 2007
-        submembranes = vgrid.getSubmembranes();
-        regionLabels = vgrid.getRegionLabels();
+        submembranes = this.getVolumeGrid().getSubmembranes();
         // WK
 
-        eltregions = vgrid.getRegionIndexes();
+        eltregions = this.getVolumeGrid().getRegionIndexes();
     }
 
     public int run() {
@@ -90,7 +85,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         double endtime = sdRun.getEndTime();
 
         for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(vgrid, sdRun.getStartTime(), fnmsOut, this);
+            resultWriter.writeGrid(this.getVolumeGrid(), sdRun.getStartTime(), fnmsOut, this);
 
         log.info("Running from time=" + time + " ms to time=" + endtime + " ms");
 
@@ -163,11 +158,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     @Override
     public String[] getSpecieIDs() {
         return this.specieIDs;
-    }
-
-    @Override
-    public String[] getRegionLabels() {
-        return this.regionLabels;
     }
 
     @Override

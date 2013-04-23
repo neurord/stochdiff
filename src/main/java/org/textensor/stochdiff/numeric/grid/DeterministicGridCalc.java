@@ -30,10 +30,9 @@ public class DeterministicGridCalc extends GridCalc {
     @Override
     public boolean preferConcs(){ return true; }
 
-//	int[] eltstims;
-//	double[] eltstimshare;
-    //AB Dec 16 2012
-    //make these two arrays 2D to hold info on each stimulation.  Was being overwritten by last stim
+    /**
+     * 2D arrays to hold info on each stimulation.
+     */
     int[][] eltstims;
     double[][] eltstimshare;
 
@@ -57,16 +56,16 @@ public class DeterministicGridCalc extends GridCalc {
 
         nspec = rtab.getNSpecies();
 
-        volumes = vgrid.getElementVolumes();
+        volumes = this.getVolumeGrid().getElementVolumes();
 
         fdiff = rtab.getDiffusionConstants();
-        neighbors = vgrid.getPerElementNeighbors();
-        couplingConstants = vgrid.getPerElementCouplingConstants();
+        neighbors = this.getVolumeGrid().getPerElementNeighbors();
+        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
 
         extractOutputScheme(rtab); // see BaseCalc.java
 
         stimTab = getStimulationTable();
-        stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
+        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
         /* AB Dec 16 2011 - eltstims needs to be 2D, determine target element and share for each */
@@ -92,7 +91,7 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-        surfaceAreas = vgrid.getExposedAreas();
+        surfaceAreas = this.getVolumeGrid().getExposedAreas();
 //AB 2012-apr 3 change wkB to wk[time-1]
         wkA = new double[nel][nspec];
         wktm1 = new double[nel][nspec];

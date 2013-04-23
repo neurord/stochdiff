@@ -53,7 +53,7 @@ public abstract class BaseCalc {
     public static final double NM_PER_PARTICLE_PUV = 1. / PARTICLES_PUVC;
 
     ReactionTable reactionTable;
-    VolumeGrid volumeGrid;
+    private VolumeGrid volumeGrid;
     StimulationTable stimulationTable;
 
     double[] baseConcentrations;
@@ -414,30 +414,30 @@ public abstract class BaseCalc {
 
     public long getCalculationSeed() {
         long ret = sdRun.simulationSeed;
-        if (ret <= 0) {
+        if (ret <= 0)
             ret = (long)(1.e5 * Math.random());
-        }
+
         return ret;
     }
 
     public ReactionTable getReactionTable() {
-        if (reactionTable == null) {
+        if (reactionTable == null)
             extractTables();
-        }
+
         return reactionTable;
     }
 
     public StimulationTable getStimulationTable() {
-        if (stimulationTable == null) {
+        if (stimulationTable == null)
             extractTables();
-        }
+
         return stimulationTable;
     }
 
     public VolumeGrid getVolumeGrid() {
-        if (volumeGrid == null) {
+        if (volumeGrid == null)
             extractGrid();
-        }
+
         return volumeGrid;
     }
 

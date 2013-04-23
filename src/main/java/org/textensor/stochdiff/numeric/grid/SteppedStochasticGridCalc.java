@@ -73,8 +73,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int[][] wkA;
     int[][] wkB;
 
-    int[][] nparticle;
-
     int nreaction;
     public int nspecie;
     String[] speciesIDs;
@@ -146,7 +144,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         nspec = rtab.getNSpecies();
         specieIDs = rtab.getSpecieIDs();
-        volumes = vgrid.getElementVolumes();
+        volumes = this.getVolumeGrid().getElementVolumes();
         lnvolumes = ArrayUtil.log(volumes);
         log.info("lnvolumes: {}", lnvolumes);
 
@@ -159,13 +157,13 @@ public class SteppedStochasticGridCalc extends GridCalc {
         // RO
         extractOutputScheme(rtab); // see BaseCalc.java
 
-        surfaceAreas = vgrid.getExposedAreas();
+        surfaceAreas = this.getVolumeGrid().getExposedAreas();
 
         fdiff = rtab.getDiffusionConstants();
         lnfdiff = ArrayUtil.log(fdiff);
 
-        neighbors = vgrid.getPerElementNeighbors();
-        couplingConstants = vgrid.getPerElementCouplingConstants();
+        neighbors = this.getVolumeGrid().getPerElementNeighbors();
+        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
         lnCC = ArrayUtil.log(couplingConstants);
         diffusionEvents = new int[nel][nspec][];
         for (int iel = 0; iel < nel; iel++)
@@ -175,7 +173,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
 
         stimTab = getStimulationTable();
-        stimtargets = vgrid.getAreaIndexes(stimTab.getTargetIDs());
+        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
         stimulationEvents = new int[nel][nspec];
 
         // workspace for the calculation

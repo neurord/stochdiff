@@ -2,6 +2,7 @@ package org.textensor.stochdiff.numeric.grid;
 
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 public interface IGridCalc {
     int getGridPartNumb(int i, int outj);
@@ -11,10 +12,11 @@ public interface IGridCalc {
 
     String[] getSpecieIDs();
     int[][] getSpecIndexesOut();
-    String[] getRegionLabels();
     int[] getEltRegions();
     boolean[] getSubmembranes();
     String[] getRegionsOut();
+
+    VolumeGrid getVolumeGrid();
 
     int getNumberElements();
 
