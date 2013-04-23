@@ -135,14 +135,15 @@ public class ResultWriterHDF5 implements ResultWriter {
                                  "x3", "y3", "z3",
                                  "volume", "deltaZ",
                                  "label",
-                                 "region", "type" };
+                                 "region", "type", "group" };
 
         Datatype[] memberTypes = new Datatype[memberNames.length];
         Arrays.fill(memberTypes, double_t);
         memberTypes[14] = short_str_t;
         memberTypes[15] = int_t;
         memberTypes[16] = short_str_t;
-        assert memberTypes.length == 17;
+        memberTypes[17] = short_str_t;
+        assert memberTypes.length == 18;
 
         Vector<Object> data = vgrid.gridData();
 
@@ -171,6 +172,16 @@ public class ResultWriterHDF5 implements ResultWriter {
             data.add(types);
         }
 
+        {
+            String[] labels = new String[n];
+            for (int i = 0; i < n; i++) {
+                labels[i] = vgrid.getGroupID(i);
+                if (labels[i] == null)
+                    labels[i] = "";
+            }
+            data.add(labels);
+        }
+
         Dataset grid =
             this.output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
                                          memberNames, memberTypes, null, data);
@@ -178,7 +189,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                  "grid", xJoined(dims), "", xJoined(chunks));
         setAttribute(grid, "TITLE", "voxels");
         setAttribute(grid, "LAYOUT",
-                     "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type}]");
+                     "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
 
         {
             Dataset ds =
