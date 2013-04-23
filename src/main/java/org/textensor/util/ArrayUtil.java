@@ -106,16 +106,16 @@ public class ArrayUtil {
             return "";
         String s = "" + dims[0];
         for (int i = 1; i < dims.length; i++)
-            s += "·" + dims[i];
+            s += "×" + dims[i];
         return s;
     }
 
     public static String xJoined(long[] dims) {
         if (dims.length == 0)
             return "";
-        String s = "" + dims[0];
+        String s = dims[0] == -1 ? "∞" : "" + dims[0];
         for (int i = 1; i < dims.length; i++)
-            s += "·" + dims[i];
+            s += "×" + (dims[i] == -1 ? "∞" : "" + dims[i]);
         return s;
     }
 

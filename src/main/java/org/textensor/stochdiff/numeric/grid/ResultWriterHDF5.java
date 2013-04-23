@@ -146,20 +146,20 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  "grid", xJoined(dims), "", xJoined(chunks));
         setAttribute(grid, "TITLE", "voxels");
-        setAttribute(grid, "LAYOUT", "[nel x {xyz, xyz, xyz, xyz, volume, deltaZ}]");
+        setAttribute(grid, "LAYOUT", "[nel × {xyz, xyz, xyz, xyz, volume, deltaZ}]");
 
         {
             Dataset ds =
                 writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
             setAttribute(ds, "TITLE", "adjacency mapping between voxels");
-            setAttribute(ds, "LAYOUT", "[nel x neighbors*]");
+            setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
             setAttribute(ds, "UNITS", "indexes");
         }
         {
             Dataset ds =
                 writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
             setAttribute(ds, "TITLE", "coupling rate between voxels");
-            setAttribute(ds, "LAYOUT", "[nel x neighbors*]");
+            setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
             setAttribute(ds, "UNITS", "nm^2 / nm ?");
         }
 
@@ -287,7 +287,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             int[][] targets = source.getStimulationTargets();
             Dataset ds = this.writeArray("targets", group, targets, -1);
             setAttribute(ds, "TITLE", "stimulated voxels");
-            setAttribute(ds, "LAYOUT", "[??? x ???]");
+            setAttribute(ds, "LAYOUT", "[??? × ???]");
             setAttribute(ds, "UNITS", "indexes");
         }
     }
@@ -304,28 +304,28 @@ public class ResultWriterHDF5 implements ResultWriter {
             int[][] indices = table.getReactantIndices();
             Dataset ds = this.writeArray("reactants", group, indices, -1);
             setAttribute(ds, "TITLE", "reactant indices");
-            setAttribute(ds, "LAYOUT", "[nreact x nreactants*]");
+            setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
             setAttribute(ds, "UNITS", "indexes");
         }
         {
             int[][] indices = table.getProductIndices();
             Dataset ds = this.writeArray("products", group, indices, -1);
             setAttribute(ds, "TITLE", "product indices");
-            setAttribute(ds, "LAYOUT", "[nreact x nproducts*]");
+            setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
             setAttribute(ds, "UNITS", "indexes");
         }
         {
             int[][] stochio = table.getReactantStochiometry();
             Dataset ds = this.writeArray("reactant_stochiometry", group, stochio, -1);
             setAttribute(ds, "TITLE", "reactant stochiometry");
-            setAttribute(ds, "LAYOUT", "[nreact x nreactants*]");
+            setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
             setAttribute(ds, "UNITS", "indexes");
         }
         {
             int[][] stochio = table.getProductStochiometry();
             Dataset ds = this.writeArray("product_stochiometry", group, stochio, -1);
             setAttribute(ds, "TITLE", "product stochiometry");
-            setAttribute(ds, "LAYOUT", "[nreact x nproducts*]");
+            setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
             setAttribute(ds, "UNITS", "indexes");
         }
 
@@ -352,7 +352,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (nspecout == 0)
             return false;
 
-        /* times x nel x nspecout, but we write only for only time 'time' at one time */
+        /* times × nel × nspecout, but we write only for only time 'time' at one time */
         {
             long[] dims = {1, nel, nspecout};
             long[] size = {H5F_UNLIMITED, nel, nspecout};
@@ -366,7 +366,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "concentrations", xJoined(dims), xJoined(size), xJoined(chunks));
             setAttribute(this.concs, "TITLE", "concentrations of species in voxels over time");
-            setAttribute(this.concs, "LAYOUT", "[snapshot x nel x nspecout]");
+            setAttribute(this.concs, "LAYOUT", "[snapshot × nel × nspecout]");
             setAttribute(this.concs, "UNITS", "count");
         }
 
@@ -461,7 +461,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         assert this.stimulation_events == null;
 
-        /* times x elements x species */
+        /* times × elements × species */
         {
             long[] dims = {1, elements, species};
             long[] size = {H5F_UNLIMITED, elements, species};
@@ -476,7 +476,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                      "stimulation_events",
                      xJoined(dims), xJoined(size), xJoined(chunks));
             setAttribute(ds, "TITLE", "actual stimulation counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times x elements x species]");
+            setAttribute(ds, "LAYOUT", "[times × elements × species]");
             setAttribute(ds, "UNITS", "count");
             this.stimulation_events = ds;
         }
@@ -524,14 +524,14 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         if (elements == 0 || species == 0 || neighbors == 0) {
             if (!initDiffusionEvents_warning) {
-                log.info("Diffusion events are {}x{}x{}", elements, species, neighbors);
+                log.info("Diffusion events are {}×{}×{}", elements, species, neighbors);
                 log.warn("No diffusion events, not writing anything");
                 initDiffusionEvents_warning = true;
             }
             return false;
         }
 
-        /* times x reactions */
+        /* times × reactions */
         {
             long[] dims = {1, elements, species, neighbors};
             long[] size = {H5F_UNLIMITED, elements, species, neighbors};
@@ -545,7 +545,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "diffusion_events", xJoined(dims), xJoined(size), xJoined(chunks));
             setAttribute(ds, "TITLE", "actual diffusion counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times x nel x species x neighbors]");
+            setAttribute(ds, "LAYOUT", "[times × nel × species × neighbors]");
             setAttribute(ds, "UNITS", "count");
             this.diffusion_events = ds;
         }
@@ -606,7 +606,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             return false;
         }
 
-        /* times x reactions */
+        /* times × reactions */
         {
             long[] dims = {1, elements, reactions};
             long[] size = {H5F_UNLIMITED, elements, reactions};
@@ -620,7 +620,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "reaction_events", xJoined(dims), xJoined(size), xJoined(chunks));
             setAttribute(ds, "TITLE", "actual reaction counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times x elements x reactions]");
+            setAttribute(ds, "LAYOUT", "[times × elements × reactions]");
             setAttribute(ds, "UNITS", "count");
             this.reaction_events = ds;
         }
@@ -674,7 +674,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (this.saved_state == null) {
             Dataset ds = this.writeArray("state", this.sim, state, -1);
             setAttribute(ds, "TITLE", "saved state");
-            setAttribute(ds, "LAYOUT", "[nelements x nspecies]");
+            setAttribute(ds, "LAYOUT", "[nelements × nspecies]");
             setAttribute(ds, "UNITS", "count");
 
             this.saved_state = ds;
@@ -693,7 +693,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (this.saved_state == null) {
             Dataset ds = this.writeArray("state", this.sim, state);
             setAttribute(ds, "TITLE", "saved state");
-            setAttribute(ds, "LAYOUT", "[nelements x nspecies]");
+            setAttribute(ds, "LAYOUT", "[nelements × nspecies]");
             setAttribute(ds, "UNITS", "nm/l ?");
 
             this.saved_state = ds;
