@@ -17,5 +17,6 @@
       <appender-ref ref="model-logfile"/>
     </root>
     <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterHDF5" level="info" />
+    <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterText" level="info" />
   </loggers>
 </configuration>

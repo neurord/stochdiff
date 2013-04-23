@@ -97,11 +97,13 @@ public class ResultWriterText implements ResultWriter {
 
     public ResultWriterText getRawSibling(String extn) {
         ResultWriterText ret = siblings.get(extn);
+        log.debug("getRawSibling {} → {}", extn, ret);
 
         if (ret == null) {
             String fnm = FileUtil.getRootName(this.outputFile) + extn;
             File f = new File(outputFile.getParentFile(), fnm);
             ret = new ResultWriterText(f, this.writeConcentration);
+            ret.init(null);
             siblings.put(extn, ret);
         }
 
@@ -135,7 +137,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     public void writeToSiblingFile(String txt, String extn, String magic) {
-        ResultWriterText rw = getSibling(extn, magic);
+        ResultWriterText rw = getRawSibling(extn);
         rw.writeString(txt);
     }
 
@@ -339,6 +341,7 @@ public class ResultWriterText implements ResultWriter {
 
     @Override
     public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {
+        log.debug("writeGridConcsDumb: i={} time={} nel={} fnamepart={}", i, time, nel, fnamepart);
         String text = getGridConcsPlainText_dumb(i, time, nel, source);
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
