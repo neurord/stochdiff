@@ -129,16 +129,47 @@ public class ResultWriterHDF5 implements ResultWriter {
             dims = {n,},
             chunks = {n,};
         int gzip = 6;
-        String[] memberNames = {"x0", "y0", "z0",
-                                "x1", "y1", "z1",
-                                "x2", "y2", "z2",
-                                "x3", "y3", "z3",
-                                "volume", "deltaZ"};
+        String[] memberNames = { "x0", "y0", "z0",
+                                 "x1", "y1", "z1",
+                                 "x2", "y2", "z2",
+                                 "x3", "y3", "z3",
+                                 "volume", "deltaZ",
+                                 "label",
+                                 "region", "type" };
 
         Datatype[] memberTypes = new Datatype[memberNames.length];
         Arrays.fill(memberTypes, double_t);
+        memberTypes[14] = short_str_t;
+        memberTypes[15] = int_t;
+        memberTypes[16] = short_str_t;
+        assert memberTypes.length == 17;
 
         Vector<Object> data = vgrid.gridData();
+
+        {
+            String[] labels = new String[n];
+            for (int i = 0; i < n; i++) {
+                labels[i] = vgrid.getLabel(i);
+                if (labels[i] == null)
+                    labels[i] = "element" + i;
+            }
+            data.add(labels);
+        }
+
+        {
+            int[] indexes = vgrid.getRegionIndexes();
+            assert indexes.length == n;
+            data.add(indexes);
+        }
+
+        {
+            boolean[] membranes = vgrid.getSubmembranes();
+            assert membranes.length == n;
+            String[] types = new String[n];
+            for (int i = 0; i < n; i++)
+                types[i] = membranes[i] ? "submembrane" : "cytosol";
+            data.add(types);
+        }
 
         Dataset grid =
             this.output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
@@ -146,7 +177,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  "grid", xJoined(dims), "", xJoined(chunks));
         setAttribute(grid, "TITLE", "voxels");
-        setAttribute(grid, "LAYOUT", "[nel × {xyz, xyz, xyz, xyz, volume, deltaZ}]");
+        setAttribute(grid, "LAYOUT",
+                     "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type}]");
 
         {
             Dataset ds =

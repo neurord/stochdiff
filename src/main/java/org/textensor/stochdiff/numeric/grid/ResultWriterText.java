@@ -315,7 +315,7 @@ public class ResultWriterText implements ResultWriter {
                         if (tempLabel.indexOf(".") > 0)
                             sb.append("." + tempLabel.substring(0, tempLabel.indexOf(".")));
                     }
-                    if (submembranes[i] == true)
+                    if (submembranes[i])
                         sb.append("_submembrane");
                     else
                         sb.append("_cytosol");
