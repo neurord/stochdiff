@@ -132,7 +132,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         // Debug.dump("rates", rates);
 
         lnrates = ArrayUtil.log(rtab.getRates());
-        log.info("lnrates: {}", lnrates);
+        log.debug("lnrates: {}", lnrates);
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
@@ -146,7 +146,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         specieIDs = rtab.getSpecieIDs();
         volumes = this.getVolumeGrid().getElementVolumes();
         lnvolumes = ArrayUtil.log(volumes);
-        log.info("lnvolumes: {}", lnvolumes);
+        log.debug("lnvolumes: {}", lnvolumes);
 
         // RO
         // ----------------------
@@ -511,19 +511,17 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
 
             if (ngo > 0) {
-                for (int k = 0; k < ri.length; k++)
+                for (int k = 0; k < ri.length; k++) {
                     nend[ri[k]] -= ngo * rs[k];
+                    if (nend[ri[k]] < 0) {
+                        log.error("nend is negative: {}", nend);
+                        log.info("reaction {}: ri={} pi={} rs={} ps={}",
+                                 ireac, ri, pi, rs, ps);
+                    }
+                }
 
                 for (int k = 0; k < pi.length; k++)
                     nend[pi[k]] += ngo * ps[k];
-
-                for (int k = 0; k < ri.length; k++)
-                    if (nend[ri[k]] < 0)
-                        log.error("nend is negative: {}", nend);
-
-                for (int k = 0; k < pi.length; k++)
-                    if (nend[pi[k]] < 0)
-                        log.error("nend is negative: {}", nend);
 
                 this.reactionEvents[iel][ireac] += ngo;
             }

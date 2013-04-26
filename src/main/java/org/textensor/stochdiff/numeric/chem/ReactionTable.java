@@ -1,13 +1,14 @@
 package org.textensor.stochdiff.numeric.chem;
 
+import static java.lang.String.format;
+import java.util.Arrays;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
-import static java.lang.String.format;
 
 public class ReactionTable {
     static final Logger log = LogManager.getLogger(ReactionTable.class);
@@ -54,24 +55,50 @@ public class ReactionTable {
             sb.append("reaction " + r + ":      ");
             for (int i = 0; i < reactantIndices[r].length; i++)
                 sb.append(format("%s%d (%d/%d)",
+                                 i == 0 ? "" : ", ",
                                  reactantIndices[r][i],
                                  reactantStochiometry[r][i],
-                                 reactantPowers[r][i],
-                                 i == 0 ? "" : ", "));
+                                 reactantPowers[r][i]));
             sb.append(" --> ");
             for (int i = 0; i < productIndices[r].length; i++)
                 sb.append(format("%s%d (%d)",
+                                 i == 0 ? "" : ", ",
                                  productIndices[r][i],
-                                 productStochiometry[r][i],
-                                 i == 0 ? "" : ", "));
+                                 productStochiometry[r][i]));
             sb.append("   rate " + rates[r] + " \n");
         }
         log.info(sb);
     }
 
+    static Integer findDuplicates(int[] indices) {
+        int[] c = Arrays.copyOf(indices, indices.length);
+        Arrays.sort(c);
+        for (int i = 0; i < indices.length-1; i++)
+            if (c[i] == c[i+1])
+                return c[i];
+        return null;
+    }
+
     public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate) {
-        log.info("nreaction={} nspecie={} ireact={} aix={} bidx={} rate={}",
-                 nreaction, nspecie, ireact, aidx, bidx, rate);
+        log.debug("nreaction={} nspecie={} ireact={} aix={} bidx={} rate={}",
+                  nreaction, nspecie, ireact, aidx, bidx, rate);
+
+        assert this.speciesIDs != null;
+
+        Integer dupl = findDuplicates(aidx[0]);
+        if (dupl != null) {
+            log.error("Duplicate reactant {} in reaction {}: {}", speciesIDs[dupl], ireact,
+                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.speciesIDs));
+            throw new RuntimeException("Duplicate reactant in reaction " + ireact);
+        }
+
+        dupl = findDuplicates(bidx[0]);
+        if (dupl != null) {
+            log.error("Duplicate product {} in reaction {}: {}", speciesIDs[dupl], ireact,
+                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.speciesIDs));
+            throw new RuntimeException("Duplicate product in reaction " + ireact);
+        }
+
         reactantIndices[ireact] = aidx[0];
         reactantStochiometry[ireact] = aidx[1];
         reactantPowers[ireact] = aidx[2];
@@ -92,6 +119,26 @@ public class ReactionTable {
         return speciesIDs;
     }
 
+    public static String getReactionSignature(int[] rr, int[] rs, int[] pp, int[] ps, String[] ids) {
+        StringBuffer b = new StringBuffer();
+
+        for (int i = 0; i < rr.length; i++) {
+            if (i > 0)
+                b.append("+");
+            if (rs[i] > 1)
+                b.append("" + rs[i] + "×");
+            b.append(ids[rr[i]]);
+        }
+        b.append("→");
+        for (int i = 0; i < pp.length; i++) {
+            if (i > 0)
+                b.append("+");
+            if (rs[i] > 1)
+                b.append("" + ps[i] + "×");
+            b.append(ids[pp[i]]);
+        }
+        return b.toString();
+    }
 
     public int getNSpecies() {
         return nspecie;

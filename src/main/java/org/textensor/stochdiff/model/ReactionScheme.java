@@ -76,6 +76,9 @@ public class ReactionScheme implements AddableTo {
 
         ReactionTable rtab = new ReactionTable(n, species.size());
 
+        rtab.setSpeciesIDs(getSpecieIDs());
+        rtab.setDiffusionConstants(getDiffusionConstants());
+
         int i = 0;
         for (Reaction r :  reactions) {
             int[][] reactants = r.getReactantIndices();
@@ -93,9 +96,6 @@ public class ReactionScheme implements AddableTo {
         }
 
         assert i == n: "ir=" + i + " n=" + n;
-
-        rtab.setSpeciesIDs(getSpecieIDs());
-        rtab.setDiffusionConstants(getDiffusionConstants());
 
         return rtab;
     }
