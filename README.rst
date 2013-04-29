@@ -46,7 +46,7 @@ Two examples follow:
 Reactions
 ~~~~~~~~~
 
-The second part of the reaction file is a listing of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. If there is more than one reactant, a statement is provided for each one. If there is more than one product, a statement is provided for each one. The format is:
+The second part of the reaction file is a list of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
 
 .. code-block:: xml
 
@@ -84,15 +84,36 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
 Stochiometry
 ~~~~~~~~~~~~
 
-It is possible to specify a “psuedo” 2nd order reaction, in which two molecules bind with 1st order kinectics.  E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
+The stochiometry of reactions is specified through two attributes: power="p" and n="n".
+Number n specifies how many molecules are consumed or produced in the reaction. Power p
+determines how the number of molecules influences reaction rate. The rate is proportional
+to
+    N·(N-1)·…·(N-p+1)
+where N is the number of molecules of given species.
+
+Both n and p default to 1. If p is not specified, the reaction is a “psuedo” higher order reaction, in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
 .. code-block:: xml
 
    <Reactant specieID="cAMP" n="2"/>
 
-which uses the optional "n=2" attribute to specify that two cAMP molecules participate in the reaction (it defaults to 1 if not set). In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
+which uses the optional n="2" attribute to specify that two cAMP molecules participate in the reaction (it defaults to 1 if not set). In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
 
-See Purkreactions.xml (no diffusion), and PurkreactionsDif.xml (with diffusion) for more examples.
+Example
+^^^^^^^
+
+A decay reaction which in which the rate is proportional to the square of concentration can be defined as:
+
+.. code-block:: xml
+
+   <Reaction name="decay" id="decay">
+      <Reactant specieID="A" power="2" n="2"/>
+      <forwardRate>0.83e-06</forwardRate>
+      <Q10>0.2</Q10>
+   </Reaction>
+
+For more examples, see Purkreactions.xml (no diffusion), and PurkreactionsDif.xml
+(with diffusion).
 
 .. note::
 
