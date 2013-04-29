@@ -100,7 +100,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int ninfo;
 
     double[][] pSharedOut;
-    double[][] lnpSharedOut;
     double[][][] fSharedExit;
 
     public SteppedStochasticGridCalc(SDRun sdm) {
@@ -239,7 +238,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
             }
             // FIXME: what about independent
 
-            lnpSharedOut = new double[nel][nspec];
             pSharedOut = new double[nel][nspec];
             fSharedExit = new double[nel][nspec][];
 
@@ -257,7 +255,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 for (int k = 0; k < nspec; k++) {
                     int inbr[] = neighbors[iel];
                     int nnbr = inbr.length;
-                    // int np0 = wkA[iel][k];
 
                     double ptot = 0.;
                     double[] pcnbr = new double[nnbr];
@@ -293,7 +290,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     }
 
                     pSharedOut[iel][k] = ptot;
-                    lnpSharedOut[iel][k] = lnptot;
                     for (int j = 0; j < nnbr; j++)
                         fSharedExit[iel][k][j] = pcnbr[j] / ptot;
                 }
