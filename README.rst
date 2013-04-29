@@ -84,20 +84,20 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
 Stochiometry
 ~~~~~~~~~~~~
 
-The stochiometry of reactions is specified through two attributes: power="p" and n="n".
-Number n specifies how many molecules are consumed or produced in the reaction. Power p
+The stochiometry of reactions is specified through two attributes: `power="p"` and `n="n"`.
+Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
 determines how the number of molecules influences reaction rate. The rate is proportional
 to
-    N·(N-1)·…·(N-p+1)
-where N is the number of molecules of given species.
+    N·(N-1)·…·(N-p+1)∕p!
+where *N* is the number of molecules of given species.
 
-Both n and p default to 1. If p is not specified, the reaction is a “psuedo” higher order reaction, in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
+Both *n* and *p* default to 1. If *p* is not specified, the reaction is a “psuedo” higher order reaction, in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
 .. code-block:: xml
 
    <Reactant specieID="cAMP" n="2"/>
 
-which uses the optional n="2" attribute to specify that two cAMP molecules participate in the reaction (it defaults to 1 if not set). In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
+which uses the optional `n="2"` attribute to specify that two cAMP molecules participate in the reaction. In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
 
 Example
 ^^^^^^^
