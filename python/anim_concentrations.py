@@ -62,6 +62,7 @@ parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
+parser.add_argument('--style', default='-')
 parser.add_argument('--time', type=time_range, default=(None, None))
 
 class Drawer(object):
@@ -296,7 +297,8 @@ def _history(simul, species, indices, region_indices, region_labels,
     for sp, name in zip(indices, species):
         for rlabel, rindi in zip(region_labels, region_indices):
             y = concentrations[:, rindi, sp].sum(axis=1)
-            ax.plot(times, y, color=next(colors), label='{} in {}'.format(name, rlabel))
+            ax.plot(times, y, opts.style, color=next(colors),
+                    label='{} in {}'.format(name, rlabel))
     ax.legend(loc='best')
     pyplot.show(block=True)
 
