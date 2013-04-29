@@ -60,6 +60,7 @@ parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
+parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--time', type=time_range, default=(None, None))
 
@@ -279,7 +280,8 @@ def specie_indices(items, species):
     species = list(species)
     return numpy.array([species.index(i) for i in items])
 
-def _history(simul, species, indices, times, concentrations, title, opts):
+def _history(simul, species, indices, region_indices, region_labels,
+             times, concentrations, title, opts):
     from matplotlib import pyplot
 
     full_title = 'particle numbers in {}: species {}'.format(title,
@@ -290,12 +292,25 @@ def _history(simul, species, indices, times, concentrations, title, opts):
     ax = f.gca(yscale=opts.yscale)
     ax.set_xlabel('t / ms')
     ax.set_ylabel('particle numbers')
-    for sp, color, name in zip(indices, itertools.cycle('rgbkcmy'), species):
-        for vox in range(concentrations.shape[1]):
-            x, y = times, concentrations[:, vox, sp]
-            ax.plot(x, y, color=color, label=name)
+    colors = itertools.cycle('rgbkcmy')
+    for sp, name in zip(indices, species):
+        for rlabel, rindi in zip(region_labels, region_indices):
+            y = concentrations[:, rindi, sp].sum(axis=1)
+            ax.plot(times, y, color=next(colors), label='{} in {}'.format(name, rlabel))
     ax.legend(loc='best')
     pyplot.show(block=True)
+
+def find_regions(regions, spec):
+    if spec is None:
+        spec = range(len(regions))
+    for item in spec:
+        try:
+            yield int(item)
+        except ValueError:
+            w = regions[:] == item
+            if w.sum() != 1:
+                raise ValueError("bad region: {}".format(item))
+            yield w.argmax() # find True
 
 def plot_history(filename, species, opts):
     file = tables.openFile(filename)
@@ -306,7 +321,16 @@ def plot_history(filename, species, opts):
     else:
         indices = numpy.arange(len(model.species))
     when = filter_times(opts.time, simul.times)
+
+    region_numbers = list(find_regions(model.regions, opts.regions))
+    region_indices = [model.grid.cols.region[:] == region
+                      for region in region_numbers]
+    assert sum(region_indices).min() >= 0
+    assert sum(region_indices).max() <= 1
+    region_labels = model.regions[region_numbers]
+
     _history(simul, model.species[indices], indices,
+             region_indices, region_labels,
              simul.times[when], simul.concentrations[when],
              title=filename, opts=opts)
 
