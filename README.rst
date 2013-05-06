@@ -88,7 +88,7 @@ The stochiometry of reactions is specified through two attributes: `power="p"` a
 Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
 determines how the number of molecules influences reaction rate. The rate is proportional
 to
-    N·(N-1)·…·(N-p+1)∕p!
+    N·(N-1)·…·(N-p+1)
 where *N* is the number of molecules of given species.
 
 Both *n* and *p* default to 1. If *p* is not specified, the reaction is a “psuedo” higher order reaction, in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:

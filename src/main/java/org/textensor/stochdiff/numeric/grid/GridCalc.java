@@ -213,10 +213,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     }
 
     protected static double ln_propensity(int n, int p) {
-        double ans = 0;
-        for (int i = 0; i < p; i++)
-            ans += intlog(n / (p - i));
-        return ans;
+        return p * intlog(n);
     }
 
     /* Total number of possible reactions is the smallest number of
