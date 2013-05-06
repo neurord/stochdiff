@@ -5,4 +5,10 @@ public interface RandomGenerator {
     double gaussian();
     double gammln(double xx);
     int poisson(double mean);
+
+    /**
+     * A number from the probability distribution
+     *    [ t ≥ 0] a exp(-at)
+     */
+    double exponential(double tau);
 }

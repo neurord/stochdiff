@@ -270,4 +270,12 @@ public class ArrayUtil {
             System.arraycopy(flat, rows * i, ans[i], 0, cols);
         return ans;
     }
+
+    public static boolean intersect(int[] aa, int... bb) {
+        for (int a: aa)
+            for (int b: bb)
+                if (a == b)
+                    return true;
+        return false;
+    }
 }

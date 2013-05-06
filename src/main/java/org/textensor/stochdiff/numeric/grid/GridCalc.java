@@ -196,4 +196,57 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     public int[][] getStimulationEvents() {
         return this.stimulationEvents;
     }
+
+    /*
+     * Common utilities
+     */
+
+    final private static double[] intlogs = ArrayUtil.logArray(10000);
+    public final static double intlog(int i) {
+        if (i <= 0)
+            return intlogs[0];
+        else
+            return i < intlogs.length ? intlogs[i] : Math.log(i);
+    }
+
+    protected static double ln_propensity(int n, int p) {
+        double ans = 0;
+        for (int i = 0; i < p; i++)
+            ans += intlog(n / (p - i));
+        return ans;
+    }
+
+    /* Total number of possible reactions is the smallest number of
+     * particles divided by stochiometry.
+     */
+    public static Object[] calculatePropensity(int[] ri, int[] pi,
+                                               int[] rs, int[] ps,
+                                               int[] rp,
+                                               double lnrate, double lnvol,
+                                               int[] nstart) {
+        double lnp = lnrate;
+
+        int n = nstart[ri[0]];
+        int ns = n / rs[0];
+        int p = rp[0];
+        for (int k = 1; k < ri.length; k++) {
+            int nk = nstart[ri[k]];
+            int nks = nk / rs[k];
+            int pk = rp[k];
+
+            if (nks < ns) {
+                lnp += ln_propensity(n, p);
+                n = nk;
+                ns = nks;
+                p = pk;
+            } else {
+                lnp += intlog(nk) * pk;
+            }
+
+            lnp -= lnvol + LN_PARTICLES_PUVC;
+        }
+        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
+
+        return new Object[]{lnp, ns};
+    }
 }

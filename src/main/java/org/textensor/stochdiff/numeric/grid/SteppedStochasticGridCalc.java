@@ -94,7 +94,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     InterpolatingStepGenerator interpSG;
     RandomGenerator random;
-    int nwarn;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
 
     double[][] pSharedOut;
@@ -378,51 +377,27 @@ public class SteppedStochasticGridCalc extends GridCalc {
         return dt;
     }
 
-    protected double ln_propensity(int n, int p) {
-        double ans = 0;
-        for (int i = 0; i < p; i++)
-            ans += intlog(n / (p - i));
-        return ans;
-    }
+    public int reactionStep_nwarn1, reactionStep_nwarn2;
 
     protected void reactionStep(int[] nstart, int[] nend, int iel, int ireac) {
-        // total number of possible reactions is the number of
-        // particles in the smallest reactant population
-
-        final double lnvol = lnvolumes[iel];
-
         int[] ri = reactantIndices[ireac];
         int[] pi = productIndices[ireac];
 
         int[] rs = reactantStochiometry[ireac];
         int[] ps = productStochiometry[ireac];
 
-        double lnp = lnrates[ireac] + lndt;
+        Object[] java_sucks = calculatePropensity(ri, pi, rs, ps,
+                                                  reactantPowers[ireac],
+                                                  lnrates[ireac], lnvolumes[iel],
+                                                  nstart);
+        double lnp = (Double)java_sucks[0];
+        int ns = (Integer)java_sucks[1];
 
-        int n = nstart[ri[0]];
-        int ns = n / rs[0];
-        int p = reactantPowers[ireac][0];
-        for (int k = 1; k < ri.length; k++) {
-            int nk = nstart[ri[k]];
-            int nks = nk / rs[k];
-            int pk = reactantPowers[ireac][k];
-
-            if (nks < ns) {
-                lnp += ln_propensity(n, p);
-                n = nk;
-                ns = nks;
-                p = pk;
-            } else {
-                lnp += intlog(nk) * pk;
-            }
-
-            lnp -= lnvol + LN_PARTICLES_PUVC;
-        }
-        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
+        lnp += lndt;
 
         if (lnp > 0) {
-            if (++nwarn < 5)
-                log.warn("p too large at element {} reaction {}: capping {} to exp(0)",
+            if (++reactionStep_nwarn1 < 500)
+                log.warn("p too large at element {} reaction {}: capping {} to 100%",
                          iel, ireac, Math.exp(lnp));
             lnp = 0;
         }
@@ -461,7 +436,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
                  * or use a binomial to share them out
                  * or use a smaller timestep.
                  */
-                if (++nwarn < 10)
+                if (++reactionStep_nwarn2 < 500)
                     log.warn("reaction {} ran out of particles - need {} but have {}",
                              ireac, ngo, navail);
                 ngo = navail;
@@ -610,14 +585,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 this.diffusionEvents[iel][k][io] ++;
             }
         }
-    }
-
-    final private static double[] intlogs = ArrayUtil.logArray(10000);
-    public final static double intlog(int i) {
-        if (i <= 0)
-            return intlogs[0];
-        else
-            return i < intlogs.length ? intlogs[i] : Math.log(i);
     }
 
     @Override
