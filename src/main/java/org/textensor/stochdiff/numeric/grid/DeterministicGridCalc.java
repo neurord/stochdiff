@@ -52,8 +52,6 @@ public class DeterministicGridCalc extends GridCalc {
     public final void init() {
         super.init();
 
-        stimTab = getStimulationTable();
-        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
         /* AB Dec 16 2011 - eltstims needs to be 2D, determine target element and share for each */
@@ -83,8 +81,6 @@ public class DeterministicGridCalc extends GridCalc {
         wkA = new double[nel][nspec];
         wktm1 = new double[nel][nspec];
         wkC = new double[nel][nspec];
-
-        dt = sdRun.fixedStepDt;
 
         double[][] regcon = getRegionConcentrations();
         double[][] regsd = getRegionSurfaceDensities();

@@ -147,8 +147,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                 diffusionEvents[iel][k] = new int[nn];
             }
 
-        stimTab = getStimulationTable();
-        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
         stimulationEvents = new int[nel][nspec];
 
         // workspace for the calculation
@@ -193,7 +191,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
             ArrayUtil.copy(cc, this.wkB);
         }
 
-        dt = sdRun.fixedStepDt;
         lndt = Math.log(dt);
 
         // final things we need is something to generate particle numbers
@@ -377,7 +374,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
         return dt;
     }
 
-    public int reactionStep_nwarn1, reactionStep_nwarn2;
+    private int reactionStep_nwarn1, reactionStep_nwarn2;
 
     protected void reactionStep(int[] nstart, int[] nend, int iel, int ireac) {
         int[] ri = reactantIndices[ireac];
@@ -567,7 +564,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     private final void particleDiffusionStep(int iel, int k) {
         int np0 = wkA[iel][k];
         int inbr[] = neighbors[iel];
-        // int nnbr = inbr.length;
         double[] fshare = fSharedExit[iel][k];
         double ptot = pSharedOut[iel][k];
 
@@ -575,12 +571,12 @@ public class SteppedStochasticGridCalc extends GridCalc {
             double r = random.random();
 
             if (r < ptot) {
-                wkB[iel][k] -= 1; // ???
+                wkB[iel][k] -= 1;
                 double fr = r / ptot;
                 int io = 0;
-                while (fr > fshare[io]) {
+                while (fr > fshare[io])
                     io++;
-                }
+
                 wkB[inbr[io]][k] += 1;
                 this.diffusionEvents[iel][k][io] ++;
             }

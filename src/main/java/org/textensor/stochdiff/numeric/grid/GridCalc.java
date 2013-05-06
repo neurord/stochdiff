@@ -87,7 +87,10 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         // RO
         extractOutputScheme(rtab); // see BaseCalc.java
 
+        stimTab = getStimulationTable();
+        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
 
+        dt = sdRun.fixedStepDt;
     }
 
     public int run() {
