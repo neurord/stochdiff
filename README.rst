@@ -91,7 +91,7 @@ to
     N·(N-1)·…·(N-p+1)
 where *N* is the number of molecules of given species.
 
-Both *n* and *p* default to 1. If *p* is not specified, the reaction is a “psuedo” higher order reaction, in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
+Power *p* defaults to 1. Stochiometry *n* defaults to *p*. If *p* is not specified but *n* is, the reaction is a “psuedo” higher order reaction in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
 .. code-block:: xml
 
@@ -107,7 +107,7 @@ A decay reaction which in which the rate is proportional to the square of concen
 .. code-block:: xml
 
    <Reaction name="decay" id="decay">
-      <Reactant specieID="A" power="2" n="2"/>
+      <Reactant specieID="A" power="2" />
       <forwardRate>0.83e-06</forwardRate>
       <Q10>0.2</Q10>
    </Reaction>
