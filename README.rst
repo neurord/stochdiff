@@ -23,7 +23,7 @@ Times are expressed in milliseconds and distances in microns. Concentrations are
 Reactions Scheme File
 ---------------------
 
-The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The format is:
+The reaction file has two parts. The first part is a listing of all molecule species. There is one program statement for each molecule in which each species is given a name, an id, a diffusion constant, and units for the diffusion constant. Species names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. The format is:
 
 .. code-block:: xml
 
@@ -35,18 +35,18 @@ Two examples follow:
 
 .. code-block:: xml
 
-     <Specie name="IP3"    id="IP3"    kdiff="100"   kdiffunit = "mu2/s"/>
+     <Specie name="IP3"   kdiff="100"   kdiffunit = "mu2/s"/>
 
 2.  examples for non-diffusing molecule specification:
 
 .. code-block:: xml
 
-     <Specie name="PIP2"   id="PIP2"   kdiff="0"     kdiffunit = "mu2/s"/>
+     <Specie name="PIP2"  kdiff="0"     kdiffunit = "mu2/s"/>
 
 Reactions
 ~~~~~~~~~
 
-The second part of the reaction file is a list of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
+The second part of the reaction file is a list of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
 
 .. code-block:: xml
 
@@ -58,11 +58,13 @@ The second part of the reaction file is a list of all reactions. There are sever
         <Q10> value </Q10>
     </Reaction>
 
+The attribute `specieID=` refers to one of the species declared above, and must match either the
+`id` or the `name` of one of the species.
 Enzyme reactions are specified as two bimolecular reactions, with the enzyme regenerated in the second step. An example of an enzyme reaction follows:
 
 .. code-block:: xml
 
-    <Reaction name = "PLCaG+PIP2--PLCPIP2 reac" id="PLCaG+PIP2--PLCPIP2_id">
+    <Reaction name = "PLCaG+PIP2--PLCPIP2 reac" >
         <Reactant specieID="PLCaG"                         />
         <Reactant specieID="PIP2"                       />
         <Product  specieID="PLCPIP2"                      />

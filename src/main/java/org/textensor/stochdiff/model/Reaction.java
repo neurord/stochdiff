@@ -9,6 +9,7 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
+import static org.textensor.stochdiff.model.Specie.generateID;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,10 @@ public class Reaction implements AddableTo {
 
     private ArrayList<Specie> r_reactants;
     private ArrayList<Specie> r_products;
+
+    public String getID() {
+        return id != null ? id : generateID(name);
+    }
 
     public void add(Object obj) {
         if (obj instanceof Reactant)

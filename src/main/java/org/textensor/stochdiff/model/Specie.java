@@ -5,23 +5,24 @@ import org.textensor.report.E;
 
 public class Specie {
 
-    public String name;
-    public String id;
+    public String name = null;
+    public String id = null;
 
-    public double kdiff;
-    public String kdiffunit;
+    public double kdiff = Double.NaN;
+    public String kdiffunit = null;
 
     private int index;
 
-
-    public Specie() {
-        kdiff = Double.NaN;
-        kdiffunit = null;
+    public String getID() {
+        return id != null ? id : generateID(name);
     }
 
+    public static String generateID(String name) {
+        return name.replaceAll(" /\\\\", "_");
+    }
 
-    public String getID() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     public void setIndex(int ict) {
@@ -36,7 +37,7 @@ public class Specie {
 
     public double getDiffusionConstant() {
         double ret = 0.;
-        if (!(Double.isNaN(kdiff))) {
+        if (!Double.isNaN(kdiff)) {
             ret = kdiff;
 
             if (kdiffunit != null) {
@@ -50,27 +51,21 @@ public class Specie {
 
 
     private double getFactor(String su) {
-        double ret = 0.;
         // output units are microns^2/ms
 
+        if (su.equals("mu2/s"))
+            return 0.001;
 
-        if (su.equals("mu2/s")) {
-            ret = 0.001;
+        if (su.equals("m2/s"))
+            return 1.e9;
 
-        } else if (su.equals("m2/s")) {
-            ret = 1.e9;
+        if (su.equals("cm2/s"))
+            return 1.e5;
 
-        } else if (su.equals("cm2/s")) {
-            ret = 1.e5;
+        if (su.equals("mu2/ms"))
+            return 1.;
 
-        } else if (su.equals("mu2/ms")) {
-            ret = 1.;
-
-        } else {
-            E.error("don't understand units " + su);
-        }
-        return ret;
+        E.error("don't understand units " + su);
+        throw new RuntimeException("don't understand units " + su);
     }
-
-
 }

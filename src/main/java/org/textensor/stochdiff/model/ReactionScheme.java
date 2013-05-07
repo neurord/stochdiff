@@ -32,6 +32,8 @@ public class ReactionScheme implements AddableTo {
             sp.setIndex(this.species.size());
             this.species.add(sp);
             hmPut(this.specieHM, sp.getID(), sp);
+            if (!sp.getName().equals(sp.getID()))
+                hmPut(this.specieHM, sp.getName(), sp);
         } else if (obj instanceof Reaction) {
             reactions.add((Reaction)obj);
         } else {
@@ -92,7 +94,7 @@ public class ReactionScheme implements AddableTo {
                     rtab.setReactionData(i++, products, reactants, r.reverseRate);
                 else
                     throw new RuntimeException("reaction with non-zero rate but no reactants: "
-                                               + r.id);
+                                               + r.getID());
         }
 
         assert i == n: "ir=" + i + " n=" + n;
