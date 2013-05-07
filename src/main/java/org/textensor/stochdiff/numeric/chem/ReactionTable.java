@@ -122,21 +122,27 @@ public class ReactionTable {
     public static String getReactionSignature(int[] rr, int[] rs, int[] pp, int[] ps, String[] ids) {
         StringBuffer b = new StringBuffer();
 
-        for (int i = 0; i < rr.length; i++) {
-            if (i > 0)
-                b.append("+");
-            if (rs[i] > 1)
-                b.append("" + rs[i] + "×");
-            b.append(ids[rr[i]]);
-        }
+        if (rr.length > 0)
+            for (int i = 0; i < rr.length; i++) {
+                if (i > 0)
+                    b.append("+");
+                if (rs[i] > 1)
+                    b.append("" + rs[i] + "×");
+                b.append(ids[rr[i]]);
+            }
+        else
+            b.append("nil");
         b.append("→");
-        for (int i = 0; i < pp.length; i++) {
-            if (i > 0)
-                b.append("+");
-            if (rs[i] > 1)
-                b.append("" + ps[i] + "×");
-            b.append(ids[pp[i]]);
-        }
+        if (pp.length > 0)
+            for (int i = 0; i < pp.length; i++) {
+                if (i > 0)
+                    b.append("+");
+                if (rs[i] > 1)
+                    b.append("" + ps[i] + "×");
+                b.append(ids[pp[i]]);
+            }
+        else
+            b.append("nil");
         return b.toString();
     }
 
