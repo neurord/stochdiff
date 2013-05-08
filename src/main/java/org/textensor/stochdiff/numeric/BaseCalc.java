@@ -52,14 +52,14 @@ public abstract class BaseCalc {
     // the nanoMolar concentration this much
     public static final double NM_PER_PARTICLE_PUV = 1. / PARTICLES_PUVC;
 
-    ReactionTable reactionTable;
+    private ReactionTable reactionTable;
     private VolumeGrid volumeGrid;
-    StimulationTable stimulationTable;
+    private StimulationTable stimulationTable;
 
-    double[] baseConcentrations;
+    private double[] baseConcentrations;
 
-    double[][] regionConcentrations;
-    double[][] regionSurfaceDensities;
+    private double[][] regionConcentrations;
+    private double[][] regionSurfaceDensities;
 
     protected final ArrayList<ResultWriter> resultWriters = inst.newArrayList();
 
@@ -79,17 +79,10 @@ public abstract class BaseCalc {
         PARTICLE,
     }
 
-    distribution_t distID = distribution_t.BINOMIAL;
+    protected distribution_t distID = distribution_t.BINOMIAL;
     protected algorithm_t algoID = algorithm_t.INDEPENDENT;
 
     public boolean writeConcentration = false;
-
-    // <--WK
-    public String n_list, dt_list, filename_list, specie_names_list;
-    // 6 18 2007
-    public String region_list;
-    // WK-->
-
 
     public final static int VISUALIZE = 1;
     public final static int RUN = 0;
@@ -347,9 +340,8 @@ public abstract class BaseCalc {
     }
 
     public double[][] getRegionConcentrations() {
-        if (regionConcentrations == null) {
+        if (regionConcentrations == null)
             extractGrid();
-        }
         return regionConcentrations;
     }
 
@@ -359,16 +351,15 @@ public abstract class BaseCalc {
 
 
     public double[][] getRevisedRegionConcentrations() {
-        if (regionConcentrations == null) {
+        if (regionConcentrations == null)
             extractGrid();
-        }
-        makeRegionConcentrations(volumeGrid.getRegionLabels());
         return regionConcentrations;
     }
 
 
     public double[][] getRevisedRegionSurfaceDensities() {
-        makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
+        if (regionSurfaceDensities == null)
+            extractGrid();
         return regionSurfaceDensities;
     }
 
