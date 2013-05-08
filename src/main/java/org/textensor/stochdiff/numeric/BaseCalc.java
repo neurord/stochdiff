@@ -116,20 +116,14 @@ public abstract class BaseCalc {
         distID = sdRun.getDistributionID();
         algoID = sdRun.getAlgorithmID();
 
-        ReactionScheme rsch = sdRun.getReactionScheme();
+        reactionTable = sdRun.getReactionScheme().makeReactionTable();
 
-        reactionTable = rsch.makeReactionTable();
+        stimulationTable = sdRun.getStimulationSet().makeStimulationTable(reactionTable);
 
-        StimulationSet stim = sdRun.getStimulationSet();
-        stimulationTable = stim.makeStimulationTable(reactionTable);
-
-        InitialConditions icons = sdRun.getInitialConditions();
         speciesList = reactionTable.getSpecieIDs();
-        // -------------------------
-        // OutputScheme output = sdRun.getOutputScheme();
-        // -------------------------
-        // double vol = sdRun.poolVolume;
-        baseConcentrations = icons.getDefaultNanoMolarConcentrations(speciesList);
+
+        baseConcentrations = sdRun.getInitialConditions()
+                                  .getDefaultNanoMolarConcentrations(speciesList);
 
         String specout = sdRun.outputSpecies;
         if (specout == null || specout.equals("all")) {
@@ -248,7 +242,7 @@ public abstract class BaseCalc {
 
 
 
-    public void extractGrid() {
+    private void extractGrid() {
         Morphology morph = sdRun.getMorphology();
         TreePoint[] tpa = morph.getTreePoints();
         Discretization disc = sdRun.getDiscretization();
@@ -311,8 +305,8 @@ public abstract class BaseCalc {
 
         extractTables();
 
-        makeRegionConcentrations(volumeGrid.getRegionLabels());
-        makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
+        regionConcentrations = makeRegionConcentrations(volumeGrid.getRegionLabels());
+        regionSurfaceDensities = makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
     }
 
     public final boolean useBinomial() {
@@ -350,23 +344,7 @@ public abstract class BaseCalc {
     }
 
 
-    public double[][] getRevisedRegionConcentrations() {
-        if (regionConcentrations == null)
-            extractGrid();
-        return regionConcentrations;
-    }
-
-
-    public double[][] getRevisedRegionSurfaceDensities() {
-        if (regionSurfaceDensities == null)
-            extractGrid();
-        return regionSurfaceDensities;
-    }
-
-
-
-
-    private void makeRegionConcentrations(String[] sra) {
+    private double[][] makeRegionConcentrations(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
@@ -388,20 +366,18 @@ public abstract class BaseCalc {
                 }
             }
         }
-        regionConcentrations = ret;
+        return ret;
     }
 
-    private void makeRegionSurfaceDensities(String[] sra) {
+    private double[][] makeRegionSurfaceDensities(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
+
         double[][] ret = new double[sra.length][];
-        for (int i = 0; i < sra.length; i++) {
-            if (icons.hasSurfaceDensitiesFor(sra[i])) {
+        for (int i = 0; i < sra.length; i++)
+            if (icons.hasSurfaceDensitiesFor(sra[i]))
                 ret[i] = icons.getRegionSurfaceDensities(sra[i], speciesList);
-            } else {
-                ret[i] = null;
-            }
-        }
-        regionSurfaceDensities = ret;
+
+        return ret;
     }
 
     public long getCalculationSeed() {

@@ -90,6 +90,17 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         stimTab = getStimulationTable();
         stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
 
+        stimulationEvents = new int[nel][nspec];
+
+        reactionEvents = new int[nel][rtab.getNReaction()];
+
+        diffusionEvents = new int[nel][nspec][];
+        for (int iel = 0; iel < nel; iel++)
+            for (int k = 0; k < nspec; k++) {
+                int nn = neighbors[iel].length;
+                diffusionEvents[iel][k] = new int[nn];
+            }
+
         dt = sdRun.fixedStepDt;
     }
 
@@ -214,39 +225,5 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     protected static double ln_propensity(int n, int p) {
         return p * intlog(n);
-    }
-
-    /* Total number of possible reactions is the smallest number of
-     * particles divided by stochiometry.
-     */
-    public static Object[] calculatePropensity(int[] ri, int[] pi,
-                                               int[] rs, int[] ps,
-                                               int[] rp,
-                                               double lnrate, double lnvol,
-                                               int[] nstart) {
-        double lnp = lnrate;
-
-        int n = nstart[ri[0]];
-        int ns = n / rs[0];
-        int p = rp[0];
-        for (int k = 1; k < ri.length; k++) {
-            int nk = nstart[ri[k]];
-            int nks = nk / rs[k];
-            int pk = rp[k];
-
-            if (nks < ns) {
-                lnp += ln_propensity(n, p);
-                n = nk;
-                ns = nks;
-                p = pk;
-            } else {
-                lnp += intlog(nk) * pk;
-            }
-
-            lnp -= lnvol + LN_PARTICLES_PUVC;
-        }
-        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
-
-        return new Object[]{lnp, ns};
     }
 }

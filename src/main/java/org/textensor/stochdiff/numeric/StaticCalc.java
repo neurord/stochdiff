@@ -73,8 +73,8 @@ public class StaticCalc extends BaseCalc {
 
 
     public void reinit() {
-        double[][] regcon = getRevisedRegionConcentrations();
-        double[][] regsd = getRevisedRegionSurfaceDensities();
+        double[][] regcon = getRegionConcentrations();
+        double[][] regsd = getRegionSurfaceDensities();
 
         for (int i = 0; i < nel; i++) {
             double[] rcs = regcon[eltregions[i]];

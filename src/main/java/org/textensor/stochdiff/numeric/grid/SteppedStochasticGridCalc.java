@@ -25,12 +25,9 @@ import java.io.File;
 import java.util.StringTokenizer;
 import java.util.Arrays;
 
-import org.textensor.report.Debug;
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.numeric.math.RandomGenerator;
-import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
@@ -52,11 +49,8 @@ import org.apache.logging.log4j.LogManager;
  * location is not taken into account until the following step.
  */
 
-public class SteppedStochasticGridCalc extends GridCalc {
+public class SteppedStochasticGridCalc extends StochasticGridCalc {
     static final Logger log = LogManager.getLogger(SteppedStochasticGridCalc.class);
-
-    @Override
-    public boolean preferConcs(){ return false; }
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),
@@ -71,7 +65,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
     double[][] lnCC;
 
-    int[][] wkA;
     int[][] wkB;
 
     double[] diffusionConstants;
@@ -93,7 +86,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     double lndt;
 
     InterpolatingStepGenerator interpSG;
-    RandomGenerator random;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
 
     double[][] pSharedOut;
@@ -103,32 +95,15 @@ public class SteppedStochasticGridCalc extends GridCalc {
         super(sdm);
     }
 
-    protected int randomRound(double number) {
-        int i = (int) number;
-        double d = number - i;
-
-        // random allocation to implement the remainder
-        // (some cells get an extra particle, some don't)
-        if (random.random() < d)
-            i++;
-
-        return i;
-    }
-
+    @Override
     public final void init() {
         super.init();
-
-        // something to generate the random nunmbers
-        random = new MersenneTwister(getCalculationSeed());
-
-        // Debug.dump("rates", rates);
 
         lnrates = ArrayUtil.log(rtab.getRates());
         log.debug("lnrates: {}", lnrates);
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
-        reactionEvents = new int[nel][rtab.getNReaction()];
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
@@ -138,32 +113,16 @@ public class SteppedStochasticGridCalc extends GridCalc {
         log.debug("lnvolumes: {}", lnvolumes);
 
         lnfdiff = ArrayUtil.log(fdiff);
-
         lnCC = ArrayUtil.log(couplingConstants);
-        diffusionEvents = new int[nel][nspec][];
-        for (int iel = 0; iel < nel; iel++)
-            for (int k = 0; k < nspec; k++) {
-                int nn = neighbors[iel].length;
-                diffusionEvents[iel][k] = new int[nn];
-            }
-
-        stimulationEvents = new int[nel][nspec];
 
         // workspace for the calculation
-        wkA = new int[nel][nspec];
         wkB = new int[nel][nspec];
+        ArrayUtil.copy(wkA, wkB);
 
-        double[][] regcon = getRegionConcentrations();
         double[][] regsd = getRegionSurfaceDensities();
 
         // apply initial conditions over the grid
         for (int i = 0; i < nel; i++) {
-            double v = volumes[i];
-            double[] rcs = regcon[eltregions[i]];
-
-            for (int j = 0; j < nspec; j++)
-                wkA[i][j] = wkB[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);
-
             double a = surfaceAreas[i];
             double[] scs = regsd[eltregions[i]];
             if (a > 0 && scs != null) {
@@ -173,11 +132,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     } else
                         wkA[i][j] = wkB[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
             }
-
-            /*
-             * if (i % 20 == 0) { E.info("elt " + i + " region " + eltregions[i]
-             * + " n0 " + wkA[i][0]); }
-             */
         }
 
         if (sdRun.initialStateFile != null) {
@@ -583,14 +537,38 @@ public class SteppedStochasticGridCalc extends GridCalc {
         }
     }
 
-    @Override
-    public int getGridPartNumb(int i, int j) {
-        return wkA[i][j];
-    }
 
-    @Override
-    public double getGridPartConc(int i, int j) {
-        int val = getGridPartNumb(i, j);
-        return val * NM_PER_PARTICLE_PUV / volumes[i];
+    /* Total number of possible reactions is the smallest number of
+     * particles divided by stochiometry.
+     */
+    public static Object[] calculatePropensity(int[] ri, int[] pi,
+                                               int[] rs, int[] ps,
+                                               int[] rp,
+                                               double lnrate, double lnvol,
+                                               int[] nstart) {
+        double lnp = lnrate;
+
+        int n = nstart[ri[0]];
+        int ns = n / rs[0];
+        int p = rp[0];
+        for (int k = 1; k < ri.length; k++) {
+            int nk = nstart[ri[k]];
+            int nks = nk / rs[k];
+            int pk = rp[k];
+
+            if (nks < ns) {
+                lnp += ln_propensity(n, p);
+                n = nk;
+                ns = nks;
+                p = pk;
+            } else {
+                lnp += intlog(nk) * pk;
+            }
+
+            lnp -= lnvol + LN_PARTICLES_PUVC;
+        }
+        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
+
+        return new Object[]{lnp, ns};
     }
 }

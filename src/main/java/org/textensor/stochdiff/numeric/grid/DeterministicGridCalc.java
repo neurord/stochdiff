@@ -7,7 +7,6 @@ package org.textensor.stochdiff.numeric.grid;
 
 import java.util.Arrays;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.math.Column;
