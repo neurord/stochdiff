@@ -2,6 +2,7 @@ package org.textensor.stochdiff;
 
 import org.textensor.stochdiff.numeric.grid.DeterministicGridCalc;
 import org.textensor.stochdiff.numeric.grid.SteppedStochasticGridCalc;
+import org.textensor.stochdiff.numeric.grid.ExactStochasticGridCalc;
 import org.textensor.stochdiff.numeric.pool.*;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.model.SDRun;
@@ -28,24 +29,20 @@ public enum SDCalcType {
     SMP_IMPLICIT_EULER(ImplicitEulerPoolCalc.class),
     SMP_FORWARD_EXPONENTIAL(ForwardExponentialPoolCalc.class),
     SMP_RK4(RungeKutta4PoolCalc.class),
+    GRID_STEPPED_CONTINUOUS(DeterministicGridCalc.class),
     GRID_STEPPED_STOCHASTIC(SteppedStochasticGridCalc.class),
-    GRID_STEPPED_CONTINUOUS(DeterministicGridCalc.class);
-
+    GRID_STEPPED_EXACT(ExactStochasticGridCalc.class);
 
     private Class calcClass;
-
 
     SDCalcType(Class cls) {
         calcClass = cls;
     }
 
-
     public boolean hasLabel(String s) {
         String sn = name();
         return (sn.equals(s) || sn.toLowerCase().equals(s));
     }
-
-
 
     public BaseCalc getCalc(SDRun sdr) {
         BaseCalc ret = null;
@@ -61,5 +58,4 @@ public enum SDCalcType {
         }
         return ret;
     }
-
 }
