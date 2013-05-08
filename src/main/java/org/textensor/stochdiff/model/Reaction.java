@@ -32,7 +32,31 @@ public class Reaction implements AddableTo {
     private ArrayList<Specie> r_products;
 
     public String getID() {
-        return id != null ? id : generateID(name);
+        return this.id != null ? this.id : generateID(this.getName());
+    }
+
+    protected static String formatSide(ArrayList<? extends SpecieRef> list) {
+        if (list.isEmpty())
+            return "nil";
+
+        StringBuffer b = new StringBuffer();
+        boolean second = false;
+        for (SpecieRef r: list) {
+            if (second)
+                b.append("+");
+            else
+                second = true;
+            if (r.getStochiometry() > 1)
+                b.append("" + r.getStochiometry() + "×");
+            b.append(r.getSpecieID());
+        }
+        return b.toString();
+    }
+
+    public String getName() {
+        if (this.name == null)
+            this.name = formatSide(this.p_reactants) + "→" + formatSide(this.p_products);
+        return this.name;
     }
 
     public void add(Object obj) {

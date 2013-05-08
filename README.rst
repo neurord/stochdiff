@@ -27,7 +27,7 @@ The reaction file has two parts. The first part is a listing of all molecule spe
 
 .. code-block:: xml
 
-     <Specie name=”name” id=”id” kdiff=”constant” kdiffunit=mu2/s” />
+     <Specie name="name" id="id" kdiff="constant" kdiffunit="mu2/s" />
 
 Two examples follow:
 
@@ -46,13 +46,13 @@ Two examples follow:
 Reactions
 ~~~~~~~~~
 
-The second part of the reaction file is a list of all reactions. There are several program statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
+The second part of the reaction file is a list of all reactions. There are several statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. The name also doesn't have to be specified: a string of the form A+2×B→C will be used by default. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
 
 .. code-block:: xml
 
-    <Reaction name=”name” id=”id”>
-        <Reactant specieID=”id”/>
-        <Product specieID=”id”/>
+    <Reaction name="name" id="id">
+        <Reactant specieID="id"/>
+        <Product specieID="id"/>
         <forwardRate> rate </forwardRate>
         <reverseRate> rate </reverseRate>
         <Q10> value </Q10>
@@ -64,7 +64,7 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
 
 .. code-block:: xml
 
-    <Reaction name = "PLCaG+PIP2--PLCPIP2 reac" >
+    <Reaction>
         <Reactant specieID="PLCaG"                         />
         <Reactant specieID="PIP2"                       />
         <Product  specieID="PLCPIP2"                      />
@@ -73,7 +73,7 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
         <Q10>                   0.2                     </Q10>
     </Reaction>
 
-    <Reaction name = "PLCPIP2--PLCaG+IP3 reac" id="PLCPIP2--PLCaG+IP3_id">
+    <Reaction>
         <Reactant specieID="PLCPIP2"                      />
         <Product  specieID="PLCaG"                         />
         <Product  specieID="IP3"                      />
@@ -108,7 +108,7 @@ A decay reaction which in which the rate is proportional to the square of concen
 
 .. code-block:: xml
 
-   <Reaction name="decay" id="decay">
+   <Reaction name="decay">
       <Reactant specieID="A" power="2" />
       <forwardRate>0.83e-06</forwardRate>
       <Q10>0.2</Q10>
