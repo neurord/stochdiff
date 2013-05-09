@@ -119,7 +119,7 @@ public abstract class BaseCalc {
 
     }
 
-    public void extractTables() {
+    private void extractTables() {
         distID = sdRun.getDistributionID();
         algoID = sdRun.getAlgorithmID();
 
@@ -316,9 +316,10 @@ public abstract class BaseCalc {
 
         volumeGrid.fix();
 
+        extractTables();
+
         makeRegionConcentrations(volumeGrid.getRegionLabels());
         makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
-
     }
 
     public final boolean useBinomial() {
@@ -422,14 +423,14 @@ public abstract class BaseCalc {
 
     public ReactionTable getReactionTable() {
         if (reactionTable == null)
-            extractTables();
+            extractGrid();
 
         return reactionTable;
     }
 
     public StimulationTable getStimulationTable() {
         if (stimulationTable == null)
-            extractTables();
+            extractGrid();
 
         return stimulationTable;
     }

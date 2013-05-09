@@ -43,8 +43,6 @@ public class DeterministicGridCalc extends GridCalc {
     double[][] wktm1;
     double[][] wkC;
 
-    int nlog;
-
     public DeterministicGridCalc(SDRun sdm) {
         super(sdm);
     }
@@ -53,16 +51,6 @@ public class DeterministicGridCalc extends GridCalc {
     // the calculation: three arrays for each species at each element;
     public final void init() {
         super.init();
-
-        nspec = rtab.getNSpecies();
-
-        volumes = this.getVolumeGrid().getElementVolumes();
-
-        fdiff = rtab.getDiffusionConstants();
-        neighbors = this.getVolumeGrid().getPerElementNeighbors();
-        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
-
-        extractOutputScheme(rtab); // see BaseCalc.java
 
         stimTab = getStimulationTable();
         stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
@@ -91,7 +79,6 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-        surfaceAreas = this.getVolumeGrid().getExposedAreas();
 //AB 2012-apr 3 change wkB to wk[time-1]
         wkA = new double[nel][nspec];
         wktm1 = new double[nel][nspec];

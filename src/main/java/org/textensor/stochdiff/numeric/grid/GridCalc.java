@@ -21,12 +21,10 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     double dt;
 
-    public int nel;
-    int nspec;
+    public int nel, nspec;
     public String[] specieIDs;
 
     double[] volumes;
-    double[] lnvolumes;
     double[] fdiff;
 
     int[][] neighbors;
@@ -64,12 +62,32 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             stateSaveTime = 1.e9;
         }
 
+        nel = this.getVolumeGrid().getNElements();
+        volumes = this.getVolumeGrid().getElementVolumes();
+
         rtab = getReactionTable();
         specieIDs = rtab.getSpecieIDs();
+        nspec = rtab.getNSpecies();
 
-        nel = this.getVolumeGrid().getNElements();
+        neighbors = this.getVolumeGrid().getPerElementNeighbors();
+        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
 
         eltregions = this.getVolumeGrid().getRegionIndexes();
+
+        fdiff = rtab.getDiffusionConstants();
+
+        surfaceAreas = this.getVolumeGrid().getExposedAreas();
+
+        // RO
+        // ----------------------
+        // System.out.println("Number of files        : " + NspeciesFilef);
+        // System.out.println("Total numer of species : " + NspeciesIDsOutf);
+
+        // ----------------------
+        // RO
+        extractOutputScheme(rtab); // see BaseCalc.java
+
+
     }
 
     public int run() {

@@ -74,9 +74,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     int[][] wkA;
     int[][] wkB;
 
-    int nreaction;
-    public int nspecie;
-    String[] speciesIDs;
     double[] diffusionConstants;
 
     int[][] reactantIndices;
@@ -90,6 +87,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
      */
     int[][] reactantPowers;
 
+    double[] lnvolumes;
     double[] lnrates;
 
     double lndt;
@@ -98,7 +96,6 @@ public class SteppedStochasticGridCalc extends GridCalc {
     RandomGenerator random;
     int nwarn;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
-    int ninfo;
 
     double[][] pSharedOut;
     double[][][] fSharedExit;
@@ -122,12 +119,8 @@ public class SteppedStochasticGridCalc extends GridCalc {
     public final void init() {
         super.init();
 
-        //not in Determinstic: stateSaveTime += sdRun.getStartTime();
-
         // something to generate the random nunmbers
         random = new MersenneTwister(getCalculationSeed());
-
-        nreaction = rtab.getNReaction();
 
         // Debug.dump("rates", rates);
 
@@ -136,34 +129,17 @@ public class SteppedStochasticGridCalc extends GridCalc {
 
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
-        reactionEvents = new int[nel][nreaction];
+        reactionEvents = new int[nel][rtab.getNReaction()];
 
         reactantStochiometry = rtab.getReactantStochiometry();
         productStochiometry = rtab.getProductStochiometry();
         reactantPowers = rtab.getReactantPowers();
 
-        nspec = rtab.getNSpecies();
-        specieIDs = rtab.getSpecieIDs();
-        volumes = this.getVolumeGrid().getElementVolumes();
         lnvolumes = ArrayUtil.log(volumes);
         log.debug("lnvolumes: {}", lnvolumes);
 
-        // RO
-        // ----------------------
-        // System.out.println("Number of files        : " + NspeciesFilef);
-        // System.out.println("Total numer of species : " + NspeciesIDsOutf);
-
-        // ----------------------
-        // RO
-        extractOutputScheme(rtab); // see BaseCalc.java
-
-        surfaceAreas = this.getVolumeGrid().getExposedAreas();
-
-        fdiff = rtab.getDiffusionConstants();
         lnfdiff = ArrayUtil.log(fdiff);
 
-        neighbors = this.getVolumeGrid().getPerElementNeighbors();
-        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
         lnCC = ArrayUtil.log(couplingConstants);
         diffusionEvents = new int[nel][nspec][];
         for (int iel = 0; iel < nel; iel++)
@@ -189,7 +165,7 @@ public class SteppedStochasticGridCalc extends GridCalc {
             double[] rcs = regcon[eltregions[i]];
 
             for (int j = 0; j < nspec; j++)
-                wkA[i][j] = wkB[i][j] = randomRound(v * rcs[j] * PARTICLES_PUVC);
+                wkA[i][j] = wkB[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);
 
             double a = surfaceAreas[i];
             double[] scs = regsd[eltregions[i]];
@@ -250,17 +226,15 @@ public class SteppedStochasticGridCalc extends GridCalc {
                     if (nn > maxnn)
                         maxnn = nn;
                 }
-            E.info("max no of neighbors for a single element is " + maxnn);
+            log.info("max no of neighbors for a single element is {}", maxnn);
 
             for (int iel = 0; iel < nel; iel++) {
                 for (int k = 0; k < nspec; k++) {
-                    int inbr[] = neighbors[iel];
-                    int nnbr = inbr.length;
 
                     double ptot = 0.;
-                    double[] pcnbr = new double[nnbr];
+                    double[] pcnbr = new double[neighbors[iel].length];
 
-                    for (int j = 0; j < nnbr; j++) {
+                    for (int j = 0; j < pcnbr.length; j++) {
                         double lnpgo = lnfdiff[k] + lnCC[iel][j] + lndt - lnvolumes[iel];
                         // probability is dt * K_diff * contact_area /
                         // (center_to_center_distance * source_volume)
@@ -271,27 +245,17 @@ public class SteppedStochasticGridCalc extends GridCalc {
                         pcnbr[j] = ptot;
                     }
 
-                    double lnptot = Math.log(ptot);
-                    if (lnptot > -1.) {
+                    if (ptot > 1/Math.E) { // why this value, who knows?
                         // WK 9 11 2007
                         System.out.println("WK===================================");
                         System.out.println("In DIFFUSION: probability TOO HIGH!");
                         System.out.println("Reduce your timestep, and try again...");
                         System.out.println("WK====================================");
                         System.exit(3);
-
-                        /*
-                         * if (nwarn < 4) {
-                         * E.warning("p too large at element " + iel +
-                         * " species " + k + " - capping from " +
-                         * Math.exp(lnptot) + " to " + Math.exp(-1.)); nwarn++;
-                         * } lnptot= -1.;
-                         */
-                        // WK
                     }
 
                     pSharedOut[iel][k] = ptot;
-                    for (int j = 0; j < nnbr; j++)
+                    for (int j = 0; j < pcnbr.length; j++)
                         fSharedExit[iel][k][j] = pcnbr[j] / ptot;
                 }
             }
@@ -404,13 +368,9 @@ public class SteppedStochasticGridCalc extends GridCalc {
         for (int iel = 0; iel < nel; iel++) {
             // start and end quantities for each species in a single
             // volume
-            int[] nstart = wkB[iel];
-            int[] nend = wkA[iel];
-            for (int isp = 0; isp < nspecie; isp++) {
-                nend[isp] = nstart[isp];
-            } // XXX: is this necessary after ArrayUtil.copy above?
+            int[] nstart = wkB[iel], nend = wkA[iel];
 
-            for (int ireac = 0; ireac < nreaction; ireac++)
+            for (int ireac = 0; ireac < rtab.getNReaction(); ireac++)
                 reactionStep(nstart, nend, iel, ireac);
         }
 
