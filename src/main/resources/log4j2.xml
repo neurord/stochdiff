@@ -18,5 +18,6 @@
     </root>
     <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterHDF5" level="info" />
     <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterText" level="info" />
+    <logger name="org.textensor.stochdiff.numeric.grid.NextEventQueue" level="info" />
   </loggers>
 </configuration>

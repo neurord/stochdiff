@@ -80,8 +80,8 @@ public class ReactionTable {
     }
 
     public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate) {
-        log.debug("nreaction={} nspecie={} ireact={} aix={} bidx={} rate={}",
-                  nreaction, nspecie, ireact, aidx, bidx, rate);
+        log.debug("ireact={}/{} {}→{} rate={}",
+                  ireact, nreaction, aidx, bidx, rate);
 
         assert this.speciesIDs != null;
 
@@ -137,7 +137,7 @@ public class ReactionTable {
             for (int i = 0; i < pp.length; i++) {
                 if (i > 0)
                     b.append("+");
-                if (rs[i] > 1)
+                if (ps[i] > 1)
                     b.append("" + ps[i] + "×");
                 b.append(ids[pp[i]]);
             }

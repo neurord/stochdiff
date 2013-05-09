@@ -59,12 +59,12 @@ public class NextEventQueue {
         void update(double current) {
             /* .time is not updated until the event is removed from queue */
             this._calculate();
-            updateEvent(this, current + random.exponential(this.propensity));
+            update_one(this, current + random.exponential(this.propensity));
 
             for (NextEvent dependent: this.dependent) {
                 double old = dependent._calculate();
                 double t = (dependent.time - current) * old / dependent.propensity + current;
-                updateEvent(dependent, t);
+                update_one(dependent, t);
             }
         }
 
@@ -101,7 +101,7 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this._calculate();
-            updateEvent(this, random.exponential(this.propensity));
+            update_one(this, random.exponential(this.propensity));
 
             log.debug("Created {}: t={}", this, this.time);
         }
@@ -137,7 +137,7 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el. %d→%d {}",
+            return String.format("%s el. %d→%d %s",
                                  getClass().getSimpleName(),
                                  element(), element2, signature);
         }
@@ -179,7 +179,7 @@ public class NextEventQueue {
             this.volume = volume;
 
             this._calculate();
-            updateEvent(this, random.exponential(this.propensity));
+            update_one(this, random.exponential(this.propensity));
 
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
@@ -220,10 +220,8 @@ public class NextEventQueue {
                                                                       this.rate,
                                                                       this.volume,
                                                                       particles[this.element]);
-            log.debug("{}: rate={} vol={} from {} propensity={}",
-                      this, this.rate, this.volume,
-                      particles[this.element],
-                      prop);
+            log.debug("{}: rate={} vol={} propensity={}",
+                      this, this.rate, this.volume, prop);
 
             return prop;
         }
@@ -258,7 +256,7 @@ public class NextEventQueue {
         this.queue = new PriorityQueue(particles.length*3, new Sooner());
     }
 
-    protected void updateEvent(NextEvent event, double time) {
+    protected void update_one(NextEvent event, double time) {
         /* this should be optimized */
         this.queue.remove(event);
         event.time = time;

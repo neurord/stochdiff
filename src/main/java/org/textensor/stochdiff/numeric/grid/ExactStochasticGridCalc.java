@@ -24,12 +24,13 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
 
     public double advance(double tnow) {
         for(double time = tnow; time < tnow+dt; ) {
-            time = neq.advance(tnow + dt,
-                               this.reactionEvents,
-                               this.diffusionEvents,
-                               this.stimulationEvents);
-            log.debug("Advanced t={} → {}", tnow, time);
-            assert time > tnow: time;
+            double next = neq.advance(tnow + dt,
+                                      this.reactionEvents,
+                                      this.diffusionEvents,
+                                      this.stimulationEvents);
+            log.debug("Advanced t={} → {}", time, next);
+            assert next >= time: next;
+            time = next;
         }
 
         return dt;
