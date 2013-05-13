@@ -3,6 +3,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
@@ -21,16 +22,116 @@ import org.apache.logging.log4j.LogManager;
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
 
-    public abstract class NextEvent {
-        final int element;
+    public interface Node {
+        int index();
+        void setIndex(int index);
+        double time();
+    }
+
+    public class PriorityTree<T extends Node> {
+        T[] nodes;
+
+        protected T child(T a, int which) {
+            assert which < 2;
+            int ch = (a.index()+1)*2 - 1 + which;
+            return ch < this.nodes.length ? this.nodes[ch] : null;
+        }
+
+        protected T parent(T a) {
+            int ch = (a.index()+1)/2 - 1;
+            if (ch < 0)
+                return null;
+            return this.nodes[ch];
+        }
+
+        protected T littlestChild(T a) {
+            T child = this.child(a, 0);
+            if (child == null)
+                return null;
+            T child2 = this.child(a, 1);
+            if (child2 == null)
+                return child;
+            if (child.time() <= child2.time())
+                return child;
+            return child2;
+        }
+
+        void swap(T a, T b) {
+            assert this.parent(b) == a;
+            int ai = a.index(),
+                bi = b.index();
+            this.nodes[ai] = b;
+            this.nodes[bi] = a;
+            a.setIndex(bi);
+            b.setIndex(ai);
+        }
+
+        void build(T[] nodes) {
+            Comparator<T> c = new Comparator<T>() {
+                @Override
+                public int compare(T a, T b) {
+                    return Double.compare(a.time(), b.time());
+                }
+            };
+            Arrays.sort(nodes, c);
+
+            for (int i = 0; i < nodes.length; i++)
+                nodes[i].setIndex(i);
+
+            this.nodes = nodes;
+        }
+
+        T first() {
+            return this.nodes[0];
+        }
+
+        void update(T node) {
+            assert node != null;
+            T parent = this.parent(node);
+            log.debug("updating position of {} t={} parent={}", node, node.time(), parent);
+
+            if (parent != null && parent.time() > node.time()) {
+                this.swap(parent, node); // original parent first
+                this.update(node);
+            } else {
+                T littlest = this.littlestChild(node);
+                log.debug("littlest Child is {} t={}", littlest,
+                          littlest != null ? littlest.time() : "-");
+                if (littlest != null && node.time() > littlest.time()) {
+                    this.swap(node, littlest); // original parent first
+                    this.update(node);
+                }
+            }
+        }
+    }
+
+    public abstract class NextEvent implements Node {
+        int index;
+
+        final private int element;
         final String signature;
 
-        double time;
+        protected double time;
         double propensity;
 
         NextEvent(int element, String signature) {
             this.element = element;
             this.signature = signature;
+        }
+
+        @Override
+        public int index() {
+            return this.index;
+        }
+
+        @Override
+        public void setIndex(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public double time() {
+            return this.time;
         }
 
         /**
@@ -46,25 +147,42 @@ public class NextEventQueue {
         public abstract double _propensity();
 
         /**
-         * Reculculate propensity and the next time.
+         * Reculculate propensity. Return old.
          */
-        double _calculate() {
+        int[] old_pop;
+        double _update_propensity() {
             double old = this.propensity;
+            int[] pop = this.reactantPopulation();
             this.propensity = this._propensity();
-            log.debug("{}: propensity changed {} → {}",
-                      this, old, this.propensity);
+            log.debug("{}: propensity changed {} → {} (n={} → {})",
+                      this, old, this.propensity, old_pop, pop);
+            assert this.propensity == 0 || this.propensity != old;
+            this.old_pop = pop;
             return old;
         }
 
-        void update(double current) {
-            /* .time is not updated until the event is removed from queue */
-            this._calculate();
-            update_one(this, current + random.exponential(this.propensity));
+        private int[] reactantPopulation() {
+            int[] react = this.reactants();
+            int[] pop = new int[react.length];
+            for (int i = 0; i < react.length; i++)
+                pop[i] = particles[this.element()][react[i]];
+            return pop;
+        }
 
-            for (NextEvent dependent: this.dependent) {
-                double old = dependent._calculate();
-                double t = (dependent.time - current) * old / dependent.propensity + current;
-                update_one(dependent, t);
+        void update(double current) {
+            this._update_propensity();
+            this.time = current + random.exponential(this.propensity);
+            log.debug("{}: time changed {} → {}", this, current, this.time);
+            log.debug("{} dependent: {}", this, this.dependent);
+            queue.update(this);
+
+            for (NextEvent dep: this.dependent) {
+                double old = dep._update_propensity();
+                if (!Double.isInfinite(dep.time))
+                    dep.time = (dep.time - current) * old / dep.propensity + current;
+                else
+                    dep.time = current + random.exponential(dep.propensity);
+                queue.update(dep);
             }
         }
 
@@ -76,13 +194,14 @@ public class NextEventQueue {
             return element;
         }
 
-        public abstract void addDependent(Collection<? extends NextEvent> coll);
+        public abstract void addDependent(NextEvent[] coll);
     }
 
     public class NextDiffusion extends NextEvent {
         final int element2, index2;
         final int sp;
         final double fdiff;
+        final private int[] reactants;
 
         /**
          * @param element index of source element in particles array
@@ -98,10 +217,11 @@ public class NextEventQueue {
             this.element2 = element2;
             this.index2 = index2;
             this.sp = sp;
+            this.reactants = new int[] {sp};
             this.fdiff = fdiff;
 
-            this._calculate();
-            update_one(this, random.exponential(this.propensity));
+            this.propensity = this._propensity();
+            this.time = random.exponential(this.propensity);
 
             log.debug("Created {}: t={}", this, this.time);
         }
@@ -119,17 +239,18 @@ public class NextEventQueue {
 
         @Override
         public double _propensity() {
-            return this.fdiff * particles[this.element][this.sp];
+            return this.fdiff * particles[this.element()][this.sp];
         }
 
         public int[] reactants() {
-            return new int[] {this.sp};
+            return this.reactants;
         }
 
-        public void addDependent(Collection<? extends NextEvent> coll) {
+        public void addDependent(NextEvent[] coll) {
             ArrayList<NextEvent> d = inst.newArrayList();
             for (NextEvent e: coll)
-                if ((e.element() == this.element() ||
+                if (e != this &&
+                    (e.element() == this.element() ||
                      e.element() == this.element2) &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
                     this.dependent.add(e);
@@ -178,8 +299,8 @@ public class NextEventQueue {
             this.rate = rate;
             this.volume = volume;
 
-            this._calculate();
-            update_one(this, random.exponential(this.propensity));
+            this.propensity = this._propensity();
+            this.time = random.exponential(this.propensity);
 
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
@@ -190,9 +311,10 @@ public class NextEventQueue {
             return this.reactants;
         }
 
-        public void addDependent(Collection<? extends NextEvent> coll) {
+        public void addDependent(NextEvent[] coll) {
             for (NextEvent e: coll) {
-                if (e.element() == this.element() &&
+                if (e != this &&
+                    e.element() == this.element() &&
                     (ArrayUtil.intersect(e.reactants(), this.reactants) ||
                      ArrayUtil.intersect(e.reactants(), this.products)))
                     this.dependent.add(e);
@@ -219,7 +341,7 @@ public class NextEventQueue {
                                                                       this.reactant_powers,
                                                                       this.rate,
                                                                       this.volume,
-                                                                      particles[this.element]);
+                                                                      particles[this.element()]);
             log.debug("{}: rate={} vol={} propensity={}",
                       this, this.rate, this.volume, prop);
 
@@ -235,52 +357,41 @@ public class NextEventQueue {
         }
     }
 
-    public static class Sooner implements Comparator<NextEvent> {
-        @Override
-        public int compare(NextEvent a, NextEvent b) {
-            return Double.compare(a.time, b.time);
-        }
-    }
-
     final RandomGenerator random = new MersenneTwister();
 
     /**
      * Particle counts: [voxels × species]
      */
     final int[][] particles;
-    final PriorityQueue<NextEvent> queue;
+    final PriorityTree<NextEvent> queue = new PriorityTree<NextEvent>();
 
     protected NextEventQueue(int[][] particles) {
         this.particles = particles;
-
-        this.queue = new PriorityQueue(particles.length*3, new Sooner());
     }
 
-    protected void update_one(NextEvent event, double time) {
-        /* this should be optimized */
-        this.queue.remove(event);
-        event.time = time;
-        this.queue.add(event);
-    }
-
-    void createDiffusions(VolumeGrid grid, ReactionTable rtab) {
-
+    ArrayList<NextDiffusion> createDiffusions(VolumeGrid grid, ReactionTable rtab) {
         int[][] neighbors = grid.getPerElementNeighbors();
         double[][] couplings = grid.getPerElementCouplingConstants();
         double[] fdiff = rtab.getDiffusionConstants();
         String[] species = rtab.getSpecieIDs();
+
+        ArrayList<NextDiffusion> ans = inst.newArrayList(3 * neighbors.length);
 
         for (int el = 0; el < neighbors.length; el++)
             for (int j = 0; j < neighbors[el].length; j++) {
                 int el2 = neighbors[el][j];
                 double cc = couplings[el][j];
                 for (int sp = 0; sp < fdiff.length; sp++)
-                    this.queue.add(new NextDiffusion(el, el2, j, sp, species[sp],
-                                                     fdiff[sp] * cc));
+                    ans.add(new NextDiffusion(el, el2, j, sp, species[sp],
+                                              fdiff[sp] * cc));
             }
+
+        log.info("Created {} diffusion events", ans.size());
+
+        return ans;
     }
 
-    void createReactions(VolumeGrid grid, ReactionTable rtab) {
+    ArrayList<NextReaction> createReactions(VolumeGrid grid, ReactionTable rtab) {
         double[] volumes = grid.getElementVolumes();
         int n = rtab.getNReaction() * volumes.length;
         int[][]
@@ -291,24 +402,42 @@ public class NextEventQueue {
             RP = rtab.getReactantPowers();
         String[] species = rtab.getSpecieIDs();
 
+        ArrayList<NextReaction> ans = inst.newArrayList(RI.length * volumes.length);
+
         for (int r = 0; r < rtab.getNReaction(); r++) {
             int[] ri = RI[r], pi = PI[r], rs = RS[r], ps = PS[r], rp = RP[r];
             double rate = rtab.getRates()[r];
 
             for (int el = 0; el < volumes.length; el++) {
                 String signature = getReactionSignature(ri, rs, pi, ps, species);
-                this.queue.add(new NextReaction(r, el, ri, pi, rs, ps, rp,
-                                                signature,
-                                                rate, volumes[el]));
+                ans.add(new NextReaction(r, el, ri, pi, rs, ps, rp,
+                                         signature,
+                                         rate, volumes[el]));
             }
         }
+
+        log.info("Created {} reaction events", ans.size());
+
+        return ans;
     }
 
     public static NextEventQueue create(int[][] particles,
                                         VolumeGrid grid, ReactionTable rtab) {
         NextEventQueue obj = new NextEventQueue(particles);
-        obj.createDiffusions(grid, rtab);
-        obj.createReactions(grid, rtab);
+
+        NextEvent[] d = obj.createDiffusions(grid, rtab).toArray(new NextEvent[0]),
+                    r = obj.createReactions(grid, rtab).toArray(new NextEvent[0]);
+        NextEvent[] e = Arrays.copyOf(d, d.length + r.length);
+        System.arraycopy(r, 0, e, d.length, r.length);
+
+        obj.queue.build(e);
+
+        for (NextEvent ev: e)
+            ev.addDependent(e);
+
+        log.info("Events at the beginning:");
+        for (int i = 0; i < e.length && i < 50; i++)
+            log.info("{} → {} prop={} t={}", i, e[i], e[i].propensity, e[i].time());
 
         return obj;
     }
@@ -318,23 +447,23 @@ public class NextEventQueue {
      *
      * @returns Time of event.
      */
-    public double advance(double tstop,
+    public double advance(double time, double tstop,
                           int[][] reactionEvents,
                           int[][][] diffusionEvents,
                           int[][] stimulationEvents) {
-        NextEvent ev = this.queue.peek();
+        NextEvent ev = this.queue.first();
         assert ev != null;
+        double now = ev.time;
 
-        log.debug("Picked event {} t={}", ev, ev.time);
+        log.debug("Advanced {}→{},{} with event {}", time, now, tstop, ev);
 
-        if (ev.time > tstop)
+        if (now > tstop)
             return tstop;
 
-        double time = ev.time;
         ev.execute(reactionEvents[ev.element()],
                    diffusionEvents[ev.element()],
                    stimulationEvents[ev.element()]);
-        ev.update(time);
-        return time;
+        ev.update(now);
+        return now;
     }
 }
