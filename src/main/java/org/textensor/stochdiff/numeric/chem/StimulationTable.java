@@ -34,27 +34,20 @@ public class StimulationTable {
 
 
     public void addSquarePulse(String injectionSite, double[] vrate, double xonset, double xduration) {
-        sites[nstim] = injectionSite;
-        rates[nstim] = vrate;
-        onset[nstim] = xonset;
-        duration[nstim] = xduration;
-        period[nstim] = -1;
-        nstim++;
-        if (nspec <= 0) {
-            nspec = vrate.length;
-        }
+        this.addPeriodicSquarePulse(injectionSite, vrate, xonset, xduration, -1, 0);
     }
 
 
     public void addPeriodicSquarePulse(String injectionSite, double[] vrate, double xonset,
                                        double xduration, double xperiod, double xend) {
         sites[nstim] = injectionSite;
-        sites[nstim] = injectionSite;
         rates[nstim] = vrate;
         onset[nstim] = xonset;
         duration[nstim] = xduration;
+
         period[nstim] = xperiod;
         ends[nstim] = xend;
+
         nstim++;
         if (nspec <= 0) {
             nspec = vrate.length;
@@ -129,16 +122,9 @@ public class StimulationTable {
         return iret;
     }
 
-
-    public String[] getStimLabels() {
-        return getTargetIDs();
-    }
-
-
     public int getNStim() {
         return nstim;
     }
-
 
     public String[] getTargetIDs() {
         String[] ret = new String[nstim];
