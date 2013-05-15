@@ -110,13 +110,15 @@ public class NextEventQueue {
 
         final private int element;
         final String signature;
+        final private int[] reactants;
 
         protected double time;
         double propensity;
 
-        NextEvent(int element, String signature) {
+        NextEvent(int element, String signature, int... reactants) {
             this.element = element;
             this.signature = signature;
+            this.reactants = reactants;
         }
 
         @Override
@@ -188,7 +190,9 @@ public class NextEventQueue {
 
         Collection<NextEvent> dependent = inst.newArrayList();
 
-        public abstract int[] reactants();
+        public int[] reactants() {
+            return this.reactants;
+        }
 
         public int element() {
             return element;
@@ -201,7 +205,6 @@ public class NextEventQueue {
         final int element2, index2;
         final int sp;
         final double fdiff;
-        final private int[] reactants;
 
         /**
          * @param element index of source element in particles array
@@ -213,11 +216,10 @@ public class NextEventQueue {
          */
         NextDiffusion(int element, int element2, int index2,
                       int sp, String signature, double fdiff) {
-            super(element, signature);
+            super(element, signature, sp);
             this.element2 = element2;
             this.index2 = index2;
             this.sp = sp;
-            this.reactants = new int[] {sp};
             this.fdiff = fdiff;
 
             this.propensity = this._propensity();
@@ -242,10 +244,6 @@ public class NextEventQueue {
             return this.fdiff * particles[this.element()][this.sp];
         }
 
-        public int[] reactants() {
-            return this.reactants;
-        }
-
         public void addDependent(NextEvent[] coll) {
             ArrayList<NextEvent> d = inst.newArrayList();
             for (NextEvent e: coll)
@@ -266,7 +264,7 @@ public class NextEventQueue {
 
     public class NextReaction extends NextEvent {
         final int[]
-            reactants, products,
+            products,
             reactant_stochiometry, product_stochiometry,
             reactant_powers;
         final int index;
@@ -288,9 +286,8 @@ public class NextEventQueue {
                      int[] reactant_stochiometry, int[] product_stochiometry,
                      int[] reactant_powers, String signature,
                      double rate, double volume) {
-            super(element, signature);
+            super(element, signature, reactants);
             this.index = index;
-            this.reactants = reactants;
             this.products = products;
             this.reactant_stochiometry = reactant_stochiometry;
             this.product_stochiometry = product_stochiometry;
