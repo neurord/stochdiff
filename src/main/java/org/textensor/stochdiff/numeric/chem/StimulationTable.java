@@ -1,136 +1,98 @@
-//2 4 2009: WK added tableSize to the constructor per AB.
-//written by Robert Cannon
-
 package org.textensor.stochdiff.numeric.chem;
 
+import java.util.ArrayList;
+
+import org.textensor.util.inst;
 
 public class StimulationTable {
 
-    int nstim;
-    int nspec;
+    public static class Stimulation {
+        public final String site;
+        public final double[] rates;
+        public final double onset, duration, period, end;
 
-    String[] sites;
-
-    double[][] rates;
-
-    double[] onset;
-    double[] duration;
-    double[] period;
-    double[] ends;
-
-
-    public StimulationTable() {
-        //<--WK
-        int tableSize = 1000;
-        //WK-->
-        sites = new String[tableSize];
-        rates = new double[tableSize][];
-
-        onset = new double[tableSize];
-        duration = new double[tableSize];
-        period = new double[tableSize];
-        ends = new double[tableSize];
+        public Stimulation(String site,
+                           double[] rates,
+                           double onset, double duration, double period, double end) {
+            this.site = site;
+            this.rates = rates;
+            this.onset = onset;
+            this.duration = duration;
+            this.period = period;
+            this.end = end;
+        }
     }
 
+    private final ArrayList<Stimulation> stims = inst.newArrayList();
 
     public void addSquarePulse(String injectionSite, double[] vrate, double xonset, double xduration) {
         this.addPeriodicSquarePulse(injectionSite, vrate, xonset, xduration, -1, 0);
     }
 
 
-    public void addPeriodicSquarePulse(String injectionSite, double[] vrate, double xonset,
-                                       double xduration, double xperiod, double xend) {
-        sites[nstim] = injectionSite;
-        rates[nstim] = vrate;
-        onset[nstim] = xonset;
-        duration[nstim] = xduration;
-
-        period[nstim] = xperiod;
-        ends[nstim] = xend;
-
-        nstim++;
-        if (nspec <= 0) {
-            nspec = vrate.length;
-        }
+    public void addPeriodicSquarePulse(String site, double[] rate, double onset,
+                                       double duration, double period, double end) {
+        this.stims.add(new Stimulation(site, rate, onset, duration, period, end));
     }
 
 
     public double[][] getStimsForInterval(double time, double dt) {
-        double[][] ret = new double[nstim][nspec];
-        for (int i = 0; i < nstim; i++) {
-            double f = effectiveRate(time, dt, onset[i], duration[i], period[i], ends[i]);
+        int nspec = getNStim() > 0 ? this.stims.get(0).rates.length : 0;
+        double[][] ret = new double[getNStim()][nspec];
+        for (int i = 0; i < ret.length; i++) {
+            Stimulation stim = this.stims.get(i);
+            double f = effectiveRate(time, dt,
+                                     stim.onset, stim.duration, stim.period, stim.end);
 
-            if (f > 0.) {
-                for (int j = 0; j < nspec; j++) {
-                    ret[i][j] = f * rates[i][j] * dt;
-                }
-            }
+            if (f > 0)
+                for (int j = 0; j < nspec; j++)
+                    ret[i][j] = f * stim.rates[j] * dt;
         }
         return ret;
     }
 
-
-
     private double effectiveRate(double t, double dt, double ons, double dur, double per, double end) {
-        double f = 0.;
-        if (per < 0) {
-            f = pulseOverlap(t, dt, ons, dur);
-        } else {
-            if (t > end) {
-                f = 0;
-            } else {
+        if (per < 0)
+            return pulseOverlap(t, dt, ons, dur);
+        else {
+            if (t > end)
+                return 0;
+            else {
                 // just compare with nearest pulse
                 // NB, assumes dt smaller than interpulse interval
                 int ipulse = (int)((t - ons) / per + 0.5);
                 double pons = ons + ipulse * per;
-                f = pulseOverlap(t, dt, pons, dur);
+                return pulseOverlap(t, dt, pons, dur);
             }
         }
-        return f;
     }
 
 
     private double pulseOverlap(double t, double dt, double ons, double dur) {
-        double f = 0.;
-        if (t + dt < ons || t > ons + dur) {
-            f = 0;
-        } else if (t >= ons && t + dt <= ons + dur) {
+        if (t + dt < ons || t > ons + dur)
+            return 0;
+        else if (t >= ons && t + dt <= ons + dur)
             // fully inside;
-            f = 1;
-        } else if (t <= ons && t + dt >= ons + dur) {
+            return 1;
+        else if (t <= ons && t + dt >= ons + dur)
             // spans whole pulse;
-            f = dur / dt;
-        } else if (t <= ons) {
+            return dur / dt;
+        else if (t <= ons)
             // straddles start
-            f = (t + dt - ons) / dt;
-        } else {
+            return (t + dt - ons) / dt;
+        else
             // straddles end;
-            f = (ons + dur - t) / dt;
-        }
-        return f;
-    }
-
-
-    public int getStimIndex(String s) {
-        int iret = -1;
-        for (int i = 0; i < nstim; i++) {
-            if (sites[i].equals(s)) {
-                iret = i;
-                break;
-            }
-        }
-        return iret;
+            return (ons + dur - t) / dt;
     }
 
     public int getNStim() {
-        return nstim;
+        return this.stims.size();
     }
 
     public String[] getTargetIDs() {
-        String[] ret = new String[nstim];
-        for (int i = 0; i < nstim; i++) {
-            ret[i] = sites[i];
-        }
+        String[] ret = new String[this.getNStim()];
+        for (int i = 0; i < ret.length; i++)
+            ret[i] = this.stims.get(i).site;
         return ret;
     }
 
