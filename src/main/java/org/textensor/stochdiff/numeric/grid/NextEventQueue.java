@@ -9,6 +9,8 @@ import java.util.PriorityQueue;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
+import org.textensor.stochdiff.numeric.chem.StimulationTable;
+import org.textensor.stochdiff.numeric.chem.StimulationTable.Stimulation;
 import static org.textensor.stochdiff.numeric.chem.ReactionTable.getReactionSignature;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
@@ -146,7 +148,11 @@ public class NextEventQueue {
         /**
          * Calculate propensity of this event.
          */
-        public abstract double _propensity();
+        abstract double _propensity();
+
+        double _new_time(double current) {
+            return current + random.exponential(this.propensity);
+        }
 
         /**
          * Reculculate propensity. Return old.
@@ -173,7 +179,7 @@ public class NextEventQueue {
 
         void update(double current) {
             this._update_propensity();
-            this.time = current + random.exponential(this.propensity);
+            this.time = this._new_time(current);
             log.debug("{}: time changed {} → {}", this, current, this.time);
             log.debug("{} dependent: {}", this, this.dependent);
             queue.update(this);
@@ -183,7 +189,7 @@ public class NextEventQueue {
                 if (!Double.isInfinite(dep.time))
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
-                    dep.time = current + random.exponential(dep.propensity);
+                    dep.time = dep._new_time(current);
                 queue.update(dep);
             }
         }
@@ -223,7 +229,7 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this.propensity = this._propensity();
-            this.time = random.exponential(this.propensity);
+            this.time = this._new_time(0);
 
             log.debug("Created {}: t={}", this, this.time);
         }
@@ -245,7 +251,6 @@ public class NextEventQueue {
         }
 
         public void addDependent(NextEvent[] coll) {
-            ArrayList<NextEvent> d = inst.newArrayList();
             for (NextEvent e: coll)
                 if (e != this &&
                     (e.element() == this.element() ||
@@ -297,22 +302,18 @@ public class NextEventQueue {
             this.volume = volume;
 
             this.propensity = this._propensity();
-            this.time = random.exponential(this.propensity);
+            this.time = this._new_time(0);
 
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
-            assert this.time > 0;
-        }
-
-        public int[] reactants() {
-            return this.reactants;
+            assert this.time >= 0;
         }
 
         public void addDependent(NextEvent[] coll) {
             for (NextEvent e: coll) {
                 if (e != this &&
                     e.element() == this.element() &&
-                    (ArrayUtil.intersect(e.reactants(), this.reactants) ||
+                    (ArrayUtil.intersect(e.reactants(), this.reactants()) ||
                      ArrayUtil.intersect(e.reactants(), this.products)))
                     this.dependent.add(e);
             }
@@ -321,9 +322,9 @@ public class NextEventQueue {
         void execute(int[] reactionEvents,
                      int[][] diffusionEvents,
                      int[] stimulationEvents) {
-            for (int i = 0; i < this.reactants.length; i++) {
-                particles[this.element()][this.reactants[i]] -= this.reactant_stochiometry[i];
-                assert particles[this.element()][this.reactants[i]] >= 0;
+            for (int i = 0; i < this.reactants().length; i++) {
+                particles[this.element()][this.reactants()[i]] -= this.reactant_stochiometry[i];
+                assert particles[this.element()][this.reactants()[i]] >= 0;
             }
             for (int i = 0; i < this.products.length; i++)
                 particles[this.element()][this.products[i]] += this.product_stochiometry[i];
@@ -332,7 +333,7 @@ public class NextEventQueue {
 
         @Override
         public double _propensity() {
-            double prop = ExactStochasticGridCalc.calculatePropensity(this.reactants, this.products,
+            double prop = ExactStochasticGridCalc.calculatePropensity(this.reactants(), this.products,
                                                                       this.reactant_stochiometry,
                                                                       this.product_stochiometry,
                                                                       this.reactant_powers,
@@ -351,6 +352,67 @@ public class NextEventQueue {
                                  getClass().getSimpleName(),
                                  element(),
                                  signature);
+        }
+    }
+
+    public class NextStimulation extends NextEvent {
+        final int neighbors;
+        final int sp;
+        final Stimulation stim;
+
+        /**
+         * @param element element to stimulate
+         * @param neighbors rate divisor (over how many neighbors the
+         *        stimulation rate is split)
+         * @param sp the species
+         * @param signature description
+         * @param stim stimulation parameters
+         */
+        NextStimulation(int element, int neighbors, int sp, String signature, Stimulation stim) {
+            super(element, signature, sp);
+            this.sp = sp;
+            this.neighbors = neighbors;
+            this.stim = stim;
+
+            this.propensity = this._propensity();
+            this.time = this._new_time(0);
+
+            log.debug("Created {}: t={}", this, this.time);
+        }
+
+        void execute(int[] reactionEvents,
+                     int[][] diffusionEvents,
+                     int[] stimulationEvents) {
+            particles[this.element()][this.sp] += 1;
+
+            stimulationEvents[this.sp] += 1;
+        }
+
+        @Override
+        double _new_time(double current) {
+            double t1 = super._new_time(current);
+            int n = (int)(t1 / this.stim.duration);
+            double t2 = n * this.stim.period + (t1 - n * this.stim.duration);
+            return t2 < this.stim.end ? t2 : Double.POSITIVE_INFINITY;
+        }
+        @Override
+        public double _propensity() {
+            return this.stim.rates[this.sp] / this.neighbors;
+        }
+
+        public void addDependent(NextEvent[] coll) {
+            for (NextEvent e: coll)
+                if (e != this &&
+                    e.element() == this.element() &&
+                    ArrayUtil.intersect(e.reactants(), this.sp))
+                    this.dependent.add(e);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s el. %d stim[%s]",
+                                 getClass().getSimpleName(),
+                                 element(), signature);
         }
     }
 
@@ -418,12 +480,39 @@ public class NextEventQueue {
         return ans;
     }
 
+    ArrayList<NextStimulation> createStimulations(VolumeGrid grid,
+                                                  StimulationTable stimtab,
+                                                  int[][] stimtargets) {
+        ArrayList<NextStimulation> ans = inst.newArrayList(stimtargets.length * 3);
+
+        for (int i = 0; i < stimtab.getStimulations().size(); i++) {
+            Stimulation stim = stimtab.getStimulations().get(i);
+            int[] targets = stimtargets[i];
+
+            for (int sp = 0; sp < stim.rates.length; sp++)
+                if (stim.rates[sp] > 0) {
+                    for (int el: targets)
+                        ans.add(new NextStimulation(el, targets.length,
+                                                    sp,
+                                                    "#" + sp,
+                                                    stim));
+                }
+        }
+
+        return ans;
+    }
+
     public static NextEventQueue create(int[][] particles,
-                                        VolumeGrid grid, ReactionTable rtab) {
+                                        VolumeGrid grid,
+                                        ReactionTable rtab,
+                                        StimulationTable stimtab,
+                                        int[][] stimtargets) {
         NextEventQueue obj = new NextEventQueue(particles);
 
-        NextEvent[] d = obj.createDiffusions(grid, rtab).toArray(new NextEvent[0]),
-                    r = obj.createReactions(grid, rtab).toArray(new NextEvent[0]);
+        NextEvent[]
+            d = obj.createDiffusions(grid, rtab).toArray(new NextEvent[0]),
+            r = obj.createReactions(grid, rtab).toArray(new NextEvent[0]),
+            s = obj.createStimulations(grid, stimtab, stimtargets).toArray(new NextEvent[0]);
         NextEvent[] e = Arrays.copyOf(d, d.length + r.length);
         System.arraycopy(r, 0, e, d.length, r.length);
 
