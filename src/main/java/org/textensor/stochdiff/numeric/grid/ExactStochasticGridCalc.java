@@ -19,7 +19,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     public final void init() {
         super.init();
 
-        neq = NextEventQueue.create(this.wkA, getVolumeGrid(), rtab);
+        neq = NextEventQueue.create(this.wkA, getVolumeGrid(), rtab,
+                                    stimTab, this.getStimulationTargets());
     }
 
     public double advance(double tnow) {

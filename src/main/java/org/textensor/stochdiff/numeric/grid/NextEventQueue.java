@@ -164,7 +164,9 @@ public class NextEventQueue {
             this.propensity = this._propensity();
             log.debug("{}: propensity changed {} → {} (n={} → {})",
                       this, old, this.propensity, old_pop, pop);
-            assert this.propensity == 0 || this.propensity != old;
+            if (this.propensity != 0 && this.propensity == old)
+                log.warn("{}: propensity changed {} → {} (n={} → {})",
+                         this, old, this.propensity, old_pop, pop);
             this.old_pop = pop;
             return old;
         }
@@ -204,7 +206,7 @@ public class NextEventQueue {
             return element;
         }
 
-        public abstract void addDependent(NextEvent[] coll);
+        public abstract void addDependent(Collection<? extends NextEvent> coll);
     }
 
     public class NextDiffusion extends NextEvent {
@@ -250,7 +252,7 @@ public class NextEventQueue {
             return this.fdiff * particles[this.element()][this.sp];
         }
 
-        public void addDependent(NextEvent[] coll) {
+        public void addDependent(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
                     (e.element() == this.element() ||
@@ -309,7 +311,7 @@ public class NextEventQueue {
             assert this.time >= 0;
         }
 
-        public void addDependent(NextEvent[] coll) {
+        public void addDependent(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll) {
                 if (e != this &&
                     e.element() == this.element() &&
@@ -369,7 +371,7 @@ public class NextEventQueue {
          * @param stim stimulation parameters
          */
         NextStimulation(int element, int neighbors, int sp, String signature, Stimulation stim) {
-            super(element, signature, sp);
+            super(element, signature);
             this.sp = sp;
             this.neighbors = neighbors;
             this.stim = stim;
@@ -377,7 +379,7 @@ public class NextEventQueue {
             this.propensity = this._propensity();
             this.time = this._new_time(0);
 
-            log.debug("Created {}: t={}", this, this.time);
+            log.debug("Created {}: t={} [{}]", this, this.time, this.stim);
         }
 
         void execute(int[] reactionEvents,
@@ -390,17 +392,39 @@ public class NextEventQueue {
 
         @Override
         double _new_time(double current) {
-            double t1 = super._new_time(current);
+            double nc = (current - this.stim.onset) / this.stim.period;
+            if (nc < 0)
+                nc = 0;
+
+            double tp = nc % 1 * this.stim.period;
+            assert current > this.stim.onset || tp == 0;
+
+            // current time converted to constant time:
+            double tc =
+                tp < this.stim.duration ?
+                Math.floor(nc) * this.stim.duration + tp :
+                Math.ceil(nc) * this.stim.duration;
+
+            double t1 = super._new_time(0);
+            t1 += tc;
+
             int n = (int)(t1 / this.stim.duration);
-            double t2 = n * this.stim.period + (t1 - n * this.stim.duration);
+            double t2 = this.stim.onset + n * this.stim.period + t1 % this.stim.duration;
             return t2 < this.stim.end ? t2 : Double.POSITIVE_INFINITY;
         }
+
         @Override
         public double _propensity() {
             return this.stim.rates[this.sp] / this.neighbors;
         }
 
-        public void addDependent(NextEvent[] coll) {
+        @Override
+        public double _update_propensity() {
+            // does not change
+            return this.propensity;
+        }
+
+        public void addDependent(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
                     e.element() == this.element() &&
@@ -416,7 +440,7 @@ public class NextEventQueue {
         }
     }
 
-    final RandomGenerator random = new MersenneTwister();
+    final RandomGenerator random;
 
     /**
      * Particle counts: [voxels × species]
@@ -424,7 +448,11 @@ public class NextEventQueue {
     final int[][] particles;
     final PriorityTree<NextEvent> queue = new PriorityTree<NextEvent>();
 
-    protected NextEventQueue(int[][] particles) {
+    /**
+     * Use create() instead, this is public only for testing.
+     */
+    public NextEventQueue(RandomGenerator random, int[][] particles) {
+        this.random = random != null ? random : new MersenneTwister();
         this.particles = particles;
     }
 
@@ -499,6 +527,8 @@ public class NextEventQueue {
                 }
         }
 
+        log.info("Created {} stimulation events", ans.size());
+
         return ans;
     }
 
@@ -507,23 +537,23 @@ public class NextEventQueue {
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
                                         int[][] stimtargets) {
-        NextEventQueue obj = new NextEventQueue(particles);
+        NextEventQueue obj = new NextEventQueue(null, particles);
 
-        NextEvent[]
-            d = obj.createDiffusions(grid, rtab).toArray(new NextEvent[0]),
-            r = obj.createReactions(grid, rtab).toArray(new NextEvent[0]),
-            s = obj.createStimulations(grid, stimtab, stimtargets).toArray(new NextEvent[0]);
-        NextEvent[] e = Arrays.copyOf(d, d.length + r.length);
-        System.arraycopy(r, 0, e, d.length, r.length);
+        ArrayList<NextEvent> e = inst.newArrayList();
+        e.addAll(obj.createDiffusions(grid, rtab));
+        e.addAll(obj.createReactions(grid, rtab));
+        e.addAll(obj.createStimulations(grid, stimtab, stimtargets));
+        obj.queue.build(e.toArray(new NextEvent[0]));
 
-        obj.queue.build(e);
-
-        for (NextEvent ev: e)
+        for (NextEvent ev: e) {
             ev.addDependent(e);
+            log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+        }
 
         log.info("Events at the beginning:");
-        for (int i = 0; i < e.length && i < 50; i++)
-            log.info("{} → {} prop={} t={}", i, e[i], e[i].propensity, e[i].time());
+        for (int i = 0; i < e.size(); i++)
+            log.info("{} → {} prop={} t={}", i,
+                     e.get(i), e.get(i).propensity, e.get(i).time());
 
         return obj;
     }

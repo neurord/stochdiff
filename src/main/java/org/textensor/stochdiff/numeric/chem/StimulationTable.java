@@ -21,12 +21,19 @@ public class StimulationTable {
             this.period = period;
             this.end = end;
         }
+
+        @Override
+        public String toString() {
+            return String.format("%s →%s onset=%f duration=%f period=%f end=%f",
+                                 getClass().getSimpleName(), site,
+                                 onset, duration, period, end);
+        }
     }
 
     private final ArrayList<Stimulation> stims = inst.newArrayList();
 
-    public void addSquarePulse(String injectionSite, double[] vrate, double xonset, double xduration) {
-        this.addPeriodicSquarePulse(injectionSite, vrate, xonset, xduration, -1, 0);
+    public void addSquarePulse(String site, double[] rate, double onset, double duration) {
+        this.addPeriodicSquarePulse(site, rate, onset, duration, -1, 0);
     }
 
 
@@ -87,6 +94,10 @@ public class StimulationTable {
 
     public int getNStim() {
         return this.stims.size();
+    }
+
+    public ArrayList<Stimulation> getStimulations() {
+        return this.stims;
     }
 
     public String[] getTargetIDs() {
