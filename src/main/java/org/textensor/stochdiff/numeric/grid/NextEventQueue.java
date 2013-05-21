@@ -20,6 +20,7 @@ import static org.textensor.stochdiff.numeric.grid.GridCalc.intlog;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
 
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
@@ -162,11 +163,9 @@ public class NextEventQueue {
             double old = this.propensity;
             int[] pop = this.reactantPopulation();
             this.propensity = this._propensity();
-            log.debug("{}: propensity changed {} → {} (n={} → {})",
-                      this, old, this.propensity, old_pop, pop);
-            if (this.propensity != 0 && this.propensity == old)
-                log.warn("{}: propensity changed {} → {} (n={} → {})",
-                         this, old, this.propensity, old_pop, pop);
+            log.log(this.propensity != 0 && this.propensity == old ? Level.WARN : Level.DEBUG,
+                    "{}: propensity changed {} → {} (n={} → {})",
+                    this, old, this.propensity, old_pop, pop);
             this.old_pop = pop;
             return old;
         }
@@ -324,11 +323,31 @@ public class NextEventQueue {
 
         public void addDependent(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll) {
-                if (e != this &&
-                    e.element() == this.element() &&
-                    (ArrayUtil.intersect(e.reactants(), this.reactants()) ||
-                     ArrayUtil.intersect(e.reactants(), this.products)))
-                    this.dependent.add(e);
+                if (e != this && e.element() == this.element())
+                    for (int r1: e.reactants()) {
+                        // find on the left side
+                        int lefts = 0, rights = 0;
+                        for (int i = 0; i < this.reactants().length; i++)
+                            if (this.reactants()[i] == r1) {
+                                lefts = this.reactant_stochiometry[i];
+                                break;
+                            }
+
+                        for (int i = 0; i < this.products.length; i++)
+                            if (this.products[i] == r1) {
+                                rights = this.product_stochiometry[i];
+                                break;
+                            }
+
+                        if (lefts != rights) {
+                            this.dependent.add(e);
+
+                            assert ArrayUtil.intersect(e.reactants(), this.reactants())
+                                || ArrayUtil.intersect(e.reactants(), this.products): this;
+
+                            break;
+                        }
+                    }
             }
         }
 
