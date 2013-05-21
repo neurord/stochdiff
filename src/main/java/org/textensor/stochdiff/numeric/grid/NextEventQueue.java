@@ -209,6 +209,17 @@ public class NextEventQueue {
         public abstract void addDependent(Collection<? extends NextEvent> coll);
     }
 
+    static void log_dependency_edges(ArrayList<NextEvent> events) {
+        int all = 0, active = 0;
+        for (NextEvent ev: events) {
+            all += ev.dependent.size();
+            if (ev.propensity > 0)
+                active += ev.dependent.size();
+        }
+
+        log.info("{} dependency edges, {} active", all, active);
+    }
+
     public class NextDiffusion extends NextEvent {
         final int element2, index2;
         final int sp;
@@ -550,10 +561,12 @@ public class NextEventQueue {
             log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
         }
 
-        log.info("Events at the beginning:");
+        log.info("{} events at the beginning:", e.size());
         for (int i = 0; i < e.size(); i++)
             log.info("{} → {} prop={} t={}", i,
                      e.get(i), e.get(i).propensity, e.get(i).time());
+
+        log_dependency_edges(e);
 
         return obj;
     }
