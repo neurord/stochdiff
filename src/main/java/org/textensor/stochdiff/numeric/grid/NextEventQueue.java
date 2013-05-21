@@ -242,7 +242,7 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this.propensity = this._propensity();
-            this.time = this._new_time(0);
+            this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
 
             log.debug("Created {}: t={}", this, this.time);
         }
@@ -315,7 +315,7 @@ public class NextEventQueue {
             this.volume = volume;
 
             this.propensity = this._propensity();
-            this.time = this._new_time(0);
+            this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
 
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
