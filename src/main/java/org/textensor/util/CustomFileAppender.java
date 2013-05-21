@@ -12,10 +12,11 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
 
 import java.util.List;
 
-@Plugin(name="CustomFile", type="Core", elementType="appender", printObject=true)
+@Plugin(name="CustomFile", category="core", elementType="appender", printObject=true)
 public final class CustomFileAppender extends AbstractAppender {
 
     final private List<Appender> appenders = inst.newArrayList();
@@ -75,7 +76,9 @@ public final class CustomFileAppender extends AbstractAppender {
             FileAppender.createAppender(filename, "false", "false", filename,
                                         "true", "false", "true",
                                         instance.getLayout(),
-                                        instance.getFilter());
+                                        instance.getFilter(),
+                                        "false", "false",
+                                        new DefaultConfiguration());
         LOGGER.info("registering custom logfile '{}'", appender);
         instance.appenders.add(appender);
     }
