@@ -40,6 +40,11 @@ public abstract class StochasticGridCalc extends GridCalc {
         }
     }
 
+    @Override
+    protected void footer() {
+        log.info("Used up {} random numbers", this.random.used());
+    }
+
     protected int randomRound(double number) {
         int i = (int) number;
         double d = number - i;

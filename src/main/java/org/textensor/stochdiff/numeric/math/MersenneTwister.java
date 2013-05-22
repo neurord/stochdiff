@@ -15,6 +15,12 @@ import org.textensor.report.E;
 
 
 public class MersenneTwister implements RandomGenerator {
+    private long used = 0;
+
+    @Override
+    public long used() {
+        return this.used;
+    }
 
     // Period parameters
     private static final int N = 624;
@@ -77,6 +83,8 @@ public class MersenneTwister implements RandomGenerator {
 
     @Override
     public final float random() {
+        this.used += 1;
+
         int y;
 
         // generate a block of words for use later;

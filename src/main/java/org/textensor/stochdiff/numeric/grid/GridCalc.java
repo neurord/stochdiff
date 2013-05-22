@@ -161,10 +161,14 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         long endTime = System.currentTimeMillis();
         log.info("Total run time {} ms", endTime - startTime);
 
+        footer();
+
         return 0;
     }
 
     protected abstract double advance(double time);
+
+    protected void footer() {}
 
     @Override
     public int getNumberElements() {

@@ -563,11 +563,12 @@ public class NextEventQueue {
     }
 
     public static NextEventQueue create(int[][] particles,
+                                        RandomGenerator random,
                                         VolumeGrid grid,
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
                                         int[][] stimtargets) {
-        NextEventQueue obj = new NextEventQueue(null, particles);
+        NextEventQueue obj = new NextEventQueue(random, particles);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));

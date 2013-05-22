@@ -26,6 +26,7 @@ public class TestStimulation {
         @Override public double gammln(double xx) { return xx; }
         @Override public int poisson(double mean) { return (int) Math.ceil(mean); }
         @Override public double exponential(double tau) { return 1/tau; }
+        @Override public long used() { return 0; }
     }
 
     NextEventQueue queue = new NextEventQueue(new FakeRandom(), new int[1][1]);

@@ -11,4 +11,6 @@ public interface RandomGenerator {
      *    [ t ≥ 0] a exp(-at)
      */
     double exponential(double tau);
+
+    long used();
 }
