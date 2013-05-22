@@ -162,11 +162,11 @@ public class NextEventQueue {
          * Reculculate propensity. Return old.
          */
         int[] old_pop;
-        double _update_propensity() {
+        double _update_propensity(boolean warn) {
             double old = this.propensity;
             int[] pop = this.reactantPopulation();
             this.propensity = this._propensity();
-            log.log(this.propensity != 0 && this.propensity == old ? Level.WARN : Level.DEBUG,
+            log.log(warn && this.propensity != 0 && this.propensity == old ? Level.WARN : Level.DEBUG,
                     "{}: propensity changed {} → {} (n={} → {})",
                     this, old, this.propensity, old_pop, pop);
             this.old_pop = pop;
@@ -182,14 +182,16 @@ public class NextEventQueue {
         }
 
         void update(double current) {
-            this._update_propensity();
+            // In reactions of the type Da→Da+MaI the propensity does not change
+            // after execution, but there's nothign to warn about.
+            this._update_propensity(false);
             this.time = this._new_time(current);
             log.debug("{}: time changed {} → {}", this, current, this.time);
             log.debug("{} dependent: {}", this, this.dependent);
             queue.update(this);
 
             for (NextEvent dep: this.dependent) {
-                double old = dep._update_propensity();
+                double old = dep._update_propensity(true);
                 if (!Double.isInfinite(dep.time))
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
@@ -452,7 +454,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public double _update_propensity() {
+        public double _update_propensity(boolean warn) {
             // does not change
             return this.propensity;
         }
