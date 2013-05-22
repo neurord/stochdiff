@@ -33,6 +33,7 @@ public class NextEventQueue {
 
     public class PriorityTree<T extends Node> {
         T[] nodes;
+        long swaps = 0;
 
         protected T child(T a, int which) {
             assert which < 2;
@@ -67,6 +68,8 @@ public class NextEventQueue {
             this.nodes[bi] = a;
             a.setIndex(bi);
             b.setIndex(ai);
+
+            this.swaps += 1;
         }
 
         void build(T[] nodes) {

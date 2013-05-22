@@ -24,6 +24,12 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                                     stimTab, this.getStimulationTargets());
     }
 
+    @Override
+    public void footer() {
+        super.footer();
+        log.info("Queue suffered {} swaps", this.neq.queue.swaps);
+    }
+
     public double advance(double tnow) {
         for(double time = tnow; time < tnow+dt; ) {
             double next = neq.advance(time, tnow + dt,
