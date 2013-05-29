@@ -302,17 +302,20 @@ def _history(simul, species, indices, region_indices, region_labels,
     ax.legend(loc='best')
     pyplot.show(block=True)
 
-def find_regions(regions, spec):
-    if spec is None:
-        spec = range(len(regions))
-    for item in spec:
+def find_regions(regions, spec, grid):
+    print('regions', regions, 'spec', spec)
+    spec_ = range(len(regions)) if spec is None else spec
+    for item in spec_:
         try:
-            yield int(item)
+            region = int(item)
         except ValueError:
             w = regions[:] == item
             if w.sum() != 1:
                 raise ValueError("bad region: {}".format(item))
-            yield w.argmax() # find True
+            region = w.argmax() # find True
+        # skip regions with no voxels unless requested
+        if spec or (grid.cols.region[:] == region).any():
+            yield region
 
 def plot_history(filename, species, opts):
     file = tables.openFile(filename)
@@ -324,7 +327,7 @@ def plot_history(filename, species, opts):
         indices = numpy.arange(len(model.species))
     when = filter_times(opts.time, simul.times)
 
-    region_numbers = list(find_regions(model.regions, opts.regions))
+    region_numbers = list(find_regions(model.regions, opts.regions, model.grid))
     region_indices = [model.grid.cols.region[:] == region
                       for region in region_numbers]
     assert sum(region_indices).min() >= 0
