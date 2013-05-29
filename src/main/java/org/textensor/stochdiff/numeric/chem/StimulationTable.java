@@ -33,9 +33,9 @@ public class StimulationTable {
     private final ArrayList<Stimulation> stims = inst.newArrayList();
 
     public void addSquarePulse(String site, double[] rate, double onset, double duration) {
-        this.addPeriodicSquarePulse(site, rate, onset, duration, -1, 0);
+        this.addPeriodicSquarePulse(site, rate, onset, duration,
+                                    Double.NaN, Double.POSITIVE_INFINITY);
     }
-
 
     public void addPeriodicSquarePulse(String site, double[] rate, double onset,
                                        double duration, double period, double end) {

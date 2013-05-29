@@ -427,25 +427,32 @@ public class NextEventQueue {
 
         @Override
         double _new_time(double current) {
-            double nc = (current - this.stim.onset) / this.stim.period;
-            if (nc < 0)
-                nc = 0;
+            final double tc;
 
-            double tp = nc % 1 * this.stim.period;
-            assert current > this.stim.onset || tp == 0;
+            if (Double.isNaN(this.stim.period))
+                tc = Math.max(current, this.stim.onset);
+            else {
+                double nc = (current - this.stim.onset) / this.stim.period;
+                if (nc < 0)
+                    nc = 0;
 
-            // current time converted to constant time:
-            double tc =
-                tp < this.stim.duration ?
-                Math.floor(nc) * this.stim.duration + tp :
-                Math.ceil(nc) * this.stim.duration;
+                double tp = nc % 1 * this.stim.period;
+                assert current > this.stim.onset || tp == 0;
 
-            double t1 = super._new_time(0);
-            t1 += tc;
+                // current time converted to constant time:
+                tc = tp < this.stim.duration ?
+                    Math.floor(nc) * this.stim.duration + tp :
+                    Math.ceil(nc) * this.stim.duration;
+            }
 
-            int n = (int)(t1 / this.stim.duration);
-            double t2 = this.stim.onset + n * this.stim.period + t1 % this.stim.duration;
-            return t2 < this.stim.end ? t2 : Double.POSITIVE_INFINITY;
+            double t1 = tc + super._new_time(0);
+
+            if (!Double.isNaN(this.stim.period)) {
+                int n = (int)(t1 / this.stim.duration);
+                t1 = this.stim.onset + n * this.stim.period + t1 % this.stim.duration;
+            }
+
+            return t1 < this.stim.end ? t1 : Double.POSITIVE_INFINITY;
         }
 
         @Override
