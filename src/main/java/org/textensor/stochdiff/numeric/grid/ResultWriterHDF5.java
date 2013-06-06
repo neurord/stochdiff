@@ -600,8 +600,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         throws Exception
     {
         final int[][][] events = source.getDiffusionEvents();
-        if (events == null)
+        if (events == null) {
+            boolean have = this.initDiffusionEvents(0, 0, 0);
+            assert !have;
             return;
+        }
 
         final long[] dims;
         if (this.diffusion_events == null) {

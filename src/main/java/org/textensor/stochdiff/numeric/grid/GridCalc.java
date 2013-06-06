@@ -115,8 +115,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         log.info("Running from time=" + time + " ms to time=" + endtime + " ms");
 
-        double tlog = 5.;
-
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
 
@@ -126,6 +124,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         while (time < endtime) {
 
             if (time >= writeTime) {
+                log.info("time {} dt={}", time, dt);
+
                 for(ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeGridConcs(time, nel, ispecout, this);
 
@@ -143,11 +143,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             }
 
             time += advance(time);
-
-            if (time > tlog) {
-                log.info("time {} dt={}", time, dt);
-                tlog += Math.max(50 * sdRun.outputInterval, 5);
-            }
 
             if (time >= stateSaveTime) {
                 for(ResultWriter resultWriter: this.resultWriters)
