@@ -49,9 +49,14 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                                              double rate, double vol,
                                              int[] nstart) {
         double ans = rate;
-        for (int i = 0; i < ri.length; i++)
-            for (int p = rp[i]; p > 0; p--)
-                ans *= nstart[ri[i]] * PARTICLES_PUVC / vol;
+        for (int i = 0; i < ri.length; i++) {
+            /* Special case for pseudo-higher-order reactions to make
+               sure that the population doesn't go negative. */
+            if (nstart[ri[i]] < rs[i])
+                return 0;
+            for (int p = 0; p < rp[i]; p++)
+                ans *= (nstart[ri[i]] - p) * PARTICLES_PUVC / vol;
+        }
 
         return ans;
     }

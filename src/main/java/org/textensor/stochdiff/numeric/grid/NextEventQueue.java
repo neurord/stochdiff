@@ -359,9 +359,17 @@ public class NextEventQueue {
         void execute(int[] reactionEvents,
                      int[][] diffusionEvents,
                      int[] stimulationEvents) {
+            for (int i = 0; i < this.reactants().length; i++)
+                if (particles[this.element()][this.reactants()[i]] < this.reactant_stochiometry[i]) {
+                    log.error("{} prop={} {}→{} pow={}: {}", this, this.propensity,
+                              this.reactants(), this.products, this.reactant_powers,
+                              particles[this.element()]);
+                    log.info("reaculated prop={}", this._propensity());
+                }
+
             for (int i = 0; i < this.reactants().length; i++) {
                 particles[this.element()][this.reactants()[i]] -= this.reactant_stochiometry[i];
-                assert particles[this.element()][this.reactants()[i]] >= 0;
+                assert particles[this.element()][this.reactants()[i]] >= 0: this;
             }
             for (int i = 0; i < this.products.length; i++)
                 particles[this.element()][this.products[i]] += this.product_stochiometry[i];
