@@ -342,7 +342,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                                                   lnrates[ireac], lnvolumes[iel],
                                                   nstart);
         double lnp = (Double)java_sucks[0];
-        int ns = (Integer)java_sucks[1];
+        int n = (Integer)java_sucks[1];
 
         lnp += lndt;
 
@@ -353,23 +353,23 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             lnp = 0;
         }
 
-        if (ns > 0) {
+        if (n > 0) {
             int ngo;
             final int b;
-            if (ns == 1) {
+            if (n == 1) {
                 // TODO use table to get rid of exp
                 ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
                 b = 1;
-            } else if (ns <= StepGenerator.NMAX_STOCHASTIC) {
-                ngo = interpSG.nGo(ns, lnp, random.random());
+            } else if (n <= StepGenerator.NMAX_STOCHASTIC) {
+                ngo = interpSG.nGo(n, lnp, random.random());
                 b = 2;
             } else {
-                ngo = this.calculateNgo("advance(reaction)", ns, Math.exp(lnp));
+                ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
                 b = 3;
             }
 
             if (rtab.getRates()[ireac] == 0 && ngo > 0)
-                log.warn("ns={} -> ngo={} (lnp={}) b={}", ns, ngo, lnp, b);
+                log.warn("n={} -> ngo={} (lnp={}) b={}", n, ngo, lnp, b);
 
             /* Update the new quantities in npn */
 
@@ -569,6 +569,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
         lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
 
-        return new Object[]{lnp, ns};
+        return new Object[]{lnp, n};
     }
 }
