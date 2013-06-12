@@ -54,7 +54,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                sure that the population doesn't go negative. */
             if (nstart[ri[i]] < rs[i])
                 return 0;
-            for (int p = 0; p < rp[i]; p++)
+            ans *= nstart[ri[i]];
+            for (int p = 1; p < rp[i]; p++)
                 ans *= (nstart[ri[i]] - p) * PARTICLES_PUVC / vol;
         }
 
