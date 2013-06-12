@@ -206,7 +206,9 @@ public class NextEventQueue {
             }
         }
 
-        Collection<NextEvent> dependent = inst.newArrayList();
+        Collection<NextEvent>
+            dependent = inst.newArrayList(),
+            dependon = inst.newArrayList();
 
         public int[] reactants() {
             return this.reactants;
@@ -216,7 +218,12 @@ public class NextEventQueue {
             return element;
         }
 
-        public abstract void addDependent(Collection<? extends NextEvent> coll);
+        public abstract void addRelations(Collection<? extends NextEvent> coll);
+
+        protected void addDependent(NextEvent ev) {
+            this.dependent.add(ev);
+            ev.dependon.add(this);
+        }
     }
 
     static void log_dependency_edges(ArrayList<NextEvent> events) {
@@ -273,13 +280,13 @@ public class NextEventQueue {
             return this.fdiff * particles[this.element()][this.sp];
         }
 
-        public void addDependent(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
                     (e.element() == this.element() ||
                      e.element() == this.element2) &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.dependent.add(e);
+                    this.addDependent(e);
         }
 
         @Override
@@ -332,7 +339,7 @@ public class NextEventQueue {
             assert this.time >= 0;
         }
 
-        public void addDependent(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll) {
                 if (e != this && e.element() == this.element())
                     for (int r1: e.reactants()) {
@@ -351,7 +358,7 @@ public class NextEventQueue {
                             }
 
                         if (lefts != rights) {
-                            this.dependent.add(e);
+                            this.addDependent(e);
 
                             assert ArrayUtil.intersect(e.reactants(), this.reactants())
                                 || ArrayUtil.intersect(e.reactants(), this.products): this;
@@ -480,12 +487,12 @@ public class NextEventQueue {
             return this.propensity;
         }
 
-        public void addDependent(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
                     e.element() == this.element() &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.dependent.add(e);
+                    this.addDependent(e);
         }
 
         @Override
@@ -602,15 +609,15 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(grid, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
+        log.info("{} events at the beginning:", obj.queue.nodes.length);
+        for (NextEvent ev: obj.queue.nodes)
+            log.info("{} → {} prop={} t={}", ev.index(),
+                     ev, ev.propensity, ev.time());
+
         for (NextEvent ev: e) {
-            ev.addDependent(e);
+            ev.addRelations(e);
             log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
         }
-
-        log.info("{} events at the beginning:", e.size());
-        for (int i = 0; i < e.size(); i++)
-            log.info("{} → {} prop={} t={}", i,
-                     e.get(i), e.get(i).propensity, e.get(i).time());
 
         log_dependency_edges(e);
 
