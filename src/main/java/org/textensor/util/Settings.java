@@ -9,6 +9,14 @@ public abstract class Settings {
             return fallback;
     }
 
+    static public boolean getProperty(String name, boolean fallback) {
+        String val = System.getProperty(name);
+        if (val != null)
+            return Boolean.valueOf(val);
+        else
+            return fallback;
+    }
+
     static public String getProperty(String name, String fallback) {
         String val = System.getProperty(name);
         if (val != null)

@@ -12,6 +12,7 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable.Stimulation;
 import static org.textensor.stochdiff.numeric.chem.ReactionTable.getReactionSignature;
+import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 import org.textensor.stochdiff.numeric.grid.GridCalc;
@@ -24,6 +25,8 @@ import org.apache.logging.log4j.Level;
 
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
+
+    final boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
 
     public interface Node {
         int index();
@@ -73,6 +76,9 @@ public class NextEventQueue {
         }
 
         void build(T[] nodes) {
+            if (!update_times)
+                log.info("stochdiff.neq.update_times is false, will regenerate times");
+
             Comparator<T> c = new Comparator<T>() {
                 @Override
                 public int compare(T a, T b) {
@@ -183,7 +189,7 @@ public class NextEventQueue {
 
         void update(double current) {
             // In reactions of the type Da→Da+MaI the propensity does not change
-            // after execution, but there's nothign to warn about.
+            // after execution, but there's nothing to warn about.
             this._update_propensity(false);
             this.time = this._new_time(current);
             log.debug("{}: time changed {} → {}", this, current, this.time);
@@ -192,7 +198,7 @@ public class NextEventQueue {
 
             for (NextEvent dep: this.dependent) {
                 double old = dep._update_propensity(true);
-                if (!Double.isInfinite(dep.time))
+                if (update_times && !Double.isInfinite(dep.time))
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
                     dep.time = dep._new_time(current);
