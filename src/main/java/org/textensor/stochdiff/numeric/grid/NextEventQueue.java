@@ -559,10 +559,12 @@ public class NextEventQueue {
             double cont_leap_time =
                 epsilon * particles[this.element()][this.sp] / this.propensity;
 
-            // limit until next period begins?
             double until = _continous_delta_to_real_time(current, cont_leap_time);
             assert until >= current: until;
-            return until - current;
+            if (Double.isNaN(this.stim.period))
+                return until - current;
+            else
+                return Math.min(until - current, this.stim.period);
         }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
