@@ -1,6 +1,7 @@
 package org.textensor.util;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -277,5 +278,13 @@ public class ArrayUtil {
                 if (a == b)
                     return true;
         return false;
+    }
+
+    public static int[] toArray(Collection<? extends Integer> coll) {
+        int[] target = new int[coll.size()];
+        int pos = 0;
+        for (int i: coll)
+            target[pos++] = i;
+        return target;
     }
 }

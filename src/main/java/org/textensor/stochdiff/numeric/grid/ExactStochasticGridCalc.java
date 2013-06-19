@@ -21,7 +21,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
 
         neq = NextEventQueue.create(this.wkA, this.random,
                                     getVolumeGrid(), rtab,
-                                    stimTab, this.getStimulationTargets());
+                                    stimTab, this.getStimulationTargets(),
+                                    this.sdRun.tolerance);
     }
 
     @Override

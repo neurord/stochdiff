@@ -160,8 +160,17 @@ public class NextEventQueue {
          */
         abstract double _propensity();
 
+        /**
+         * Calculate the time for which <b>this reaction</b> changes the population
+         * of <b>products</b> by ɛ. Propensity is not recalculated, so must be brought
+         * up-to-date externally.
+         */
+        abstract double leap_time(double current, double epsilon);
+
         double _new_time(double current) {
-            return current + random.exponential(this.propensity);
+            double exp = random.exponential(this.propensity);
+            log.debug("Generating exponential time for prop={} → time={}", this.propensity, exp);
+            return current + exp;
         }
 
         /**
@@ -191,9 +200,15 @@ public class NextEventQueue {
             // In reactions of the type Da→Da+MaI the propensity does not change
             // after execution, but there's nothing to warn about.
             this._update_propensity(false);
+
             this.time = this._new_time(current);
-            log.debug("{}: time changed {} → {}", this, current, this.time);
+            double leap = this.leap_time(current, tolerance);
+
+            log.debug("{}: time changed {} → {} by {}, could leap {}",
+                      this, current, this.time,
+                      this.time - current, leap);
             log.debug("{} dependent: {}", this, this.dependent);
+
             queue.update(this);
 
             for (NextEvent dep: this.dependent) {
@@ -280,6 +295,14 @@ public class NextEventQueue {
             return this.fdiff * particles[this.element()][this.sp];
         }
 
+        @Override
+        public double leap_time(double current, double epsilon) {
+            double
+                t1 = epsilon * particles[this.element()][this.sp] / this.propensity,
+                t2 = epsilon * particles[this.element2][this.sp] / this.propensity;
+            return Math.min(t1, t2);
+        }
+
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
@@ -297,11 +320,44 @@ public class NextEventQueue {
         }
     }
 
+    public static int[][] stochiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
+        ArrayList<Integer>
+            si = inst.newArrayList(),
+            ss = inst.newArrayList();
+        boolean[] pconsidered = new boolean[pi.length];
+
+        for (int i = 0; i < ri.length; i++) {
+            int j;
+            for (j = 0; j < pi.length; j++)
+                if (ri[i] == pi[j]) {
+                    pconsidered[j] = true;
+                    break;
+                }
+            if (j == pi.length) {       // product not found
+                si.add(ri[i]);
+                ss.add(-rs[i]);
+            } else if(rs[i] != ps[j]) { // stoichimetry coefficient is nonzero
+                assert ri[i] == pi[j];
+                si.add(ri[i]);
+                ss.add(ps[j] - rs[i]);
+            }
+        }
+
+        for (int j = 0; j < pi.length; j++)
+            if (!pconsidered[j]) {      // reactant not found
+                si.add(pi[j]);
+                ss.add(ps[j]);
+            }
+
+        return new int[][] {ArrayUtil.toArray(si), ArrayUtil.toArray(ss)};
+    }
+
     public class NextReaction extends NextEvent {
         final int[]
             products,
             reactant_stochiometry, product_stochiometry,
-            reactant_powers;
+            reactant_powers,
+            substrates, substrate_stochiometry;
         final int index;
         final double rate, volume;
 
@@ -334,39 +390,46 @@ public class NextEventQueue {
             this.propensity = this._propensity();
             this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
 
+            int[][] tmp = stochiometry(reactants, reactant_stochiometry,
+                                       products, product_stochiometry);
+            this.substrates = tmp[0];
+            this.substrate_stochiometry = tmp[1];
+
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
             assert this.time >= 0;
         }
 
+        @Override
+        public double leap_time(double current, double epsilon) {
+            int[] X = particles[this.element()];
+            double time = Double.POSITIVE_INFINITY;
+
+            for (int i = 0; i < this.substrates.length; i++)
+                time = Math.min(time,
+                                epsilon * X[this.substrates[i]] /
+                                this.propensity / Math.abs(this.substrate_stochiometry[i]));
+
+            log.debug("leaping: subs {}×{}, ɛ={}, pop={} → leap={}",
+                      this.substrates, this.substrate_stochiometry,
+                      epsilon, X, time);
+
+            return time;
+        }
+
         public void addRelations(Collection<? extends NextEvent> coll) {
-            for (NextEvent e: coll) {
+            for (NextEvent e: coll)
                 if (e != this && e.element() == this.element())
-                    for (int r1: e.reactants()) {
-                        // find on the left side
-                        int lefts = 0, rights = 0;
-                        for (int i = 0; i < this.reactants().length; i++)
-                            if (this.reactants()[i] == r1) {
-                                lefts = this.reactant_stochiometry[i];
+                    for (int r1: e.reactants())
+                        for (int i = 0; i < this.substrates.length; i++)
+                            if (this.substrates[i] == r1) {
+                                this.addDependent(e);
+
+                                assert ArrayUtil.intersect(e.reactants(), this.reactants())
+                                    || ArrayUtil.intersect(e.reactants(), this.products): this;
+
                                 break;
                             }
-
-                        for (int i = 0; i < this.products.length; i++)
-                            if (this.products[i] == r1) {
-                                rights = this.product_stochiometry[i];
-                                break;
-                            }
-
-                        if (lefts != rights) {
-                            this.addDependent(e);
-
-                            assert ArrayUtil.intersect(e.reactants(), this.reactants())
-                                || ArrayUtil.intersect(e.reactants(), this.products): this;
-
-                            break;
-                        }
-                    }
-            }
         }
 
         void execute(int[] reactionEvents,
@@ -446,8 +509,7 @@ public class NextEventQueue {
             stimulationEvents[this.sp] += 1;
         }
 
-        @Override
-        double _new_time(double current) {
+        private double _continous_delta_to_real_time(double current, double delta) {
             final double tc;
 
             if (Double.isNaN(this.stim.period))
@@ -466,7 +528,7 @@ public class NextEventQueue {
                     Math.ceil(nc) * this.stim.duration;
             }
 
-            double t1 = tc + super._new_time(0);
+            double t1 = tc + delta;
 
             if (!Double.isNaN(this.stim.period)) {
                 int n = (int)(t1 / this.stim.duration);
@@ -474,6 +536,11 @@ public class NextEventQueue {
             }
 
             return t1 < this.stim.end ? t1 : Double.POSITIVE_INFINITY;
+        }
+
+        @Override
+        double _new_time(double current) {
+            return _continous_delta_to_real_time(current, super._new_time(0));
         }
 
         @Override
@@ -485,6 +552,17 @@ public class NextEventQueue {
         public double _update_propensity(boolean warn) {
             // does not change
             return this.propensity;
+        }
+
+        @Override
+        public double leap_time(double current, double epsilon) {
+            double cont_leap_time =
+                epsilon * particles[this.element()][this.sp] / this.propensity;
+
+            // limit until next period begins?
+            double until = _continous_delta_to_real_time(current, cont_leap_time);
+            assert until >= current: until;
+            return until - current;
         }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
@@ -509,14 +587,18 @@ public class NextEventQueue {
      * Particle counts: [voxels × species]
      */
     final int[][] particles;
+    final double tolerance;
     final PriorityTree<NextEvent> queue = new PriorityTree<NextEvent>();
 
     /**
      * Use create() instead, this is public only for testing.
      */
-    public NextEventQueue(RandomGenerator random, int[][] particles) {
+    public NextEventQueue(RandomGenerator random, int[][] particles, double tolerance) {
         this.random = random != null ? random : new MersenneTwister();
         this.particles = particles;
+
+        assert 0 <= tolerance && tolerance <= 1: tolerance;
+        this.tolerance = tolerance;
     }
 
     ArrayList<NextDiffusion> createDiffusions(VolumeGrid grid, ReactionTable rtab) {
@@ -600,8 +682,9 @@ public class NextEventQueue {
                                         VolumeGrid grid,
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
-                                        int[][] stimtargets) {
-        NextEventQueue obj = new NextEventQueue(random, particles);
+                                        int[][] stimtargets,
+                                        double tolerance) {
+        NextEventQueue obj = new NextEventQueue(random, particles, tolerance);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));
