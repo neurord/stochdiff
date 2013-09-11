@@ -25,6 +25,7 @@ import java.util.HashMap;
  */
 
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+import org.textensor.stochdiff.numeric.math.RandomGenerator;
 
 public class DiscretePStepGenerator extends StepGenerator {
 
@@ -36,23 +37,26 @@ public class DiscretePStepGenerator extends StepGenerator {
 
     distribution_t mode;
 
-    public DiscretePStepGenerator(distribution_t mode) {
+    public DiscretePStepGenerator(distribution_t mode, RandomGenerator random) {
+        super(random);
+
         generators = new HashMap<Integer, FixedPStepGenerator>();
         this.mode = mode;
     }
 
 
     public FixedPStepGenerator getGenerator(double lnp) {
-        FixedPStepGenerator ret = null;
+        final FixedPStepGenerator ret;
         double po = lnp - lnpmin;
-        if (po < 0.) {
+        if (po < 0.)
             po = 0.;
-        }
+
         int ipbin = (int)(Integer.MAX_VALUE * (po / (0. - lnpmin)));
         Integer key = new Integer(ipbin);
-        if (generators.containsKey(key)) {
+
+        if (generators.containsKey(key))
             ret = generators.get(key);
-        } else {
+        else {
             ret = new FixedPStepGenerator(lnp, mode);
             generators.put(key, ret);
         }
@@ -63,11 +67,8 @@ public class DiscretePStepGenerator extends StepGenerator {
     // this is here for completeness, but shouldnt be used
     // in real calculations - you should call getGenerator once
     // at the beginning and then use that - it will be much faster.
-    public int nGo(int n, double lnp, double r) {
+    @Override
+    protected int nGo(int n, double lnp, double r) {
         return getGenerator(lnp).nGo(n, r);
     }
-
-
-
-
 }

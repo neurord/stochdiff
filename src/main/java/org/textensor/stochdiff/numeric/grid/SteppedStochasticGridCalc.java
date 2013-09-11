@@ -85,7 +85,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
     double lndt;
 
-    InterpolatingStepGenerator interpSG;
+    InterpolatingStepGenerator stepper;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
 
     double[][] pSharedOut;
@@ -149,13 +149,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
         // final things we need is something to generate particle numbers
         // for steps of given n, p
-        if (useBinomial())
-            interpSG = InterpolatingStepGenerator.getBinomialGenerator();
-        else if (usePoisson()) {
-            interpSG = InterpolatingStepGenerator.getPoissonGenerator();
-        } else {
-            E.error("unknown probability distribution");
-        }
+        stepper = new InterpolatingStepGenerator(distID, random);
 
         if (doShared() || doParticle() || doIndependent()) {
             if (doShared()) {
@@ -213,20 +207,19 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     }
 
     protected int calculateNgo(String where, int n, double exp){
-        final double g = random.gaussian(), r = random.random();
         final String msg;
         final int ngo;
 
         if (useBinomial()) {
             if (n * exp < NP) {
-                ngo = StepGenerator.gaussianStep(n, exp, g, r, random.poisson(n * exp), NP);
+                ngo = stepper.gaussianStep(n, exp, NP);
                 msg = "n*exp < " + NP;
             } else {
-                ngo = StepGenerator.gaussianStep(n, exp, g, r);
+                ngo = stepper.gaussianStep(n, exp);
                 msg = "n*exp >= " + NP;
             }
         } else {
-            ngo = StepGenerator.poissonStep(n, exp, g, r);
+            ngo = stepper.poissonStep(n * exp);
             msg = "not using binomial";
         }
 
@@ -361,7 +354,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                 ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
                 b = 1;
             } else if (n <= StepGenerator.NMAX_STOCHASTIC) {
-                ngo = interpSG.nGo(n, lnp, random.random());
+                ngo = stepper.nGo(n, lnp);
                 b = 2;
             } else {
                 ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
@@ -422,7 +415,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         if (np0 == 1) {
             ngo = (random.random() < pSharedOut[iel][k] ? 1 : 0);
         } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
-            ngo = interpSG.nGo(np0, Math.log(pSharedOut[iel][k]), random.random());
+            ngo = stepper.nGo(np0, Math.log(pSharedOut[iel][k]));
 
             if (ngo < 0) {
                 System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
@@ -475,15 +468,14 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                         ngo = 0;
                     else {
                         if (pgoTmp <= 0.5)
-                            ngo = interpSG.nGo(ngo_remaining, lnpgo, random.random()); // 2011 BHK
+                            ngo = stepper.nGo(ngo_remaining, lnpgo); // 2011 BHK
                         else
-                            ngo = ngo_remaining - interpSG.nGo(ngo_remaining, lnpgo, random.random());
+                            ngo = ngo_remaining - stepper.nGo(ngo_remaining, lnpgo);
                     }
                 } else if (ngo_remaining * Math.exp(lnpgo) < NP)
-                    ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random(),
-                                                     random.poisson(ngo_remaining * Math.exp(lnpgo)), NP);
+                    ngo = stepper.gaussianStep(ngo_remaining, Math.exp(lnpgo), NP);
                 else
-                    ngo = StepGenerator.gaussianStep(ngo_remaining, Math.exp(lnpgo), random.gaussian(), random.random());
+                    ngo = stepper.gaussianStep(ngo_remaining, Math.exp(lnpgo));
 
                 if (ngo < 0) {
                     ngo = 0;

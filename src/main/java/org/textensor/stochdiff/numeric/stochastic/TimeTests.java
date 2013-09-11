@@ -2,6 +2,7 @@ package org.textensor.stochdiff.numeric.stochastic;
 
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.math.NRRandom;
+import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 
 import java.util.Random;
 
@@ -24,8 +25,9 @@ public class TimeTests {
 
 
     public static void interpTest() {
-        InterpolatingStepGenerator isg = InterpolatingStepGenerator.getBinomialGenerator();
-        isg.timeTest();
+        InterpolatingStepGenerator stepper = new InterpolatingStepGenerator(distribution_t.BINOMIAL,
+                                                                            new MersenneTwister());
+        stepper.timeTest();
     }
 
 

@@ -3,6 +3,7 @@ package org.textensor.stochdiff.numeric.stochastic;
 import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
+import org.textensor.stochdiff.numeric.math.RandomGenerator;
 
 import static java.lang.String.format;
 
@@ -32,25 +33,9 @@ public class InterpolatingStepGenerator extends StepGenerator {
 
     private final NGoTable[][] pnTable;
 
-    private static InterpolatingStepGenerator bInstance;
-    private static InterpolatingStepGenerator pInstance;
+    public InterpolatingStepGenerator(distribution_t mode, RandomGenerator generator) {
+        super(generator);
 
-
-    public static InterpolatingStepGenerator getBinomialGenerator() {
-        if (bInstance == null)
-            bInstance = new InterpolatingStepGenerator(BINOMIAL);
-
-        return bInstance;
-    }
-
-    public static InterpolatingStepGenerator getPoissonGenerator() {
-        if (pInstance == null)
-            pInstance = new InterpolatingStepGenerator(POISSON);
-
-        return pInstance;
-    }
-
-    private InterpolatingStepGenerator(distribution_t mode) {
         pnTable = new NGoTable[NRANGES+1][StepGenerator.NMAX_STOCHASTIC+1];
 
         log.info("Using {} step generator with {}×{} tables",
