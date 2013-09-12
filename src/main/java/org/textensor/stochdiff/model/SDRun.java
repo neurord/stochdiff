@@ -55,9 +55,17 @@ public class SDRun {
 
     public String outputQuantity; // either "NUMBER" or "CONCENTRATION"
 
-    // accepted tolerance for adaptive calculations (delta f / f  for an algorithm dependent function f);
+    /**
+     * Accepted tolerance for adaptive calculations
+     * (delta f / f  for an algorithm dependent function f).
+     */
     public double tolerance;
 
+    /**
+     * How many times our calculated allowed leap must be longer than
+     * normal event waiting time, for us to choose leaping.
+     */
+    public double leap_min_jump;
 
     public String calculation;
 

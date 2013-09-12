@@ -171,7 +171,7 @@ public class NextEventQueue {
          * of <b>products</b> by ɛ. Propensity is not recalculated, so must be brought
          * up-to-date externally.
          */
-        abstract double leap_time(double current, double epsilon);
+        abstract double leap_time(double current, double tolerance);
 
         /**
          * Calculate the (randomized) extent of the reaction based in the time given.
@@ -221,15 +221,16 @@ public class NextEventQueue {
             // after execution, but there's nothing to warn about.
             this._update_propensity(false);
 
-            double normal = this._new_time(current);
-            double leap = this.leap_time(current, tolerance);
+            final double normal = this._new_time(current);
+            final double leap = leap_min_jump == 0 ? Double.NaN
+                : this.leap_time(current, tolerance);
 
             log.debug("{} dependent: {}", this, this.dependent);
             log.debug("{}: time change {} → {} wait {}, can leap {}",
                       this, current, normal,
                       normal - current, leap);
 
-            if (leap > (normal - current) * 5) {
+            if (leap_min_jump != 0 && leap > (normal - current) * leap_min_jump) {
                 assert update_times;
 
                 int count = this.leap_count(current, leap);
@@ -337,10 +338,10 @@ public class NextEventQueue {
         }
 
         @Override
-        public double leap_time(double current, double epsilon) {
+        public double leap_time(double current, double tolerance) {
             double
-                t1 = epsilon * particles[this.element()][this.sp] / this.propensity,
-                t2 = epsilon * particles[this.element2][this.sp] / this.propensity;
+                t1 = tolerance * particles[this.element()][this.sp] / this.propensity,
+                t2 = tolerance * particles[this.element2][this.sp] / this.propensity;
             return Math.min(t1, t2);
             // update here please
         }
@@ -456,18 +457,18 @@ public class NextEventQueue {
         }
 
         @Override
-        public double leap_time(double current, double epsilon) {
+        public double leap_time(double current, double tolerance) {
             int[] X = particles[this.element()];
             double time = Double.POSITIVE_INFINITY;
 
             for (int i = 0; i < this.substrates.length; i++)
                 time = Math.min(time,
-                                epsilon * X[this.substrates[i]] /
+                                tolerance * X[this.substrates[i]] /
                                 this.propensity / Math.abs(this.substrate_stochiometry[i]));
 
             log.debug("leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
                       this.substrates, this.substrate_stochiometry,
-                      epsilon, X, time);
+                      tolerance, X, time);
 
             return time;
         }
@@ -642,9 +643,9 @@ public class NextEventQueue {
         }
 
         @Override
-        public double leap_time(double current, double epsilon) {
+        public double leap_time(double current, double tolerance) {
             double cont_leap_time =
-                epsilon * particles[this.element()][this.sp] / this.propensity;
+                tolerance * particles[this.element()][this.sp] / this.propensity;
 
             double until = _continous_delta_to_real_time(current, cont_leap_time, true);
             assert until >= current: until;
@@ -681,6 +682,14 @@ public class NextEventQueue {
      */
     final int[][] particles;
     final double tolerance;
+
+    /**
+     * How many times our calculated allowed leap must be longer than
+     * normal event waiting time, for us to choose leaping.
+     * C.f. SDRun.leap_min_jump.
+     */
+    final double leap_min_jump;
+
     final PriorityTree<NextEvent> queue = new PriorityTree<NextEvent>();
 
     /**
@@ -689,7 +698,8 @@ public class NextEventQueue {
     public NextEventQueue(RandomGenerator random,
                           StepGenerator stepper,
                           int[][] particles,
-                          double tolerance) {
+                          double tolerance,
+                          double leap_min_jump) {
         this.random = random != null ? random : new MersenneTwister();
         this.stepper = stepper != null ? stepper :
             new InterpolatingStepGenerator(BINOMIAL, this.random);
@@ -697,6 +707,14 @@ public class NextEventQueue {
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
         this.tolerance = tolerance;
+
+        this.leap_min_jump = leap_min_jump;
+
+        if (leap_min_jump == 0)
+            log.info("Leaping disabled");
+        else
+            log.info("Using {} as leap tolerance, jumping when {} times faster",
+                     tolerance, leap_min_jump);
     }
 
     ArrayList<NextDiffusion> createDiffusions(VolumeGrid grid, ReactionTable rtab) {
@@ -782,8 +800,9 @@ public class NextEventQueue {
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
                                         int[][] stimtargets,
-                                        double tolerance) {
-        NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance);
+                                        double tolerance,
+                                        double leap_min_jump) {
+        NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance, leap_min_jump);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));
