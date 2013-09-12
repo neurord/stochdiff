@@ -59,7 +59,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     // we do shared diffusion,
     // (2) otherwise, we do parallel diffusion.
     public static final int SHARED_DIFF_PARTICLES = 4;
-    public static final int NP = 30;         // AB Changed from 20 to 30. 2011.09.23
 
     double[] lnfdiff;
 
@@ -206,31 +205,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
     }
 
-    protected int calculateNgo(String where, int n, double exp){
-        final String msg;
-        final int ngo;
-
-        if (useBinomial()) {
-            if (n * exp < NP) {
-                ngo = stepper.gaussianStep(n, exp, NP);
-                msg = "n*exp < " + NP;
-            } else {
-                ngo = stepper.gaussianStep(n, exp);
-                msg = "n*exp >= " + NP;
-            }
-        } else {
-            ngo = stepper.poissonStep(n * exp);
-            msg = "not using binomial";
-        }
-
-        if (ngo >= 0)
-            return ngo;
-
-        log.warn("{} with {}: ngo is NEGATIVE (ngo={}, n={}, Math.exp(lnp)={})",
-                 where, msg, ngo, n, exp);
-        return 0;
-    }
-
     // NB the following method is one of the only two that need optimizing
     // (the other is nGo in the interpolating step generator)
     // things to do (in the c version)
@@ -347,22 +321,10 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
 
         if (n > 0) {
-            int ngo;
-            final int b;
-            if (n == 1) {
-                // TODO use table to get rid of exp
-                ngo = (random.random() < Math.exp(lnp) ? 1 : 0);
-                b = 1;
-            } else if (n <= StepGenerator.NMAX_STOCHASTIC) {
-                ngo = stepper.nGo(n, lnp);
-                b = 2;
-            } else {
-                ngo = this.calculateNgo("advance(reaction)", n, Math.exp(lnp));
-                b = 3;
-            }
+            int ngo = this.stepper.versatile_ngo("advance(reaction)", n, Math.exp(lnp));
 
             if (rtab.getRates()[ireac] == 0 && ngo > 0)
-                log.warn("n={} -> ngo={} (lnp={}) b={}", n, ngo, lnp, b);
+                log.warn("n={} -> ngo={} (lnp={})", n, ngo, lnp);
 
             /* Update the new quantities in npn */
 
@@ -410,21 +372,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         int inbr[] = neighbors[iel];
         double[] fshare = fSharedExit[iel][k];
 
-        int ngo;
-
-        if (np0 == 1) {
-            ngo = (random.random() < pSharedOut[iel][k] ? 1 : 0);
-        } else if (np0 < StepGenerator.NMAX_STOCHASTIC) {
-            ngo = stepper.nGo(np0, Math.log(pSharedOut[iel][k]));
-
-            if (ngo < 0) {
-                System.out.println("in parallelAndSharedDiffusionStep 1st else: ngo is NEGATIVE. Exiting...");
-                System.exit(3);
-            }
-        } else {
-            ngo = this.calculateNgo("parallelAndSharedDiffusionStep", np0, pSharedOut[iel][k]);
-        }
-
+        int ngo = this.stepper.versatile_ngo("parallelAndSharedDiffusionStep", np0, pSharedOut[iel][k]);
         assert ngo >= 0;
 
         /* if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
@@ -432,7 +380,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
          * else
          *    do independent_diffusion
         */
-        if (ngo <= (inbr.length) * SHARED_DIFF_PARTICLES) {
+        if (ngo <= inbr.length * SHARED_DIFF_PARTICLES) {
             /* SHARED diffusion */
 
             wkB[iel][k] -= ngo;
@@ -448,54 +396,30 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         } else {
             /* MULTINOMIAL diffusion */
 
-            int ngo_remaining = ngo;  // the number of particles not yet diffused
             double prev = 0;
             for (int j = 0; j < inbr.length - 1; j++) {
-                double pgoTmp = (fSharedExit[iel][k][j] - prev)/(fSharedExit[iel][k][inbr.length-1] - prev);
-                double lnpgo;
-                if (pgoTmp > 0.5 && ngo_remaining < StepGenerator.NMAX_STOCHASTIC)
-                    lnpgo = Math.log(1.0 - pgoTmp);
-                else
-                    lnpgo = Math.log(pgoTmp);
-
+                double pgoTmp = (fSharedExit[iel][k][j] - prev)
+                              / (fSharedExit[iel][k][inbr.length-1] - prev);
                 prev = fSharedExit[iel][k][j];
 
-                //This next section uses the tables KTB
-                if (ngo_remaining < StepGenerator.NMAX_STOCHASTIC) {
-                    if (ngo_remaining == 1)
-                        ngo = (random.random() < fSharedExit[iel][k][j] ? 1 : 0); //2011 BHK for ngo_remaining == 1
-                    else if (ngo_remaining == 0) // 2011 BHK, occaisionally will run out of particles on 2nd to last neighbor
-                        ngo = 0;
-                    else {
-                        if (pgoTmp <= 0.5)
-                            ngo = stepper.nGo(ngo_remaining, lnpgo); // 2011 BHK
-                        else
-                            ngo = ngo_remaining - stepper.nGo(ngo_remaining, lnpgo);
-                    }
-                } else if (ngo_remaining * Math.exp(lnpgo) < NP)
-                    ngo = stepper.gaussianStep(ngo_remaining, Math.exp(lnpgo), NP);
-                else
-                    ngo = stepper.gaussianStep(ngo_remaining, Math.exp(lnpgo));
+                int ngo2 = stepper.versatile_ngo("parallelAndSharedDiffusionStep multinomial",
+                                                 ngo, pgoTmp);
 
-                if (ngo < 0) {
-                    ngo = 0;
-                    System.out.println("parallelAndSharedDiffusionStep multinomial: ngo is NEGATIVE.");
-                    System.out.println("ngo: " + ngo + " ngo_remaining: " + ngo_remaining + "pgoTmp " + pgoTmp);
-                } else if (ngo > ngo_remaining) {
+                assert ngo2 >= 0;
+
+                if (ngo2 > ngo) {
                     if (++nngowarn < 10)
                         log.warn("parallelAndSharedDiffusionStep multinomial: "
-                                 + "ngo = {} > {} = ngo_remaining, setting ngo=ngo_remaining ",
-                                 ngo, ngo_remaining);
-                    ngo = ngo_remaining;
+                                 + "ngo2 = {} > {} = ngo, setting ngo2=ngo ",
+                                 ngo2, ngo);
+                    ngo2 = ngo;
                 }
 
-                wkB[iel][k] -= ngo;
-                wkB[inbr[j]][k] += ngo;
-                this.diffusionEvents[iel][k][j] += ngo;
-                ngo_remaining -= ngo;
+                wkB[iel][k] -= ngo2;
+                wkB[inbr[j]][k] += ngo2;
+                this.diffusionEvents[iel][k][j] += ngo2;
+                ngo -= ngo2;
             } //end of loop through all but last neighbor
-
-            ngo = ngo_remaining;
 
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;

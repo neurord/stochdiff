@@ -34,7 +34,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
     private final NGoTable[][] pnTable;
 
     public InterpolatingStepGenerator(distribution_t mode, RandomGenerator generator) {
-        super(generator);
+        super(mode, generator);
 
         pnTable = new NGoTable[NRANGES+1][StepGenerator.NMAX_STOCHASTIC+1];
 
@@ -52,7 +52,7 @@ public class InterpolatingStepGenerator extends StepGenerator {
     public String toString() {
         return String.format("%s.%s[%d·%d tables, %.3g:%.3g:%.3g]",
                              getClass().getSimpleName(),
-                             pnTable[0][2].mode, pnTable.length, pnTable[0].length,
+                             this.mode, pnTable.length, pnTable[0].length,
                              lnpmin, lnpmax, deltalnp);
     }
 

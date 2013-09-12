@@ -1,6 +1,10 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
+import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * Return the integer number of particles that going to move (or
@@ -14,14 +18,18 @@ import org.textensor.stochdiff.numeric.math.RandomGenerator;
  */
 
 public abstract class StepGenerator {
+    static final Logger log = LogManager.getLogger(StepGenerator.class);
 
+    protected final distribution_t mode;
     protected final RandomGenerator random;
 
-    public StepGenerator(RandomGenerator random) {
+    public StepGenerator(distribution_t mode, RandomGenerator random) {
+        this.mode = mode;
         this.random = random;
     }
 
     public final static int NMAX_STOCHASTIC = 120;
+    public final static int NP = 30;         // AB Changed from 20 to 30. 2011.09.23
 
     protected abstract int nGo(int n, double p, double r);
 
@@ -95,5 +103,48 @@ public abstract class StepGenerator {
 
     public int poissonStep(double np) {
         return poissonStep(np, this.random.gaussian(), this.random.random());
+    }
+
+    public int versatile_ngo(String descr, int n, double p) {
+        final int ngo;
+
+        if (n == 1)
+            ngo = this.random.random() < p ? 1 : 0;
+        else if (n < NMAX_STOCHASTIC) {
+            ngo  = this.nGo(n, Math.log(p));
+
+            if (ngo < 0)
+                throw new RuntimeException("ngo is negative (" + descr + ")");
+        } else
+            ngo = this._calculate_ngo(descr, n, p);
+
+        return ngo;
+    }
+
+    protected int _calculate_ngo(String where, int n, double p){
+        final String msg;
+        final int ngo;
+
+        switch(mode) {
+        case BINOMIAL:
+            if (n * p < NP) {
+                ngo = this.gaussianStep(n, p, NP);
+                msg = "n*p < " + NP;
+            } else {
+                ngo = this.gaussianStep(n, p);
+                msg = "n*p >= " + NP;
+            }
+            break;
+        default:
+            ngo = this.poissonStep(n * p);
+            msg = "not using binomial";
+        }
+
+        if (ngo >= 0)
+            return ngo;
+
+        log.warn("{} with {}: ngo is NEGATIVE (ngo={}, n={}, p={})",
+                 where, msg, ngo, n, p);
+        return 0;
     }
 }
