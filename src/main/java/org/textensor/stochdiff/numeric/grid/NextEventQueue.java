@@ -18,6 +18,9 @@ import org.textensor.util.inst;
 import org.textensor.stochdiff.numeric.grid.GridCalc;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import static org.textensor.stochdiff.numeric.grid.GridCalc.intlog;
+import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
+import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
+import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -97,21 +100,21 @@ public class NextEventQueue {
             return this.nodes[0];
         }
 
-        void update(T node) {
+        void reposition(T node) {
             assert node != null;
             T parent = this.parent(node);
             log.debug("updating position of {} t={} parent={}", node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
                 this.swap(parent, node); // original parent first
-                this.update(node);
+                this.reposition(node);
             } else {
                 T littlest = this.littlestChild(node);
                 log.debug("littlest Child is {} t={}", littlest,
                           littlest != null ? littlest.time() : "-");
                 if (littlest != null && node.time() > littlest.time()) {
                     this.swap(node, littlest); // original parent first
-                    this.update(node);
+                    this.reposition(node);
                 }
             }
         }
@@ -123,6 +126,8 @@ public class NextEventQueue {
         final private int element;
         final String signature;
         final private int[] reactants;
+
+        private boolean already_executed;
 
         protected double time;
         double propensity;
@@ -153,7 +158,8 @@ public class NextEventQueue {
          */
         abstract void execute(int[] reactionEvents,
                               int[][] diffusionEvents,
-                              int[] stimulationEvents);
+                              int[] stimulationEvents,
+                              int count);
 
         /**
          * Calculate propensity of this event.
@@ -166,6 +172,11 @@ public class NextEventQueue {
          * up-to-date externally.
          */
         abstract double leap_time(double current, double epsilon);
+
+        /**
+         * Calculate the (randomized) extent of the reaction based in the time given.
+         */
+        abstract int leap_count(double current, double time);
 
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
@@ -196,20 +207,48 @@ public class NextEventQueue {
             return pop;
         }
 
-        void update(double current) {
+        void update(int[][] reactionEvents,
+                    int[][][] diffusionEvents,
+                    int[][] stimulationEvents,
+                    double current) {
+            if (!this.already_executed)
+                this.execute(reactionEvents[this.element()],
+                             diffusionEvents[this.element()],
+                             stimulationEvents[this.element()],
+                             1);
+
             // In reactions of the type Da→Da+MaI the propensity does not change
             // after execution, but there's nothing to warn about.
             this._update_propensity(false);
 
-            this.time = this._new_time(current);
+            double normal = this._new_time(current);
             double leap = this.leap_time(current, tolerance);
 
-            log.debug("{}: time changed {} → {} by {}, could leap {}",
-                      this, current, this.time,
-                      this.time - current, leap);
             log.debug("{} dependent: {}", this, this.dependent);
+            log.debug("{}: time change {} → {} wait {}, can leap {}",
+                      this, current, normal,
+                      normal - current, leap);
 
-            queue.update(this);
+            if (leap > (normal - current) * 5) {
+                assert update_times;
+
+                int count = this.leap_count(current, leap);
+
+                log.debug("leaping {} extent {} until time={}", leap, count, current + leap);
+                this.time = current + leap;
+
+                this.execute(reactionEvents[this.element()],
+                             diffusionEvents[this.element()],
+                             stimulationEvents[this.element()],
+                             count);
+                this.already_executed = true;
+            } else {
+                log.debug("waiting {} until time={}", normal - current, normal);
+                this.time = normal;
+                this.already_executed = false;
+            }
+
+            queue.reposition(this);
 
             for (NextEvent dep: this.dependent) {
                 double old = dep._update_propensity(true);
@@ -217,7 +256,7 @@ public class NextEventQueue {
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
                     dep.time = dep._new_time(current);
-                queue.update(dep);
+                queue.reposition(dep);
             }
         }
 
@@ -279,15 +318,17 @@ public class NextEventQueue {
             log.debug("Created {}: t={}", this, this.time);
         }
 
+        @Override
         void execute(int[] reactionEvents,
                      int[][] diffusionEvents,
-                     int[] stimulationEvents) {
-            particles[this.element()][this.sp] -= 1;
-            particles[this.element2][this.sp] += 1;
+                     int[] stimulationEvents,
+                     int count) {
+            particles[this.element()][this.sp] -= count;
+            particles[this.element2][this.sp] += count;
 
             assert particles[this.element()][this.sp] >= 0;
 
-            diffusionEvents[this.sp][this.index2] += 1;
+            diffusionEvents[this.sp][this.index2] += count;
         }
 
         @Override
@@ -301,6 +342,20 @@ public class NextEventQueue {
                 t1 = epsilon * particles[this.element()][this.sp] / this.propensity,
                 t2 = epsilon * particles[this.element2][this.sp] / this.propensity;
             return Math.min(t1, t2);
+            // update here please
+        }
+
+        @Override
+        public int leap_count(double current, double time) {
+            // Diffusion is a first order reaction, governed by the
+            // sum of binomial distributions.
+
+            // FIXME: replace two diffusion events by just one and
+            //        implement skellam or sum of binomials directly.
+            // https://github.com/scipy/scipy/blob/master/scipy/stats/distributions.py#L7861
+
+            int n = particles[this.element()][this.sp];
+            return stepper.versatile_ngo("neq diffusion", n, this.propensity * time / n);
         }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
@@ -314,7 +369,7 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el. %d→%d %s",
+            return String.format("%s el.%d→%d %s",
                                  getClass().getSimpleName(),
                                  element(), element2, signature);
         }
@@ -410,12 +465,26 @@ public class NextEventQueue {
                                 epsilon * X[this.substrates[i]] /
                                 this.propensity / Math.abs(this.substrate_stochiometry[i]));
 
-            log.debug("leaping: subs {}×{}, ɛ={}, pop={} → leap={}",
+            log.debug("leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
                       this.substrates, this.substrate_stochiometry,
                       epsilon, X, time);
 
             return time;
         }
+
+        @Override
+        public int leap_count(double current, double time) {
+            int[] X = particles[this.element()];
+
+            int n = Integer.MAX_VALUE;
+            for (int i = 0; i < this.reactants().length; i++)
+                n = Math.min(n, X[this.reactants()[i]] / this.reactant_stochiometry[i]);
+
+            return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
+
+            // FIXME: update for second order reactions
+        }
+
 
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
@@ -432,24 +501,29 @@ public class NextEventQueue {
                             }
         }
 
+        @Override
         void execute(int[] reactionEvents,
                      int[][] diffusionEvents,
-                     int[] stimulationEvents) {
+                     int[] stimulationEvents,
+                     int count) {
             for (int i = 0; i < this.reactants().length; i++)
-                if (particles[this.element()][this.reactants()[i]] < this.reactant_stochiometry[i]) {
-                    log.error("{} prop={} {}→{} pow={}: {}", this, this.propensity,
+                if (particles[this.element()][this.reactants()[i]]
+                    < this.reactant_stochiometry[i] * count) {
+                    log.error("{} prop={} {}→{} pow={} count={}: {}", this, this.propensity,
                               this.reactants(), this.products, this.reactant_powers,
-                              particles[this.element()]);
+                              count, particles[this.element()]);
                     log.info("reaculated prop={}", this._propensity());
                 }
 
             for (int i = 0; i < this.reactants().length; i++) {
-                particles[this.element()][this.reactants()[i]] -= this.reactant_stochiometry[i];
+                particles[this.element()][this.reactants()[i]] -=
+                    this.reactant_stochiometry[i] * count;
                 assert particles[this.element()][this.reactants()[i]] >= 0: this;
             }
             for (int i = 0; i < this.products.length; i++)
-                particles[this.element()][this.products[i]] += this.product_stochiometry[i];
-            reactionEvents[this.index] += 1;
+                particles[this.element()][this.products[i]] +=
+                    this.product_stochiometry[i] * count;
+            reactionEvents[this.index] += count;
         }
 
         @Override
@@ -461,15 +535,15 @@ public class NextEventQueue {
                                                                       this.rate,
                                                                       this.volume,
                                                                       particles[this.element()]);
-            log.debug("{}: rate={} vol={} propensity={}",
-                      this, this.rate, this.volume, prop);
+            //  log.debug("{}: rate={} vol={} propensity={}",
+            //        this, this.rate, this.volume, prop);
 
             return prop;
         }
 
         @Override
         public String toString() {
-            return String.format("%s el. %d %s",
+            return String.format("%s el.%d %s",
                                  getClass().getSimpleName(),
                                  element(),
                                  signature);
@@ -498,28 +572,37 @@ public class NextEventQueue {
             this.propensity = this._propensity();
             this.time = this._new_time(0);
 
-            log.debug("Created {}: t={} [{}]", this, this.time, this.stim);
+            log.info("Created {}: t={} [{}]", this, this.time, this.stim);
         }
 
         void execute(int[] reactionEvents,
                      int[][] diffusionEvents,
-                     int[] stimulationEvents) {
-            particles[this.element()][this.sp] += 1;
+                     int[] stimulationEvents,
+                     int count) {
+            particles[this.element()][this.sp] += count;
 
-            stimulationEvents[this.sp] += 1;
+            stimulationEvents[this.sp] += count;
         }
 
-        private double _continous_delta_to_real_time(double current, double delta) {
-            final double tc;
+        /**
+         * @param current: starting time
+         * @param delta: time interval
+         * @param insideWindow: whether to limit the returned value to current
+         *        stimulation window.
+         */
+        private double _continous_delta_to_real_time(double current, double delta,
+                                                     boolean insideWindow) {
+            final double tc, tp;
 
-            if (Double.isNaN(this.stim.period))
+            if (Double.isNaN(this.stim.period)) {
                 tc = Math.max(current, this.stim.onset);
-            else {
+                tp = this.stim.onset;
+            } else {
                 double nc = (current - this.stim.onset) / this.stim.period;
                 if (nc < 0)
                     nc = 0;
 
-                double tp = nc % 1 * this.stim.period;
+                tp = nc % 1 * this.stim.period;
                 assert current > this.stim.onset || tp == 0;
 
                 // current time converted to constant time:
@@ -528,7 +611,11 @@ public class NextEventQueue {
                     Math.ceil(nc) * this.stim.duration;
             }
 
-            double t1 = tc + delta;
+            double t1;
+            if (insideWindow)
+                t1 = Math.max(tc + delta, tp + this.stim.duration);
+            else
+                t1 = tc + delta;
 
             if (!Double.isNaN(this.stim.period)) {
                 int n = (int)(t1 / this.stim.duration);
@@ -540,7 +627,7 @@ public class NextEventQueue {
 
         @Override
         double _new_time(double current) {
-            return _continous_delta_to_real_time(current, super._new_time(0));
+            return _continous_delta_to_real_time(current, super._new_time(0), false);
         }
 
         @Override
@@ -559,12 +646,15 @@ public class NextEventQueue {
             double cont_leap_time =
                 epsilon * particles[this.element()][this.sp] / this.propensity;
 
-            double until = _continous_delta_to_real_time(current, cont_leap_time);
+            double until = _continous_delta_to_real_time(current, cont_leap_time, true);
             assert until >= current: until;
-            if (Double.isNaN(this.stim.period))
-                return until - current;
-            else
-                return Math.min(until - current, this.stim.period);
+            assert until < current + this.stim.duration;
+            return until - current;
+        }
+
+        @Override
+        public int leap_count(double current, double time) {
+            return stepper.poissonStep(this.propensity * time);
         }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
@@ -577,13 +667,14 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el. %d stim[%s]",
+            return String.format("%s el.%d stim[%s]",
                                  getClass().getSimpleName(),
                                  element(), signature);
         }
     }
 
     final RandomGenerator random;
+    final StepGenerator stepper;
 
     /**
      * Particle counts: [voxels × species]
@@ -595,8 +686,13 @@ public class NextEventQueue {
     /**
      * Use create() instead, this is public only for testing.
      */
-    public NextEventQueue(RandomGenerator random, int[][] particles, double tolerance) {
+    public NextEventQueue(RandomGenerator random,
+                          StepGenerator stepper,
+                          int[][] particles,
+                          double tolerance) {
         this.random = random != null ? random : new MersenneTwister();
+        this.stepper = stepper != null ? stepper :
+            new InterpolatingStepGenerator(BINOMIAL, this.random);
         this.particles = particles;
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
@@ -681,12 +777,13 @@ public class NextEventQueue {
 
     public static NextEventQueue create(int[][] particles,
                                         RandomGenerator random,
+                                        StepGenerator stepper,
                                         VolumeGrid grid,
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
                                         int[][] stimtargets,
                                         double tolerance) {
-        NextEventQueue obj = new NextEventQueue(random, particles, tolerance);
+        NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));
@@ -727,10 +824,10 @@ public class NextEventQueue {
         if (now > tstop)
             return tstop;
 
-        ev.execute(reactionEvents[ev.element()],
-                   diffusionEvents[ev.element()],
-                   stimulationEvents[ev.element()]);
-        ev.update(now);
+        ev.update(reactionEvents,
+                  diffusionEvents,
+                  stimulationEvents,
+                  now);
         return now;
     }
 }
