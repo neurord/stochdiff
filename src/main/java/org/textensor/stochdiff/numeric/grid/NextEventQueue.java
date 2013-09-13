@@ -127,15 +127,16 @@ public class NextEventQueue {
         final String signature;
         final private int[] reactants;
 
-        private boolean already_executed;
-
         protected double time;
+        protected int extent;
+
         double propensity;
 
         NextEvent(int element, String signature, int... reactants) {
             this.element = element;
             this.signature = signature;
             this.reactants = reactants;
+            this.extent = 1;
         }
 
         @Override
@@ -211,11 +212,15 @@ public class NextEventQueue {
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
                     double current) {
-            if (!this.already_executed)
+
+            assert this.extent >= 0: this.extent;
+
+            final boolean changed = this.extent > 0;
+            if (changed)
                 this.execute(reactionEvents[this.element()],
                              diffusionEvents[this.element()],
                              stimulationEvents[this.element()],
-                             1);
+                             this.extent);
 
             // In reactions of the type Da→Da+MaI the propensity does not change
             // after execution, but there's nothing to warn about.
@@ -237,22 +242,17 @@ public class NextEventQueue {
 
                 log.debug("leaping {} extent {} until time={}", leap, count, current + leap);
                 this.time = current + leap;
-
-                this.execute(reactionEvents[this.element()],
-                             diffusionEvents[this.element()],
-                             stimulationEvents[this.element()],
-                             count);
-                this.already_executed = true;
+                this.extent = count;
             } else {
                 log.debug("waiting {} until time={}", normal - current, normal);
                 this.time = normal;
-                this.already_executed = false;
+                this.extent = 1;
             }
 
             queue.reposition(this);
 
             for (NextEvent dep: this.dependent) {
-                double old = dep._update_propensity(true);
+                double old = dep._update_propensity(changed);
                 if (update_times && !Double.isInfinite(dep.time))
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
