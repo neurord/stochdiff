@@ -100,21 +100,22 @@ public class NextEventQueue {
             return this.nodes[0];
         }
 
-        void reposition(T node) {
+        void reposition(String prefix, T node) {
             assert node != null;
             T parent = this.parent(node);
-            log.debug("updating position of {} t={} parent={}", node, node.time(), parent);
+            log.debug("{}: updating position of {} t={} parent={}",
+                      prefix, node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
                 this.swap(parent, node); // original parent first
-                this.reposition(node);
+                this.reposition(prefix, node);
             } else {
                 T littlest = this.littlestChild(node);
                 log.debug("littlest Child is {} t={}", littlest,
                           littlest != null ? littlest.time() : "-");
                 if (littlest != null && node.time() > littlest.time()) {
                     this.swap(node, littlest); // original parent first
-                    this.reposition(node);
+                    this.reposition(prefix + "-", node);
                 }
             }
         }
@@ -181,7 +182,7 @@ public class NextEventQueue {
 
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
-            log.debug("Generating exponential time for prop={} → time={}", this.propensity, exp);
+            log.debug("generating exponential time for prop={} → time={}", this.propensity, exp);
             return current + exp;
         }
 
@@ -230,9 +231,10 @@ public class NextEventQueue {
             final double leap = leap_min_jump == 0 ? Double.NaN
                 : this.leap_time(current, tolerance);
 
-            log.debug("{} dependent: {}", this, this.dependent);
-            log.debug("{}: time change {} → {} wait {}, can leap {}",
-                      this, current, normal,
+            log.debug("Updating {}", this);
+            log.debug("deps: {}", this.dependent);
+            log.debug("options: {} → {} wait {}, leap {}",
+                      current, normal,
                       normal - current, leap);
 
             if (leap_min_jump != 0 && leap > (normal - current) * leap_min_jump) {
@@ -249,7 +251,7 @@ public class NextEventQueue {
                 this.extent = 1;
             }
 
-            queue.reposition(this);
+            queue.reposition("update", this);
 
             for (NextEvent dep: this.dependent) {
                 double old = dep._update_propensity(changed);
@@ -257,7 +259,7 @@ public class NextEventQueue {
                     dep.time = (dep.time - current) * old / dep.propensity + current;
                 else
                     dep.time = dep._new_time(current);
-                queue.reposition(dep);
+                queue.reposition("upd.dep", dep);
             }
         }
 
@@ -713,7 +715,7 @@ public class NextEventQueue {
         if (leap_min_jump == 0)
             log.info("Leaping disabled");
         else
-            log.info("Using {} as leap tolerance, jumping when {} times faster",
+            log.info("Using {} as leap tolerance, jumping when {} times longer",
                      tolerance, leap_min_jump);
     }
 
