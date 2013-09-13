@@ -278,6 +278,9 @@ public class NextEventQueue {
         public abstract void addRelations(Collection<? extends NextEvent> coll);
 
         protected void addDependent(NextEvent ev) {
+            if (this.dependent.contains(ev))
+                return;
+
             this.dependent.add(ev);
             ev.dependon.add(this);
         }
