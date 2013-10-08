@@ -197,6 +197,8 @@ public class NextEventQueue {
             log.log(warn && this.propensity != 0 && this.propensity == old ? Level.WARN : Level.DEBUG,
                     "{}: propensity changed {} → {} (n={} → {}), extent={}",
                     this, old, this.propensity, old_pop, pop, this.extent);
+            if (warn && this.propensity != 0 && this.propensity == old)
+                throw new RuntimeException();
             this.old_pop = pop;
             return old;
         }
@@ -345,8 +347,10 @@ public class NextEventQueue {
         public double leap_time(double current, double tolerance) {
             double
                 t1 = tolerance * particles[this.element()][this.sp] / this.propensity,
-                t2 = tolerance * particles[this.element2][this.sp] / this.propensity;
-            return Math.min(t1, t2);
+                t2 = tolerance * particles[this.element2][this.sp] / this.propensity,
+                ans = Math.min(t1, t2);
+            log.debug("leap time: min({},{}) → {}", t1, t2, ans);
+            return ans;
             // update here please
         }
 
@@ -471,12 +475,15 @@ public class NextEventQueue {
                                 this.propensity / this.reactant_stochiometry[i]);
             for (int i = 0; i < this.products.length; i++)
                 time = Math.min(time,
-                                - tolerance * X[this.products[i]] /
+                                tolerance * X[this.products[i]] /
                                 this.propensity / this.product_stochiometry[i]);
 
             log.debug("leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
                       this.substrates, this.substrate_stochiometry,
                       tolerance, X, time);
+
+            /* Make sure time is NaN or >= 0. */
+            assert !(time < 0): time;
 
             return time;
         }
