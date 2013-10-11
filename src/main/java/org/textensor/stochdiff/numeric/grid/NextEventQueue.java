@@ -103,7 +103,7 @@ public class NextEventQueue {
         void reposition(String prefix, T node) {
             assert node != null;
             T parent = this.parent(node);
-            log.debug("{}: updating position of {} t={} parent={}",
+            log.debug("{}: moving {} t={} parent={}",
                       prefix, node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
@@ -611,8 +611,8 @@ public class NextEventQueue {
             final double tc, tp;
 
             if (Double.isNaN(this.stim.period)) {
-                tc = Math.max(current, this.stim.onset);
-                tp = this.stim.onset;
+                tc = Math.max(current, this.stim.onset);   /* current continous time */
+                tp = this.stim.onset;                      /* beggining of current period */
             } else {
                 double nc = (current - this.stim.onset) / this.stim.period;
                 if (nc < 0)
@@ -621,7 +621,7 @@ public class NextEventQueue {
                 tp = nc % 1 * this.stim.period;
                 assert current > this.stim.onset || tp == 0;
 
-                // current time converted to constant time:
+                /* current time converted to continous time */
                 tc = tp < this.stim.duration ?
                     Math.floor(nc) * this.stim.duration + tp :
                     Math.ceil(nc) * this.stim.duration;
@@ -629,7 +629,7 @@ public class NextEventQueue {
 
             double t1;
             if (insideWindow)
-                t1 = Math.max(tc + delta, tp + this.stim.duration);
+                t1 = Math.min(tc + delta, tp + this.stim.duration);
             else
                 t1 = tc + delta;
 
@@ -638,7 +638,8 @@ public class NextEventQueue {
                 t1 = this.stim.onset + n * this.stim.period + t1 % this.stim.duration;
             }
 
-            return t1 < this.stim.end ? t1 : Double.POSITIVE_INFINITY;
+            return (t1 < this.stim.end ? t1 :
+                    insideWindow ? this.stim.end : Double.POSITIVE_INFINITY);
         }
 
         @Override
@@ -666,7 +667,10 @@ public class NextEventQueue {
                       tolerance, particles[this.element()][this.sp], this.propensity,
                       cont_leap_time, until);
 
-            assert until >= current: until;
+            /* When we are after the end of the stimulation period,
+             * there might be no "next" time. */
+            if (until <= current)
+                return 0;
             assert until < current + this.stim.duration;
             return until - current;
         }

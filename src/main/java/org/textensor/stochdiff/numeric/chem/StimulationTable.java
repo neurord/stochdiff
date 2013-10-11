@@ -34,7 +34,7 @@ public class StimulationTable {
 
     public void addSquarePulse(String site, double[] rate, double onset, double duration) {
         this.addPeriodicSquarePulse(site, rate, onset, duration,
-                                    Double.NaN, Double.POSITIVE_INFINITY);
+                                    Double.NaN, onset + duration);
     }
 
     public void addPeriodicSquarePulse(String site, double[] rate, double onset,
