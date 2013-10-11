@@ -42,6 +42,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
             time = next;
         }
 
+        ninjected += ArrayUtil.sum(this.diffusionEvents);
+
         return dt;
     }
 

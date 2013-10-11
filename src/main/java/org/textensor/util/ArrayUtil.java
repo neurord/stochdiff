@@ -287,4 +287,25 @@ public class ArrayUtil {
             target[pos++] = i;
         return target;
     }
+
+    public static int sum(int[] a) {
+        int s = 0;
+        for (int x: a)
+            s += x;
+        return s;
+    }
+
+    public static int sum(int[][] a) {
+        int s = 0;
+        for (int[] x: a)
+            s += sum(x);
+        return s;
+    }
+
+    public static int sum(int[][][] a) {
+        int s = 0;
+        for (int[][] x: a)
+            s += sum(x);
+        return s;
+    }
 }
