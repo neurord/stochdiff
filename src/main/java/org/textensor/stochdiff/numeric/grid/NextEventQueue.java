@@ -343,26 +343,32 @@ public class NextEventQueue {
             return this.fdiff * particles[this.element()][this.sp];
         }
 
+        /**
+         * Calulate leap_time based on the limit on variance
+         * and expected extents.
+         * t &lt; tolerance / fdiff * min(X1, X2) / |X2-X1|
+         * t &lt; tolerance / fdiff * min(X1, X2) / (X2+X1)
+         */
         @Override
         public double leap_time(double current, double tolerance) {
-            double
-                t1 = tolerance * particles[this.element()][this.sp] / this.propensity,
-                t2 = tolerance * particles[this.element2][this.sp] / this.propensity,
-                ans = Math.min(t1, t2);
-            log.debug("leap time: min({},{}) → {}", t1, t2, ans);
-            return ans;
-            // update here please
+            int
+                X1 = particles[this.element()][this.sp],
+                X2 = particles[this.element2][this.sp],
+                Xm = Math.min(X1, X2);
+
+             double
+                 t1 = tolerance * Xm / this.fdiff / Math.abs(X1 - X2),
+                 t2 = tolerance * Xm / this.fdiff / (X1 + X2),
+                 ans = Math.min(t1, t2);
+
+             log.debug("leap time: min(E→{}, V→{}) → {}", t1, t2, ans);
+             return ans;
         }
 
         @Override
         public int leap_count(double current, double time) {
-            // Diffusion is a first order reaction, governed by the
-            // sum of binomial distributions.
-
-            // FIXME: replace two diffusion events by just one and
-            //        implement skellam or sum of binomials directly.
-            // https://github.com/scipy/scipy/blob/master/scipy/stats/distributions.py#L7861
-
+            /* Diffusion is a first order reaction, governed by the
+             * sum of binomial distributions. */
             int n = particles[this.element()][this.sp];
             return stepper.versatile_ngo("neq diffusion", n, this.propensity * time / n);
         }
