@@ -98,13 +98,25 @@ public abstract class StepGenerator {
     private static int poissonStep(double np, double grv, double urv) {
         double rngo = np + grv * Math.sqrt(np); //WK: removed Math.round per RC's email on 5-17-2007
         int ngo = (int)rngo;
-        return ngo + (rngo - ngo > urv ? 1 : 0);
+        ngo += (rngo - ngo > urv ? 1 : 0);
+        if (ngo >= 0)
+            return ngo;
+
+        log.warn("poisson step is negative: np={}", np);
+        return 0;
     }
 
     public int poissonStep(double np) {
         return poissonStep(np, this.random.gaussian(), this.random.random());
     }
 
+    /**
+     * Return a random variate from one of the distributions
+     * appropriate for first-order reactions (binomial, gaussian,
+     * poisson, or something in between, based on how large n is,
+     * and also distribution_t mode specified when this object
+     * was created.
+     */
     public int versatile_ngo(String descr, int n, double p) {
         final int ngo;
 
