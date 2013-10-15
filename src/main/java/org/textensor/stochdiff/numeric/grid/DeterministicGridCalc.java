@@ -258,4 +258,8 @@ public class DeterministicGridCalc extends GridCalc {
         double val = getGridPartConc(i, j);
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
+
+    public IGridCalc.Event[] getEvents() {
+        return null;
+    }
 }

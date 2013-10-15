@@ -20,11 +20,34 @@ public interface IGridCalc {
     int getNumberElements();
 
     int[][] getReactionEvents();
+
     int[][][] getDiffusionEvents();
 
     StimulationTable getStimulationTable();
     int[][] getStimulationTargets();
     int[][] getStimulationEvents();
+
+    public enum EventType {
+        REACTION,
+        DIFFUSION,
+        STIMULATION,
+    }
+
+    public enum EventKind {
+        EXACT,
+        LEAP,
+    }
+
+    public interface Event {
+        int index();
+        EventType type();
+        EventKind kind();
+        int extent();
+        double time();
+        double waited();
+    }
+
+    Event[] getEvents();
 
     ReactionTable getReactionTable();
 }

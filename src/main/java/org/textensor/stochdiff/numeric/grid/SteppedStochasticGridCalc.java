@@ -487,4 +487,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
         return new Object[]{lnp, n};
     }
+
+    public IGridCalc.Event[] getEvents() {
+        return null;
+    }
 }

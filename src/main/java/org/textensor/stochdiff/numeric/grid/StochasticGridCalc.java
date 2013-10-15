@@ -4,12 +4,15 @@ import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.Settings;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class StochasticGridCalc extends GridCalc {
     static final Logger log = LogManager.getLogger(StochasticGridCalc.class);
+
+    final static boolean log_events = Settings.getProperty("stochdiff.neq.log_events", false);
 
     RandomGenerator random;
 

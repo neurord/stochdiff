@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.List;
 
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
@@ -15,7 +16,6 @@ import static org.textensor.stochdiff.numeric.chem.ReactionTable.getReactionSign
 import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
-import org.textensor.stochdiff.numeric.grid.GridCalc;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import static org.textensor.stochdiff.numeric.grid.GridCalc.intlog;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Level;
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
 
-    final boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
+    final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
 
     public interface Node {
         int index();
@@ -124,7 +124,6 @@ public class NextEventQueue {
     int leaps = 0;
     int leap_extent = 0;
     int normal_waits = 0;
-    int infinite_waits = 0;
 
     public abstract class NextEvent implements Node {
         int index;
@@ -133,16 +132,23 @@ public class NextEventQueue {
         final String signature;
         final private int[] reactants;
 
+        protected double wait_start;
         protected double time;
         protected int extent;
+        protected boolean leap;
 
         double propensity;
+
+        public abstract IGridCalc.EventType event_type();
+        Happening happening;
 
         NextEvent(int element, String signature, int... reactants) {
             this.element = element;
             this.signature = signature;
             this.reactants = reactants;
             this.extent = 1;
+            this.leap = false;
+            this.wait_start = 0;
         }
 
         @Override
@@ -224,11 +230,22 @@ public class NextEventQueue {
             assert this.extent >= 0: this.extent;
 
             final boolean changed = this.extent > 0;
-            if (changed)
+            if (changed) {
+                /* As an ugly optimization, this is only created when it will be used */
+                if (StochasticGridCalc.log_events)
+                    this.happening = new Happening(this.index(), this.event_type(),
+                                                   this.leap ? IGridCalc.EventKind.LEAP : IGridCalc.EventKind.EXACT,
+                                                   this.extent, current, current - this.wait_start);
                 this.execute(reactionEvents[this.element()],
                              diffusionEvents[this.element()],
                              stimulationEvents[this.element()],
                              this.extent);
+                if (this.leap) {
+                    leaps += 1;
+                    leap_extent += this.extent;
+                } else
+                    normal_waits += 1;
+            }
 
             log.debug("Updating {}", this);
 
@@ -251,18 +268,12 @@ public class NextEventQueue {
                 log.debug("leaping {} {}→{}, extent {}", leap, current, current + leap, count);
                 this.time = current + leap;
                 this.extent = count;
-                leaps += 1;
-                leap_extent += count;
             } else {
                 log.debug("waiting {} {}→{}", normal - current, current, normal);
                 this.time = normal;
                 this.extent = 1;
-
-                if (this.propensity == 0)
-                    infinite_waits += 1;
-                else
-                    normal_waits += 1;
             }
+            this.wait_start = current;
 
             queue.reposition("update", this);
 
@@ -296,6 +307,13 @@ public class NextEventQueue {
 
             this.dependent.add(ev);
             ev.dependon.add(this);
+        }
+
+        public IGridCalc.Event getEvent() {
+            IGridCalc.Event event = this.happening;
+            assert event != null;
+            this.happening = null;
+            return event;
         }
     }
 
@@ -335,6 +353,11 @@ public class NextEventQueue {
             this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
 
             log.debug("Created {}: t={}", this, this.time);
+        }
+
+        @Override
+        public IGridCalc.EventType event_type() {
+            return IGridCalc.EventType.DIFFUSION;
         }
 
         @Override
@@ -483,6 +506,11 @@ public class NextEventQueue {
         }
 
         @Override
+        public IGridCalc.EventType event_type() {
+            return IGridCalc.EventType.REACTION;
+        }
+
+        @Override
         public double leap_time(double current, double tolerance) {
             int[] X = particles[this.element()];
             double time = Double.POSITIVE_INFINITY;
@@ -607,6 +635,11 @@ public class NextEventQueue {
             this.time = this._new_time(0);
 
             log.info("Created {}: t={} [{}]", this, this.time, this.stim);
+        }
+
+        @Override
+        public IGridCalc.EventType event_type() {
+            return IGridCalc.EventType.STIMULATION;
         }
 
         void execute(int[] reactionEvents,
@@ -875,7 +908,8 @@ public class NextEventQueue {
     public double advance(double time, double tstop,
                           int[][] reactionEvents,
                           int[][][] diffusionEvents,
-                          int[][] stimulationEvents) {
+                          int[][] stimulationEvents,
+                          List<IGridCalc.Event> events) {
         NextEvent ev = this.queue.first();
         assert ev != null;
         double now = ev.time;
@@ -889,6 +923,62 @@ public class NextEventQueue {
                   diffusionEvents,
                   stimulationEvents,
                   now);
+
+        if (events != null)
+            events.add(ev.getEvent());
+
         return now;
+    }
+
+    public class Happening implements IGridCalc.Event {
+        int index;
+        IGridCalc.EventType type;
+        IGridCalc.EventKind kind;
+        int extent;
+        double time, waited;
+
+        public Happening(int index,
+                         IGridCalc.EventType type,
+                         IGridCalc.EventKind kind,
+                         int extent,
+                         double time,
+                         double waited) {
+            this.index = index;
+            this.type = type;
+            this.kind = kind;
+            this.extent = extent;
+            this.time = time;
+            this.waited = waited;
+        }
+
+        @Override
+        public int index() {
+            return this.index;
+        }
+
+        @Override
+        public IGridCalc.EventType type() {
+            return this.type;
+        }
+
+        @Override
+        public IGridCalc.EventKind kind() {
+            return this.kind;
+        }
+
+        @Override
+        public int extent() {
+            return this.extent;
+        }
+
+        @Override
+        public double time() {
+            return this.time;
+        }
+
+        @Override
+        public double waited() {
+            return this.waited;
+        }
     }
 }
