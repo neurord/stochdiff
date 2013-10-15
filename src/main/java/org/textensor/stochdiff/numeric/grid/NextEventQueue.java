@@ -121,6 +121,11 @@ public class NextEventQueue {
         }
     }
 
+    int leaps = 0;
+    int leap_extent = 0;
+    int normal_waits = 0;
+    int infinite_waits = 0;
+
     public abstract class NextEvent implements Node {
         int index;
 
@@ -246,10 +251,17 @@ public class NextEventQueue {
                 log.debug("leaping {} {}→{}, extent {}", leap, current, current + leap, count);
                 this.time = current + leap;
                 this.extent = count;
+                leaps += 1;
+                leap_extent += count;
             } else {
                 log.debug("waiting {} {}→{}", normal - current, current, normal);
                 this.time = normal;
                 this.extent = 1;
+
+                if (this.propensity == 0)
+                    infinite_waits += 1;
+                else
+                    normal_waits += 1;
             }
 
             queue.reposition("update", this);

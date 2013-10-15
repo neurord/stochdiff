@@ -30,6 +30,9 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     public void footer() {
         super.footer();
         log.info("Queue suffered {} swaps", this.neq.queue.swaps);
+        log.info("Chose leaping {} ({} events), waiting {} times, for Godot {} times",
+                 this.neq.leaps, this.neq.leap_extent,
+                 this.neq.normal_waits, this.neq.infinite_waits);
     }
 
     public double advance(double tnow) {
