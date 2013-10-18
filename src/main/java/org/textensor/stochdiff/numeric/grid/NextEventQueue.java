@@ -103,7 +103,7 @@ public class NextEventQueue {
         void reposition(String prefix, T node) {
             assert node != null;
             T parent = this.parent(node);
-            log.debug("{}: moving {} t={} parent={}",
+            log.trace("{}: moving {} t={} parent={}",
                       prefix, node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
@@ -111,7 +111,7 @@ public class NextEventQueue {
                 this.reposition(prefix, node);
             } else {
                 T littlest = this.littlestChild(node);
-                log.debug("littlest child is {} t={}", littlest,
+                log.trace("littlest child is {} t={}", littlest,
                           littlest != null ? littlest.time() : "-");
                 if (littlest != null && node.time() > littlest.time()) {
                     this.swap(node, littlest); // original parent first
@@ -134,8 +134,8 @@ public class NextEventQueue {
 
         private double wait_start;
         protected double time;
-        private int extent;
-        private boolean leap;
+        protected int extent;
+        protected boolean leap;
 
         double propensity;
 
@@ -197,7 +197,7 @@ public class NextEventQueue {
 
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
-            log.debug("generating exponential time for prop={} → time={}", this.propensity, exp);
+            log.trace("generating exponential time for prop={} → time={}", this.propensity, exp);
             return current + exp;
         }
 
@@ -209,7 +209,7 @@ public class NextEventQueue {
             double old = this.propensity;
             int[] pop = this.reactantPopulation();
             this.propensity = this._propensity();
-            log.log(warn && this.propensity != 0 && this.propensity == old ? Level.WARN : Level.DEBUG,
+            log.log(warn && this.propensity != 0 && this.propensity == old ? Level.WARN : Level.TRACE,
                     "{}: propensity changed {} → {} (n={} → {}), extent={}",
                     this, old, this.propensity, old_pop, pop, this.extent);
             if (warn && this.propensity != 0 && this.propensity == old)
@@ -254,7 +254,7 @@ public class NextEventQueue {
                     normal_waits += 1;
             }
 
-            log.debug("Updating {}", this);
+            log.trace("Updating {}", this);
 
             // In reactions of the type Da→Da+MaI the propensity does not change
             // after execution, but there's nothing to warn about.
@@ -264,18 +264,20 @@ public class NextEventQueue {
             final double leap = leap_min_jump == 0 ? Double.NaN
                 : this.leap_time(current, tolerance);
 
-            log.debug("deps: {}", this.dependent);
-            log.debug("options: wait {}, leap {}", normal - current, leap);
+            log.trace("deps: {}", this.dependent);
+            log.trace("options: wait {}, leap {}", normal - current, leap);
 
             if (leap_min_jump != 0 && leap > (normal - current) * leap_min_jump) {
                 assert update_times;
 
                 int count = this.leap_count(current, leap);
 
-                log.debug("leaping {} {}→{}, extent {}", leap, current, current + leap, count);
+                log.debug("{}: leaping {} {}→{}, extent {}",
+                          this, leap, current, current + leap, count);
                 this.setEvent(count, true, current, current + leap);
             } else {
-                log.debug("waiting {} {}→{}", normal - current, current, normal);
+                log.debug("{}: waiting {} {}→{}",
+                          this, normal - current, current, normal);
                 this.setEvent(1, false, current, normal);
             }
 
@@ -350,7 +352,7 @@ public class NextEventQueue {
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
-            log.debug("Created {}: t={}", this, this.time);
+            log.trace("Created {}: t={}", this, this.time);
         }
 
         @Override
@@ -394,7 +396,7 @@ public class NextEventQueue {
                  t2 = tolerance * Xm / this.fdiff / (X1 + X2),
                  ans = Math.min(t1, t2);
 
-             log.debug("leap time: min(E→{}, V→{}) → {}", t1, t2, ans);
+             log.debug("{}: leap time: min(E→{}, V→{}) → {}", this, t1, t2, ans);
              return ans;
         }
 
@@ -499,7 +501,7 @@ public class NextEventQueue {
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
-            log.debug("Created {} rate={} vol={} time={}", this,
+            log.trace("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
             assert this.time >= 0;
         }
@@ -523,7 +525,8 @@ public class NextEventQueue {
                                 tolerance * X[this.products[i]] /
                                 this.propensity / this.product_stochiometry[i]);
 
-            log.debug("leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
+            log.debug("{}: leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
+                      this,
                       this.substrates, this.substrate_stochiometry,
                       tolerance, X, time);
 
@@ -713,7 +716,8 @@ public class NextEventQueue {
             double cont_leap_time =
                 tolerance * particles[this.element()][this.sp] / this.propensity;
             double until = _continous_delta_to_real_time(current, cont_leap_time, true);
-            log.debug("leap time: {}×{}/{} → {} cont, {} real",
+            log.debug("{}: leap time: {}×{}/{} → {} cont, {} real",
+                      this,
                       tolerance, particles[this.element()][this.sp], this.propensity,
                       cont_leap_time, until);
 
@@ -891,7 +895,7 @@ public class NextEventQueue {
 
         for (NextEvent ev: e) {
             ev.addRelations(e);
-            log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+            log.trace("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
         }
 
         log_dependency_edges(e);
@@ -917,7 +921,8 @@ public class NextEventQueue {
             log.debug("Next event is {} time {}, past stop at {}", ev, time, tstop);
             return tstop;
         } else
-            log.debug("Advanced {}→{} with event {}", time, now, ev);
+            log.debug("Advanced {}→{} with event {} {} extent={}",
+                      time, now, ev, ev.leap ? "leap" : "", ev.extent);
 
         ev.update(reactionEvents,
                   diffusionEvents,
