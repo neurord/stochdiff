@@ -295,6 +295,13 @@ public class ArrayUtil {
         return s;
     }
 
+    public static long product(long[] a) {
+        long s = 1;
+        for (long x: a)
+            s *= x;
+        return s;
+    }
+
     public static int sum(int[][] a) {
         int s = 0;
         for (int[] x: a)

@@ -6,6 +6,7 @@
 package org.textensor.stochdiff.numeric.grid;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
@@ -259,7 +260,7 @@ public class DeterministicGridCalc extends GridCalc {
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 
-    public IGridCalc.Event[] getEvents() {
+    public Collection<IGridCalc.Event> getEvents() {
         return null;
     }
 }

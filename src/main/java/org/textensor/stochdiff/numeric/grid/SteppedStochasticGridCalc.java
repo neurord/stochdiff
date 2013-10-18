@@ -24,6 +24,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.io.File;
 import java.util.StringTokenizer;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
@@ -488,7 +489,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         return new Object[]{lnp, n};
     }
 
-    public IGridCalc.Event[] getEvents() {
+    public Collection<IGridCalc.Event> getEvents() {
         return null;
     }
 }

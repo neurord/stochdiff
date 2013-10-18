@@ -132,10 +132,10 @@ public class NextEventQueue {
         final String signature;
         final private int[] reactants;
 
-        protected double wait_start;
+        private double wait_start;
         protected double time;
-        protected int extent;
-        protected boolean leap;
+        private int extent;
+        private boolean leap;
 
         double propensity;
 
@@ -146,9 +146,13 @@ public class NextEventQueue {
             this.element = element;
             this.signature = signature;
             this.reactants = reactants;
-            this.extent = 1;
-            this.leap = false;
-            this.wait_start = 0;
+        }
+
+        protected void setEvent(int extent, boolean leap, double wait_start, double time) {
+            this.extent = extent;
+            this.leap = leap;
+            this.wait_start = wait_start;
+            this.time = time;
         }
 
         @Override
@@ -225,17 +229,20 @@ public class NextEventQueue {
         void update(int[][] reactionEvents,
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
-                    double current) {
+                    double current,
+                    List<IGridCalc.Event> events) {
 
             assert this.extent >= 0: this.extent;
 
             final boolean changed = this.extent > 0;
+
+            /* As an ugly optimization, this is only created when it will be used. */
+            if (events != null)
+                events.add(new Happening(this.index(), this.event_type(),
+                                         this.leap ? IGridCalc.EventKind.LEAP : IGridCalc.EventKind.EXACT,
+                                         this.extent, current, current - this.wait_start));
+
             if (changed) {
-                /* As an ugly optimization, this is only created when it will be used */
-                if (StochasticGridCalc.log_events)
-                    this.happening = new Happening(this.index(), this.event_type(),
-                                                   this.leap ? IGridCalc.EventKind.LEAP : IGridCalc.EventKind.EXACT,
-                                                   this.extent, current, current - this.wait_start);
                 this.execute(reactionEvents[this.element()],
                              diffusionEvents[this.element()],
                              stimulationEvents[this.element()],
@@ -266,14 +273,11 @@ public class NextEventQueue {
                 int count = this.leap_count(current, leap);
 
                 log.debug("leaping {} {}→{}, extent {}", leap, current, current + leap, count);
-                this.time = current + leap;
-                this.extent = count;
+                this.setEvent(count, true, current, current + leap);
             } else {
                 log.debug("waiting {} {}→{}", normal - current, current, normal);
-                this.time = normal;
-                this.extent = 1;
+                this.setEvent(1, false, current, normal);
             }
-            this.wait_start = current;
 
             queue.reposition("update", this);
 
@@ -307,13 +311,6 @@ public class NextEventQueue {
 
             this.dependent.add(ev);
             ev.dependon.add(this);
-        }
-
-        public IGridCalc.Event getEvent() {
-            IGridCalc.Event event = this.happening;
-            assert event != null;
-            this.happening = null;
-            return event;
         }
     }
 
@@ -350,7 +347,8 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this.propensity = this._propensity();
-            this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
+            this.setEvent(1, false, 0.0,
+                          this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {}: t={}", this, this.time);
         }
@@ -492,13 +490,14 @@ public class NextEventQueue {
             this.rate = rate;
             this.volume = volume;
 
-            this.propensity = this._propensity();
-            this.time = this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY;
-
             int[][] tmp = stochiometry(reactants, reactant_stochiometry,
                                        products, product_stochiometry);
             this.substrates = tmp[0];
             this.substrate_stochiometry = tmp[1];
+
+            this.propensity = this._propensity();
+            this.setEvent(1, false, 0.0,
+                          this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
@@ -632,7 +631,7 @@ public class NextEventQueue {
             this.stim = stim;
 
             this.propensity = this._propensity();
-            this.time = this._new_time(0);
+            this.setEvent(1, false, 0.0, this._new_time(0));
 
             log.info("Created {}: t={} [{}]", this, this.time, this.stim);
         }
@@ -914,18 +913,17 @@ public class NextEventQueue {
         assert ev != null;
         double now = ev.time;
 
-        log.debug("Advanced {}→{},{} with event {}", time, now, tstop, ev);
-
-        if (now > tstop)
+        if (now > tstop) {
+            log.debug("Next event is {} time {}, past stop at {}", ev, time, tstop);
             return tstop;
+        } else
+            log.debug("Advanced {}→{} with event {}", time, now, ev);
 
         ev.update(reactionEvents,
                   diffusionEvents,
                   stimulationEvents,
-                  now);
-
-        if (events != null)
-            events.add(ev.getEvent());
+                  now,
+                  events);
 
         return now;
     }

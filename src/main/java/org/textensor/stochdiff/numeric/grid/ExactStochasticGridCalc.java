@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.inst;
 
 import java.util.ArrayList;
 
@@ -15,7 +16,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     static final Logger log = LogManager.getLogger(ExactStochasticGridCalc.class);
 
     NextEventQueue neq;
-    final ArrayList<IGridCalc.Event> events
+    ArrayList<IGridCalc.Event> events
         = log_events ? new ArrayList<IGridCalc.Event>() : null;
 
     public ExactStochasticGridCalc(SDRun sdm) {
@@ -77,9 +78,9 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         return ans;
     }
 
-    public IGridCalc.Event[] getEvents() {
-        IGridCalc.Event[] recent = this.events.toArray(new IGridCalc.Event[0]);
-        this.events.clear();
+    public Collection<IGridCalc.Event> getEvents() {
+        Collection<IGridCalc.Event> recent = this.events;
+        this.events = inst.newArrayList();
         return recent;
     }
 }

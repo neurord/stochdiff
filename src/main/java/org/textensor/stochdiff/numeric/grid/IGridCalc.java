@@ -1,5 +1,7 @@
 package org.textensor.stochdiff.numeric.grid;
 
+import java.util.Collection;
+
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
@@ -47,7 +49,7 @@ public interface IGridCalc {
         double waited();
     }
 
-    Event[] getEvents();
+    Collection<Event> getEvents();
 
     ReactionTable getReactionTable();
 }

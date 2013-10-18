@@ -1,8 +1,10 @@
 package org.textensor.stochdiff.numeric.grid;
 
 import java.io.File;
+import java.util.List;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.Collection;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
@@ -23,6 +25,7 @@ import org.textensor.util.FileUtil;
 import org.textensor.util.ArrayUtil;
 import static org.textensor.util.ArrayUtil.xJoined;
 import org.textensor.util.LibUtil;
+import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -41,12 +44,17 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected H5File output;
     protected Group model;
     protected Group sim;
-    protected H5ScalarDS concs = null;
-    protected H5ScalarDS times = null;
-    protected H5ScalarDS species = null;
-    protected H5ScalarDS stimulation_events = null;
-    protected H5ScalarDS diffusion_events = null;
-    protected H5ScalarDS reaction_events = null;
+    protected H5ScalarDS concs;
+    protected H5ScalarDS times;
+    protected H5ScalarDS species;
+    protected H5ScalarDS stimulation_events;
+    protected H5ScalarDS diffusion_events;
+    protected H5ScalarDS reaction_events;
+    protected Group events;
+    protected List<IGridCalc.Event> events_cache;
+    protected H5ScalarDS
+        events_event, events_type, events_kind,
+        events_extent, events_time, events_waited;
     protected Dataset saved_state = null;
 
     public static final H5Datatype double_t =
@@ -381,6 +389,61 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
+    protected H5ScalarDS createExtensibleArray(String name, Group parent, Datatype type,
+                                               String TITLE, String LAYOUT, String UNITS,
+                                               long... dims)
+        throws Exception
+    {
+        long[] size = dims.clone();
+        size[0] = H5F_UNLIMITED;
+        long[] chunks = dims.clone();
+        chunks[0] = 1024;
+
+        H5ScalarDS ds = (H5ScalarDS)
+            this.output.createScalarDS(name, parent, type,
+                                       dims, size, chunks,
+                                       6, null);
+        ds.init();
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), xJoined(size), xJoined(chunks));
+
+        setAttribute(ds, "TITLE", TITLE);
+        setAttribute(ds, "LAYOUT", LAYOUT);
+        setAttribute(ds, "UNITS", UNITS);
+
+        return ds;
+    }
+
+    protected void extendExtensibleArray(H5ScalarDS ds, long howmuch)
+        throws Exception
+    {
+        final long[] start = ds.getStartDims();
+        final long[] dims = ds.getDims();
+        final long[] selected = ds.getSelectedDims();
+        start[0] = dims[0];
+        dims[0] = dims[0] + howmuch;
+        ds.extend(dims);
+
+        selected[0] = howmuch;
+        System.arraycopy(dims, 1, selected, 1, dims.length - 1);
+
+        Object data = ds.getData();
+        int length = 0;
+        if (data instanceof int[])
+            length = ((int[])data).length;
+        else if (data instanceof double[])
+            length = ((double[])data).length;
+        else
+            assert false;
+        if (length != ArrayUtil.product(selected)) {
+            log.error("howmuch={} start={} dims={} selected={}" +
+                      " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}",
+                      howmuch, start, dims, selected,
+                      ds.getSelectedDims(), ds.getStride(), ds.getDims(), ds.getStartDims(),
+                      ds.getMaxDims(), ds.getChunkSize(),
+                      length, ArrayUtil.product(selected));
+        }
+    }
 
     protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
         throws Exception
@@ -396,40 +459,17 @@ public class ResultWriterHDF5 implements ResultWriter {
             return false;
 
         /* times × nel × nspecout, but we write only for only time 'time' at one time */
-        {
-            long[] dims = {1, nel, nspecout};
-            long[] size = {H5F_UNLIMITED, nel, nspecout};
-            long[] chunks = {32, nel, nspecout};
+        this.concs = createExtensibleArray("concentrations", this.sim, double_t,
+                                           "concentrations of species in voxels over time",
+                                           "[snapshot × nel × nspecout]",
+                                           "count",
+                                           0, nel, nspecout);
 
-            this.concs = (H5ScalarDS)
-                this.output.createScalarDS("concentrations", this.sim,
-                                           double_t, dims, size, chunks,
-                                           9, null);
-            this.concs.init();
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "concentrations", xJoined(dims), xJoined(size), xJoined(chunks));
-            setAttribute(this.concs, "TITLE", "concentrations of species in voxels over time");
-            setAttribute(this.concs, "LAYOUT", "[snapshot × nel × nspecout]");
-            setAttribute(this.concs, "UNITS", "count");
-        }
-
-        {
-            long[] dims = {1};
-            long[] size = {H5F_UNLIMITED};
-            long[] chunks = {1024};
-            double[] times = {0.0};
-
-            this.times = (H5ScalarDS)
-                this.output.createScalarDS("times", this.sim,
-                                           double_t, dims, size, chunks,
-                                           9, times);
-            this.times.init();
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "times", xJoined(dims), xJoined(size), xJoined(chunks));
-            setAttribute(this.times, "TITLE", "times when snapshots were written");
-            setAttribute(this.times, "LAYOUT", "[times]");
-            setAttribute(this.times, "UNITS", "ms");
-        }
+        this.times = createExtensibleArray("times", this.sim, double_t,
+                                           "times when snapshots were written",
+                                           "[times]",
+                                           "ms",
+                                           0);
         return true;
     }
 
@@ -457,38 +497,19 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.debug("Writing concentrations at time {}", time);
 
         final long[] dims;
-        if (this.concs == null) {
+        if (this.concs == null)
             if (!this.initConcs(nel, ispecout, source))
                 return;
-            dims = this.concs.getDims();;
-        } else {
-            dims = this.concs.getDims();
-            dims[0] = dims[0] + 1;
-            this.concs.extend(dims);
-
-            long[] dims2 = this.times.getDims();
-            dims2[0] = dims2[0] + 1;
-            this.times.extend(dims);
-        }
 
         {
-            long[] selected = this.concs.getSelectedDims();
-            long[] start = this.concs.getStartDims();
-            selected[0] = 1;
-            selected[1] = dims[1];
-            selected[2] = dims[2];
-            start[0] = dims[0] - 1;
-
+            extendExtensibleArray(this.concs, 1);
             double[] data = (double[]) this.concs.getData();
             this.getGridNumbers(data, nel, ispecout, source);
             this.concs.write(data);
         }
 
         {
-            long[] selected = this.times.getSelectedDims();
-            long[] start = this.times.getStartDims();
-            selected[0] = 1;
-            start[0] = dims[0] - 1;
+            extendExtensibleArray(this.times, 1);
             double[] times = (double[]) this.times.getData();
             times[0] = time;
             this.times.write(times);
@@ -497,6 +518,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.writeStimulationEvents(time, source);
         this.writeDiffusionEvents(time, source);
         this.writeReactionEvents(time, source);
+        this.writeEvents(time, source);
     }
 
     protected void initStimulationEvents(int elements, int species)
@@ -505,24 +527,12 @@ public class ResultWriterHDF5 implements ResultWriter {
         assert this.stimulation_events == null;
 
         /* times × elements × species */
-        {
-            long[] dims = {1, elements, species};
-            long[] size = {H5F_UNLIMITED, elements, species};
-            long[] chunks = {32, elements, species};
-
-            H5ScalarDS ds =  (H5ScalarDS)
-                this.output.createScalarDS("stimulation_events", this.sim,
-                                           int_t, dims, size, chunks,
-                                           9, null);
-            ds.init();
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "stimulation_events",
-                     xJoined(dims), xJoined(size), xJoined(chunks));
-            setAttribute(ds, "TITLE", "actual stimulation counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times × elements × species]");
-            setAttribute(ds, "UNITS", "count");
-            this.stimulation_events = ds;
-        }
+        this.stimulation_events =
+            createExtensibleArray("stimulation_events", this.sim, int_t,
+                                  "actual stimulation counts since last snapshot",
+                                  "[times × elements × species]",
+                                  "count",
+                                  0, elements, species);
     }
 
     protected void writeStimulationEvents(double time, IGridCalc source)
@@ -532,26 +542,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        final long[] dims;
-        if (this.stimulation_events == null) {
+        if (this.stimulation_events == null)
             this.initStimulationEvents(events.length, events[0].length);
-            dims = this.stimulation_events.getDims();
-        } else {
-            dims = this.stimulation_events.getDims();
-            dims[0] = dims[0] + 1;
-            this.stimulation_events.extend(dims);
-        }
 
         log.debug("Writing stimulation events at time {}", time);
-
         {
-            long[] selected = this.stimulation_events.getSelectedDims();
-            long[] start = this.stimulation_events.getStartDims();
-            selected[0] = 1;
-            selected[1] = dims[1];
-            selected[2] = dims[2];
-            start[0] = dims[0] - 1;
-
+            extendExtensibleArray(this.stimulation_events, 1);
+            long[] dims = this.stimulation_events.getDims();
             int[] data = (int[]) this.stimulation_events.getData();
             ArrayUtil._flatten(data, events, dims[2], 0);
             this.stimulation_events.write(data);
@@ -575,24 +572,12 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         /* times × reactions */
-        {
-            long[] dims = {1, elements, species, neighbors};
-            long[] size = {H5F_UNLIMITED, elements, species, neighbors};
-            long[] chunks = {4, elements, species, neighbors};
-
-            H5ScalarDS ds = (H5ScalarDS)
-                this.output.createScalarDS("diffusion_events", this.sim,
-                                           int_t, dims, size, chunks,
-                                           9, null);
-            ds.init();
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "diffusion_events", xJoined(dims), xJoined(size), xJoined(chunks));
-            setAttribute(ds, "TITLE", "actual diffusion counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times × nel × species × neighbors]");
-            setAttribute(ds, "UNITS", "count");
-            this.diffusion_events = ds;
-        }
-
+        this.diffusion_events =
+            createExtensibleArray("diffusion_events", this.sim, int_t,
+                                  "actual diffusion counts since last snapshot",
+                                  "[times × nel × species × neighbors]",
+                                  "count",
+                                  0, elements, species, neighbors);
         return true;
     }
 
@@ -606,31 +591,19 @@ public class ResultWriterHDF5 implements ResultWriter {
             return;
         }
 
-        final long[] dims;
         if (this.diffusion_events == null) {
             int maxneighbors = ArrayUtil.maxLength(events);
             boolean have = this.initDiffusionEvents(events.length, events[0].length,
                                                     maxneighbors);
             if (!have)
                 return;
-            dims = this.diffusion_events.getDims();
-        } else {
-            dims = this.diffusion_events.getDims();
-            dims[0] = dims[0] + 1;
-            this.diffusion_events.extend(dims);
         }
 
         log.debug("Writing diffusion events at time {}", time);
 
         {
-            long[] selected = this.diffusion_events.getSelectedDims();
-            long[] start = this.diffusion_events.getStartDims();
-            selected[0] = 1;
-            selected[1] = dims[1];
-            selected[2] = dims[2];
-            selected[3] = dims[3];
-            start[0] = dims[0] - 1;
-
+            extendExtensibleArray(this.diffusion_events, 1);
+            long dims[] = this.diffusion_events.getDims();
             int[] data = (int[]) this.diffusion_events.getData();
             ArrayUtil._flatten(data, events, dims[3], 0);
             this.diffusion_events.write(data);
@@ -653,23 +626,12 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         /* times × reactions */
-        {
-            long[] dims = {1, elements, reactions};
-            long[] size = {H5F_UNLIMITED, elements, reactions};
-            long[] chunks = {32, elements, reactions};
-
-            H5ScalarDS ds =  (H5ScalarDS)
-                this.output.createScalarDS("reaction_events", this.sim,
-                                           int_t, dims, size, chunks,
-                                           9, null);
-            ds.init();
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "reaction_events", xJoined(dims), xJoined(size), xJoined(chunks));
-            setAttribute(ds, "TITLE", "actual reaction counts since last snapshot");
-            setAttribute(ds, "LAYOUT", "[times × elements × reactions]");
-            setAttribute(ds, "UNITS", "count");
-            this.reaction_events = ds;
-        }
+        this.reaction_events =
+            createExtensibleArray("reaction_events", this.sim, int_t,
+                                  "actual reaction counts since last snapshot",
+                                  "[times × elements × reactions]",
+                                  "count",
+                                  0, elements, reactions);
 
         return true;
     }
@@ -681,34 +643,144 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (events == null)
             return;
 
-        final long[] dims;
         if (this.reaction_events == null) {
             boolean have = this.initReactionEvents(events.length, events[0].length);
             if (!have)
                 return;
-            dims = this.reaction_events.getDims();
-        } else {
-            dims = this.reaction_events.getDims();
-            dims[0] = dims[0] + 1;
-            this.reaction_events.extend(dims);
         }
 
         log.debug("Writing reaction events at time {}", time);
-
         {
-            long[] selected = this.reaction_events.getSelectedDims();
-            long[] start = this.reaction_events.getStartDims();
-            selected[0] = 1;
-            selected[1] = dims[1];
-            selected[2] = dims[2];
-            start[0] = dims[0] - 1;
-
+            extendExtensibleArray(this.reaction_events, 1);
+            long[] dims = this.reaction_events.getDims();
             int[] data = (int[]) this.reaction_events.getData();
             ArrayUtil._flatten(data, events, dims[2], 0);
             this.reaction_events.write(data);
         }
     }
 
+    protected void initEvents()
+        throws Exception
+    {
+        assert this.events == null;
+
+        this.events = this.output.createGroup("events", this.sim);
+
+        this.events_event = createExtensibleArray("events", this.events, int_t,
+                                                  "index of the event that happened",
+                                                  "[event#]",
+                                                  "",
+                                                  0);
+
+        this.events_type = createExtensibleArray("types", this.events, int_t,
+                                                 "type of the event that happened",
+                                                 "[type]",
+                                                  "",
+                                                 0);
+
+        this.events_kind = createExtensibleArray("kinds", this.events, int_t,
+                                                 "mechanism of the event that happened",
+                                                 "[kind]",
+                                                  "",
+                                                 0);
+
+        this.events_extent = createExtensibleArray("extents", this.events, int_t,
+                                                   "the extent of the reaction or event",
+                                                   "[extent]",
+                                                   "count",
+                                                   0);
+        this.events_time = createExtensibleArray("times", this.events, double_t,
+                                                 "at what time the event happened",
+                                                 "[extent]",
+                                                 "ms",
+                                                 0);
+        this.events_waited = createExtensibleArray("waited", this.events, double_t,
+                                                   "time since the previous instance of this event",
+                                                   "[waited]",
+                                                   "ms",
+                                                   0);
+
+        long chunk_size = this.events_event.getChunkSize()[0];
+        this.events_cache = inst.newArrayList((int)chunk_size);
+    }
+
+    private boolean initEvents_warning = false;
+
+    protected void writeEvents(double time, IGridCalc source)
+        throws Exception
+    {
+        final Collection<IGridCalc.Event> events = source.getEvents();
+        if (events == null) {
+            if (!initEvents_warning) {
+                log.warn("No events, not writing anything");
+                initEvents_warning = true;
+            }
+            return;
+        }
+
+        if (this.events == null)
+            this.initEvents();
+
+        this.events_cache.addAll(events);
+
+        int n = this.events_cache.size();
+        n -= n % this.events_event.getChunkSize()[0];
+
+        log.debug("Got {} events at time {}, writing {}", events.size(), time, n);
+        if (n == 0)
+            return;
+
+        {
+            extendExtensibleArray(this.events_event, n);
+            int[] data = (int[]) this.events_event.getData();
+            for (int i = 0; i < n; i++)
+                data[i] = this.events_cache.get(i).hashCode();
+            this.events_event.write(data);
+        }
+
+        {
+            extendExtensibleArray(this.events_type, n);
+            int[] data = (int[]) this.events_type.getData();
+            for (int i = 0; i < n; i++) {
+                data[i] = this.events_cache.get(i).type().ordinal();
+            }
+            this.events_type.write(data);
+        }
+
+        {
+            extendExtensibleArray(this.events_kind, n);
+            int[] data = (int[]) this.events_kind.getData();
+            for (int i = 0; i < n; i++)
+                data[i] = this.events_cache.get(i).kind().ordinal();
+            this.events_kind.write(data);
+        }
+
+        {
+            extendExtensibleArray(this.events_extent, n);
+            int[] data = (int[]) this.events_extent.getData();
+            for (int i = 0; i < n; i++)
+                data[i] = this.events_cache.get(i).extent();
+            this.events_extent.write(data);
+        }
+
+        {
+            extendExtensibleArray(this.events_time, n);
+            double[] data = (double[]) this.events_time.getData();
+            for (int i = 0; i < n; i++)
+                data[i] = this.events_cache.get(i).time();
+            this.events_time.write(data);
+        }
+
+        {
+            extendExtensibleArray(this.events_waited, n);
+            double[] data = (double[]) this.events_waited.getData();
+            for (int i = 0; i < n; i++)
+                data[i] = this.events_cache.get(i).waited();
+            this.events_waited.write(data);
+        }
+
+        this.events_cache = this.events_cache.subList(n, this.events_cache.size());
+    }
 
     @Override
     public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {}
