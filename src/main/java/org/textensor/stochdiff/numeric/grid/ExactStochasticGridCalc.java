@@ -80,7 +80,9 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
 
     public Collection<IGridCalc.Event> getEvents() {
         Collection<IGridCalc.Event> recent = this.events;
-        this.events = inst.newArrayList();
+        /* If it was null, it should stay null. Otherwise, reinitalize. */
+        if (recent != null)
+            this.events = inst.newArrayList();
         return recent;
     }
 }

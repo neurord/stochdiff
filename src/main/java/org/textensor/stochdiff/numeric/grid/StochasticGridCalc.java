@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 public abstract class StochasticGridCalc extends GridCalc {
     static final Logger log = LogManager.getLogger(StochasticGridCalc.class);
 
-    final static boolean log_events = Settings.getProperty("stochdiff.neq.log_events", false);
+    final static boolean log_events = Settings.getProperty("stochdiff.stochastic.log_events", false);
 
     RandomGenerator random;
 
