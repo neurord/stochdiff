@@ -32,14 +32,19 @@ public class ResultWriterText implements ResultWriter {
 
     final protected HashMap<String, ResultWriterText> siblings = inst.newHashMap();
 
-    public ResultWriterText(File outFile, boolean writeConcentration) {
+    public ResultWriterText(File output, boolean writeConcentration) {
         this.writeConcentration = writeConcentration;
 
-        outputFile = outFile;
+        outputFile = new File(output + ".out");
     }
 
     public boolean isContinuation() {
         return continuation && outputFile.exists();
+    }
+
+    @Override
+    public File outputFile() {
+        return this.outputFile;
     }
 
     @Override
@@ -70,6 +75,7 @@ public class ResultWriterText implements ResultWriter {
     @Override
     public void close() {
         if (!closed) {
+            log.info("Closing output file {}", this.outputFile);
 
             if (writer != null) {
                 try {

@@ -19,17 +19,16 @@ import org.apache.logging.log4j.LogManager;
 public class SDCalc {
     static final Logger log = LogManager.getLogger(SDCalc.class);
 
-    SDCalcType calculationType;
-
-    SDRun sdRun;
+    final SDRun sdRun;
+    final SDCalcType calculationType;
 
     protected final List<ResultWriter> resultWriters = inst.newArrayList();
 
     BaseCalc bCalc;
 
-    public SDCalc(SDRun sdr, File outputFile) {
-        sdRun = sdr;
-        String sr = sdRun.calculation;
+    public SDCalc(SDRun sdr, File output) {
+        this.sdRun = sdr;
+        this.calculationType = SDCalcType.valueOf(sdr.calculation);
 
         final String[] writers = Settings.getPropertyList("stochdiff.writers",
                                                           "text");
@@ -37,11 +36,11 @@ public class SDCalc {
         for (String type: writers) {
             final ResultWriter writer;
             if (type.equals("text")) {
-                writer = new ResultWriterText(outputFile, false);
-                log.info("Using text writer for {}", outputFile);
+                writer = new ResultWriterText(output, false);
+                log.info("Using text writer for {}", writer.outputFile());
             } else if (type.equals("h5")) {
-                writer = new ResultWriterHDF5(outputFile);
-                log.info("Using HDF5 writer for {}", outputFile);
+                writer = new ResultWriterHDF5(output);
+                log.info("Using HDF5 writer for {}", writer.outputFile());
             } else {
                 log.error("Unknown writer '{}'", type);
                 throw new RuntimeException("uknown writer: " + type);
@@ -51,31 +50,20 @@ public class SDCalc {
 
         //        if (sdRun.continueOutput() && outputFile.exists() && sdRun.getStartTime() > 0)
         //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
-
-        for (SDCalcType  sdct : SDCalcType.values()) {
-            if (sdct.hasLabel(sr)) {
-                calculationType = sdct;
-            }
-        }
-        if (calculationType == null) {
-            E.warning("unrecognized calculation type " + sr);
-        }
     }
-
-
 
     public int run() {
         int ret = 0;
-        bCalc = calculationType.getCalc(sdRun);
+        bCalc = calculationType.getCalc(this.sdRun);
         for (ResultWriter resultWriter: this.resultWriters)
             bCalc.addResultWriter(resultWriter);
-        ret = bCalc.run();
-
-        for (ResultWriter resultWriter: this.resultWriters)
-            resultWriter.close();
-        return ret;
+        return bCalc.run();
     }
 
+    public void close() {
+        for (ResultWriter resultWriter: this.resultWriters)
+            resultWriter.close();
+    }
 
     public long getParticleCount() {
         return bCalc.getParticleCount();

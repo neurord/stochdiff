@@ -21,10 +21,10 @@ public class StochDiff {
     // SDCalc object and run it;
 
     public static void help_exit(boolean error) {
-        String msg = "Usage: org.textensor.stochdiff.StochDiff modelFile [outputFile]\n"
-            + " where the modelFile is an XML specification of the model to run. \n "
-            + "The optional outputFile specifies where the results should be stored. If it is \n"
-            + "not supplied, they are written to modelFile.out";
+        String msg = "Usage: org.textensor.stochdiff.StochDiff <model> [<output>]\n"
+            + " where the <model> is an XML specification of the model to run. \n "
+            + "The optional <output> specifies where the results should be stored (w/o extension).\n"
+            + "If it is not supplied, they are written to <model> but with .out extension.";
         if (error) {
             System.err.println(msg);
             System.exit(1);
@@ -36,7 +36,7 @@ public class StochDiff {
 
     public static void main(String[] argv) {
         File modelFile = null;
-        File outputFile = null;
+        final File outputFile;
 
         List<String> args = Arrays.asList(argv);
         boolean help_requested = args.contains("-h") || args.contains("--help");
@@ -49,20 +49,16 @@ public class StochDiff {
             System.exit(2);
         }
 
-        if (argv.length > 1) {
+        if (argv.length > 1)
             outputFile = new File(argv[1]);
-
-        } else {
+        else {
             String s = argv[0];
-            if (s.indexOf(".") > 0) {
+            if (s.indexOf(".") > 0)
                 s = s.substring(0, s.lastIndexOf("."));
-            }
-            outputFile = new File(s + ".out");
+            outputFile = new File(s);
         }
 
-        final String logfile = outputFile.toString().substring(0,
-                                            outputFile.toString().lastIndexOf("."))
-            + ".log";
+        final String logfile = outputFile + ".log";
         CustomFileAppender.addFileAppender(logfile);
 
         SDRun sdModel = ModelReader.read(modelFile);
@@ -71,11 +67,12 @@ public class StochDiff {
         SDCalc sdCalc = new SDCalc(sdModel, outputFile);
 
         int runret = sdCalc.run();
-
         if (runret == 0) {
             E.info("total number of particles at the end: " + sdCalc.getParticleCount());
             E.info("should have written " + outputFile);
         }
+
+        sdCalc.close();
     }
 
 

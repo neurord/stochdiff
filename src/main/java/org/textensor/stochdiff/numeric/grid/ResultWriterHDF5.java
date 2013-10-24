@@ -64,8 +64,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     public static final H5Datatype short_str_t =
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
-    public ResultWriterHDF5(File outFile) {
-        this.outputFile = new File(FileUtil.getRootName(outFile) + ".h5");
+    public ResultWriterHDF5(File output) {
+        this.outputFile = new File(output + ".h5");
         log.debug("Writing HDF5 to {}", this.outputFile);
     }
 
@@ -115,6 +115,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         } catch(Exception e) {
             log.error("Failed to close results file {}", outputFile, e);
         }
+    }
+
+    @Override
+    public File outputFile() {
+        return this.outputFile;
     }
 
     @Override
