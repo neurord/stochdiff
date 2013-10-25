@@ -7,6 +7,11 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 public interface IGridCalc {
+    /*
+     * An identifier of a trial. Should start at 0.
+     */
+    int trial();
+
     int getGridPartNumb(int i, int outj);
     double getGridPartConc(int i, int outj);
 

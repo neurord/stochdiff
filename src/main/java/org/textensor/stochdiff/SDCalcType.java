@@ -33,27 +33,22 @@ public enum SDCalcType {
     GRID_STEPPED_STOCHASTIC(SteppedStochasticGridCalc.class),
     GRID_STEPPED_EXACT(ExactStochasticGridCalc.class);
 
-    private Class calcClass;
+    private final Class cls;
 
     SDCalcType(Class cls) {
-        calcClass = cls;
+        this.cls = cls;
     }
 
-    public boolean hasLabel(String s) {
-        String sn = name();
-        return (sn.equals(s) || sn.toLowerCase().equals(s));
-    }
-
-    public BaseCalc getCalc(SDRun sdr) {
+    public BaseCalc getCalc(int trial, SDRun sdr) {
         BaseCalc ret = null;
         try {
-            Class[] argTyp = {SDRun.class};
-            Constructor constructor = calcClass.getConstructor(argTyp);
-            Object[] args = {sdr};
+            Class[] argTyp = {Integer.TYPE, SDRun.class};
+            Constructor constructor = this.cls.getConstructor(argTyp);
+            Object[] args = {trial, sdr};
             ret = (BaseCalc)(constructor.newInstance(args));
 
         } catch (Exception ex) {
-            E.error("ex " + ex + " cannot instantiate " + name() + " " + calcClass);
+            E.error("ex " + ex + " cannot instantiate " + name() + " " + this.cls);
             ex.printStackTrace();
         }
         return ret;

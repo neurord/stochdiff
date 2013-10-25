@@ -52,8 +52,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     int ninjected = 0;
 
 
-    protected GridCalc(SDRun sdm) {
-        super(sdm);
+    protected GridCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     protected void init() {

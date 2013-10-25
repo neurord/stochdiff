@@ -89,6 +89,7 @@ public abstract class BaseCalc {
 
     public int runAction = 0;
 
+    private final int trial;
 
     protected int[][] specIndexesOut;
     protected String[] regionsOut;
@@ -96,7 +97,8 @@ public abstract class BaseCalc {
     protected String[] fnmsOut;
     protected String[][] specNamesOut;
 
-    public BaseCalc(SDRun sdr) {
+    public BaseCalc(int trial, SDRun sdr) {
+        this.trial = trial;
         sdRun = sdr;
 
         if (sdr.action == null) {
@@ -110,6 +112,10 @@ public abstract class BaseCalc {
             E.error("Unrecognized action: only 'visualize' is supported");
         }
 
+    }
+
+    public int trial() {
+        return this.trial;
     }
 
     private void extractTables() {

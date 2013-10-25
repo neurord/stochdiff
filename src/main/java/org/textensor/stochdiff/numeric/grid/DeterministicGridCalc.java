@@ -43,8 +43,8 @@ public class DeterministicGridCalc extends GridCalc {
     double[][] wktm1;
     double[][] wkC;
 
-    public DeterministicGridCalc(SDRun sdm) {
-        super(sdm);
+    public DeterministicGridCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     // the only task here is to allocate and initialize the workspace for

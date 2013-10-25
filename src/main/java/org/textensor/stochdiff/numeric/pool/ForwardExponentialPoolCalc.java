@@ -25,8 +25,8 @@ import org.textensor.stochdiff.numeric.math.Column;
 
 public class ForwardExponentialPoolCalc extends DeterministicPoolCalc {
 
-    public ForwardExponentialPoolCalc(SDRun sdm) {
-        super(sdm);
+    public ForwardExponentialPoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
 

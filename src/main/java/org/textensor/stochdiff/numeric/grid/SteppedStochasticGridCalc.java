@@ -91,8 +91,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     double[][] pSharedOut;
     double[][][] fSharedExit;
 
-    public SteppedStochasticGridCalc(SDRun sdm) {
-        super(sdm);
+    public SteppedStochasticGridCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     @Override

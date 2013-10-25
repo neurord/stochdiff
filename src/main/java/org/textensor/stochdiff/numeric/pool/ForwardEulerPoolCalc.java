@@ -7,8 +7,8 @@ import org.textensor.stochdiff.numeric.math.Column;
 
 public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
 
-    public ForwardEulerPoolCalc(SDRun sdm) {
-        super(sdm);
+    public ForwardEulerPoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
 

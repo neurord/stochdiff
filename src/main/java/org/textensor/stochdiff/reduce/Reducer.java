@@ -70,7 +70,7 @@ public class Reducer {
         E.info("The template provides " + nv + " accessible concentration values");
 
         // StaticCalc maps the model onto the array of concentrations for each element
-        staticCalc = new StaticCalc(sdr);
+        staticCalc = new StaticCalc(0, sdr);
         staticCalc.init();
         vols = staticCalc.getVolumes();
         nspec = staticCalc.getNSpec();

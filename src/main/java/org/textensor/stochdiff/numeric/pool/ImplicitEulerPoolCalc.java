@@ -27,8 +27,8 @@ public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
 
 
 
-    public ImplicitEulerPoolCalc(SDRun sdm) {
-        super(sdm);
+    public ImplicitEulerPoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     public void dpcInit() {

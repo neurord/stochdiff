@@ -18,8 +18,8 @@ public abstract class StochasticGridCalc extends GridCalc {
 
     int[][] wkA;
 
-    public StochasticGridCalc(SDRun sdm) {
-        super(sdm);
+    public StochasticGridCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     @Override

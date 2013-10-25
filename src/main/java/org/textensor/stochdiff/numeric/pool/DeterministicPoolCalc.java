@@ -21,8 +21,8 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
 
     double time;
 
-    public DeterministicPoolCalc(SDRun sdm) {
-        super(sdm);
+    public DeterministicPoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
 

@@ -6,9 +6,6 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
 public class StaticCalc extends BaseCalc {
-    public SDRun sdRun;
-
-
     ReactionTable rtab;
     VolumeGrid vgrid;
     int nel;
@@ -23,8 +20,8 @@ public class StaticCalc extends BaseCalc {
     double[][] wkA;
 
 
-    public StaticCalc(SDRun sdr) {
-        super(sdr);
+    public StaticCalc(int trial, SDRun sdr) {
+        super(trial, sdr);
     }
 
     @Override

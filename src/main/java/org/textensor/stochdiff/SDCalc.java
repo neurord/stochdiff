@@ -54,7 +54,7 @@ public class SDCalc {
 
     public int run() {
         int ret = 0;
-        bCalc = calculationType.getCalc(this.sdRun);
+        bCalc = calculationType.getCalc(0, this.sdRun);
         for (ResultWriter resultWriter: this.resultWriters)
             bCalc.addResultWriter(resultWriter);
         return bCalc.run();

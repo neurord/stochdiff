@@ -26,8 +26,8 @@ import org.textensor.stochdiff.numeric.math.Column;
 
 public class SemiImplicitEulerPoolCalc extends DeterministicPoolCalc {
 
-    public SemiImplicitEulerPoolCalc(SDRun sdm) {
-        super(sdm);
+    public SemiImplicitEulerPoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
 

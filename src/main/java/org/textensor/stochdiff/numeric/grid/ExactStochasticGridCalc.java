@@ -19,8 +19,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     ArrayList<IGridCalc.Event> events
         = log_events ? new ArrayList<IGridCalc.Event>() : null;
 
-    public ExactStochasticGridCalc(SDRun sdm) {
-        super(sdm);
+    public ExactStochasticGridCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
     @Override

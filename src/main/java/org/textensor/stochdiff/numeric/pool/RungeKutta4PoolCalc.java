@@ -13,8 +13,8 @@ import org.textensor.stochdiff.model.SDRun;
 
 public class RungeKutta4PoolCalc extends DeterministicPoolCalc {
 
-    public RungeKutta4PoolCalc(SDRun sdm) {
-        super(sdm);
+    public RungeKutta4PoolCalc(int trial, SDRun sdm) {
+        super(trial, sdm);
     }
 
 
