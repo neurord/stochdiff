@@ -22,6 +22,9 @@ public class SDCalc {
     final SDRun sdRun;
     final SDCalcType calculationType;
 
+    final String[] writers = Settings.getPropertyList("stochdiff.writers", "text");
+    final int trials = Settings.getProperty("stochdiff.trials", 1);
+
     protected final List<ResultWriter> resultWriters = inst.newArrayList();
 
     BaseCalc bCalc;
@@ -29,9 +32,6 @@ public class SDCalc {
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;
         this.calculationType = SDCalcType.valueOf(sdr.calculation);
-
-        final String[] writers = Settings.getPropertyList("stochdiff.writers",
-                                                          "text");
 
         for (String type: writers) {
             final ResultWriter writer;
@@ -53,11 +53,19 @@ public class SDCalc {
     }
 
     public int run() {
-        int ret = 0;
-        bCalc = calculationType.getCalc(0, this.sdRun);
-        for (ResultWriter resultWriter: this.resultWriters)
-            bCalc.addResultWriter(resultWriter);
-        return bCalc.run();
+        int r = 0;
+
+        for (int i = 0; i < trials; i++) {
+            if (trials > 1)
+                log.info("Starting trial {}", i);
+
+            bCalc = calculationType.getCalc(i, this.sdRun);
+            for (ResultWriter resultWriter: this.resultWriters)
+                bCalc.addResultWriter(resultWriter);
+            r = bCalc.run();
+        }
+
+        return r;
     }
 
     public void close() {

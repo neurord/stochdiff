@@ -57,8 +57,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.debug("Writing HDF5 to {}", this.outputFile);
     }
 
+    private boolean inited = false;
+
     @Override
     public void init(String magic) {
+        if (inited)
+            return;
+
         try {
             this._init();
         } catch(UnsatisfiedLinkError e) {
@@ -68,6 +73,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.warn("java.library.path: {}", System.getProperty("java.library.path"));
             throw new RuntimeException(e);
         }
+
+        inited = true;
     }
 
     protected void _init()
