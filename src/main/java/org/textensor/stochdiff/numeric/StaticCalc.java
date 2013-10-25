@@ -31,9 +31,8 @@ public class StaticCalc extends BaseCalc {
     }
 
     @Override
-    public int run() {
+    protected void _run() {
         // TODO Auto-generated method stub
-        return 0;
     }
 
 

@@ -9,6 +9,7 @@ package org.textensor.stochdiff.numeric;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.Random;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.disc.SpineLocator;
@@ -25,6 +26,9 @@ import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 /**
  * Units: concentrations are expressed in nM and volumes in cubic microns
  * So, in these units, one Litre is 10^15 and a 1M solution is 10^9.
@@ -34,7 +38,8 @@ import org.textensor.util.inst;
  * ie, nparticles = 0.6022 * conc
  */
 
-public abstract class BaseCalc {
+public abstract class BaseCalc implements Runnable {
+    static final Logger log = LogManager.getLogger(BaseCalc.class);
 
     public SDRun sdRun;
 
@@ -386,12 +391,15 @@ public abstract class BaseCalc {
         return ret;
     }
 
+    private long seed = -1;
     public long getCalculationSeed() {
-        long ret = sdRun.simulationSeed;
-        if (ret <= 0)
-            ret = (long)(1.e5 * Math.random());
-
-        return ret;
+        if (seed == -1) {
+            if (sdRun.simulationSeed > 0)
+                seed = sdRun.simulationSeed;
+            else
+                seed = Math.abs(new Random().nextInt());
+        }
+        return seed;
     }
 
     public ReactionTable getReactionTable() {
@@ -420,7 +428,22 @@ public abstract class BaseCalc {
         this.resultWriters.add(rw);
     }
 
-    public abstract int run();
+    protected abstract void _run();
+
+    @Override
+    public void run() {
+        try {
+            this._run();
+        } catch(Error e) {
+            log.error("{}: failed (seed={})", this, seed);
+            throw e;
+        }
+    }
+
+    public void close() {
+        for (ResultWriter resultWriter: this.resultWriters)
+            resultWriter.close();
+    }
 
     public abstract long getParticleCount();
 

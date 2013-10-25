@@ -35,8 +35,8 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
         dt = sdRun.fixedStepDt;
     }
 
-
-    public final int run() {
+    @Override
+    protected void _run() {
         init();
 
         mconc.print();
@@ -46,10 +46,8 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
 
         dpcInit();
 
-        while (time < runtime) {
+        while (time < runtime)
             time += advance();
-        }
-        return 0;
     }
 
 

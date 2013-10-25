@@ -104,7 +104,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         dt = sdRun.fixedStepDt;
     }
 
-    public int run() {
+    @Override
+    protected void _run() {
         init();
 
         double time = sdRun.getStartTime();
@@ -153,12 +154,13 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         log.info("Injected {} particles", ninjected);
 
+        log.info("Total number of particles at the end: {}", this.getParticleCount());
+
         long endTime = System.currentTimeMillis();
         log.info("Total run time {} ms", endTime - startTime);
 
-        footer();
-
-        return 0;
+        this.footer();
+        this.close();
     }
 
     protected abstract double advance(double time);

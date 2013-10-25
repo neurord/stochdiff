@@ -57,11 +57,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.debug("Writing HDF5 to {}", this.outputFile);
     }
 
-    private boolean inited = false;
+    private int users = 0;
 
     @Override
-    public void init(String magic) {
-        if (inited)
+    synchronized public void init(String magic) {
+        if (users++ > 0)
             return;
 
         try {
@@ -73,8 +73,6 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.warn("java.library.path: {}", System.getProperty("java.library.path"));
             throw new RuntimeException(e);
         }
-
-        inited = true;
     }
 
     protected void _init()
@@ -99,7 +97,10 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public void close() {
+    synchronized public void close() {
+        if (--users > 0)
+            return;
+
         log.info("Closing output file {}", this.outputFile);
         try {
             this.output.close();
@@ -128,14 +129,15 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected Trial createTrial(int trial)
         throws Exception
     {
-        String name = Integer.toString(trial);
+        String name = "trial" + trial;
         Group group = this.output.createGroup(name, this.root);
         setAttribute(group, "TITLE", "trial " + trial);
         return new Trial(group);
     }
 
     @Override
-    public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[], IGridCalc source)
+    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[],
+                                       IGridCalc source)
     {
         try {
             Trial t = this.getTrial(source.trial());
@@ -146,7 +148,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
+    synchronized public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
             t._writeGridConcs(time, nel, ispecout, source);
@@ -156,10 +158,11 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {}
+    synchronized public void writeGridConcsDumb(int i, double time, int nel, String fnamepart,
+                                                IGridCalc source) {}
 
     @Override
-    public void saveState(double time, String prefix, IGridCalc source) {
+    synchronized public void saveState(double time, String prefix, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
             t._saveState(time, prefix, source);
@@ -169,7 +172,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public Object loadState(String filename, IGridCalc source) {
+    synchronized public Object loadState(String filename, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
             return t._loadState(filename, source);
@@ -800,7 +803,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.debug("Wrote metadata on {} {}={}", obj, name, value);
     }
 
-    public Dataset writeArray(String name, Group parent, double[][] items)
+    protected Dataset writeArray(String name, Group parent, double[][] items)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -816,7 +819,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    public Dataset writeArray(String name, Group parent, int[][] items, int fill)
+    protected Dataset writeArray(String name, Group parent, int[][] items, int fill)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -832,7 +835,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    public Dataset writeVector(String name, Group parent, String[] items)
+    protected Dataset writeVector(String name, Group parent, String[] items)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);
@@ -849,7 +852,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    public Dataset writeVector(String name, Group parent, double[] items)
+    protected Dataset writeVector(String name, Group parent, double[] items)
         throws Exception
     {
         long[] dims = {items.length};
@@ -918,7 +921,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    public static void getGridNumbers(double[] dst,
+    protected static void getGridNumbers(double[] dst,
                                       int nel, int ispecout[], IGridCalc source) {
         assert dst.length == nel * ispecout.length;
         int pos = 0;

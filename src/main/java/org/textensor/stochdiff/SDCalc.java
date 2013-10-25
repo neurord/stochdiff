@@ -2,6 +2,9 @@ package org.textensor.stochdiff;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
@@ -27,11 +30,14 @@ public class SDCalc {
 
     protected final List<ResultWriter> resultWriters = inst.newArrayList();
 
-    BaseCalc bCalc;
-
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;
         this.calculationType = SDCalcType.valueOf(sdr.calculation);
+
+        if (trials > 1 && sdr.simulationSeed > 0) {
+            log.warn("Ignoring fixed simulation seed");
+            sdr.simulationSeed = 0;
+        }
 
         for (String type: writers) {
             final ResultWriter writer;
@@ -52,28 +58,36 @@ public class SDCalc {
         //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
     }
 
-    public int run() {
-        int r = 0;
-
-        for (int i = 0; i < trials; i++) {
-            if (trials > 1)
-                log.info("Starting trial {}", i);
-
-            bCalc = calculationType.getCalc(i, this.sdRun);
-            for (ResultWriter resultWriter: this.resultWriters)
-                bCalc.addResultWriter(resultWriter);
-            r = bCalc.run();
-        }
-
-        return r;
-    }
-
-    public void close() {
+    protected BaseCalc prepareCalc(int trial) {
+        BaseCalc calc = calculationType.getCalc(trial, this.sdRun);
         for (ResultWriter resultWriter: this.resultWriters)
-            resultWriter.close();
+                calc.addResultWriter(resultWriter);
+        return calc;
     }
 
-    public long getParticleCount() {
-        return bCalc.getParticleCount();
+    public void run() {
+        if (trials == 1)
+            this.prepareCalc(0).run();
+        else {
+            int poolSize = Runtime.getRuntime().availableProcessors();
+            ExecutorService pool = Executors.newFixedThreadPool(poolSize);
+            log.info("Running with pool {}", pool);
+
+            for (int i = 0; i < trials; i++) {
+                log.info("Starting trial {}", i);
+                pool.execute(this.prepareCalc(i));
+            }
+
+            log.info("Executing shutdown of pool {}", pool);
+            pool.shutdown();
+            while (true) {
+                try {
+                    pool.awaitTermination(1, TimeUnit.MINUTES);
+                    return;
+                } catch(InterruptedException e) {
+                    log.info("Waiting: {}", pool);
+                }
+            }
+        }
     }
 }
