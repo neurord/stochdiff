@@ -10,9 +10,11 @@ import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.XMLContainer;
 
-
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ReflectionInstantiator {
+    static final Logger log = LogManager.getLogger(ReflectionInstantiator.class);
 
     ArrayList search = new ArrayList();
 
@@ -43,11 +45,12 @@ public class ReflectionInstantiator {
 
 
     public void appendContent(Object obj, String s) {
-        if (obj instanceof XMLContainer) {
+        if (obj instanceof XMLContainer)
             ((XMLContainer)obj).appendContent(s);
-        } else {
-            E.error(" - reflection instantiator doesn't do appendContent on " +
-                    obj + "(" + obj.getClass() +  ") while trying to append " + s);
+        else {
+            log.error("{} ({}) is not an XMLContainer while trying to append {}",
+                      obj, obj.getClass(), s);
+            throw new ClassCastException();
         }
     }
 

@@ -243,12 +243,12 @@ public class XMLReader {
                             } else if (child == null) {
                                 child = next.svalue;
 
-                            }  else if (child instanceof Double && ((Double)child).doubleValue() == 0.0) {
+                            }  else if (child instanceof Double) {
                                 child = new Double(next.svalue);
 
                                 //          E.info("resetting dbl field " + parent + " " + start.getName() + " " + next.svalue);
 
-                            } else if (child instanceof Integer && ((Integer)child).intValue() == 0) {
+                            } else if (child instanceof Integer) {
                                 child = new Integer(next.svalue);
 
                             } else if (child instanceof BodyValued) {

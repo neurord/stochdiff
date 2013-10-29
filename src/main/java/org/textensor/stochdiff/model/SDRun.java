@@ -59,13 +59,13 @@ public class SDRun {
      * Accepted tolerance for adaptive calculations
      * (delta f / f  for an algorithm dependent function f).
      */
-    public double tolerance;
+    public double tolerance = 0.001;
 
     /**
      * How many times our calculated allowed leap must be longer than
      * normal event waiting time, for us to choose leaping.
      */
-    public double leap_min_jump;
+    public double leap_min_jump = 5.0;
 
     public String calculation;
 
