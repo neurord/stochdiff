@@ -88,6 +88,7 @@ public class NextEventQueue {
                     return Double.compare(a.time(), b.time());
                 }
             };
+            log.info("sorting {} nodes ({})", nodes.length, "" + nodes);
             Arrays.sort(nodes, c);
 
             for (int i = 0; i < nodes.length; i++)
@@ -103,7 +104,7 @@ public class NextEventQueue {
         void reposition(String prefix, T node) {
             assert node != null;
             T parent = this.parent(node);
-            log.trace("{}: moving {} t={} parent={}",
+            log.debug("{}: moving {} t={} parent={}",
                       prefix, node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
@@ -111,7 +112,7 @@ public class NextEventQueue {
                 this.reposition(prefix, node);
             } else {
                 T littlest = this.littlestChild(node);
-                log.trace("littlest child is {} t={}", littlest,
+                log.debug("littlest child is {} t={}", littlest,
                           littlest != null ? littlest.time() : "-");
                 if (littlest != null && node.time() > littlest.time()) {
                     this.swap(node, littlest); // original parent first
@@ -197,7 +198,7 @@ public class NextEventQueue {
 
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
-            log.trace("generating exponential time for prop={} → time={}", this.propensity, exp);
+            log.debug("generating exponential time for prop={} → time={}", this.propensity, exp);
             return current + exp;
         }
 
@@ -209,11 +210,21 @@ public class NextEventQueue {
             double old = this.propensity;
             int[] pop = this.reactantPopulation();
             this.propensity = this._propensity();
-            log.log(warn && this.propensity != 0 && this.propensity == old ? Level.WARN : Level.TRACE,
-                    "{}: propensity changed {} → {} (n={} → {}), extent={}",
-                    this, old, this.propensity, old_pop, pop, this.extent);
-            if (warn && this.propensity != 0 && this.propensity == old)
-                throw new RuntimeException();
+            if (warn && this.propensity != 0 && this.propensity == old) {
+                boolean higher = false;
+                boolean lower = false;
+                for (int i = 0; i < pop.length; i++) {
+                    if (pop[i] < old_pop[i])
+                        lower = true;
+                    if (pop[i] > old_pop[i])
+                        higher = true;
+                }
+                log.log(higher && lower ? Level.DEBUG : Level.ERROR,
+                        "{}: propensity changed {} → {} (n={} → {}), extent={}",
+                        this, old, this.propensity, old_pop, pop, this.extent);
+                if (!(higher && lower))
+                    throw new RuntimeException();
+            }
             this.old_pop = pop;
             return old;
         }
@@ -254,7 +265,7 @@ public class NextEventQueue {
                     normal_waits += 1;
             }
 
-            log.trace("Updating {}", this);
+            log.debug("Updating {}", this);
 
             // In reactions of the type Da→Da+MaI the propensity does not change
             // after execution, but there's nothing to warn about.
@@ -264,8 +275,8 @@ public class NextEventQueue {
             final double leap = leap_min_jump == 0 ? Double.NaN
                 : this.leap_time(current, tolerance);
 
-            log.trace("deps: {}", this.dependent);
-            log.trace("options: wait {}, leap {}", normal - current, leap);
+            log.debug("deps: {}", this.dependent);
+            log.debug("options: wait {}, leap {}", normal - current, leap);
 
             if (leap_min_jump != 0 && leap > (normal - current) * leap_min_jump) {
                 assert update_times;
@@ -352,7 +363,7 @@ public class NextEventQueue {
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
-            log.trace("Created {}: t={}", this, this.time);
+            log.debug("Created {}: t={}", this, this.time);
         }
 
         @Override
@@ -365,12 +376,10 @@ public class NextEventQueue {
                      int[][] diffusionEvents,
                      int[] stimulationEvents,
                      int count) {
-            particles[this.element()][this.sp] -= count;
-            particles[this.element2][this.sp] += count;
+            int done = updatePopulation(this.element(), this.sp, -count, this);
+            updatePopulation(this.element2, this.sp, -done, this);
 
-            assert particles[this.element()][this.sp] >= 0;
-
-            diffusionEvents[this.sp][this.index2] += count;
+            diffusionEvents[this.sp][this.index2] += -done;
         }
 
         @Override
@@ -501,7 +510,7 @@ public class NextEventQueue {
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
-            log.trace("Created {} rate={} vol={} time={}", this,
+            log.debug("Created {} rate={} vol={} time={}", this,
                       this.rate, this.volume, this.time);
             assert this.time >= 0;
         }
@@ -579,14 +588,12 @@ public class NextEventQueue {
                     log.info("reaculated prop={}", this._propensity());
                 }
 
-            for (int i = 0; i < this.reactants().length; i++) {
-                particles[this.element()][this.reactants()[i]] -=
-                    this.reactant_stochiometry[i] * count;
-                assert particles[this.element()][this.reactants()[i]] >= 0: this;
-            }
+            for (int i = 0; i < this.reactants().length; i++)
+                updatePopulation(this.element(), this.reactants()[i],
+                                 this.reactant_stochiometry[i] * -count, this);
             for (int i = 0; i < this.products.length; i++)
-                particles[this.element()][this.products[i]] +=
-                    this.product_stochiometry[i] * count;
+                updatePopulation(this.element(), this.products[i],
+                                 this.product_stochiometry[i] * count, this);
             reactionEvents[this.index] += count;
         }
 
@@ -648,7 +655,7 @@ public class NextEventQueue {
                      int[][] diffusionEvents,
                      int[] stimulationEvents,
                      int count) {
-            particles[this.element()][this.sp] += count;
+            updatePopulation(this.element(), this.sp, count, this);
 
             stimulationEvents[this.sp] += count;
         }
@@ -768,6 +775,22 @@ public class NextEventQueue {
 
     final PriorityTree<NextEvent> queue = new PriorityTree<NextEvent>();
 
+    public int updatePopulation(int element, int specie, int count, NextEvent event) {
+        final int done;
+        if (count < 0 && this.particles[element][specie] < -count) {
+            log.warn("{}: population would become negative for element {} sp {}: changing {} by {} {}",
+                     event, element, specie,
+                     this.particles[element][specie], count,
+                     "" + this.particles);
+            done = -this.particles[element][specie];
+            this.particles[element][specie] = 0;
+        } else {
+            this.particles[element][specie] += count;
+            done = count;
+        }
+        return done;
+    }
+
     /**
      * Use create() instead, this is public only for testing.
      */
@@ -879,8 +902,11 @@ public class NextEventQueue {
                                         StimulationTable stimtab,
                                         int[][] stimtargets,
                                         double tolerance,
-                                        double leap_min_jump) {
+                                        double leap_min_jump,
+                                        boolean verbose) {
         NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance, leap_min_jump);
+
+        log.warn("particles {}", "" + particles);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));
@@ -888,17 +914,19 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
-        log.info("{} events at the beginning:", obj.queue.nodes.length);
-        for (NextEvent ev: obj.queue.nodes)
-            log.info("{} → {} prop={} t={}", ev.index(),
-                     ev, ev.propensity, ev.time());
+        if (verbose) {
+            log.info("{} events at the beginning:", obj.queue.nodes.length);
+            for (NextEvent ev: obj.queue.nodes)
+                log.info("{} → {} prop={} t={}", ev.index(),
+                         ev, ev.propensity, ev.time());
 
-        for (NextEvent ev: e) {
-            ev.addRelations(e);
-            log.trace("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+            for (NextEvent ev: e) {
+                ev.addRelations(e);
+                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+            }
+
+            log_dependency_edges(e);
         }
-
-        log_dependency_edges(e);
 
         return obj;
     }
