@@ -1,5 +1,6 @@
 package org.textensor.stochdiff.numeric.morph;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.HashMap;
@@ -73,8 +74,6 @@ public class VolumeGrid {
         }
     }
 
-
-
     public void importLines(ArrayList<VolumeLine> gridAL) {
         hasCuboids = true;
         for (VolumeLine vs : gridAL) {
@@ -85,11 +84,9 @@ public class VolumeGrid {
         }
     }
 
-
-    public void addElements(ArrayList<VolumeElement> veal) {
-        for (VolumeElement ve : veal) {
+    public void addElements(List<VolumeElement> veal) {
+        for (VolumeElement ve : veal)
             addVolumeElement(ve);
-        }
     }
 
     private void addVolumeElement(VolumeElement ve) {
@@ -110,7 +107,6 @@ public class VolumeGrid {
         }
     }
 
-
     public ArrayList<VolumeElement> getElementsInRegion(String reg) {
         ArrayList<VolumeElement> ret = null;
         if (regionHM.containsKey(reg)) {
@@ -121,8 +117,6 @@ public class VolumeGrid {
         }
         return ret;
     }
-
-
 
     // switch from collections to arrays for the calculation
     public void fix() {
@@ -225,9 +219,6 @@ public class VolumeGrid {
             eltNbrG[i1][inbr[i1]] = conG[i];
             inbr[i1] += 1;
         }
-
-
-
     }
 
 
@@ -241,7 +232,6 @@ public class VolumeGrid {
 
         return nelement;
     }
-
 
     public double[] getElementVolumes() {
         return volumes;
@@ -260,7 +250,6 @@ public class VolumeGrid {
         return eltNbrs;
     }
 
-
     public double[][] getPerElementCouplingConstants() {
         return eltNbrG;
     }
@@ -270,11 +259,9 @@ public class VolumeGrid {
         return getNElements();
     }
 
-
     public String[] getRegionLabels() {
         return regionLabels;
     }
-
 
     public String getAsText() {
         StringBuffer sb = new StringBuffer();
@@ -286,7 +273,6 @@ public class VolumeGrid {
         }
         return sb.toString();
     }
-
 
     public String getAsTableText() {
         StringBuffer sb = new StringBuffer();
@@ -350,10 +336,7 @@ public class VolumeGrid {
             } else if (sti.indexOf("[") >= 0) {
                 int[] ms = getMatches(areaHM, sti);
                 if (ms != null && ms.length > 0) {
-
                     ret[i] = ms;
-
-
                 } else {
                     ret[i] = new int[0];
                     E.warning("There are no matches for target: " + sti);
@@ -467,19 +450,11 @@ public class VolumeGrid {
 
 
     public boolean isCuboid() {
-        boolean ret = false;
-        if (hasCuboids && !hasCurveds) {
-            ret = true;
-        }
-        return ret;
+        return hasCuboids && !hasCurveds;
     }
 
     public boolean isCurved() {
-        boolean ret = false;
-        if (hasCurveds && !hasCuboids) {
-            ret = true;
-        }
-        return ret;
+        return hasCurveds && !hasCuboids;
     }
 
 
@@ -499,12 +474,4 @@ public class VolumeGrid {
         }
         return sb.toString();
     }
-
-
-
-
-
-
-
-
 }
