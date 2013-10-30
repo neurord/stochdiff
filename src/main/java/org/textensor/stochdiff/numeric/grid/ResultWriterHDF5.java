@@ -52,6 +52,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     public static final H5Datatype short_str_t =
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
+    static final int CACHE_SIZE1 = 1024;
+    static final int CACHE_SIZE2 = 1024*1024;
+
     public ResultWriterHDF5(File output) {
         this.outputFile = new File(output + ".h5");
         log.debug("Writing HDF5 to {}", this.outputFile);
@@ -186,7 +189,10 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected final Group model;
         protected final Group sim;
         protected H5ScalarDS concs;
+        protected double[] concs_data;
         protected H5ScalarDS times;
+        protected double[] times_data;
+        protected int concs_times_count;
         protected H5ScalarDS species;
         protected H5ScalarDS stimulation_events;
         protected H5ScalarDS diffusion_events;
@@ -401,7 +407,19 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected boolean initConcs(int nel, int[] ispecout, IGridCalc source)
+        public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
+            throws Exception
+        {
+            log.debug("Saving stats at time {} for trial {}", time, source.trial());
+
+            this.writeConcentrations(time, nel, ispecout, source);
+            this.writeStimulationEvents(time, source);
+            this.writeDiffusionEvents(time, source);
+            this.writeReactionEvents(time, source);
+            this.writeEvents(time, source);
+        }
+
+        protected boolean initConcentrations(int nel, int[] ispecout, IGridCalc source)
             throws Exception
         {
             assert this.concs == null;
@@ -419,44 +437,43 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                "concentrations of species in voxels over time",
                                                "[snapshot × nel × nspecout]",
                                                "count",
-                                               0, nel, nspecout);
+                                               CACHE_SIZE1, nel, nspecout);
 
             this.times = createExtensibleArray("times", this.sim, double_t,
                                                "times when snapshots were written",
                                                "[times]",
                                                "ms",
-                                               0);
+                                               CACHE_SIZE1);
+            this.resetTimesConcs();
             return true;
         }
 
-        public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
+        protected void resetTimesConcs()
             throws Exception
         {
-            log.debug("Writing concentrations at time {} for trial {}", time, source.trial());
+            extendExtensibleArray(this.concs, CACHE_SIZE1);
+            extendExtensibleArray(this.times, CACHE_SIZE1);
+            this.concs_data = (double[]) this.concs.getData();
+            this.times_data = (double[]) this.times.getData();
+            this.concs_times_count = 0;
+        }
 
-            final long[] dims;
+        protected void writeConcentrations(double time, int nel, int ispecout[], IGridCalc source)
+            throws Exception
+        {
             if (this.concs == null)
-                if (!this.initConcs(nel, ispecout, source))
+                if (!this.initConcentrations(nel, ispecout, source))
                     return;
 
-            {
-                extendExtensibleArray(this.concs, 1);
-                double[] data = (double[]) this.concs.getData();
-                getGridNumbers(data, nel, ispecout, source);
-                this.concs.write(data);
-            }
+            getGridNumbers(this.concs_data, this.concs_times_count, nel, ispecout, source);
+            this.times_data[this.concs_times_count] = time;
 
-            {
-                extendExtensibleArray(this.times, 1);
-                double[] times = (double[]) this.times.getData();
-                times[0] = time;
+            if (this.concs_times_count++ == this.times_data.length) {
+                log.debug("Writing stats at time {} for trial {}", time, source.trial());
+                this.concs.write(this.concs_data);
                 this.times.write(times);
+                this.resetTimesConcs();
             }
-
-            this.writeStimulationEvents(time, source);
-            this.writeDiffusionEvents(time, source);
-            this.writeReactionEvents(time, source);
-            this.writeEvents(time, source);
         }
 
         protected void initStimulationEvents(int elements, int species)
@@ -470,7 +487,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                       "actual stimulation counts since last snapshot",
                                       "[times × elements × species]",
                                       "count",
-                                      0, elements, species);
+                                      CACHE_SIZE1, elements, species);
         }
 
         protected void writeStimulationEvents(double time, IGridCalc source)
@@ -515,7 +532,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                       "actual diffusion counts since last snapshot",
                                       "[times × nel × species × neighbors]",
                                       "count",
-                                      0, elements, species, neighbors);
+                                      CACHE_SIZE1, elements, species, neighbors);
             return true;
         }
 
@@ -569,7 +586,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                       "actual reaction counts since last snapshot",
                                       "[times × elements × reactions]",
                                       "count",
-                                      0, elements, reactions);
+                                      CACHE_SIZE1, elements, reactions);
 
             return true;
         }
@@ -608,35 +625,35 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                       "index of the event that happened",
                                                       "[event#]",
                                                       "",
-                                                      0);
+                                                      CACHE_SIZE2);
 
             this.events_type = createExtensibleArray("types", this.events, int_t,
                                                      "type of the event that happened",
                                                      "[type]",
                                                      "",
-                                                     0);
+                                                     CACHE_SIZE2);
 
             this.events_kind = createExtensibleArray("kinds", this.events, int_t,
                                                      "mechanism of the event that happened",
                                                      "[kind]",
                                                      "",
-                                                     0);
+                                                     CACHE_SIZE2);
 
             this.events_extent = createExtensibleArray("extents", this.events, int_t,
                                                        "the extent of the reaction or event",
                                                        "[extent]",
                                                        "count",
-                                                       0);
+                                                       CACHE_SIZE2);
             this.events_time = createExtensibleArray("times", this.events, double_t,
                                                      "at what time the event happened",
                                                      "[extent]",
                                                      "ms",
-                                                     0);
+                                                     CACHE_SIZE2);
             this.events_waited = createExtensibleArray("waited", this.events, double_t,
                                                        "time since the previous instance of this event",
                                                        "[waited]",
                                                        "ms",
-                                                       0);
+                                                       CACHE_SIZE2);
 
             long chunk_size = this.events_event.getChunkSize()[0];
             this.events_cache = inst.newArrayList((int)chunk_size);
@@ -873,7 +890,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         long[] size = dims.clone();
         size[0] = H5F_UNLIMITED;
         long[] chunks = dims.clone();
-        chunks[0] = 1024;
+        chunks[0] = dims[0];
 
         H5ScalarDS ds = (H5ScalarDS)
             this.output.createScalarDS(name, parent, type,
@@ -921,10 +938,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected static void getGridNumbers(double[] dst,
-                                      int nel, int ispecout[], IGridCalc source) {
-        assert dst.length == nel * ispecout.length;
-        int pos = 0;
+    protected static void getGridNumbers(double[] dst, int row,
+                                         int nel, int ispecout[], IGridCalc source) {
+        final int rowsize = nel * ispecout.length;
+        assert dst.length % rowsize == 0;
+        assert row < dst.length / rowsize;
+
+        int pos = row * rowsize;
         for (int i = 0; i < nel; i++)
             for (int j = 0; j < ispecout.length; j++)
                 dst[pos++] = source.getGridPartNumb(i, ispecout[j]);
