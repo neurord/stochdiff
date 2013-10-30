@@ -318,26 +318,8 @@ public abstract class BaseCalc implements Runnable {
 
         regionConcentrations = makeRegionConcentrations(volumeGrid.getRegionLabels());
         regionSurfaceDensities = makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
-    }
 
-    public final boolean useBinomial() {
-        return (distID == distribution_t.BINOMIAL);
-    }
-
-    public final boolean usePoisson() {
-        return (distID == distribution_t.POISSON);
-    }
-
-    public final boolean doIndependent() {
-        return (algoID == algorithm_t.INDEPENDENT);
-    }
-
-    public final boolean doShared() {
-        return (algoID == algorithm_t.SHARED);
-    }
-
-    public final boolean doParticle() {
-        return (algoID == algorithm_t.PARTICLE);
+        log.warn("{}: exiting extract grid", this.trial());
     }
 
     public double[] getNanoMolarConcentrations() {
@@ -364,17 +346,14 @@ public abstract class BaseCalc implements Runnable {
             // override
             // those values that are explicitly set elsewhere
             ret[i] = new double[baseConcentrations.length];
-            for (int j = 0; j < nc; j++) {
+            for (int j = 0; j < nc; j++)
                 ret[i][j] = baseConcentrations[j];
-            }
 
             if (icons.hasConcentrationsFor(sra[i])) {
                 double[] wk = icons.getRegionConcentrations(sra[i], speciesList);
-                for (int j = 0; j < nc; j++) {
-                    if (wk[j] >= 0.) {
+                for (int j = 0; j < nc; j++)
+                    if (wk[j] >= 0.)
                         ret[i][j] = wk[j];
-                    }
-                }
             }
         }
         return ret;

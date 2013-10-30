@@ -151,57 +151,51 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         // for steps of given n, p
         stepper = new InterpolatingStepGenerator(distID, random);
 
-        if (doShared() || doParticle() || doIndependent()) {
-            if (doShared()) {
-                E.info("Using SHARED destination allocation");
-            } else {
-                E.info("Using PER PARTICLE destination allocation");
+        log.info("Using {} destination allocation", algoID);
+        // FIXME: is independent supported
+
+        pSharedOut = new double[nel][nspec];
+        fSharedExit = new double[nel][nspec][];
+
+        int maxnn = 0;
+        for (int iel = 0; iel < nel; iel++)
+            for (int k = 0; k < nspec; k++) {
+                int nn = neighbors[iel].length;
+                fSharedExit[iel][k] = new double[nn];
+                if (nn > maxnn)
+                    maxnn = nn;
             }
-            // FIXME: what about independent
+        log.info("max no of neighbors for a single element is {}", maxnn);
 
-            pSharedOut = new double[nel][nspec];
-            fSharedExit = new double[nel][nspec][];
+        for (int iel = 0; iel < nel; iel++) {
+            for (int k = 0; k < nspec; k++) {
 
-            int maxnn = 0;
-            for (int iel = 0; iel < nel; iel++)
-                for (int k = 0; k < nspec; k++) {
-                    int nn = neighbors[iel].length;
-                    fSharedExit[iel][k] = new double[nn];
-                    if (nn > maxnn)
-                        maxnn = nn;
+                double ptot = 0.;
+                double[] pcnbr = new double[neighbors[iel].length];
+
+                for (int j = 0; j < pcnbr.length; j++) {
+                    double lnpgo = lnfdiff[k] + lnCC[iel][j] + lndt - lnvolumes[iel];
+                    // probability is dt * K_diff * contact_area /
+                    // (center_to_center_distance * source_volume)
+                    // gnbr contains the gometry: contact_area / distance
+
+                    double p = Math.exp(lnpgo);
+                    ptot += p;
+                    pcnbr[j] = ptot;
                 }
-            log.info("max no of neighbors for a single element is {}", maxnn);
 
-            for (int iel = 0; iel < nel; iel++) {
-                for (int k = 0; k < nspec; k++) {
-
-                    double ptot = 0.;
-                    double[] pcnbr = new double[neighbors[iel].length];
-
-                    for (int j = 0; j < pcnbr.length; j++) {
-                        double lnpgo = lnfdiff[k] + lnCC[iel][j] + lndt - lnvolumes[iel];
-                        // probability is dt * K_diff * contact_area /
-                        // (center_to_center_distance * source_volume)
-                        // gnbr contains the gometry: contact_area / distance
-
-                        double p = Math.exp(lnpgo);
-                        ptot += p;
-                        pcnbr[j] = ptot;
-                    }
-
-                    if (ptot > 1/Math.E) { // why this value, who knows?
-                        // WK 9 11 2007
-                        System.out.println("WK===================================");
-                        System.out.println("In DIFFUSION: probability TOO HIGH!");
-                        System.out.println("Reduce your timestep, and try again...");
-                        System.out.println("WK====================================");
-                        System.exit(3);
-                    }
-
-                    pSharedOut[iel][k] = ptot;
-                    for (int j = 0; j < pcnbr.length; j++)
-                        fSharedExit[iel][k][j] = pcnbr[j] / ptot;
+                if (ptot > 1/Math.E) { // why this value, who knows?
+                    // WK 9 11 2007
+                    System.out.println("WK===================================");
+                    System.out.println("In DIFFUSION: probability TOO HIGH!");
+                    System.out.println("Reduce your timestep, and try again...");
+                    System.out.println("WK====================================");
+                    System.exit(3);
                 }
+
+                pSharedOut[iel][k] = ptot;
+                for (int j = 0; j < pcnbr.length; j++)
+                    fSharedExit[iel][k][j] = pcnbr[j] / ptot;
             }
         }
     }
