@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -38,6 +39,10 @@ public abstract class inst {
 
     public static <K,V> HashMap<K,V> newHashMap() {
         return new HashMap<K,V>();
+    }
+
+    public static <V> HashSet<V> newHashSet() {
+        return new HashSet<V>();
     }
 
     public static <K,V> LinkedHashMap<K,V> newLinkedHashMap() {

@@ -310,7 +310,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSpecies(int[] ispecout, IGridCalc source)
             throws Exception
         {
-            String[] specieIDs = source.getSpecieIDs();
+            String[] specieIDs = source.getSource().getSpecieIDs();
             String[] outSpecies = new String[ispecout.length];
             for (int i = 0; i < ispecout.length; i++)
                 outSpecies[i] = specieIDs[ispecout[i]];
@@ -324,7 +324,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeRegionLabels(IGridCalc source)
             throws Exception
         {
-            String[] regions = source.getVolumeGrid().getRegionLabels();
+            String[] regions = source.getSource().getVolumeGrid().getRegionLabels();
             Dataset ds = writeVector("regions", this.model, regions);
             setAttribute(ds, "TITLE", "names of regions");
             setAttribute(ds, "LAYOUT", "[nregions]");
@@ -334,7 +334,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeStimulationData(IGridCalc source)
             throws Exception
         {
-            StimulationTable table = source.getStimulationTable();
+            StimulationTable table = source.getSource().getStimulationTable();
 
             Group group = output.createGroup("stimulation", this.model);
             setAttribute(group, "TITLE", "stimulation parameters");
@@ -353,7 +353,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             {
-                int[][] targets = source.getStimulationTargets();
+                int[][] targets = source.getSource().getStimulationTargets();
                 Dataset ds = writeArray("targets", group, targets, -1);
                 setAttribute(ds, "TITLE", "stimulated voxels");
                 setAttribute(ds, "LAYOUT", "[??? × ???]");
@@ -364,7 +364,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeReactionData(IGridCalc source)
             throws Exception
         {
-            ReactionTable table = source.getReactionTable();
+            ReactionTable table = source.getSource().getReactionTable();
 
             Group group = output.createGroup("reactions", this.model);
             setAttribute(group, "TITLE", "reaction scheme");
@@ -780,7 +780,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             log.debug("state saved at t={} ms for trial {}", time, source.trial());
             int nel = source.getNumberElements();
-            int nspecie = source.getSpecieIDs().length;
+            int nspecie = source.getSource().getSpecieIDs().length;
             if (source.preferConcs())
                 this.writeSavedStateD(nel, nspecie, source);
             else
@@ -794,7 +794,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             // the file on creation...
             Dataset obj = (Dataset) output.get("/simulation/state");
             int nel = source.getNumberElements();
-            int nspecie = source.getSpecieIDs().length;
+            int nspecie = source.getSource().getSpecieIDs().length;
             if (obj == null)
                 throw new RuntimeException("state hasn't been saved");
             if (source.preferConcs()) {

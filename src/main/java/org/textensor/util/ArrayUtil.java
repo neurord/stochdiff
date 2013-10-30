@@ -315,4 +315,22 @@ public class ArrayUtil {
             s += sum(x);
         return s;
     }
+
+    // Note: there is a similar thing in catacomb.util.ArrayUtil.
+    public static double min(double[] a) {
+        if (a.length == 0)
+            return Double.NaN;
+        double x = a[0];
+        for (double x2: a)
+            if (x2 < x)
+                x = x2;
+        return x;
+    }
+
+    public static int[] iota(int len) {
+        int[] x = new int[len];
+        for (int i = 0; i < len; i++)
+            x[i] = i;
+        return x;
+    }
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
+import org.textensor.stochdiff.model.SDRunWrapper;
 
 public interface IGridCalc {
     /*
@@ -17,21 +18,12 @@ public interface IGridCalc {
 
     boolean preferConcs();
 
-    String[] getSpecieIDs();
-    int[][] getSpecIndexesOut();
-    int[] getEltRegions();
-    String[] getRegionsOut();
-
-    VolumeGrid getVolumeGrid();
+    SDRunWrapper getSource();
 
     int getNumberElements();
 
     int[][] getReactionEvents();
-
     int[][][] getDiffusionEvents();
-
-    StimulationTable getStimulationTable();
-    int[][] getStimulationTargets();
     int[][] getStimulationEvents();
 
     public enum EventType {
@@ -55,6 +47,4 @@ public interface IGridCalc {
     }
 
     Collection<Event> getEvents();
-
-    ReactionTable getReactionTable();
 }

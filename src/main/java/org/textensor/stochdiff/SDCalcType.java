@@ -5,9 +5,12 @@ import org.textensor.stochdiff.numeric.grid.SteppedStochasticGridCalc;
 import org.textensor.stochdiff.numeric.grid.ExactStochasticGridCalc;
 import org.textensor.stochdiff.numeric.pool.*;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.report.E;
 import java.lang.reflect.Constructor;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * This is an enumeration of all the calculation methods. The names
@@ -33,24 +36,24 @@ public enum SDCalcType {
     GRID_STEPPED_STOCHASTIC(SteppedStochasticGridCalc.class),
     GRID_STEPPED_EXACT(ExactStochasticGridCalc.class);
 
+    static final Logger log = LogManager.getLogger(SDCalcType.class);
+
     private final Class cls;
 
     SDCalcType(Class cls) {
         this.cls = cls;
     }
 
-    public BaseCalc getCalc(int trial, SDRun sdr) {
+    public BaseCalc getCalc(int trial, SDRunWrapper sdr) {
         BaseCalc ret = null;
         try {
-            Class[] argTyp = {Integer.TYPE, SDRun.class};
+            Class[] argTyp = {Integer.TYPE, SDRunWrapper.class};
             Constructor constructor = this.cls.getConstructor(argTyp);
             Object[] args = {trial, sdr};
-            ret = (BaseCalc)(constructor.newInstance(args));
-
-        } catch (Exception ex) {
-            E.error("ex " + ex + " cannot instantiate " + name() + " " + this.cls);
-            ex.printStackTrace();
+            return (BaseCalc)(constructor.newInstance(args));
+        } catch (Exception e) {
+            log.error("{}: cannot instantiate {}", this, this.cls.getName(), e);
+            throw new RuntimeException(e);
         }
-        return ret;
     }
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
@@ -58,16 +59,19 @@ public class SDCalc {
         //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
     }
 
-    protected BaseCalc prepareCalc(int trial) {
-        BaseCalc calc = calculationType.getCalc(trial, this.sdRun);
+    protected BaseCalc prepareCalc(int trial, SDRunWrapper wrapper) {
+        BaseCalc calc = calculationType.getCalc(trial, wrapper);
         for (ResultWriter resultWriter: this.resultWriters)
                 calc.addResultWriter(resultWriter);
         return calc;
     }
 
     public void run() {
+        SDRunWrapper wrapper = new SDRunWrapper(this.sdRun);
+        log.info("Wrapper is ready, beginning calculations");
+
         if (trials == 1)
-            this.prepareCalc(0).run();
+            this.prepareCalc(0, wrapper).run();
         else {
             int poolSize = Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(poolSize);
@@ -75,7 +79,7 @@ public class SDCalc {
 
             for (int i = 0; i < trials; i++) {
                 log.info("Starting trial {}", i);
-                pool.execute(this.prepareCalc(i));
+                pool.execute(this.prepareCalc(i, wrapper));
             }
 
             log.info("Executing shutdown of pool {}", pool);

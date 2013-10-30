@@ -116,6 +116,7 @@ public class ReactionTable {
 
 
     public String[] getSpecieIDs() {
+        assert speciesIDs != null;
         return speciesIDs;
     }
 

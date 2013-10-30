@@ -250,7 +250,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     private String getGridConcsText(double time, int nel, int[] ispecout, IGridCalc source) {
-        final String[] specieIDs = source.getSpecieIDs();
+        final String[] specieIDs = source.getSource().getSpecieIDs();
         StringBuffer sb = new StringBuffer();
         // TODO tag specific to integer quantities;
         int nspecout = ispecout.length;
@@ -277,10 +277,10 @@ public class ResultWriterText implements ResultWriter {
     }
 
     private String getGridConcsPlainText_dumb(int filenum, double time, int nel, IGridCalc source) {
-        final int[][] specIndexesOut = source.getSpecIndexesOut();
-        final String[] regionLabels = source.getVolumeGrid().getRegionLabels();
-        final int[] eltRegions = source.getEltRegions();
-        final String[] regionsOut = source.getRegionsOut();
+        final int[][] specIndexesOut = source.getSource().getSpecIndexesOut();
+        final String[] regionLabels = source.getSource().getVolumeGrid().getRegionLabels();
+        final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
+        final String[] regionsOut = source.getSource().getRegionsOut();
 
         StringBuffer sb = new StringBuffer();
         sb.append(stringd(time));
@@ -295,12 +295,12 @@ public class ResultWriterText implements ResultWriter {
     }
 
     private String getGridConcsHeadings_dumb(int filenum, VolumeGrid vgrid, IGridCalc source) {
-        final int[][] specIndexesOut = source.getSpecIndexesOut();
-        final String[] regionsOut = source.getRegionsOut();
+        final int[][] specIndexesOut = source.getSource().getSpecIndexesOut();
+        final String[] regionsOut = source.getSource().getRegionsOut();
         final String[] regionLabels = vgrid.getRegionLabels();
-        final String[] specieIDs = source.getSpecieIDs();
+        final String[] specieIDs = source.getSource().getSpecieIDs();
         final boolean[] submembranes = vgrid.getSubmembranes();
-        final int[] eltRegions = source.getEltRegions();
+        final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
 
         StringBuffer sb = new StringBuffer();
         sb.append("time");
@@ -358,7 +358,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     protected String getStateText(IGridCalc source) {
-        String[] specieIDs = source.getSpecieIDs();
+        String[] specieIDs = source.getSource().getSpecieIDs();
         int nel = source.getNumberElements();
 
         StringBuffer sb = new StringBuffer();
@@ -421,7 +421,7 @@ public class ResultWriterText implements ResultWriter {
 
     public Object loadState(String fnm, IGridCalc source) {
             int nel = source.getNumberElements();
-            String[] species = source.getSpecieIDs();
+            String[] species = source.getSource().getSpecieIDs();
             double[][] state = this._readInitialState(fnm, nel, species.length, species);
             if (source.preferConcs())
                 return state;

@@ -1,7 +1,7 @@
 package org.textensor.stochdiff.numeric;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
@@ -20,7 +20,7 @@ public class StaticCalc extends BaseCalc {
     double[][] wkA;
 
 
-    public StaticCalc(int trial, SDRun sdr) {
+    public StaticCalc(int trial, SDRunWrapper sdr) {
         super(trial, sdr);
     }
 
@@ -38,8 +38,8 @@ public class StaticCalc extends BaseCalc {
 
     public void init() {
 
-        rtab = getReactionTable();
-        vgrid = getVolumeGrid();
+        rtab = this.wrapper.getReactionTable();
+        vgrid = this.wrapper.getVolumeGrid();
 
         nel = vgrid.getNElements();
 
@@ -69,8 +69,8 @@ public class StaticCalc extends BaseCalc {
 
 
     public void reinit() {
-        double[][] regcon = getRegionConcentrations();
-        double[][] regsd = getRegionSurfaceDensities();
+        double[][] regcon = this.wrapper.getRegionConcentrations();
+        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
 
         for (int i = 0; i < nel; i++) {
             double[] rcs = regcon[eltregions[i]];

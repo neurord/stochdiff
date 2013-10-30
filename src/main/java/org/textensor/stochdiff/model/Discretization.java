@@ -12,7 +12,7 @@ public class Discretization implements AddableTo {
     public double spineDeltaX;
 
 
-    public double defaultMaxElementSide;
+    public double defaultMaxElementSide = 1.;
 
 
     public String elementShape = "Cuboid";

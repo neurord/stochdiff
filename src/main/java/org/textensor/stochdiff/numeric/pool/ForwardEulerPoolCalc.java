@@ -1,17 +1,15 @@
 package org.textensor.stochdiff.numeric.pool;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.math.Column;
 
 
 public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
 
-    public ForwardEulerPoolCalc(int trial, SDRun sdm) {
+    public ForwardEulerPoolCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
-
-
 
     public double advance() {
         Column rates = rtab.getRateColumn(mconc);
@@ -27,8 +25,6 @@ public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
 
         return dt;
     }
-
-
 
     public long getParticleCount() {
         // TODO Auto-generated method stub

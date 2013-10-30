@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
@@ -91,7 +91,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     double[][] pSharedOut;
     double[][][] fSharedExit;
 
-    public SteppedStochasticGridCalc(int trial, SDRun sdm) {
+    public SteppedStochasticGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 
@@ -119,7 +119,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         wkB = new int[nel][nspec];
         ArrayUtil.copy(wkA, wkB);
 
-        double[][] regsd = getRegionSurfaceDensities();
+        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
 
         // apply initial conditions over the grid
         for (int i = 0; i < nel; i++) {
@@ -134,13 +134,14 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             }
         }
 
-        if (sdRun.initialStateFile != null) {
+        String statefile = this.wrapper.sdRun.initialStateFile;
+        if (statefile != null) {
             if (this.resultWriters.size() == 0) {
                 log.error("Unable to read state because writers are disabled");
                 throw new RuntimeException("Unable to read state because writers are disabled");
             }
 
-            int[][] cc = (int[][]) resultWriters.get(0).loadState(sdRun.initialStateFile, this);
+            int[][] cc = (int[][]) resultWriters.get(0).loadState(statefile, this);
             ArrayUtil.copy(cc, this.wkA);
             ArrayUtil.copy(cc, this.wkB);
         }
@@ -210,7 +211,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
     public double advance(double tnow) {
         // add in any injections
-        double[][] stims = stimTab.getStimsForInterval(tnow, dt);
+        double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
         for (int i = 0; i < stims.length; i++) {
             double[] astim = stims[i];
             for (int j = 0; j < astim.length; j++) {
@@ -224,6 +225,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     // TODO - allow stim type (deterministic or poisson etc) in
                     // config;
 
+                    int[][] stimtargets = this.wrapper.getStimulationTargets();
                     int nk = stimtargets[i].length;
                     if (nk > 0) {
                         double as = astim[j] / nk;

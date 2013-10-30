@@ -1,7 +1,7 @@
 package org.textensor.stochdiff.numeric.pool;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
@@ -27,7 +27,7 @@ public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
 
 
 
-    public ImplicitEulerPoolCalc(int trial, SDRun sdm) {
+    public ImplicitEulerPoolCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 

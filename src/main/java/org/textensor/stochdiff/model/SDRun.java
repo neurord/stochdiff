@@ -27,7 +27,7 @@ public class SDRun {
 
     public String action;
 
-    public String geometry;
+    public String geometry = "2D";
     public double depth2D;
 
     public double runtime;
@@ -53,7 +53,7 @@ public class SDRun {
 
     public String outputSpecies;
 
-    public String outputQuantity; // either "NUMBER" or "CONCENTRATION"
+    public String outputQuantity = "NUMBER"; // either "NUMBER" or "CONCENTRATION"
 
     /**
      * Accepted tolerance for adaptive calculations
@@ -233,10 +233,5 @@ public class SDRun {
         }
         return ret;
     }
-
-
-
-
-
 
 }

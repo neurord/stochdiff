@@ -3,7 +3,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.util.List;
 import java.util.Collection;
 
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 
@@ -19,7 +19,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     ArrayList<IGridCalc.Event> events
         = log_events ? new ArrayList<IGridCalc.Event>() : null;
 
-    public ExactStochasticGridCalc(int trial, SDRun sdm) {
+    public ExactStochasticGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 
@@ -28,10 +28,12 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         super.init();
 
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
-                                         getVolumeGrid(), rtab,
-                                         stimTab, this.getStimulationTargets(),
-                                         this.sdRun.tolerance,
-                                         this.sdRun.leap_min_jump);
+                                         this.wrapper.getVolumeGrid(), rtab,
+                                         this.wrapper.getStimulationTable(),
+                                         this.wrapper.getStimulationTargets(),
+                                         this.wrapper.sdRun.tolerance,
+                                         this.wrapper.sdRun.leap_min_jump,
+                                         this.trial() == 0);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.textensor.stochdiff.numeric.grid;
 
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.util.ArrayUtil;
@@ -18,7 +18,7 @@ public abstract class StochasticGridCalc extends GridCalc {
 
     int[][] wkA;
 
-    public StochasticGridCalc(int trial, SDRun sdm) {
+    public StochasticGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 
@@ -36,7 +36,7 @@ public abstract class StochasticGridCalc extends GridCalc {
 
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
-            double[] rcs = getRegionConcentrations()[eltregions[i]];
+            double[] rcs = this.wrapper.getRegionConcentrations()[eltregions[i]];
 
             for (int j = 0; j < nspec; j++)
                 wkA[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);

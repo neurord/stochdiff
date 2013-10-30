@@ -2,11 +2,12 @@ package org.textensor.stochdiff.numeric.grid;
 
 import java.util.Arrays;
 
-import org.textensor.stochdiff.model.SDRun;
+import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.util.ArrayUtil;
 
 import org.apache.logging.log4j.Logger;
@@ -16,8 +17,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     static final Logger log = LogManager.getLogger(GridCalc.class);
 
     ReactionTable rtab;
-
-    StimulationTable stimTab;
 
     double dt;
 
@@ -31,7 +30,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     double[][] couplingConstants;
 
     public int[] eltregions;
-    int[][] stimtargets;
 
     double[] surfaceAreas;
 
@@ -52,31 +50,33 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     int ninjected = 0;
 
 
-    protected GridCalc(int trial, SDRun sdm) {
+    protected GridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 
     protected void init() {
-        stateSaveTime = sdRun.getStateSaveInterval();
+        stateSaveTime = wrapper.sdRun.getStateSaveInterval();
         if (stateSaveTime <= 0.0) {
             stateSaveTime = 1.e9;
         }
 
-        nel = this.getVolumeGrid().getNElements();
-        volumes = this.getVolumeGrid().getElementVolumes();
+        VolumeGrid grid = this.wrapper.getVolumeGrid();
 
-        rtab = getReactionTable();
+        nel = grid.getNElements();
+        volumes = grid.getElementVolumes();
+
+        rtab = this.wrapper.getReactionTable();
         specieIDs = rtab.getSpecieIDs();
         nspec = rtab.getNSpecies();
 
-        neighbors = this.getVolumeGrid().getPerElementNeighbors();
-        couplingConstants = this.getVolumeGrid().getPerElementCouplingConstants();
+        neighbors = grid.getPerElementNeighbors();
+        couplingConstants = grid.getPerElementCouplingConstants();
 
-        eltregions = this.getVolumeGrid().getRegionIndexes();
+        eltregions = grid.getRegionIndexes();
 
         fdiff = rtab.getDiffusionConstants();
 
-        surfaceAreas = this.getVolumeGrid().getExposedAreas();
+        surfaceAreas = grid.getExposedAreas();
 
         // RO
         // ----------------------
@@ -85,61 +85,59 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         // ----------------------
         // RO
-        extractOutputScheme(rtab); // see BaseCalc.java
 
-        stimTab = getStimulationTable();
-        stimtargets = this.getVolumeGrid().getAreaIndexes(stimTab.getTargetIDs());
+        StimulationTable stimTab = this.wrapper.getStimulationTable();
+        this.stimulationEvents = new int[nel][nspec];
 
-        stimulationEvents = new int[nel][nspec];
+        this.reactionEvents = new int[nel][rtab.getNReaction()];
 
-        reactionEvents = new int[nel][rtab.getNReaction()];
-
-        diffusionEvents = new int[nel][nspec][];
+        this.diffusionEvents = new int[nel][nspec][];
         for (int iel = 0; iel < nel; iel++)
             for (int k = 0; k < nspec; k++) {
                 int nn = neighbors[iel].length;
                 diffusionEvents[iel][k] = new int[nn];
             }
 
-        dt = sdRun.fixedStepDt;
+        dt = this.wrapper.sdRun.fixedStepDt;
     }
 
     @Override
     protected void _run() {
         init();
 
-        double time = sdRun.getStartTime();
-        double endtime = sdRun.getEndTime();
+        double time = this.wrapper.sdRun.getStartTime();
+        double endtime = this.wrapper.sdRun.getEndTime();
 
         for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(this.getVolumeGrid(), sdRun.getStartTime(), fnmsOut, this);
+            resultWriter.writeGrid(this.wrapper.getVolumeGrid(),
+                                   time, this.wrapper.fnmsOut, this);
 
-        log.info("Running from time=" + time + " ms to time=" + endtime + " ms");
+        log.info("Trial {}: running from time={} ms to time={} ms", this.trial(), time, endtime);
 
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
 
-        double[] writeTimeArray = new double[fnmsOut.length];
+        double[] writeTimeArray = new double[this.wrapper.fnmsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
 
         while (time < endtime) {
 
             if (time >= writeTime) {
-                log.info("time {} dt={}", time, dt);
+                log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
 
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeGridConcs(time, nel, ispecout, this);
+                    resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
 
-                writeTime += sdRun.outputInterval;
+                writeTime += this.wrapper.sdRun.outputInterval;
                 ArrayUtil.fill(this.stimulationEvents, 0);
                 ArrayUtil.fill(this.diffusionEvents, 0);
                 ArrayUtil.fill(this.reactionEvents, 0);
             }
-            for (int i = 0; i < fnmsOut.length; i++) {
+            for (int i = 0; i < this.wrapper.fnmsOut.length; i++) {
                 if (time >= writeTimeArray[i]) {
                     for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.writeGridConcsDumb(i, time, nel, fnmsOut[i], this);
-                    writeTimeArray[i] += Double.valueOf(dtsOut[i]);
+                        resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
+                    writeTimeArray[i] += Double.valueOf(this.wrapper.dtsOut[i]);
                 }
             }
 
@@ -147,17 +145,18 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
             if (time >= stateSaveTime) {
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, sdRun.stateSavePrefix, this);
-                stateSaveTime += sdRun.getStateSaveInterval();
+                    resultWriter.saveState(time, this.wrapper.sdRun.stateSavePrefix, this);
+                stateSaveTime += this.wrapper.sdRun.getStateSaveInterval();
             }
         }
 
-        log.info("Injected {} particles", ninjected);
+        log.info("Trial {}: injected {} particles", this.trial(), ninjected);
 
-        log.info("Total number of particles at the end: {}", this.getParticleCount());
+        log.info("Trial {}: total number of particles at the end: {}",
+                 this.trial(), this.getParticleCount());
 
         long endTime = System.currentTimeMillis();
-        log.info("Total run time {} ms", endTime - startTime);
+        log.info("Trial {}: total run time {} ms", endTime - startTime);
 
         this.footer();
         this.close();
@@ -183,16 +182,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     }
 
     @Override
-    public String[] getSpecieIDs() {
-        return this.specieIDs;
-    }
-
-    @Override
-    public int[] getEltRegions() {
-        return this.eltregions;
-    }
-
-    @Override
     public int[][] getReactionEvents() {
         return this.reactionEvents;
     }
@@ -200,11 +189,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     @Override
     public int[][][] getDiffusionEvents() {
         return this.diffusionEvents;
-    }
-
-    @Override
-    public int[][] getStimulationTargets() {
-        return this.stimtargets;
     }
 
     @Override
