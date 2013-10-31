@@ -29,6 +29,7 @@ import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
 
 public class ResultWriterHDF5 implements ResultWriter {
     static final Logger log = LogManager.getLogger(ResultWriterHDF5.class);
@@ -467,11 +468,12 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             getGridNumbers(this.concs_data, this.concs_times_count, nel, ispecout, source);
             this.times_data[this.concs_times_count] = time;
+            this.concs_times_count++;
 
-            if (this.concs_times_count++ == this.times_data.length) {
+            if (this.concs_times_count == this.times_data.length) {
                 log.debug("Writing stats at time {} for trial {}", time, source.trial());
                 this.concs.write(this.concs_data);
-                this.times.write(times);
+                this.times.write(this.times_data);
                 this.resetTimesConcs();
             }
         }
@@ -942,10 +944,12 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected static void getGridNumbers(double[] dst, int row,
                                          int nel, int ispecout[], IGridCalc source) {
         final int rowsize = nel * ispecout.length;
-        assert dst.length % rowsize == 0;
-        assert row < dst.length / rowsize;
-
         int pos = row * rowsize;
+
+        assert dst.length % rowsize == 0;
+        assert row < dst.length / rowsize: "dst[" + dst.length + "] row=" + row +
+            " nel=" + nel + " rowsize=" + rowsize + " pos=" + pos;
+
         for (int i = 0; i < nel; i++)
             for (int j = 0; j < ispecout.length; j++)
                 dst[pos++] = source.getGridPartNumb(i, ispecout[j]);
