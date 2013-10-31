@@ -681,7 +681,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             int n = this.events_cache.size();
             n -= n % this.events_event.getChunkSize()[0];
 
-            log.debug("Got {} events at time {}, writing {}", events.size(), time, n);
+            log.log(n > 0 ? Level.INFO : Level.DEBUG,
+                    "Got {} events at time {}, writing {}", events.size(), time, n);
             if (n == 0)
                 return;
 

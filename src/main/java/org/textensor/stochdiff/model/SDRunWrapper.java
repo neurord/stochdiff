@@ -124,7 +124,7 @@ public class SDRunWrapper {
         String[] specieIDs = rtab.getSpecieIDs();
         int nspec = specieIDs.length;
 
-        log.info("extracting output scheme with {} for {} species", os.outputSets.size(), nspec);
+        log.info("extracting output scheme with {} file for {} species", os.outputSets.size(), nspec);
 
 
         for (int i = 0; i < os.outputSets.size(); i++) {

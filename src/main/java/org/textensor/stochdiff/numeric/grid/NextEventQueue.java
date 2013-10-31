@@ -88,7 +88,7 @@ public class NextEventQueue {
                     return Double.compare(a.time(), b.time());
                 }
             };
-            log.info("sorting {} nodes ({})", nodes.length, "" + nodes);
+            log.warn("sorting {} nodes ({})", nodes.length, "" + nodes);
             Arrays.sort(nodes, c);
 
             for (int i = 0; i < nodes.length; i++)
@@ -198,7 +198,7 @@ public class NextEventQueue {
 
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
-            log.debug("generating exponential time for prop={} → time={}", this.propensity, exp);
+            log.debug("exponential time for prop={} → time={}", this.propensity, exp);
             return current + exp;
         }
 
@@ -405,7 +405,7 @@ public class NextEventQueue {
                  t2 = tolerance * Xm / this.fdiff / (X1 + X2),
                  ans = Math.min(t1, t2);
 
-             log.debug("{}: leap time: min(E→{}, V→{}) → {}", this, t1, t2, ans);
+             log.debug("leap time: min(E→{}, V→{}) → {}", this, t1, t2, ans);
              return ans;
         }
 
