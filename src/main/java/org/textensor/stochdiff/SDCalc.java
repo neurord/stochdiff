@@ -28,6 +28,7 @@ public class SDCalc {
 
     final String[] writers = Settings.getPropertyList("stochdiff.writers", "text");
     final int trials = Settings.getProperty("stochdiff.trials", 1);
+    final int threads = Settings.getProperty("stochdiff.threads", 0);
 
     protected final List<ResultWriter> resultWriters = inst.newArrayList();
 
@@ -73,7 +74,7 @@ public class SDCalc {
         if (trials == 1)
             this.prepareCalc(0, wrapper).run();
         else {
-            int poolSize = Runtime.getRuntime().availableProcessors();
+            int poolSize = threads > 0 ? threads : Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(poolSize);
             log.info("Running with pool {}", pool);
 
