@@ -661,18 +661,23 @@ public class NextEventQueue {
         }
 
         /**
-         * @param current: starting time
-         * @param delta: time interval
-         * @param insideWindow: whether to limit the returned value to current
-         *        stimulation window.
+         * @param current: starting real time
+         * @param delta: continous time interval
+         * @param insideDuration: if real and continous time delta were different, return
+         *               the moment of divergence. Returned value might be negative in
+         *               this case.
          */
         private double _continous_delta_to_real_time(double current, double delta,
-                                                     boolean insideWindow) {
-            final double tc, tp;
+                                                     boolean insideDuration)
+        {
+            final double tc;
+            double tp;
 
             if (Double.isNaN(this.stim.period)) {
-                tc = Math.max(current, this.stim.onset);   /* current continous time */
-                tp = this.stim.onset;                      /* beggining of current period */
+                tc = Math.max(current, this.stim.onset); /* beginning of the relevant period,
+                                                            expressed in real time */
+                tp = tc - this.stim.onset;               /* real time since the beggining of
+                                                            the relevant period */
             } else {
                 double nc = (current - this.stim.onset) / this.stim.period;
                 if (nc < 0)
@@ -681,25 +686,35 @@ public class NextEventQueue {
                 tp = nc % 1 * this.stim.period;
                 assert current > this.stim.onset || tp == 0;
 
-                /* current time converted to continous time */
-                tc = tp < this.stim.duration ?
-                    Math.floor(nc) * this.stim.duration + tp :
-                    Math.ceil(nc) * this.stim.duration;
+                if (tp < this.stim.duration)
+                    tc = this.stim.onset + Math.floor(nc) * this.stim.period;
+                else {
+                    tc = this.stim.onset + Math.ceil(nc) * this.stim.period;
+                    tp = 0;
+                }
             }
 
-            double t1;
-            if (insideWindow)
-                t1 = Math.min(tc + delta, tp + this.stim.duration);
-            else
-                t1 = tc + delta;
+            double t1 = tp + delta;
 
-            if (!Double.isNaN(this.stim.period)) {
+            if (insideDuration && t1 > this.stim.duration)
+                return tc + this.stim.duration;
+
+            if (Double.isNaN(this.stim.period))
+                t1 += tc;
+            else {
                 int n = (int)(t1 / this.stim.duration);
-                t1 = this.stim.onset + n * this.stim.period + t1 % this.stim.duration;
+                t1 = tc + n * this.stim.period + t1 % this.stim.duration;
             }
 
-            return (t1 < this.stim.end ? t1 :
-                    insideWindow ? this.stim.end : Double.POSITIVE_INFINITY);
+            double t2 = t1 < this.stim.end ? t1 : Double.POSITIVE_INFINITY;
+            assert insideDuration || t2 + 1e-6 >= current + delta:
+                  "t1=" + t1  + " t2=" + t2 + " current=" + current + " delta=" + delta +
+                  " current+delta=" + (current+delta);
+            /* FIXME: problem with rounding can happen. But we don't want to go negative */
+            if (!insideDuration && t2 < current)
+                return current;
+            else
+                return t2;
         }
 
         @Override
@@ -722,17 +737,18 @@ public class NextEventQueue {
         public double leap_time(double current, double tolerance) {
             double cont_leap_time =
                 tolerance * particles[this.element()][this.sp] / this.propensity;
+            assert cont_leap_time >= 0;
+
             double until = _continous_delta_to_real_time(current, cont_leap_time, true);
-            log.debug("{}: leap time: {}×{}/{} → {} cont, {} real",
+            log.debug("{}: leap time: {}×{}/{} → {} cont, {} real until {}",
                       this,
                       tolerance, particles[this.element()][this.sp], this.propensity,
-                      cont_leap_time, until);
+                      cont_leap_time, until - current, until);
 
-            /* When we are after the end of the stimulation period,
+            /* When we are after the end of the stimulation duration,
              * there might be no "next" time. */
             if (until <= current)
                 return 0;
-            assert until < current + this.stim.duration;
             return until - current;
         }
 
@@ -916,17 +932,23 @@ public class NextEventQueue {
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
-            for (NextEvent ev: obj.queue.nodes)
+            for (NextEvent ev: obj.queue.nodes) {
                 log.info("{} → {} prop={} t={}", ev.index(),
                          ev, ev.propensity, ev.time());
-
-            for (NextEvent ev: e) {
-                ev.addRelations(e);
-                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+                if (Double.isInfinite(ev.time())) {
+                    log.info("subsequent events will happen at infinity");
+                    break;
+                }
             }
-
-            log_dependency_edges(e);
         }
+
+        for (NextEvent ev: e) {
+            ev.addRelations(e);
+            if (verbose)
+                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+        }
+
+        log_dependency_edges(e);
 
         return obj;
     }
