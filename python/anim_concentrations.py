@@ -159,7 +159,7 @@ class DrawerSet(object):
 
 def animate_drawing(opts):
     file = tables.openFile(opts.file)
-    ss = DrawerSet(file.root.model, file.root.simulation, opts)
+    ss = DrawerSet(file.root.trial0.model, file.root.trial0.simulation, opts)
     indexes = itertools.cycle(ss.items)
     ss.animate(indexes)
 
@@ -169,7 +169,7 @@ def save_drawings(opts, suboffset=None, subtotal=1):
         matplotlib.use('Agg')
 
     file = tables.openFile(opts.file)
-    ss = DrawerSet(file.root.model, file.root.simulation, opts)
+    ss = DrawerSet(file.root.trial0.model, file.root.trial0.simulation, opts)
     if opts.save:
         if suboffset is None:
             indexes = ss.items
@@ -226,7 +226,7 @@ def _connections(dst, regions, connections, couplings):
 
 def dot_connections(filename):
     file = tables.openFile(filename)
-    model = file.root.model
+    model = file.root.trial0.model
     regions = model.regions[1:] # skip "default" in first position
     _connections(sys.stdout, regions, model.neighbors, model.couplings)
 
@@ -271,7 +271,7 @@ def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates)
 
 def dot_productions(filename):
     file = tables.openFile(filename)
-    model = file.root.model
+    model = file.root.trial0.model
     _productions(sys.stdout, model.species,
                  model.reactions.reactants, model.reactions.reactant_stochiometry,
                  model.reactions.products, model.reactions.product_stochiometry,
@@ -319,8 +319,8 @@ def find_regions(regions, spec, grid):
 
 def plot_history(filename, species, opts):
     file = tables.openFile(filename)
-    model = file.root.model
-    simul = file.root.simulation
+    model = file.root.trial0.model
+    simul = file.root.trial0.simulation
     if species:
         indices = specie_indices(species, model.species)
     else:
