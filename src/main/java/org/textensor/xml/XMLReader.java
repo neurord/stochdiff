@@ -7,8 +7,11 @@ import java.util.StringTokenizer;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.BodyValued;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class XMLReader {
+    static final Logger log = LogManager.getLogger(XMLReader.class);
 
     ReflectionInstantiator instantiator;
     int sourceLength;
@@ -126,7 +129,7 @@ public class XMLReader {
         }
 
 
-        Object child = null;
+        Object child;
 
         if (parent instanceof String || parent instanceof StringBuffer) {
             child = new StringBuffer();
@@ -246,8 +249,6 @@ public class XMLReader {
                             }  else if (child instanceof Double) {
                                 child = new Double(next.svalue);
 
-                                //          E.info("resetting dbl field " + parent + " " + start.getName() + " " + next.svalue);
-
                             } else if (child instanceof Integer) {
                                 child = new Integer(next.svalue);
 
@@ -273,7 +274,23 @@ public class XMLReader {
             // b) replaced obj with a new object of the same type
             // c) filled the vector with strings, doubles or objects;
 
+            String prop = "stochdiff.sdrun." + start.getName();
+            String val = System.getProperty(prop);
+            if (val != null) {
+                if (child instanceof Double)
+                    child = Double.valueOf(val);
+                else if (child instanceof Integer)
+                    child = Integer.valueOf(val);
+                else if (child instanceof Boolean)
+                    child = Boolean.valueOf(val);
+                else if (child instanceof String)
+                    child = val;
+                else
+                    throw new RuntimeException("unknown setting type " + prop);
 
+                log.info("Setting {} from the environment to {}", start.getName(), child);
+            } else
+                log.debug("Setting {} not found");
 
             if (child instanceof StringBuffer) {
                 child = ((StringBuffer)child).toString();
