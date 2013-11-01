@@ -15,6 +15,10 @@ import org.apache.logging.log4j.LogManager;
 public class ExactStochasticGridCalc extends StochasticGridCalc {
     static final Logger log = LogManager.getLogger(ExactStochasticGridCalc.class);
 
+    /* Timestamp when queue creation was finished */
+    private long real_start_time;
+    private long real_end_time;
+
     NextEventQueue neq;
     ArrayList<IGridCalc.Event> events
         = log_events ? new ArrayList<IGridCalc.Event>() : null;
@@ -34,6 +38,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                                          this.wrapper.sdRun.tolerance,
                                          this.wrapper.sdRun.leap_min_jump,
                                          this.trial() == 0);
+        this.real_start_time = this.real_end_time = System.currentTimeMillis();
     }
 
     @Override
@@ -44,6 +49,10 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                  this.neq.leaps, this.neq.leap_extent,
                  ((double)this.neq.leap_extent)/this.neq.leaps,
                  this.neq.normal_waits);
+
+        long time = this.real_end_time - this.real_start_time;
+        double speed = 1000*(this.wrapper.sdRun.getEndTime() - this.wrapper.sdRun.getStartTime())/time;
+        log.info("Real simulation took {} ms, {} ms/s", time, speed);
     }
 
     public double advance(double tnow) {
@@ -58,7 +67,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         }
 
         this.ninjected += ArrayUtil.sum(this.diffusionEvents);
-
+        this.real_end_time = System.currentTimeMillis();
         return dt;
     }
 
