@@ -41,6 +41,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                                 "/usr/lib/jhdf5");
     }
 
+    static final int COMPRESSION_LEVEL = 6;
+
     final protected File outputFile;
     protected H5File output;
     protected Group root;
@@ -50,6 +52,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
     public static final H5Datatype int_t =
         new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE);
+    public static final H5Datatype long_t =
+        new H5Datatype(Datatype.CLASS_INTEGER, 8, Datatype.NATIVE, Datatype.NATIVE);
     public static final H5Datatype short_str_t =
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
@@ -221,91 +225,104 @@ public class ResultWriterHDF5 implements ResultWriter {
                                   String fnmsOut[], IGridCalc source)
             throws Exception
         {
+            this.writeSimulationData(source);
+
             log.debug("Writing grid at time {} for trial {}", startTime, source.trial());
             int n = vgrid.getNElements();
             long[]
                 dims = {n,},
                 chunks = {n,};
-                int gzip = 6;
-                String[] memberNames = { "x0", "y0", "z0",
-                                         "x1", "y1", "z1",
-                                         "x2", "y2", "z2",
-                                         "x3", "y3", "z3",
-                                         "volume", "deltaZ",
-                                         "label",
-                                         "region", "type", "group" };
+            String[] memberNames = { "x0", "y0", "z0",
+                                     "x1", "y1", "z1",
+                                     "x2", "y2", "z2",
+                                     "x3", "y3", "z3",
+                                     "volume", "deltaZ",
+                                     "label",
+                                     "region", "type", "group" };
 
-                Datatype[] memberTypes = new Datatype[memberNames.length];
-                Arrays.fill(memberTypes, double_t);
-                memberTypes[14] = short_str_t;
-                memberTypes[15] = int_t;
-                memberTypes[16] = short_str_t;
-                memberTypes[17] = short_str_t;
-                assert memberTypes.length == 18;
+            Datatype[] memberTypes = new Datatype[memberNames.length];
+            Arrays.fill(memberTypes, double_t);
+            memberTypes[14] = short_str_t;
+            memberTypes[15] = int_t;
+            memberTypes[16] = short_str_t;
+            memberTypes[17] = short_str_t;
+            assert memberTypes.length == 18;
 
-                Vector<Object> data = vgrid.gridData();
+            Vector<Object> data = vgrid.gridData();
 
-                {
-                    String[] labels = new String[n];
-                    for (int i = 0; i < n; i++) {
-                        labels[i] = vgrid.getLabel(i);
-                        if (labels[i] == null)
-                            labels[i] = "element" + i;
-                    }
+            {
+                String[] labels = new String[n];
+                for (int i = 0; i < n; i++) {
+                    labels[i] = vgrid.getLabel(i);
+                    if (labels[i] == null)
+                        labels[i] = "element" + i;
+                }
                     data.add(labels);
-                }
+            }
 
-                {
-                    int[] indexes = vgrid.getRegionIndexes();
-                    assert indexes.length == n;
-                    data.add(indexes);
-                }
+            {
+                int[] indexes = vgrid.getRegionIndexes();
+                assert indexes.length == n;
+                data.add(indexes);
+            }
 
-                {
-                    boolean[] membranes = vgrid.getSubmembranes();
-                    assert membranes.length == n;
-                    String[] types = new String[n];
-                    for (int i = 0; i < n; i++)
-                        types[i] = membranes[i] ? "submembrane" : "cytosol";
-                    data.add(types);
-                }
+            {
+                boolean[] membranes = vgrid.getSubmembranes();
+                assert membranes.length == n;
+                String[] types = new String[n];
+                for (int i = 0; i < n; i++)
+                    types[i] = membranes[i] ? "submembrane" : "cytosol";
+                data.add(types);
+            }
 
-                {
-                    String[] labels = new String[n];
-                    for (int i = 0; i < n; i++) {
-                        labels[i] = vgrid.getGroupID(i);
-                        if (labels[i] == null)
-                            labels[i] = "";
-                    }
-                    data.add(labels);
+            {
+                String[] labels = new String[n];
+                for (int i = 0; i < n; i++) {
+                    labels[i] = vgrid.getGroupID(i);
+                    if (labels[i] == null)
+                        labels[i] = "";
                 }
+                data.add(labels);
+            }
 
-                Dataset grid =
-                    output.createCompoundDS("grid", this.model, dims, null, chunks, gzip,
-                                            memberNames, memberTypes, null, data);
-                log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                         "grid", xJoined(dims), "", xJoined(chunks));
-                setAttribute(grid, "TITLE", "voxels");
-                setAttribute(grid, "LAYOUT",
-                             "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
+            Dataset grid =
+                output.createCompoundDS("grid", this.model, dims, null, chunks, COMPRESSION_LEVEL,
+                                        memberNames, memberTypes, null, data);
+            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                     "grid", xJoined(dims), "", xJoined(chunks));
+            setAttribute(grid, "TITLE", "voxels");
+            setAttribute(grid, "LAYOUT",
+                         "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
 
-                {
-                    Dataset ds =
-                        writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
-                    setAttribute(ds, "TITLE", "adjacency mapping between voxels");
-                    setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
-                    setAttribute(ds, "UNITS", "indexes");
-                }
-                {
-                    Dataset ds =
-                        writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
-                    setAttribute(ds, "TITLE", "coupling rate between voxels");
-                    setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
-                    setAttribute(ds, "UNITS", "nm^2 / nm ?");
-                }
+            {
+                Dataset ds =
+                    writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
+                setAttribute(ds, "TITLE", "adjacency mapping between voxels");
+                setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
+                setAttribute(ds, "UNITS", "indexes");
+            }
+            {
+                Dataset ds =
+                    writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
+                setAttribute(ds, "TITLE", "coupling rate between voxels");
+                setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
+                setAttribute(ds, "UNITS", "nm^2 / nm ?");
+            }
 
-                this.writeStimulationData(source);
-                this.writeReactionData(source);
+            this.writeStimulationData(source);
+            this.writeReactionData(source);
+        }
+
+        protected void writeSimulationData(IGridCalc source)
+            throws Exception
+        {
+            {
+                long seed = source.getCalculationSeed();
+                Dataset ds = writeVector("calculation_seed", this.sim, seed);
+                setAttribute(ds, "TITLE", "the calculation seed");
+                setAttribute(ds, "LAYOUT", "seed");
+                setAttribute(ds, "UNITS", "number");
+            }
         }
 
         protected void writeSpecies(int[] ispecout, IGridCalc source)
@@ -872,13 +889,26 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    protected Dataset writeVector(String name, Group parent, double[] items)
+    protected Dataset writeVector(String name, Group parent, double... items)
         throws Exception
     {
         long[] dims = {items.length};
 
         Dataset ds = this.output.createScalarDS(name, parent,
                                                 double_t, dims, null, null,
+                                                0, items);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
+        return ds;
+    }
+
+    protected Dataset writeVector(String name, Group parent, long... items)
+        throws Exception
+    {
+        long[] dims = {items.length};
+
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                long_t, dims, null, null,
                                                 0, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
@@ -898,7 +928,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         H5ScalarDS ds = (H5ScalarDS)
             this.output.createScalarDS(name, parent, type,
                                        dims, size, chunks,
-                                       6, null);
+                                       COMPRESSION_LEVEL, null);
         ds.init();
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), xJoined(size), xJoined(chunks));

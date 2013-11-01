@@ -19,6 +19,7 @@ public interface IGridCalc {
     boolean preferConcs();
 
     SDRunWrapper getSource();
+    long getCalculationSeed();
 
     int getNumberElements();
 

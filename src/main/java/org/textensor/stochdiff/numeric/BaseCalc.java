@@ -64,8 +64,8 @@ public abstract class BaseCalc implements Runnable {
         CONCENTRATION,
     }
 
-    protected distribution_t distID = distribution_t.BINOMIAL;
-    protected algorithm_t algoID = algorithm_t.INDEPENDENT;
+    protected final distribution_t distID;
+    protected final algorithm_t algoID;
 
     final public boolean writeConcentration;
 
@@ -76,8 +76,8 @@ public abstract class BaseCalc implements Runnable {
         this.trial = trial;
         this.wrapper = wrapper;
 
-        this.distID = wrapper.sdRun.getDistributionID();
-        this.algoID = wrapper.sdRun.getAlgorithmID();
+        this.distID = wrapper.sdRun.getDistribution();
+        this.algoID = wrapper.sdRun.getAlgorithm();
         this.writeConcentration =
             output_t.valueOf(wrapper.sdRun.outputQuantity) == output_t.CONCENTRATION;
         log.info("Writing particle numbers as {}s", wrapper.sdRun.outputQuantity);

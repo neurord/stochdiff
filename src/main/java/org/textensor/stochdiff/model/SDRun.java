@@ -2,12 +2,15 @@
 //written by Robert Cannon
 package org.textensor.stochdiff.model;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class SDRun {
+    static final Logger log = LogManager.getLogger(SDRun.class);
 
     public String reactionSchemeFile;
     public String morphologyFile;
@@ -88,50 +91,19 @@ public class SDRun {
 
     public Discretization discretization;
 
-
     public void resolve() {
-        resolveCalcTypes();
         reactionScheme.resolve();
         morphology.resolve();
     }
 
-
-    private void resolveCalcTypes() {
-
-        if (distribution != null && distribution.length() > 0) {
-            if (distribution.toLowerCase().equals("binomial")) {
-                distributionID = distribution_t.BINOMIAL;
-            } else if (distribution.toLowerCase().equals("poisson")) {
-                distributionID = distribution_t.POISSON;
-            } else {
-                E.warning("Unrecognized distribution (" + distribution
-                               + ") expecting binomial or poisson");
-            }
-        }
-
-        if (algorithm != null && algorithm.length() > 0) {
-            if (algorithm.toLowerCase().equals("independent")) {
-                algorithmID = algorithm_t.INDEPENDENT;
-            } else if (algorithm.toLowerCase().equals("shared")) {
-                algorithmID = algorithm_t.SHARED;
-            } else if (algorithm.toLowerCase().equals("particle")) {
-                algorithmID = algorithm_t.PARTICLE;
-
-            } else {
-                E.warning("Unrecognized algorithm (" + algorithm
-                               + ") expecting independent or shared");
-            }
-        }
-    }
-
     // just getters and setters from here on;
 
-    public distribution_t getDistributionID() {
-        return distributionID;
+    public distribution_t getDistribution() {
+        return distribution_t.valueOf(this.distribution);
     }
 
-    public algorithm_t getAlgorithmID() {
-        return algorithmID;
+    public algorithm_t getAlgorithm() {
+        return algorithm_t.valueOf(this.algorithm);
     }
 
 
@@ -211,7 +183,8 @@ public class SDRun {
         } else if (runtime > 0) {
             ret = runtime - getStartTime();
         } else {
-            E.error("Either runtime or endtime must be specified in the model file");
+            log.error("Either runtime or endtime must be specified in the model file");
+            throw new RuntimeException("Either runtime or endtime must be specified in the model file");
         }
         return ret;
     }
@@ -228,10 +201,10 @@ public class SDRun {
             } else if (lco.equals("new")) {
                 ret = false;
             } else {
-                E.warning("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
+                log.error("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
+                throw new RuntimeException("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
             }
         }
         return ret;
     }
-
 }
