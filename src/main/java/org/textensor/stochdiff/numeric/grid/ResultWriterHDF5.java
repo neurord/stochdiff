@@ -57,7 +57,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     public static final H5Datatype short_str_t =
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
-    static final int CACHE_SIZE1 = 1024;
+    static final int CACHE_SIZE1 = 1;
     static final int CACHE_SIZE2 = 1024*1024;
 
     public ResultWriterHDF5(File output) {
@@ -194,9 +194,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected final Group model;
         protected final Group sim;
         protected H5ScalarDS concs;
-        protected double[] concs_data;
+        protected int[][][] concs_cache;
         protected H5ScalarDS times;
-        protected double[] times_data;
+        protected double[] times_cache;
         protected int concs_times_count;
         protected H5ScalarDS species;
         protected H5ScalarDS stimulation_events;
@@ -451,7 +451,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 return false;
 
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
-            this.concs = createExtensibleArray("concentrations", this.sim, double_t,
+            this.concs = createExtensibleArray("concentrations", this.sim, int_t,
                                                "concentrations of species in voxels over time",
                                                "[snapshot × nel × nspecout]",
                                                "count",
@@ -462,18 +462,11 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                "[times]",
                                                "ms",
                                                CACHE_SIZE1);
-            this.resetTimesConcs();
-            return true;
-        }
 
-        protected void resetTimesConcs()
-            throws Exception
-        {
-            extendExtensibleArray(this.concs, CACHE_SIZE1);
-            extendExtensibleArray(this.times, CACHE_SIZE1);
-            this.concs_data = (double[]) this.concs.getData();
-            this.times_data = (double[]) this.times.getData();
-            this.concs_times_count = 0;
+            this.concs_cache = new int[CACHE_SIZE1][nel][nspecout];
+            this.times_cache = new double[CACHE_SIZE1];
+
+            return true;
         }
 
         protected void writeConcentrations(double time, int nel, int ispecout[], IGridCalc source)
@@ -483,15 +476,29 @@ public class ResultWriterHDF5 implements ResultWriter {
                 if (!this.initConcentrations(nel, ispecout, source))
                     return;
 
-            getGridNumbers(this.concs_data, this.concs_times_count, nel, ispecout, source);
-            this.times_data[this.concs_times_count] = time;
+            getGridNumbers(this.concs_cache[this.concs_times_count],
+                           nel, ispecout, source);
+            this.times_cache[this.concs_times_count] = time;
             this.concs_times_count++;
 
-            if (this.concs_times_count == this.times_data.length) {
+            if (this.concs_times_count == this.times_cache.length) {
                 log.debug("Writing stats at time {} for trial {}", time, source.trial());
-                this.concs.write(this.concs_data);
-                this.times.write(this.times_data);
-                this.resetTimesConcs();
+
+                {
+                    extendExtensibleArray(this.concs, CACHE_SIZE1);
+                    int[] data = (int[]) this.concs.getData();
+                    ArrayUtil._flatten(data, this.concs_cache, ispecout.length, 0);
+                    this.concs.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.times, CACHE_SIZE1);
+                    double[] data = (double[]) this.times.getData();
+                    System.arraycopy(this.times_cache, 0, data, 0, this.times_cache.length);
+                    this.times.write(data);
+                }
+
+                this.concs_times_count = 0;
             }
         }
 
@@ -920,18 +927,19 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                long... dims)
         throws Exception
     {
-        long[] size = dims.clone();
-        size[0] = H5F_UNLIMITED;
+        long[] maxdims = dims.clone();
+        maxdims[0] = H5F_UNLIMITED;
         long[] chunks = dims.clone();
         chunks[0] = dims[0];
+        dims[0] = 0;
 
         H5ScalarDS ds = (H5ScalarDS)
             this.output.createScalarDS(name, parent, type,
-                                       dims, size, chunks,
+                                       dims, maxdims, chunks,
                                        COMPRESSION_LEVEL, null);
         ds.init();
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                 name, xJoined(dims), xJoined(size), xJoined(chunks));
+                 name, xJoined(dims), xJoined(maxdims), xJoined(chunks));
 
         setAttribute(ds, "TITLE", TITLE);
         setAttribute(ds, "LAYOUT", LAYOUT);
@@ -961,7 +969,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             length = ((double[])data).length;
         else
             assert false;
-        if (length != ArrayUtil.product(selected) && false) {
+        if (length != ArrayUtil.product(selected)) {
             log.error("howmuch={} start={} dims={} selected={}" +
                       " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}",
                       howmuch, start, dims, selected,
@@ -971,17 +979,10 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected static void getGridNumbers(double[] dst, int row,
+    protected static void getGridNumbers(int[][] dst,
                                          int nel, int ispecout[], IGridCalc source) {
-        final int rowsize = nel * ispecout.length;
-        int pos = row * rowsize;
-
-        assert dst.length % rowsize == 0;
-        assert row < dst.length / rowsize: "dst[" + dst.length + "] row=" + row +
-            " nel=" + nel + " rowsize=" + rowsize + " pos=" + pos;
-
         for (int i = 0; i < nel; i++)
             for (int j = 0; j < ispecout.length; j++)
-                dst[pos++] = source.getGridPartNumb(i, ispecout[j]);
+                dst[i][j] = source.getGridPartNumb(i, ispecout[j]);
     }
 }

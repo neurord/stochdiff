@@ -120,7 +120,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         double[] writeTimeArray = new double[this.wrapper.fnmsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
 
-        while (time < endtime) {
+        while (time <= endtime) {
 
             if (time >= writeTime) {
                 log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
@@ -141,13 +141,16 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 }
             }
 
-            time += advance(time);
+            if (time < endtime) {
+                time += advance(time);
 
-            if (time >= stateSaveTime) {
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.saveState(time, this.wrapper.sdRun.stateSavePrefix, this);
-                stateSaveTime += this.wrapper.sdRun.getStateSaveInterval();
-            }
+                if (time >= stateSaveTime) {
+                    for(ResultWriter resultWriter: this.resultWriters)
+                        resultWriter.saveState(time, this.wrapper.sdRun.stateSavePrefix, this);
+                    stateSaveTime += this.wrapper.sdRun.getStateSaveInterval();
+                }
+            } else
+                break;
         }
 
         log.info("Trial {}: injected {} particles", this.trial(), ninjected);
