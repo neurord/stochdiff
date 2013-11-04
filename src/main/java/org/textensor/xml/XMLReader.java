@@ -290,11 +290,10 @@ public class XMLReader {
 
                 log.info("Setting {} from the environment to {}", start.getName(), child);
             } else
-                log.debug("Setting {} not found");
+                log.debug("Setting {} not found in {}", start.getName(), child);
 
-            if (child instanceof StringBuffer) {
+            if (child instanceof StringBuffer)
                 child = ((StringBuffer)child).toString();
-            }
 
             /*
                      if (child instanceof ReReferencable) {
