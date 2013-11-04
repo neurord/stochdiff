@@ -88,7 +88,7 @@ public class NextEventQueue {
                     return Double.compare(a.time(), b.time());
                 }
             };
-            log.warn("sorting {} nodes ({})", nodes.length, "" + nodes);
+            log.info("sorting {} nodes ({})", nodes.length, "" + nodes);
             Arrays.sort(nodes, c);
 
             for (int i = 0; i < nodes.length; i++)
@@ -922,8 +922,6 @@ public class NextEventQueue {
                                         boolean verbose) {
         NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance, leap_min_jump);
 
-        log.warn("particles {}", "" + particles);
-
         ArrayList<NextEvent> e = inst.newArrayList();
         e.addAll(obj.createDiffusions(grid, rtab));
         e.addAll(obj.createReactions(grid, rtab));
@@ -935,8 +933,9 @@ public class NextEventQueue {
             for (NextEvent ev: obj.queue.nodes) {
                 log.info("{} → {} prop={} t={}", ev.index(),
                          ev, ev.propensity, ev.time());
-                if (Double.isInfinite(ev.time())) {
-                    log.info("subsequent events will happen at infinity");
+                if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
+                    log.info("{} — {} will happen at infinity",
+                             ev.index() + 1, obj.queue.nodes.length-1);
                     break;
                 }
             }
