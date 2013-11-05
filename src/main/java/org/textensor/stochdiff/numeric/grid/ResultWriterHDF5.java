@@ -317,8 +317,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             {
-                long seed = source.getCalculationSeed();
-                Dataset ds = writeVector("calculation_seed", this.sim, seed);
+                long seed = source.getSimulationSeed();
+                Dataset ds = writeVector("simulation_seed", this.sim, seed);
                 setAttribute(ds, "TITLE", "the calculation seed");
                 setAttribute(ds, "LAYOUT", "seed");
                 setAttribute(ds, "UNITS", "number");

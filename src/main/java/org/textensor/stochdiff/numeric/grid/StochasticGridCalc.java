@@ -27,7 +27,7 @@ public abstract class StochasticGridCalc extends GridCalc {
         super.init();
 
         // something to generate the random nunmbers
-        random = new MersenneTwister(getCalculationSeed());
+        random = new MersenneTwister(getSimulationSeed());
 
         // workspace for the calculation
         assert(nel > 0);

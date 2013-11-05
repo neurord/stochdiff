@@ -92,7 +92,7 @@ public abstract class BaseCalc implements Runnable {
     }
 
     private long seed = -1;
-    public long getCalculationSeed() {
+    public long getSimulationSeed() {
         if (seed == -1) {
             if (wrapper.sdRun.simulationSeed > 0)
                 seed = wrapper.sdRun.simulationSeed;
