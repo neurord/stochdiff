@@ -64,6 +64,7 @@ parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--style', default='-')
 parser.add_argument('--time', type=time_range, default=(None, None))
+parser.add_argument('--trial', type=int, default=0)
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -159,7 +160,7 @@ class DrawerSet(object):
 
 def animate_drawing(opts):
     file = tables.openFile(opts.file)
-    ss = DrawerSet(file.root.trial0.model, file.root.trial0.simulation, opts)
+    ss = DrawerSet(trial.model, trial.simulation, opts)
     indexes = itertools.cycle(ss.items)
     ss.animate(indexes)
 
@@ -169,7 +170,7 @@ def save_drawings(opts, suboffset=None, subtotal=1):
         matplotlib.use('Agg')
 
     file = tables.openFile(opts.file)
-    ss = DrawerSet(file.root.trial0.model, file.root.trial0.simulation, opts)
+    ss = DrawerSet(trial.model, trial.simulation, opts)
     if opts.save:
         if suboffset is None:
             indexes = ss.items
@@ -226,7 +227,7 @@ def _connections(dst, regions, connections, couplings):
 
 def dot_connections(filename):
     file = tables.openFile(filename)
-    model = file.root.trial0.model
+    model = trial.model
     regions = model.regions[1:] # skip "default" in first position
     _connections(sys.stdout, regions, model.neighbors, model.couplings)
 
@@ -271,7 +272,7 @@ def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates)
 
 def dot_productions(filename):
     file = tables.openFile(filename)
-    model = file.root.trial0.model
+    model = trial.model
     _productions(sys.stdout, model.species,
                  model.reactions.reactants, model.reactions.reactant_stochiometry,
                  model.reactions.products, model.reactions.product_stochiometry,
@@ -319,8 +320,9 @@ def find_regions(regions, spec, grid):
 
 def plot_history(filename, species, opts):
     file = tables.openFile(filename)
-    model = file.root.trial0.model
-    simul = file.root.trial0.simulation
+    trial = file.get_node('/trial{}'.format(opts.trial))
+    model = trial.model
+    simul = trial.simulation
     if species:
         indices = specie_indices(species, model.species)
     else:
