@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;

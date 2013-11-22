@@ -133,13 +133,12 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 ArrayUtil.fill(this.diffusionEvents, 0);
                 ArrayUtil.fill(this.reactionEvents, 0);
             }
-            for (int i = 0; i < this.wrapper.fnmsOut.length; i++) {
+            for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
                     for(ResultWriter resultWriter: this.resultWriters)
                         resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
                     writeTimeArray[i] += Double.valueOf(this.wrapper.dtsOut[i]);
                 }
-            }
 
             if (time < endtime) {
                 time += advance(time);
@@ -152,6 +151,16 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             } else
                 break;
         }
+
+        if (writeTime < time + this.wrapper.sdRun.outputInterval / 10) {
+            log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
+            for(ResultWriter resultWriter: this.resultWriters)
+                resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
+        }
+        for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
+            if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
+                for(ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
 
         log.info("Trial {}: injected {} particles", this.trial(), ninjected);
 
