@@ -9,13 +9,6 @@ import java.util.List;
 
 public class XMLWriter {
 
-    boolean conciseTags = false;
-
-    public void setConciseTags(boolean b) {
-        conciseTags = b;
-    }
-
-
     public static void err(String s) {
         System.out.println(s);
     }
@@ -64,18 +57,15 @@ public class XMLWriter {
 
 
 
-        String tag = "error";
+        String tag;
         if (knownAs != null) {
             tag = knownAs;
         } else {
             tag = ob.getClass().getName();
 
-            if (conciseTags) {
-                int ilast = tag.lastIndexOf(".");
-                if (ilast >= 0) {
-                    tag = tag.substring(ilast + 1, tag.length());
-                }
-            }
+            int ilast = tag.lastIndexOf(".");
+            if (ilast >= 0)
+                tag = tag.substring(ilast + 1, tag.length());
         }
 
         sbv.append(psk);

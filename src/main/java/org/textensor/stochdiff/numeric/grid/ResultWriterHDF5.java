@@ -316,12 +316,21 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSimulationData(IGridCalc source)
             throws Exception
         {
+            log.debug("Writing simulation configuration for trial {}", source.trial());
+
             {
                 long seed = source.getSimulationSeed();
                 Dataset ds = writeVector("simulation_seed", this.sim, seed);
                 setAttribute(ds, "TITLE", "the calculation seed");
                 setAttribute(ds, "LAYOUT", "seed");
                 setAttribute(ds, "UNITS", "number");
+            }
+
+            {
+                String s = source.getSource().serialize();
+                Dataset ds = writeVector("serialized_config", this.sim, s);
+                setAttribute(ds, "TITLE", "serialized config");
+                setAttribute(ds, "LAYOUT", "XML");
             }
         }
 
@@ -879,7 +888,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    protected Dataset writeVector(String name, Group parent, String[] items)
+    protected Dataset writeVector(String name, Group parent, String... items)
         throws Exception
     {
         int maxlength = ArrayUtil.maxLength(items);

@@ -4,10 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.ModelReader;
 import org.textensor.stochdiff.model.SDRun;
-import org.textensor.xml.XMLWriter;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;

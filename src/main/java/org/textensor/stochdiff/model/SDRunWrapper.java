@@ -14,6 +14,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
+import org.textensor.xml.XMLWriter;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -288,5 +289,9 @@ public class SDRunWrapper {
     public int[] getOutputSpecies() {
         assert this.ispecout != null;
         return this.ispecout;
+    }
+
+    public String serialize() {
+        return XMLWriter.serialize(this.sdRun);
     }
 }
