@@ -54,9 +54,10 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         log.info("Real simulation took {} ms, {} ms/s", time, speed);
     }
 
-    public double advance(double tnow) {
-        for(double time = tnow; time < tnow+dt; ) {
-            double next = this.neq.advance(time, tnow + dt,
+    @Override
+    public double advance(double tnow, double tend) {
+        for(double time = tnow; time < tend; ) {
+            double next = this.neq.advance(time, tend,
                                            this.reactionEvents,
                                            this.diffusionEvents,
                                            this.stimulationEvents,
@@ -66,7 +67,10 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         }
 
         this.ninjected += ArrayUtil.sum(this.diffusionEvents);
-        return dt;
+
+        /* If next > tend, it will not be actually executed, so
+         * the real end time is tend. */
+        return tend - tnow;
     }
 
     public static double calculatePropensity(int[] ri, int[] pi,

@@ -528,11 +528,11 @@ public class NextEventQueue {
             for (int i = 0; i < this.reactants().length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.reactants()[i]] /
-                                this.propensity / this.reactant_stochiometry[i]);
+                                    this.propensity / this.reactant_stochiometry[i]);
             for (int i = 0; i < this.products.length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.products[i]] /
-                                this.propensity / this.product_stochiometry[i]);
+                                    this.propensity / this.product_stochiometry[i]);
 
             log.debug("{}: leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
                       this,

@@ -294,4 +294,10 @@ public class SDRunWrapper {
     public String serialize() {
         return XMLWriter.serialize(this.sdRun);
     }
+
+    public double stepSize() {
+        return Math.min(Math.min(this.sdRun.fixedStepDt,
+                                 this.sdRun.outputInterval),
+                        this.sdRun.runtime);
+    }
 }

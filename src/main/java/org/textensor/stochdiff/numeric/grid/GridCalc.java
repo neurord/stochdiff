@@ -98,7 +98,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 diffusionEvents[iel][k] = new int[nn];
             }
 
-        dt = this.wrapper.sdRun.fixedStepDt;
+        this.dt = this.wrapper.stepSize();
     }
 
     @Override
@@ -141,7 +141,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 }
 
             if (time < endtime) {
-                time += advance(time);
+                time += advance(time, time + dt);
 
                 if (time >= stateSaveTime) {
                     for(ResultWriter resultWriter: this.resultWriters)
@@ -174,7 +174,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         this.close();
     }
 
-    protected abstract double advance(double time);
+    protected abstract double advance(double now, double end);
 
     protected void footer() {}
 

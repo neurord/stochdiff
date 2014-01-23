@@ -49,7 +49,7 @@ public class SDRun {
     public double poolVolume;
 
     // time step for fixed step calculations;
-    public double fixedStepDt;
+    public double fixedStepDt = Float.POSITIVE_INFINITY;
 
     // public double outputInterval=0.8;
     public double outputInterval;

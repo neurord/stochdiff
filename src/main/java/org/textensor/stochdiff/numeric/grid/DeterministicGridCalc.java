@@ -130,8 +130,10 @@ public class DeterministicGridCalc extends GridCalc {
         }
     }
 
+    @Override
+    public double advance(double tnow, double tend) {
+        final double dt = tend - tnow;
 
-    public double advance(double time) {
         // diffusion terms;
         // wkA is time t, wktm1 time t-1, wkC the next step, t+1
 
@@ -184,7 +186,7 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-        double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(time, dt);
+        double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
 
         // reaction step;
         for (int iel = 0; iel < nel; iel++) {

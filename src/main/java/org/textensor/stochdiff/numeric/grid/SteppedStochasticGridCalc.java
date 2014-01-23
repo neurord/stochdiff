@@ -208,7 +208,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     // - unwrap inner conditionals for different reaction types
     // - make nGo inlinable
 
-    public double advance(double tnow) {
+    @Override
+    public double advance(double tnow, double tend) {
         // add in any injections
         double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
         for (int i = 0; i < stims.length; i++) {
@@ -288,6 +289,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
 
         // now wkA contains the actual numbers again;
+        if ((tend - tnow) - dt > 0.01 * dt)
+            log.warn("Step {} is different than dt={}", tend - tnow, dt);
         return dt;
     }
 
