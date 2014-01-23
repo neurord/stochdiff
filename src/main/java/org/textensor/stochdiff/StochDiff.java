@@ -67,11 +67,4 @@ public class StochDiff {
         SDCalc sdCalc = new SDCalc(sdModel, outputFile);
         sdCalc.run();
     }
-
-
-    private static void dump(SDRun sdr) {
-        String srw = XMLWriter.serialize(sdr);
-        E.info("after rewrite: \n" + srw);
-    }
-
 }

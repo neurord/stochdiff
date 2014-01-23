@@ -9,23 +9,10 @@ import java.util.List;
 
 public class XMLWriter {
 
-    boolean conciseTags;
-    boolean quoteStrings;
-
-
-    public XMLWriter() {
-        conciseTags = false;
-        quoteStrings = true;
-    }
-
+    boolean conciseTags = false;
 
     public void setConciseTags(boolean b) {
         conciseTags = b;
-    }
-
-
-    public void setQuoteStrings(boolean b) {
-        quoteStrings = b;
     }
 
 
@@ -285,28 +272,7 @@ public class XMLWriter {
 
     }
 
-
-
     private void appendString(StringBuffer sbv, String sss) {
-        if (sss == null) {
-            if (quoteStrings) {
-                sbv.append("\"null\"");
-            } else {
-                sbv.append("null");
-            }
-
-        } else {
-            sss = StringEncoder.xmlEscape(sss);
-
-            if (!quoteStrings) {
-                sbv.append(sss);
-            } else {
-                sbv.append("\"");
-                sbv.append(sss);
-                sbv.append("\"");
-            }
-        }
+        sbv.append(sss == null ? "null" : StringEncoder.xmlEscape(sss));
     }
-
-
 }
