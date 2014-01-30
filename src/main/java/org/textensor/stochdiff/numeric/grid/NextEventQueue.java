@@ -192,6 +192,15 @@ public class NextEventQueue {
         abstract double leap_time(double current, double tolerance);
 
         /**
+         * Calculate the <b>expected</b> time of a single exact execution.
+         * Propensity is not recalculated, so must be brought
+         * up-to-date externally.
+         */
+        double exact_time(double current) {
+            return 1 / this.propensity;
+        }
+
+        /**
          * Calculate the (randomized) extent of the reaction based in the time given.
          */
         abstract int leap_count(double current, double time);
@@ -271,14 +280,14 @@ public class NextEventQueue {
             // after execution, but there's nothing to warn about.
             this._update_propensity(false);
 
-            final double normal = this._new_time(current);
+            final double exact = this.exact_time(current);
             final double leap = leap_min_jump == 0 ? Double.NaN
                 : this.leap_time(current, tolerance);
 
             log.debug("deps: {}", this.dependent);
-            log.debug("options: wait {}, leap {}", normal - current, leap);
+            log.debug("options: wait {}, leap {}", exact - current, leap);
 
-            if (leap_min_jump != 0 && leap > (normal - current) * leap_min_jump) {
+            if (leap_min_jump != 0 && leap > (exact - current) * leap_min_jump) {
                 assert update_times;
 
                 int count = this.leap_count(current, leap);
@@ -287,6 +296,8 @@ public class NextEventQueue {
                           this, leap, current, current + leap, count);
                 this.setEvent(count, true, current, current + leap);
             } else {
+                double normal =  this._new_time(current);
+
                 log.debug("{}: waiting {} {}→{}",
                           this, normal - current, current, normal);
                 this.setEvent(1, false, current, normal);
@@ -715,6 +726,11 @@ public class NextEventQueue {
                 return current;
             else
                 return t2;
+        }
+
+        @Override
+        double exact_time(double current) {
+            return _continous_delta_to_real_time(current, super.exact_time(current), false);
         }
 
         @Override
