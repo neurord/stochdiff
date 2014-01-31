@@ -72,12 +72,10 @@ public class ModelReader {
     }
 
     private static Object readFile(File f, XMLReader xmlr) {
-        Object ret = null;
-        if (f.exists()) {
-            String txt = FileUtil.readStringFromFile(f);
-            ret = xmlr.read(txt);
-        }
-        return ret;
+        if (f.exists())
+            return xmlr.readObject(FileUtil.readStringFromFile(f));
+        else
+            return null;
     }
 
 

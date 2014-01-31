@@ -20,12 +20,9 @@ public class XMLReader {
     double progressFraction;
 
 
-    public XMLReader(ReflectionInstantiator insta) {
-        instantiator = insta;
+    public XMLReader(ReflectionInstantiator instantiator) {
+        this.instantiator = instantiator;
     }
-
-
-
 
     public void err(String s) {
         System.out.println(s);
@@ -33,17 +30,6 @@ public class XMLReader {
 
 
     public Object readObject(String s) {
-        return readFromString(s);
-    }
-
-
-    public Object read(String s) {
-        return readFromString(s);
-    }
-
-
-
-    public Object readFromString(String s) {
         s = XMLChecker.deGarbage(s);
 
         if (s == null) {
