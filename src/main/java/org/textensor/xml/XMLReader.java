@@ -4,7 +4,6 @@ package org.textensor.xml;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.BodyValued;
 
 import org.apache.logging.log4j.Logger;
@@ -32,9 +31,8 @@ public class XMLReader {
     public Object readObject(String s) {
         s = XMLChecker.deGarbage(s);
 
-        if (s == null) {
+        if (s == null)
             return null;
-        }
 
         progressFraction = 0.;
 
@@ -48,10 +46,8 @@ public class XMLReader {
         XMLToken xmlt = tkz.nextToken();
         while (xmlt.isIntro() || xmlt.isComment()) {
 
-            if (xmlt.isComment()) {
-                E.info("reading comment " + xmlt);
-            }
-
+            if (xmlt.isComment())
+                log.info("ignoring comment " + xmlt);
 
             xmlt = tkz.nextToken();
         }
@@ -187,8 +183,7 @@ public class XMLReader {
 
                         } else {
                             nerror++;
-                            E.error(" non-matching close item \n" + "start Item was: \n"
-                                         + start.toString() + "\n" + "but close was: \n" + next.toString() + "\n");
+                            log.error("non-matching close item: {} vs. {}", start, next);
                         }
 
                         // stop anyway - either its the right close item, or
@@ -204,10 +199,8 @@ public class XMLReader {
 
 
                         if (child instanceof ArrayList) {
-                            E.error("attempted to read string into array list?  - ignored" + next.svalue);
-
-                            // ((ArrayList)child).add(next.svalue);
-
+                            log.error("attempted to read string into array list?" + next.svalue);
+                            nerror++;
 
                         } else if (child instanceof StringBuffer) {
                             //   E.deprecate("xml reader - string added to string buffer " + next.svalue);
@@ -249,7 +242,7 @@ public class XMLReader {
 
 
                     } else if (next.isNumber()) {
-                        E.error("XMLReader sjhould never return numbers....!!!! but " + "just got " + next);
+                        throw new RuntimeException("XMLReader reteurned number " + next);
                     }
                     next = readToken(tkz);
                 }
