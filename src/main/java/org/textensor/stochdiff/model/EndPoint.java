@@ -4,18 +4,17 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.report.E;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class EndPoint extends MorphPoint {
+    static final Logger log = LogManager.getLogger(EndPoint.class);
 
     @XmlAttribute public String on;
     @XmlAttribute public String at;
-    @XmlAttribute public double atFraction;
+    @XmlAttribute public Double atFraction;
 
-    public EndPoint() {
-        atFraction = -1.;
-
-    }
+    public EndPoint() { }
 
     public EndPoint(String id, double x, double y, double z, double r) {
         super(id, x, y, z, r);
@@ -26,24 +25,21 @@ public class EndPoint extends MorphPoint {
             if (segmentHM.containsKey(on)) {
                 Segment tgtSeg = segmentHM.get(on);
                 if (at != null) {
-                    if (at.equals("start")) {
+                    if (at.equals("start"))
                         pointConnect(tgtSeg.getStart());
-
-                    } else if (at.equals("end")) {
+                    else if (at.equals("end"))
                         pointConnect(tgtSeg.getEnd());
-
-                    } else {
-                        E.error("connection to segment: at value can only be 'start' or 'end', not " + at);
+                    else {
+                        log.error("connection to segment: at value can only be 'start' or 'end', not '{}'", at);
+                        throw new RuntimeException("connection to segment: at value can only be 'start' or 'end', not " + at);
                     }
 
-                } else {
-                    if (atFraction < 0.) {
-                        E.error("must either set 'at' or 'atFraction' if 'on' is specified");
+                } else if (atFraction != null) {
 
-                    } else if (atFraction < 1.e-4) {
+                    if (atFraction == 0) {
                         pointConnect(tgtSeg.getStart());
 
-                    } else if (atFraction > 1. - 1.e-4) {
+                    } else if (atFraction == 1) {
                         pointConnect(tgtSeg.getEnd());
 
                     } else {
@@ -51,19 +47,20 @@ public class EndPoint extends MorphPoint {
                         tgtSeg.checkHasPositions();
 
                         interiorPointConnect(tgtSeg, atFraction, ep);
-
                     }
-
+                } else {
+                    log.error("must either set 'at' or 'atFraction' if 'on' is specified");
+                    throw new RuntimeException("must either set 'at' or 'atFraction' if 'on' is specified");
                 }
 
             } else {
-                E.error("point refers to segment " + on + " but that segment cannot be found");
+                log.error("point refers to segment '{}' but that segment cannot be found", on);
+                throw new RuntimeException("point refers to segment " + on + " but that segment cannot be found");
             }
 
         }
 
     }
-
 
     private void supplySize(double xp, double yp, double zp, double rp) {
         if (Double.isNaN(x)) {
@@ -102,9 +99,6 @@ public class EndPoint extends MorphPoint {
         }
     }
 
-
-
-
     public void interiorPointConnect(Segment tgtSeg, double f, MorphPoint twds) {
         MorphPoint st = tgtSeg.getStart();
         MorphPoint ed = tgtSeg.getEnd();
@@ -129,14 +123,7 @@ public class EndPoint extends MorphPoint {
         st.addOffsetChild(this);
     }
 
-
     public String writePos() {
         return "(x=" + x + ", y=" + y + ", z=" + z +")";
     }
-
-
-
-
-
-
 }

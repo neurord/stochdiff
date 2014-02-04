@@ -30,10 +30,10 @@ public class Reaction implements AddableTo {
     @XmlElement(name="Product")
     private final ArrayList<Product> p_products = inst.newArrayList();
 
-    public double forwardRate;
-    public double reverseRate;
+    private Double forwardRate;
+    private Double reverseRate;
 
-    public double Q10;
+    public Double Q10;
 
     private ArrayList<Specie> r_reactants;
     private ArrayList<Specie> r_products;
@@ -64,6 +64,14 @@ public class Reaction implements AddableTo {
         if (this.name == null)
             this.name = formatSide(this.p_reactants) + "→" + formatSide(this.p_products);
         return this.name;
+    }
+
+    public double getForwardRate() {
+        return this.forwardRate != null ? this.forwardRate : 0;
+    }
+
+    public double getReverseRate() {
+        return this.reverseRate != null ? this.reverseRate : 0;
     }
 
     public void add(Object obj) {

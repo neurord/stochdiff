@@ -8,17 +8,17 @@ public class SpecieRef {
     private String specieID;
 
     @XmlAttribute
-    private int n = -1;
+    private Integer n;
 
     @XmlAttribute
-    private int power = 1;
+    private Integer power;
 
     /**
      * The stochiometry (number of molecules consumed during a reaction).
      * Defaults to 'power' if not specified.
      */
     public int getStochiometry() {
-        return n > 0 ? n : power;
+        return n != null ? n : this.getPower();
     }
 
     /**
@@ -27,7 +27,7 @@ public class SpecieRef {
      * Defaults to 1 if not specified.
      */
     public int getPower() {
-        return power;
+        return power != null ? power : 1;
     }
 
     public String getSpecieID() {
