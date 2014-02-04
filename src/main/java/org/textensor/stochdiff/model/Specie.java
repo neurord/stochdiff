@@ -1,17 +1,26 @@
 package org.textensor.stochdiff.model;
 
-import org.textensor.report.E;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
+import javax.xml.bind.annotation.*;
 
 public class Specie {
+    static final Logger log = LogManager.getLogger(Specie.class);
 
+    @XmlAttribute
     public String name = null;
+
+    @XmlAttribute
     public String id = null;
 
-    public double kdiff = Double.NaN;
-    public String kdiffunit = null;
+    @XmlAttribute
+    public double kdiff = 0;
 
-    private int index;
+    @XmlAttribute
+    public String kdiffunit = "mu2/s";
+
+    transient private int index;
 
     public String getID() {
         return id != null ? id : generateID(name);
@@ -33,22 +42,9 @@ public class Specie {
         return index;
     }
 
-
-
     public double getDiffusionConstant() {
-        double ret = 0.;
-        if (!Double.isNaN(kdiff)) {
-            ret = kdiff;
-
-            if (kdiffunit != null) {
-                ret *= getFactor(kdiffunit);
-            } else {
-                ret *= getFactor("mu2/s");
-            }
-        }
-        return ret;
+        return kdiff * getFactor(kdiffunit);
     }
-
 
     private double getFactor(String su) {
         // output units are microns^2/ms
@@ -65,7 +61,7 @@ public class Specie {
         if (su.equals("mu2/ms"))
             return 1.;
 
-        E.error("don't understand units " + su);
-        throw new RuntimeException("don't understand units " + su);
+        log.error("Unknown units '{}'", su);
+        throw new RuntimeException("Unknown units '" + su + "'");
     }
 }

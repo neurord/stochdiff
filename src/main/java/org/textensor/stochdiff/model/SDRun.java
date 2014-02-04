@@ -1,4 +1,4 @@
-//5 16 2007: modified by RO (modifications within <--RO ... RO-->)
+//5 16 2007: modified by RO
 //written by Robert Cannon
 package org.textensor.stochdiff.model;
 
@@ -9,19 +9,34 @@ import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import javax.xml.bind.annotation.*;
+
+@XmlRootElement(namespace="http://model.stochdiff.textensor.org", name="SDRun")
 public class SDRun {
     static final Logger log = LogManager.getLogger(SDRun.class);
+
+    @XmlElement(name="ReactionScheme")
+    private ReactionScheme reactionScheme;
+
+    @XmlElement(name="StimulationSet")
+    private StimulationSet stimulationSet;
+
+    @XmlElement(name="Morphology")
+    private Morphology morphology;
+
+    @XmlElement(name="InitialConditions")
+    private InitialConditions initialConditions;
+
+    @XmlElement(name="OutputScheme")
+    private OutputScheme outputScheme;
+
+    private Discretization discretization;
 
     public String reactionSchemeFile;
     public String morphologyFile;
     public String stimulationFile;
     public String initialConditionsFile;
-    //<--RO
-    // ------------------------
     public String outputSchemeFile;
-    // ------------------------
-    //RO-->
-
 
     public String initialStateFile;
     public double stateSaveInterval;
@@ -31,7 +46,7 @@ public class SDRun {
     public String action;
 
     public String geometry = "2D";
-    public double depth2D;
+    public double depth2D = 0.5;
 
     public double runtime;
     public double starttime;
@@ -42,11 +57,6 @@ public class SDRun {
 
     public int spineSeed;
     public int simulationSeed;
-
-
-    //  volume to use for a single mixed pool calculation : could (should?) be computed
-    // by summing the volume in the supplied morphology
-    public double poolVolume;
 
     // time step for fixed step calculations;
     public double fixedStepDt = Float.POSITIVE_INFINITY;
@@ -78,19 +88,6 @@ public class SDRun {
     private distribution_t distributionID;
     private algorithm_t algorithmID;
 
-
-    public ReactionScheme reactionScheme;
-    public StimulationSet stimulationSet;
-    public Morphology morphology;
-    public InitialConditions initialConditions;
-    //<--RO
-    // ------------------------
-    public OutputScheme outputScheme;
-    // ------------------------
-    //RO-->
-
-    public Discretization discretization;
-
     public void resolve() {
         reactionScheme.resolve();
         morphology.resolve();
@@ -112,9 +109,6 @@ public class SDRun {
     }
 
 
-
-    //<--RO
-    // -------------------------
     public void setOutputScheme(OutputScheme outputScheme) {
         this.outputScheme = outputScheme;
     }
@@ -122,8 +116,6 @@ public class SDRun {
     public OutputScheme getOutputScheme() {
         return outputScheme;
     }
-    // -------------------------
-    //RO-->
 
     public void setReactionScheme(ReactionScheme reactionScheme) {
         this.reactionScheme = reactionScheme;
@@ -153,42 +145,28 @@ public class SDRun {
         return discretization;
     }
 
-
     public void setInitialConditions(InitialConditions initialConditions) {
         this.initialConditions = initialConditions;
     }
-
-
 
     public InitialConditions getInitialConditions() {
         return initialConditions;
     }
 
-
     public double getStartTime() {
-        double ret = 0;
-        if (starttime > 0) {
-            ret = starttime;
-        } else {
-            // leave it at 0;
-        }
-        return ret;
+        return starttime;
     }
 
-
     public double getEndTime() {
-        double ret = 0;
-        if (endtime > 0) {
-            ret = endtime;
-        } else if (runtime > 0) {
-            ret = runtime - getStartTime();
-        } else {
+        if (endtime > 0)
+            return endtime;
+        else if (runtime > 0)
+            return runtime - getStartTime();
+        else {
             log.error("Either runtime or endtime must be specified in the model file");
             throw new RuntimeException("Either runtime or endtime must be specified in the model file");
         }
-        return ret;
     }
-
 
     public boolean continueOutput() {
         boolean ret = false;

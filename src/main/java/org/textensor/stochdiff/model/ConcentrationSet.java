@@ -3,21 +3,25 @@ package org.textensor.stochdiff.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.*;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.FloatValued;
 
 public class ConcentrationSet implements AddableTo {
 
-    public String region;
+    @XmlAttribute public String region;
 
+    @XmlElements({
+            @XmlElement(name="NanoMolarity", type=NanoMolarity.class),
+            @XmlElement(name="NumberDensity", type=NumberDensity.class)
+                })
     public ArrayList<Concentration> concentrations;
 
-    HashMap<String, Concentration> concHM;
+    transient HashMap<String, Concentration> concHM;
 
-    public boolean complete;
-
-
+    transient public boolean complete;
 
     public void add(Object obj) {
         if (concentrations == null) {

@@ -58,7 +58,7 @@ public class Reducer {
 
     public void reduce() {
         E.info("Starting reduce");
-        icon = sdr.initialConditions;
+        icon = sdr.getInitialConditions();
         afv = icon.getFloatValuedElements();
         nv = afv.size();
 

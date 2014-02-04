@@ -179,7 +179,6 @@ public class SDRunWrapper {
         log.info("subvolume grid size is: {}", d);
 
         final geometry_t vgg = geometry_t.fromString(sdRun.geometry);
-        final double d2d = sdRun.depth2D > 0 ? sdRun.depth2D : 0.5;
 
         if (disc.curvedElements()) {
             TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);
@@ -187,7 +186,7 @@ public class SDRunWrapper {
 
         } else {
             TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
-            volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),  vgg, d2d);
+            volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),  vgg, sdRun.depth2D);
         }
 
         SpineLocator.locate(sdRun.spineSeed, morph.getSpineDistribution(), disc.spineDeltaX,

@@ -1,15 +1,12 @@
 package org.textensor.stochdiff.model;
 
-import org.textensor.stochdiff.phys.Phys;
+import javax.xml.bind.annotation.*;
 
+import org.textensor.stochdiff.phys.Phys;
 
 public class NumberDensity extends Concentration {
 
-    public double number;      // per cubic micron;
-
-
-
-
+    @XmlAttribute public double number;      // per cubic micron;
 
     public double getNanoMolarConcentration() {
         // volume is in cubic microns
@@ -20,27 +17,18 @@ public class NumberDensity extends Concentration {
 
         double nanomolarity = fvol * number;
 
-
-
         return nanomolarity;
-
     }
-
-
 
     public String makeXMLLine() {
         return "<NumberDensity specieID=\"" + specieID + "\" number=\"" + number + "\"/>";
-
     }
-
 
     public double getValue() {
         return number;
     }
 
-
     public void setValue(double d) {
         number = d;
     }
-
 }

@@ -2,38 +2,28 @@ package org.textensor.stochdiff.model;
 
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.*;
+
 import org.textensor.report.E;
 
 public class Segment {
 
-    public String id;
-    public String region;
+    @XmlAttribute public String id;
+    @XmlAttribute public String region;
 
     public EndPoint start;
     public EndPoint end;
 
-
-    private boolean resolved;
-
-
-
-    public Segment() {
-        resolved = false;
-    }
-
+    private transient boolean resolved = false;
 
     public String getID() {
         return id;
     }
 
-
-
     public void checkResolved(HashMap<String, Segment> segmentHM) {
-        if (!resolved) {
+        if (!resolved)
             resolve(segmentHM);
-        }
     }
-
 
     public void resolve(HashMap<String, Segment> segmentHM) {
         start.setSegment(this);

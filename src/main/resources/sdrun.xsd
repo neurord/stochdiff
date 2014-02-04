@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://stochdiff.textensor.org"
+        xmlns:s="http://stochdiff.textensor.org"
+        targetNamespace="http://stochdiff.textensor.org">
+
+
+  <xs:element name="SDRun">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="ReactionScheme" />
+        <xs:element ref="Morphology" />
+        <xs:element ref="InitialConditions" />
+
+        <xs:element ref="runtime" />
+        <xs:element ref="geometry" />
+        <xs:element ref="depth2D" />
+        <xs:element ref="distribution" />
+        <xs:element ref="algorithm" />
+        <xs:element ref="simulationSeed" />
+        <xs:element ref="outputQuantity" />
+        <xs:element ref="spineSeed" />
+
+        <xs:element ref="fixedStepDt" />
+        <xs:element ref="outputInterval" />
+        <xs:element ref="tolerance" />
+
+        <xs:element ref="calculation" />
+
+        <xs:element ref="discretization" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ReactionScheme">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Specie" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element ref="Reaction" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Specie">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" />
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="kdiff" type="non-negative-real" />
+      <xs:attribute name="kdiffunit" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Reaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Reactant" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element ref="Product" minOccurs="0" maxOccurs="unbounded"/>
+
+        <xs:element ref="forwardRate" />
+        <xs:element ref="reverseRate" minOccurs="0" />
+      </xs:sequence>
+
+      <xs:attribute name="name" type="xs:string" />
+      <xs:attribute name="id" type="xs:string" />
+
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Reactant" type="substrate" />
+  <xs:element name="Product" type="substrate" />
+  <xs:element name="forwardRate" type="non-negative-real" />
+  <xs:element name="reverseRate" type="non-negative-real" />
+
+  <xs:element name="Morphology">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Segment" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Segment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="start" />
+        <xs:element ref="end" />
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="region" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="start" type="point" />
+  <xs:element name="end" type="point" />
+
+  <xs:element name="InitialConditions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ConcentrationSet" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ConcentrationSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="NanoMolarity" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="NanoMolarity">
+    <xs:complexType>
+      <xs:attribute name="specieID" type="xs:string" use="required" />
+      <xs:attribute name="value" type="non-negative-real" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="runtime" type="non-negative-real" />
+  <xs:element name="geometry" type="geometry" />
+  <xs:element name="depth2D" type="non-negative-real" />
+  <xs:element name="distribution" type="distribution" />
+  <xs:element name="algorithm" type="algorithm" />
+  <xs:element name="simulationSeed" type="xs:integer" />
+  <xs:element name="outputQuantity" type="outputQuantity" />
+  <xs:element name="spineSeed" type="xs:integer" />
+
+  <xs:element name="fixedStepDt" type="non-negative-real" />
+  <xs:element name="outputInterval" type="non-negative-real" />
+  <xs:element name="tolerance" type="non-negative-real" />
+
+  <xs:element name="calculation" type="calculation" />
+
+  <xs:element name="discretization">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="defaultMaxElementSide" />
+        <xs:element ref="spineDeltaX" minOccurs="0" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="defaultMaxElementSide" type="non-negative-real" />
+  <xs:element name="spineDeltaX" type="non-negative-real" />
+
+  <xs:simpleType name="geometry">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="2D" />
+      <xs:enumeration value="3D" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="distribution">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BINOMIAL" />
+      <xs:enumeration value="POISSON" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="algorithm">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INDEPENDENT" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="outputQuantity">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NUMBER" />
+      <xs:enumeration value="CONCENTRATION" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="calculation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GRID_STEPPED_STOCHASTIC" />
+      <xs:enumeration value="GRID_STEPPED_EXACT" />
+      <xs:enumeration value="GRID_STEPPED_DETERMINISTIC" />
+      <xs:whiteSpace value="collapse" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="substrate">
+    <xs:attribute name="specieID" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="point">
+    <xs:attribute name="x" type="xs:decimal" use="required" />
+    <xs:attribute name="y" type="xs:decimal" use="required" />
+    <xs:attribute name="z" type="xs:decimal" use="required" />
+    <xs:attribute name="r" type="non-negative-real" use="required" />
+    <xs:attribute name="label" type="xs:string" />
+  </xs:complexType>
+
+  <xs:simpleType name="non-negative-real">
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

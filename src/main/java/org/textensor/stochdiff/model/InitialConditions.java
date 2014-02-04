@@ -1,21 +1,25 @@
 package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.FloatValued;
 
-import java.util.HashMap;
-
 public class InitialConditions implements AddableTo {
 
 
-
+    @XmlElement(name="ConcentrationSet")
     public ArrayList<ConcentrationSet> concentrationSets;
-    public HashMap<String, ConcentrationSet> concSetHM;
 
+    transient public HashMap<String, ConcentrationSet> concSetHM;
+
+    @XmlElement(name="SurfanceDensitySet")
     public ArrayList<SurfaceDensitySet> sdSets;
-    public HashMap<String, SurfaceDensitySet> sdSetHM;
+
+    transient public HashMap<String, SurfaceDensitySet> sdSetHM;
 
 
     public FitConstraints fitConstraints;

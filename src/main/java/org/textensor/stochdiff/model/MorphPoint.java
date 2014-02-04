@@ -1,20 +1,24 @@
 package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
-
-import org.textensor.report.E;
-import org.textensor.stochdiff.numeric.morph.TreePoint;
-
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.*;
+
+import org.textensor.stochdiff.numeric.morph.TreePoint;
+import org.textensor.util.inst;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class MorphPoint {
+    static final Logger log = LogManager.getLogger(MorphPoint.class);
 
-    public String label;
-    public double x;
-    public double y;
-    public double z;
-    public double r;
+    @XmlAttribute public double x;
+    @XmlAttribute public double y;
+    @XmlAttribute public double z;
+    @XmlAttribute public double r;
+    @XmlAttribute public String label;
 
 
     private Segment r_segment;
@@ -26,44 +30,30 @@ public class MorphPoint {
     private ArrayList<MorphPoint> offsetNeighbors;
 
 
-    public HashMap<MorphPoint, String> segidHM;
-    public HashMap<MorphPoint, String> regionHM;
-
-
-
+    transient HashMap<MorphPoint, String> segidHM = inst.newHashMap();
+    transient HashMap<MorphPoint, String> regionHM = inst.newHashMap();
 
     public MorphPoint() {
-        x = Double.NaN;
-        y = Double.NaN;
-        z = Double.NaN;
-        r = Double.NaN;
-
-        segidHM = new HashMap<MorphPoint, String>();
-        regionHM = new HashMap<MorphPoint, String>();
-
+        x = y = z = r = Double.NaN;
     }
 
-    public MorphPoint(String id, double ax, double ay, double az, double ar) {
-        this();
-        label = id;
-        x = ax;
-        y = ay;
-        z = az;
-        r = ar;
+    public MorphPoint(String label, double x, double y, double z, double r) {
+        this.label = label;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.r = r;
     }
-
-
 
     public void setSegment(Segment seg) {
         r_segment = seg;
 
     }
 
-
     protected void addNeighbor(MorphPoint p) {
-        if (neighbors == null) {
+        if (neighbors == null)
             neighbors = new ArrayList<MorphPoint>();
-        }
+
         neighbors.add(p);
     }
 
@@ -72,32 +62,27 @@ public class MorphPoint {
     // linked from here temporarily until the tree is discretized and a new point
     // is available to have them connected from as neighbors
     public void addOffsetChild(MorphPoint p) {
-        if (offsetNeighbors == null) {
+        if (offsetNeighbors == null)
             offsetNeighbors = new ArrayList<MorphPoint>();
-        }
+
         offsetNeighbors.add(p);
     }
 
     public boolean hasOffsetChildren() {
-        return (offsetNeighbors != null);
+        return offsetNeighbors != null;
     }
 
     public ArrayList<MorphPoint> getOffsetChildren() {
         return offsetNeighbors;
     }
 
-
-
-
     public void removeNeighbor(MorphPoint mp) {
         neighbors.remove(mp);
     }
 
-
     public boolean redundant() {
-        return (r_peerPoint != null);
+        return r_peerPoint != null;
     }
-
 
     public ArrayList<MorphPoint> getNeighbors() {
         return neighbors;
@@ -105,15 +90,16 @@ public class MorphPoint {
 
     public TreePoint toTreePoint() {
         TreePoint tp = new TreePoint(x, y, z, r);
-        if (label != null) {
+        if (label != null)
             tp.setLabel(label);
-        }
+
         return tp;
     }
 
     public void transferConnections() {
         if (r_peerPoint == null) {
-            E.error("cannot transfer connections - no peer");
+            log.error("cannot transfer connections - no peer");
+            throw new RuntimeException("cannot transfer connections - no peer");
         } else {
             if (neighbors != null) {
                 for (MorphPoint mp : neighbors) {
@@ -134,15 +120,13 @@ public class MorphPoint {
             }
 
             if (offsetNeighbors != null) {
-                for (MorphPoint mon : offsetNeighbors) {
+                for (MorphPoint mon : offsetNeighbors)
                     r_peerPoint.addOffsetChild(mon);
-                }
                 offsetNeighbors = null;
             }
         }
 
     }
-
 
     public boolean hasPosition() {
         boolean ret = true;
@@ -152,32 +136,25 @@ public class MorphPoint {
         return ret;
     }
 
-
     public double distanceTo(MorphPoint mp) {
-        double ret = 1.;
-        if (hasPosition() && mp.hasPosition()) {
-            double dx = mp.x - x;
-            double dy = mp.y - y;
-            double dz = mp.z - z;
-            ret = Math.sqrt(dx*dx + dy*dy + dz*dz);
-
-        } else {
-            E.error("cannot calculate distance (undefined position)");
+        if (!hasPosition() || !mp.hasPosition()) {
+            log.error("cannot calculate distance (undefined position)");
+            throw new RuntimeException("cannot calculate distance (undefined position)");
         }
-        return ret;
-    }
 
+        double dx = mp.x - x;
+        double dy = mp.y - y;
+        double dz = mp.z - z;
+        return Math.sqrt(dx*dx + dy*dy + dz*dz);
+    }
 
     public void setIDWith(MorphPoint end, String id) {
         segidHM.put(end, id);
     }
 
-
     public void setRegionWith(MorphPoint ep, String r) {
         regionHM.put(ep, r);
     }
-
-
 
     public void replaceNeighborLabels(MorphPoint mp, MorphPoint mpnew) {
         if (segidHM.containsKey(mp)) {
@@ -189,5 +166,4 @@ public class MorphPoint {
             regionHM.remove(mp);
         }
     }
-
 }

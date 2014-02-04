@@ -4,7 +4,8 @@ package org.textensor.stochdiff.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.textensor.report.E;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
@@ -15,9 +16,12 @@ import org.apache.logging.log4j.LogManager;
 public class ReactionScheme implements AddableTo {
     static final Logger log = LogManager.getLogger(ReactionScheme.class);
 
+    @XmlElement(name="Specie")
     private final ArrayList<Specie> species = inst.newArrayList();
-    private final HashMap<String, Specie> specieHM = inst.newHashMap();
 
+    private final transient HashMap<String, Specie> specieHM = inst.newHashMap();
+
+    @XmlElement(name="Reaction")
     private final ArrayList<Reaction> reactions = inst.newArrayList();
 
     static <T,V> void hmPut(HashMap<T, V> hm, T key, V value) {

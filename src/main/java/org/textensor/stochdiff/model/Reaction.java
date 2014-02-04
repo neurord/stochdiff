@@ -5,7 +5,8 @@ import java.util.HashMap;
 
 import java.util.StringTokenizer;
 
-import org.textensor.report.E;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
@@ -17,10 +18,16 @@ import org.apache.logging.log4j.LogManager;
 public class Reaction implements AddableTo {
     static final Logger log = LogManager.getLogger(Reaction.class);
 
+    @XmlAttribute
     public String name;
+
+    @XmlAttribute
     public String id;
 
+    @XmlElement(name="Reactant")
     private final ArrayList<Reactant> p_reactants = inst.newArrayList();
+
+    @XmlElement(name="Product")
     private final ArrayList<Product> p_products = inst.newArrayList();
 
     public double forwardRate;

@@ -1,11 +1,12 @@
 package org.textensor.stochdiff.model;
 
-import org.textensor.stochdiff.inter.FloatValued;
+import javax.xml.bind.annotation.*;
 
+import org.textensor.stochdiff.inter.FloatValued;
 
 public abstract class Concentration implements FloatValued {
 
-    public String specieID;
+    @XmlAttribute public String specieID;
 
     public abstract double getNanoMolarConcentration();
 

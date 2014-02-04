@@ -1,13 +1,17 @@
 package org.textensor.stochdiff.model;
 
+import javax.xml.bind.annotation.*;
 
 public class SpecieRef {
 
-    public String specieID;
+    @XmlAttribute
+    private String specieID;
 
-    public int n = -1;
+    @XmlAttribute
+    private int n = -1;
 
-    public int power = 1;
+    @XmlAttribute
+    private int power = 1;
 
     /**
      * The stochiometry (number of molecules consumed during a reaction).

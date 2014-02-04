@@ -4,6 +4,7 @@ package org.textensor.stochdiff.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.*;
 
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.AddableTo;
@@ -15,15 +16,14 @@ public class Morphology implements AddableTo {
 
     public ArrayList<SpineType> spineTypes;
 
+    @XmlElement(name="Segment")
     public ArrayList<Segment> segments;
-
-    boolean resolved = false;
 
     private ArrayList<MorphPoint> p_points;
 
     private ArrayList<SpineAllocation> p_spineAllocations;
 
-
+    transient private boolean resolved = false;
 
     public void add(Object obj) {
 

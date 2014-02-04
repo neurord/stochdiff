@@ -2,31 +2,24 @@ package org.textensor.stochdiff.model;
 
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.*;
 
 import org.textensor.report.E;
 
-
 public class EndPoint extends MorphPoint {
 
-    public String on;
-    public String at;
-    public double atFraction;
-
-
+    @XmlAttribute public String on;
+    @XmlAttribute public String at;
+    @XmlAttribute public double atFraction;
 
     public EndPoint() {
-        super();
         atFraction = -1.;
 
     }
 
-
-
     public EndPoint(String id, double x, double y, double z, double r) {
         super(id, x, y, z, r);
     }
-
-
 
     public void resolve(HashMap<String, Segment> segmentHM, MorphPoint ep) {
         if (on != null) {

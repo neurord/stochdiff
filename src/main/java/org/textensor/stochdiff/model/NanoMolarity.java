@@ -1,14 +1,15 @@
 package org.textensor.stochdiff.model;
 
+import javax.xml.bind.annotation.*;
 
 public class NanoMolarity extends Concentration {
 
-    public double value;
-
+    @XmlAttribute public double value;
 
     public double getNanoMolarConcentration() {
         return value;
     }
+
     public double getValue() {
         return value;
     }
