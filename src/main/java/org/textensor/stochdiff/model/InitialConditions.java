@@ -103,44 +103,6 @@ public class InitialConditions {
     }
 
 
-    public String xmlSerialize() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("<InitialConditions>\n");
-
-
-        for (ConcentrationSet cset : concentrationSets) {
-            sb.append("<ConcentrationSet");
-            if (cset.hasRegion()) {
-                sb.append("region=\"" + cset.getRegion() + "\">\n");
-            } else {
-                sb.append(">\n");
-            }
-            for (Concentration c : cset.concentrations) {
-                sb.append("   " + c.makeXMLLine() + "\n");
-            }
-            sb.append("</ConcentrationSet>\n");
-        }
-
-        for (SurfaceDensitySet sdset : sdSets) {
-            sb.append("<SurfaceDensitySet");
-            if (sdset.hasRegion()) {
-                sb.append("region=\"" + sdset.getRegion() + "\">\n");
-            } else {
-                sb.append(">\n");
-            }
-            for (SurfaceDensity sd : sdset.sds) {
-                sb.append("   " + sd.makeXMLLine() + "\n");
-            }
-            sb.append("</SurfaceDensitySet>\n");
-        }
-
-
-
-        sb.append("</InitialConditions>\n");
-        return sb.toString();
-    }
-
-
     public String[] getTotalPreserved() {
         if (fitConstraints != null)
             return fitConstraints.getTotalPreserved();

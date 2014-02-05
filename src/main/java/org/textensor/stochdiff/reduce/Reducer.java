@@ -13,6 +13,7 @@ import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.StaticCalc;
 import org.textensor.stochdiff.numeric.math.Matrix;
+import org.textensor.xml.ModelReader;
 
 public class Reducer {
 
@@ -48,7 +49,8 @@ public class Reducer {
     // the target concentrations from the target state, nel * nspec
     double[][] ctgt;
 
-
+    public final ModelReader<InitialConditions> ic_loader
+        = new ModelReader(InitialConditions.class);
 
     public Reducer(SDRun sdModel, SDState sdState) {
         sdr = sdModel;
@@ -56,7 +58,9 @@ public class Reducer {
     }
 
 
-    public void reduce() {
+    public void reduce()
+        throws Exception
+    {
         E.info("Starting reduce");
         icon = sdr.getInitialConditions();
         afv = icon.getFloatValuedElements();
@@ -197,17 +201,10 @@ public class Reducer {
         for (int j = 0; j < nv; j++) {
             afv.get(j).setValue(fit[j]);
         }
-        String stxt = icon.xmlSerialize();
-        File fout = new File("reduce-fit.xml");
-        FileUtil.writeStringToFile(stxt, fout);
+        String fout = "reduce-fit.xml";
+        ic_loader.marshall(icon, fout);
         E.info("New initial conditions have been written to " + fout);
-        E.info("Best fit xml is:\n " + stxt);
     }
-
-
-
-
-
 
     public void showFit(double[] newvars, double[] mcdat) {
         for (int j = 0; j < nv; j++) {

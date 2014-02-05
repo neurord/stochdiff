@@ -17,9 +17,4 @@ public class NanoMolarity extends Concentration {
     public void setValue(double x) {
         value = x;
     }
-
-    public String makeXMLLine() {
-        return "<NanoMolarity specieID=\"" + specieID + "\" value=\"" + String.format("%.4g", value) + "\"/>";
-    }
-
 }

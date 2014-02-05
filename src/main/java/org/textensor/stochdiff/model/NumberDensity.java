@@ -20,10 +20,6 @@ public class NumberDensity extends Concentration {
         return nanomolarity;
     }
 
-    public String makeXMLLine() {
-        return "<NumberDensity specieID=\"" + specieID + "\" number=\"" + number + "\"/>";
-    }
-
     public double getValue() {
         return number;
     }
