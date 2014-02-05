@@ -6,13 +6,12 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.morph.SpineDistribution;
 import org.textensor.stochdiff.numeric.morph.SpinePopulation;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
+import org.textensor.util.inst;
 
-public class Morphology implements AddableTo {
+public class Morphology {
 
     public ArrayList<SpineType> spineTypes;
 
@@ -25,75 +24,38 @@ public class Morphology implements AddableTo {
 
     transient private boolean resolved = false;
 
-    public void add(Object obj) {
-
-        if (obj instanceof Segment) {
-            if (segments == null) {
-                segments = new ArrayList<Segment>();
-            }
-            segments.add((Segment)obj);
-
-        } else if (obj instanceof SpineType) {
-            if (spineTypes == null) {
-                spineTypes = new ArrayList<SpineType>();
-            }
-            spineTypes.add((SpineType)obj);
-
-
-        } else if (obj instanceof SpineAllocation) {
-            if (p_spineAllocations == null) {
-                p_spineAllocations = new ArrayList<SpineAllocation>();
-            }
-            p_spineAllocations.add((SpineAllocation)obj);
-
-        } else {
-            E.error("cannot ad a " + obj.getClass() + " to a morphology");
-        }
-    }
-
-
     public void resolve() {
-        HashMap<String, SpineType> spineHM = new HashMap<String, SpineType>();
-        if (spineTypes != null) {
-            for (SpineType st : spineTypes) {
+        HashMap<String, SpineType> spineHM = inst.newHashMap();
+        if (spineTypes != null)
+            for (SpineType st : spineTypes)
                 spineHM.put(st.id, st);
-            }
-        }
 
-        if (p_spineAllocations != null) {
-            for (SpineAllocation ss : p_spineAllocations) {
+        if (p_spineAllocations != null)
+            for (SpineAllocation ss : p_spineAllocations)
                 ss.resolve(spineHM);
-            }
-        }
 
-        if (segments == null) {
-            // nothing to do;
-        } else {
-            HashMap<String, Segment> segmentHM = new HashMap<String, Segment>();
-            for (Segment seg : segments) {
+        if (segments != null) {
+            HashMap<String, Segment> segmentHM = inst.newHashMap();
+            for (Segment seg : segments)
                 segmentHM.put(seg.getID(), seg);
-            }
 
-            for (Segment seg : segments) {
+            for (Segment seg : segments)
                 seg.resolve(segmentHM);
-            }
 
-            ArrayList<MorphPoint> wk = new ArrayList<MorphPoint>();
+            ArrayList<MorphPoint> wk = inst.newArrayList();
             for (Segment seg : segments) {
                 wk.add(seg.getStart());
                 wk.add(seg.getEnd());
             }
 
-            p_points = new ArrayList<MorphPoint>();
-            for (MorphPoint mp : wk) {
-                if (mp.redundant()) {
+            p_points = inst.newArrayList();
+            for (MorphPoint mp : wk)
+                if (mp.redundant())
                     mp.transferConnections();
-                } else {
+                else
                     p_points.add(mp);
-                }
-            }
-
         }
+
         resolved = true;
     }
 

@@ -2,18 +2,16 @@ package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
 
-import org.textensor.stochdiff.inter.AddableTo;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.util.inst;
 
-public class StimulationSet implements AddableTo {
+public class StimulationSet {
 
-    public ArrayList<InjectionStim> stimProcesses = inst.newArrayList();
-
-    public void add(Object obj) {
-        stimProcesses.add((InjectionStim)obj);
-    }
+    @XmlElement(name="InjectionStim")
+    public ArrayList<InjectionStim> stimProcesses;
 
     public StimulationTable makeStimulationTable(ReactionTable rtab) {
         StimulationTable stab = new StimulationTable();

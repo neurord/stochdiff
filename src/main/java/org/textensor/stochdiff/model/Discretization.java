@@ -1,13 +1,17 @@
 package org.textensor.stochdiff.model;
 
-
 import java.util.HashMap;
+import java.util.List;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
+import javax.xml.bind.annotation.*;
 
+import org.textensor.util.inst;
 
-public class Discretization implements AddableTo {
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+public class Discretization {
+    static final Logger log = LogManager.getLogger(Discretization.class);
 
     public double spineDeltaX;
 
@@ -20,81 +24,41 @@ public class Discretization implements AddableTo {
     public double surfaceLayer = 0;
     public double maxAspectRatio= 0;
 
-//    public double[] surfaceLayers = null;
-
-
-
     public SurfaceLayers surfaceLayers;
 
+    @XmlElement(name="MaxElementSide")
+    public List<MaxElementSide> sides;
 
-    public HashMap<String, Double> maxSideHM;
+    private HashMap<String, Double> maxSideHM;
 
-
-
-
-    public void add(Object obj) {
-        if (obj instanceof MaxElementSide) {
-            MaxElementSide mes = (MaxElementSide)obj;
-            if (mes.region != null) {
-                String reg = mes.region.trim();
-                if (reg.length() > 0) {
-                    if (maxSideHM == null) {
-                        maxSideHM = new HashMap<String, Double>();
-                    }
-                    maxSideHM.put(reg, new Double(mes.value));
-
-                } else {
-                    if (defaultMaxElementSide <= 0) {
-                        defaultMaxElementSide = mes.value;
-                    }
+    public synchronized HashMap<String, Double> getResolutionHM() {
+        if (this.maxSideHM == null) {
+            this.maxSideHM = inst.newHashMap();
+            for(MaxElementSide side: this.sides) {
+                Double old = this.maxSideHM.put(side.region, side.value);
+                if (old != null) {
+                    log.error("Duplicate MaxElementSide for region '{}'", side.region);
+                    throw new RuntimeException("Duplicate MaxElementSide");
                 }
             }
-
-            /*
-            else if (obj instanceof MaxAspectRatio) {
-            	maxAspectRatio = ((MaxAspectRatio)obj).value;
-
-            } else if (obj instanceof SurfaceLayers) {
-            	surfaceLayers = ((SurfaceLayers)obj).getValues();
-            	*/
-        } else {
-            E.warning("unrecognized object " + obj);
         }
-    }
-
-
-    public HashMap<String, Double> getResolutionHM() {
-        return maxSideHM;
+        return this.maxSideHM;
     }
 
     public boolean curvedElements() {
-        boolean ret = false;
-        String eslc = elementShape.toLowerCase();
-        if (eslc.equals("curved")) {
-            ret = true;
-        } else if (eslc.equals("cuboid")) {
-            ret = false;
-        } else {
-            E.error("unrecognized element shape (need 'curved' or 'cuboid'): " + elementShape);
-        }
-        return ret;
+        return elementShape.equals("Curved");
     }
-
 
     public double getMaxAspectRatio() {
         return maxAspectRatio;
     }
 
     public double[] getSurfaceLayers() {
-        double[] ret = new double[0];
-        if (surfaceLayers != null) {
-            ret = surfaceLayers.getValues();
-        } else if (surfaceLayer > 0) {
-            ret = new double[1];
-            ret[0] = surfaceLayer;
-        }
-        return ret;
+        if (surfaceLayers != null)
+            return surfaceLayers.getValues();
+        else if (surfaceLayer > 0)
+            return new double[]{ surfaceLayer };
+        else
+            return new double[]{ };
     }
-
-
 }

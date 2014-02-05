@@ -2,104 +2,74 @@ package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.HashMap;
+
 import javax.xml.bind.annotation.*;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.FloatValued;
+import org.textensor.util.inst;
 
-public class InitialConditions implements AddableTo {
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
+public class InitialConditions {
+    static final Logger log = LogManager.getLogger(InitialConditions.class);
 
     @XmlElement(name="ConcentrationSet")
     public ArrayList<ConcentrationSet> concentrationSets;
 
-    transient public HashMap<String, ConcentrationSet> concSetHM;
+    transient private HashMap<String, ConcentrationSet> concSetHM;
 
     @XmlElement(name="SurfanceDensitySet")
     public ArrayList<SurfaceDensitySet> sdSets;
 
-    transient public HashMap<String, SurfaceDensitySet> sdSetHM;
-
+    transient private HashMap<String, SurfaceDensitySet> sdSetHM;
 
     public FitConstraints fitConstraints;
 
     ConcentrationSet defaultConcs;
 
-
-    public void add(Object obj) {
-
-        if (concentrationSets == null) {
-            concentrationSets = new ArrayList<ConcentrationSet>();
-            concSetHM = new HashMap<String, ConcentrationSet>();
-        }
-
-        if (sdSets == null) {
-            sdSets = new ArrayList<SurfaceDensitySet>();
-            sdSetHM = new HashMap<String, SurfaceDensitySet>();
-        }
-
-        if (obj instanceof ConcentrationSet) {
-            ConcentrationSet cset = (ConcentrationSet)obj;
-            concentrationSets.add(cset);
-            if (cset.hasRegion()) {
-                concSetHM.put(cset.getRegion(), cset);
-            }
-            if (defaultConcs == null) {
-                defaultConcs = cset;
-            } else {
-                if (defaultConcs.hasRegion() && !cset.hasRegion()) {
-                    defaultConcs = cset;
-                }
-            }
-
-        } else if (obj instanceof SurfaceDensitySet) {
-            SurfaceDensitySet sdset = (SurfaceDensitySet)obj;
-            sdSets.add(sdset);
-            if (sdset.hasRegion()) {
-                sdSetHM.put(sdset.getRegion(), sdset);
-            }
-
-        } else if (obj instanceof FitConstraints) {
-            fitConstraints = (FitConstraints)obj;
-
-        } else {
-            E.error("cannot add " + obj);
-        }
+    public synchronized HashMap<String, ConcentrationSet> getConcentrationSets() {
+        if (concSetHM == null)
+            concSetHM = listToRegionMap(this.concentrationSets);
+        return concSetHM;
     }
 
+    public synchronized HashMap<String, SurfaceDensitySet> getSurfaceDensitySets() {
+        if (sdSetHM == null)
+            sdSetHM = listToRegionMap(this.sdSets);
+        return sdSetHM;
+    }
 
     public ArrayList<FloatValued> getFloatValuedElements() {
         ArrayList<FloatValued> afv = new ArrayList<FloatValued>();
-        if (concentrationSets != null) {
-            for (ConcentrationSet cs : concentrationSets) {
-                cs.addFloatValued(afv);
-            }
-        }
 
-        if (sdSets != null) {
-            for (SurfaceDensitySet sdSet : sdSets) {
+        if (concentrationSets != null)
+            for (ConcentrationSet cs : concentrationSets)
+                cs.addFloatValued(afv);
+
+        if (sdSets != null)
+            for (SurfaceDensitySet sdSet : sdSets)
                 sdSet.addFloatValued(afv);
-            }
-        }
+
         return afv;
     }
 
 
     public double[] getDefaultNanoMolarConcentrations(String[] spl) {
-        double[] ret = null;
         if (defaultConcs != null) {
-            ret = defaultConcs.getNanoMolarConcentrations(spl);
-        } else {
-            ret = new double[spl.length];
-        }
-        // set to zero where previously undefined (indicated by negative return from getNanoMolarConcentrations)
-        for (int i = 0; i < ret.length; i++) {
-            if (ret[i] < 0.) {
-                ret[i] = 0.;
-            }
-        }
-        return ret;
+            double[] ret = defaultConcs.getNanoMolarConcentrations(spl);
+
+            // set to zero where previously undefined (indicated by
+            // negative return from getNanoMolarConcentrations)
+            for (int i = 0; i < ret.length; i++)
+                if (ret[i] < 0)
+                    ret[i] = 0;
+
+            return ret;
+        } else
+            return new double[spl.length];
     }
 
     public boolean hasConcentrationsFor(String rnm) {
@@ -108,15 +78,14 @@ public class InitialConditions implements AddableTo {
 
 
     public double[] getRegionConcentrations(String rnm, String[] spl) {
-        double[] ret = null;
-        if (concSetHM.containsKey(rnm)) {
-            ret = concSetHM.get(rnm).getNanoMolarConcentrations(spl);
-        } else if (rnm.equals("default")) {
-            ret = defaultConcs.getNanoMolarConcentrations(spl);
-        } else {
-            E.error("want concentrations for unknown region " + rnm);
+        if (concSetHM.containsKey(rnm))
+            return concSetHM.get(rnm).getNanoMolarConcentrations(spl);
+        else if (rnm.equals("default"))
+            return defaultConcs.getNanoMolarConcentrations(spl);
+        else {
+            log.error("want concentrations for unknown region '{}'", rnm);
+            throw new RuntimeException("want concentrations for unknown region " + rnm);
         }
-        return ret;
     }
 
 
@@ -125,14 +94,12 @@ public class InitialConditions implements AddableTo {
     }
 
     public double[] getRegionSurfaceDensities(String rnm, String[] spl) {
-        double[] ret = null;
-        if (sdSetHM.containsKey(rnm)) {
-            ret = sdSetHM.get(rnm).getPicoSurfaceDensities(spl);
-
-        } else {
-            E.error("want concentrations for unknown region " + rnm);
+        if (sdSetHM.containsKey(rnm))
+            return sdSetHM.get(rnm).getPicoSurfaceDensities(spl);
+        else {
+            log.error("want surface densities for unknown region '{}'", rnm);
+            throw new RuntimeException("want surface densities for unknown region " + rnm);
         }
-        return ret;
     }
 
 
@@ -175,12 +142,25 @@ public class InitialConditions implements AddableTo {
 
 
     public String[] getTotalPreserved() {
-        String[] ret = new String[0];
-        if (fitConstraints != null) {
-            ret = fitConstraints.getTotalPreserved();
-        }
-        return ret;
+        if (fitConstraints != null)
+            return fitConstraints.getTotalPreserved();
+        else
+            return new String[0];
     }
 
+    public static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
+        HashMap<String, T> hm = inst.newHashMap();
 
+        for(T item: list)
+            if (item.hasRegion()) {
+                T old = hm.put(item.getRegion(), item);
+                if (old != null) {
+                    log.error("Duplicate {} for region '{}'",
+                              item.getClass().getSimpleName(), item.getRegion());
+                    throw new RuntimeException("Duplicate " + item.getClass());
+                }
+            }
+
+        return hm;
+    }
 }

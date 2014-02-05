@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import org.textensor.stochdiff.inter.ModelReader;
+import org.textensor.xml.ModelReader;
 import org.textensor.stochdiff.model.SDRun;
 
 import org.apache.logging.log4j.Logger;
@@ -14,6 +14,8 @@ import org.textensor.util.CustomFileAppender;
 
 public class StochDiff {
     static final Logger log = LogManager.getLogger("stochdiff");
+
+    static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     // The main method - a bit of basic checking and if all is well, create the
     // SDCalc object and run it;
@@ -32,7 +34,7 @@ public class StochDiff {
         }
     }
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         File modelFile = null;
         final File outputFile;
 
@@ -59,7 +61,7 @@ public class StochDiff {
         final String logfile = outputFile + ".log";
         CustomFileAppender.addFileAppender(logfile);
 
-        SDRun sdModel = ModelReader.read(modelFile);
+        SDRun sdModel = loader.unmarshall(modelFile);
         sdModel.resolve();
 
         SDCalc sdCalc = new SDCalc(sdModel, outputFile);

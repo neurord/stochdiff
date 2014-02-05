@@ -2,7 +2,7 @@ package org.textensor.stochdiff.neuroml;
 
 
 
-public class cable implements MetaContainer {
+public class cable {
 
     public String id;
     public String name;
@@ -12,17 +12,6 @@ public class cable implements MetaContainer {
     public String fractAlongParent;
 
     meta meta;
-
-
-
-    public void addMetaItem(MetaItem mi) {
-        if (meta == null) {
-            meta = new meta();
-        }
-        meta.add(mi);
-    }
-
-
 
     public String getID() {
         return id;

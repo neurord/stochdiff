@@ -5,7 +5,7 @@ import org.textensor.stochdiff.StochDiff;
 
 public class DetTest {
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         String snm = DetTest.class.getPackage().getName();
         System.out.println("pnm is " + snm);
         String srt = "src/" + snm.replaceAll("\\.", "/") + "/";

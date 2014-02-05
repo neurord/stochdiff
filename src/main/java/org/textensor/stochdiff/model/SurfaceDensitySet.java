@@ -3,76 +3,52 @@ package org.textensor.stochdiff.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.stochdiff.inter.FloatValued;
+import org.textensor.util.inst;
 
-public class SurfaceDensitySet implements AddableTo {
+public class SurfaceDensitySet implements Regional {
 
-    public String region;
+    @XmlAttribute public String region;
 
+    @XmlElement(name="SurfaceDensity")
     public ArrayList<SurfaceDensity> sds;
 
-    HashMap<String, SurfaceDensity> sdHM;
-
-    public boolean complete;
-
-
-
-    public void add(Object obj) {
-        if (sds == null) {
-            sds = new ArrayList<SurfaceDensity>();
-        }
-        if (obj instanceof SurfaceDensity) {
-            sds.add((SurfaceDensity)obj);
-        } else {
-            E.error("cannot add " + obj);
-        }
-    }
-
-
+    transient HashMap<String, SurfaceDensity> sdHM;
 
     public HashMap<String, SurfaceDensity> getSurfaceDensityHM() {
         if (sdHM == null) {
-            sdHM = new HashMap<String, SurfaceDensity>();
-            if (sds != null) {
-                for (SurfaceDensity sd : sds) {
+            sdHM = inst.newHashMap();
+            if (sds != null)
+                for (SurfaceDensity sd : sds)
                     sdHM.put(sd.specieID, sd);
-                }
-            }
         }
         return sdHM;
     }
-
 
     public double[] getPicoSurfaceDensities(String[] ids) {
         double[] ret = new double[ids.length];
         HashMap<String, SurfaceDensity> chm = getSurfaceDensityHM();
 
-        for (int i = 0; i < ids.length; i++) {
-            if (chm.containsKey(ids[i])) {
+        for (int i = 0; i < ids.length; i++)
+            if (chm.containsKey(ids[i]))
                 ret[i] = chm.get(ids[i]).getPicoMoleSurfaceDensity();
-            } else {
+            else
                 ret[i] = Double.NaN;
-            }
-        }
 
         return ret;
     }
 
-
     public boolean hasRegion() {
-        return (region != null);
+        return region != null;
     }
 
     public String getRegion() {
         return region;
     }
 
-
-
     public void addFloatValued(ArrayList<FloatValued> afv) {
         afv.addAll(sds);
     }
-
 }

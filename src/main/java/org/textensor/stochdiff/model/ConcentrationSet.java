@@ -5,11 +5,9 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.FloatValued;
 
-public class ConcentrationSet implements AddableTo {
+public class ConcentrationSet implements Regional {
 
     @XmlAttribute public String region;
 
@@ -20,21 +18,6 @@ public class ConcentrationSet implements AddableTo {
     public ArrayList<Concentration> concentrations;
 
     transient HashMap<String, Concentration> concHM;
-
-    transient public boolean complete;
-
-    public void add(Object obj) {
-        if (concentrations == null) {
-            concentrations = new ArrayList<Concentration>();
-        }
-        if (obj instanceof Concentration) {
-            concentrations.add((Concentration)obj);
-        } else {
-            E.error("cannot add " + obj);
-        }
-    }
-
-
 
     public HashMap<String, Concentration> getConcHM() {
         if (concHM == null) {
@@ -66,18 +49,14 @@ public class ConcentrationSet implements AddableTo {
 
 
     public boolean hasRegion() {
-        return (region != null);
+        return region != null;
     }
 
     public String getRegion() {
         return region;
     }
 
-
-
     public void addFloatValued(ArrayList<FloatValued> afv) {
         afv.addAll(concentrations);
-
     }
-
 }

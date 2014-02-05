@@ -133,15 +133,28 @@
 
   <xs:element name="discretization">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="defaultMaxElementSide" />
+      <xs:all>
+        <xs:element ref="defaultMaxElementSide" minOccurs="0" />
         <xs:element ref="spineDeltaX" minOccurs="0" />
-      </xs:sequence>
+        <xs:element ref="elementShape" minOccurs="0" />
+        <xs:element ref="surfaceLayer" minOccurs="0" />
+        <xs:element ref="maxAspectRatio" minOccurs="0" />
+      </xs:all>
     </xs:complexType>
   </xs:element>
 
   <xs:element name="defaultMaxElementSide" type="non-negative-real" />
   <xs:element name="spineDeltaX" type="non-negative-real" />
+  <xs:element name="elementShape" type="elementShape" />
+  <xs:element name="surfaceLayer" type="non-negative-real" />
+  <xs:element name="maxAspectRatio" type="non-negative-real" />
+
+  <xs:simpleType name="elementShape">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Cuboid" />
+      <xs:enumeration value="Curved" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:simpleType name="geometry">
     <xs:restriction base="xs:string">

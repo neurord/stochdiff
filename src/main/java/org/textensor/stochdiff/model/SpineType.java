@@ -1,34 +1,16 @@
 package org.textensor.stochdiff.model;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.morph.SpineProfile;
 
 import java.util.ArrayList;
 
-public class SpineType implements AddableTo {
+public class SpineType {
 
     public String id;
 
     public ArrayList<Section> sections;
 
-
     private SpineProfile r_profile;
-
-
-
-    public void add(Object obj) {
-        if (sections == null) {
-            sections = new ArrayList<Section>();
-        }
-        if (obj instanceof Section) {
-            sections.add((Section)obj);
-        } else {
-            E.error("cannot add " + obj);
-        }
-    }
-
-
 
     public SpineProfile makeProfile() {
         int np = sections.size();

@@ -5,7 +5,7 @@ import org.textensor.stochdiff.StochDiff;
 
 public class ICTest {
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         String snm = ICTest.class.getPackage().getName();
         System.out.println("pnm is " + snm);
         String srt = "src/" + snm.replaceAll("\\.", "/") + "/";
@@ -18,6 +18,4 @@ public class ICTest {
         String[] sa = {srt + "model2.out"};
         CCViz.main(sa);
     }
-
-
 }

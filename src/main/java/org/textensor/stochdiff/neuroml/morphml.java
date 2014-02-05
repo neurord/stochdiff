@@ -2,14 +2,10 @@ package org.textensor.stochdiff.neuroml;
 
 import java.util.ArrayList;
 
-
 import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.Transitional;
 
-
-
-public class morphml implements AddableTo, Transitional {
+public class morphml implements Transitional {
 
     public String id;
 
@@ -21,32 +17,14 @@ public class morphml implements AddableTo, Transitional {
     public String xmlns_xsi;
     public String xsi_schemaLocation;
 
-
     public String name;
     public String lengthUnits;
     public String length_units;
 
-
-
-    public ArrayList<cell> cells = new ArrayList<cell>();
-
-
-
-    public void add(Object obj) {
-        if (obj instanceof cell) {
-            cells.add((cell)obj);
-        } else if (obj instanceof meta) {
-            // ignore for now
-        } else {
-            E.error("unrecognized type " + obj);
-        }
-    }
-
-
+    public ArrayList<cell> cells;
 
     public cell getMorphMLCell() {
-        cell ret = null;
-        if (cells.size() > 0) {
+        if (cells != null && cells.size() > 0) {
             Object obj = cells.get(0);
             try {
                 if (obj instanceof Transitional) {
@@ -55,11 +33,10 @@ public class morphml implements AddableTo, Transitional {
             } catch (Exception ex) {
                 E.error("cannot convert from " + obj);
             }
-            ret = (cell)obj;
+            return (cell)obj;
         }
-        return ret;
+        return null;
     }
-
 
     public Object getFinal() {
         Object ret = null;
@@ -77,7 +54,4 @@ public class morphml implements AddableTo, Transitional {
         }
         return ret;
     }
-
-
-
 }

@@ -4,33 +4,19 @@ package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
+import javax.xml.bind.annotation.*;
 
-public class OutputSet implements AddableTo {
+public class OutputSet {
     public String filename;
     public String region;
     public String dt;
+
+    @XmlElement(name="OutputSpecie")
     public ArrayList<OutputSpecie> outputSpec;
-
-    public void add(Object obj) {
-        if (outputSpec == null) {
-            outputSpec = new ArrayList<OutputSpecie>();
-        }
-
-        if (obj instanceof OutputSpecie) {
-            outputSpec.add((OutputSpecie)obj);
-
-        } else {
-            E.error("cannot add " + obj);
-        }
-    }
-
 
     public int getNumberOfOutputSpecies() {
         return outputSpec.size();
     }
-
 
     public String[] getNamesOfOutputSpecies() {
         int ns = outputSpec.size();

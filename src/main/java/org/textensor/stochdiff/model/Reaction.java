@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
 import static org.textensor.stochdiff.model.Specie.generateID;
@@ -15,7 +14,7 @@ import static org.textensor.stochdiff.model.Specie.generateID;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-public class Reaction implements AddableTo {
+public class Reaction {
     static final Logger log = LogManager.getLogger(Reaction.class);
 
     @XmlAttribute
@@ -72,15 +71,6 @@ public class Reaction implements AddableTo {
 
     public double getReverseRate() {
         return this.reverseRate != null ? this.reverseRate : 0;
-    }
-
-    public void add(Object obj) {
-        if (obj instanceof Reactant)
-            this.p_reactants.add((Reactant)obj);
-        else if (obj instanceof Product)
-            this.p_products.add((Product)obj);
-        else
-            throw new RuntimeException("cannot add " + obj);
     }
 
     public void resolve(HashMap<String, Specie> sphm) {

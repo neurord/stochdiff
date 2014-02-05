@@ -4,22 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.inter.Transitional;
 import org.textensor.stochdiff.model.Morphology;
 import org.textensor.stochdiff.model.Segment;
 
-
-public class cell implements MetaContainer, AddableTo, Transitional {
+public class cell implements Transitional {
 
     public String name;
 
-    public ArrayList<segment> segments = new ArrayList<segment>();
+    public ArrayList<segment> segments;
 
-    public ArrayList<cable> cables = new ArrayList<cable>();
+    public ArrayList<cable> cables;
 
-    public ArrayList<MorphMLCableGroup> cableGroups = new ArrayList<MorphMLCableGroup>();
-
+    public ArrayList<MorphMLCableGroup> cableGroups;
 
     public String notes;
 
@@ -32,42 +29,13 @@ public class cell implements MetaContainer, AddableTo, Transitional {
 
     meta meta;
 
-
-    public void add(Object obj) {
-        if (obj instanceof cable) {
-            cables.add((cable)obj);
-        } else if (obj instanceof MorphMLCableGroup) {
-            cableGroups.add((MorphMLCableGroup)obj);
-
-//		} else if (obj instanceof NeuroMLMechanism) {
-
-
-        } else {
-            E.error("cannot add " + obj);
-        }
-    }
-
-
-    public void addMetaItem(MetaItem mi) {
-        if (meta == null) {
-            meta = new meta();
-        }
-        meta.add(mi);
-    }
-
-
     public ArrayList<segment> getSegments() {
         return segments;
     }
 
-
     public Object getFinal() {
         return getStochDiffMorphology();
     }
-
-
-
-
 
     public Morphology getStochDiffMorphology() {
         Morphology ret = new Morphology();
@@ -83,7 +51,7 @@ public class cell implements MetaContainer, AddableTo, Transitional {
 
         for (segment seg : segs) {
             Segment s = seg.getStochDiffSegment(cableHM);
-            ret.add(s);
+            ret.segments.add(s);
             E.info("added a segment " + s);
         }
 

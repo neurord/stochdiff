@@ -1,9 +1,6 @@
 package org.textensor.stochdiff.neuroml;
 
-import org.textensor.stochdiff.inter.BodyValued;
-
-
-public class MetaItem implements BodyValued, MetaContainer {
+public class MetaItem {
 
     public String name;
     public String value;
@@ -16,17 +13,8 @@ public class MetaItem implements BodyValued, MetaContainer {
 
     meta meta;
 
-
-    public void addMetaItem(MetaItem mi) {
-        if (meta == null) {
-            meta = new meta();
-        }
-        meta.add(mi);
-    }
-
-    public MetaItem(String n) {
-        name = n;
-
+    public MetaItem(String name) {
+        this.name = name;
     }
 
     public void setName(String s) {

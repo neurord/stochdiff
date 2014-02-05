@@ -6,14 +6,13 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.stochdiff.inter.AddableTo;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-public class ReactionScheme implements AddableTo {
+public class ReactionScheme {
     static final Logger log = LogManager.getLogger(ReactionScheme.class);
 
     @XmlElement(name="Specie")

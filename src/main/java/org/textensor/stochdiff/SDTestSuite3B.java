@@ -6,7 +6,7 @@ import org.catacomb.dataview.CCViz;
 public class SDTestSuite3B {
 
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         String root = "data/apr25/New_EPAC_S_1500/HEK293model";
         String[] args = {root + ".xml"};
 

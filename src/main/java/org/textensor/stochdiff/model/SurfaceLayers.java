@@ -2,12 +2,7 @@ package org.textensor.stochdiff.model;
 
 import java.util.StringTokenizer;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.inter.BodyValued;
-
-
-public class SurfaceLayers implements BodyValued {
-
+public class SurfaceLayers {
 
     public double[] values;
 

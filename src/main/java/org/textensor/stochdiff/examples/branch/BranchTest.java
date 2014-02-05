@@ -5,7 +5,7 @@ import org.textensor.stochdiff.StochDiff;
 
 public class BranchTest {
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         String snm = BranchTest.class.getPackage().getName();
         String srt = "src/" + snm.replaceAll("\\.", "/") + "/";
 
