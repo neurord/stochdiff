@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns="http://stochdiff.textensor.org"
-        xmlns:s="http://stochdiff.textensor.org"
         targetNamespace="http://stochdiff.textensor.org">
 
 
@@ -12,20 +11,20 @@
         <xs:element ref="Morphology" />
         <xs:element ref="InitialConditions" />
 
-        <xs:element ref="runtime" />
-        <xs:element ref="geometry" />
-        <xs:element ref="depth2D" />
-        <xs:element ref="distribution" />
-        <xs:element ref="algorithm" />
-        <xs:element ref="simulationSeed" />
-        <xs:element ref="outputQuantity" />
-        <xs:element ref="spineSeed" />
+        <xs:element ref="runtime" minOccurs="0" />
+        <xs:element ref="geometry" minOccurs="0" />
+        <xs:element ref="depth2D" minOccurs="0" />
+        <xs:element ref="distribution" minOccurs="0" />
+        <xs:element ref="algorithm" minOccurs="0" />
+        <xs:element ref="simulationSeed" minOccurs="0" />
+        <xs:element ref="outputQuantity" minOccurs="0" />
+        <xs:element ref="spineSeed" minOccurs="0" />
 
-        <xs:element ref="fixedStepDt" />
-        <xs:element ref="outputInterval" />
-        <xs:element ref="tolerance" />
+        <xs:element ref="fixedStepDt" minOccurs="0" />
+        <xs:element ref="outputInterval" minOccurs="0" />
+        <xs:element ref="tolerance" minOccurs="0" />
 
-        <xs:element ref="calculation" />
+        <xs:element ref="calculation" minOccurs="0" />
 
         <xs:element ref="discretization" />
       </xs:all>

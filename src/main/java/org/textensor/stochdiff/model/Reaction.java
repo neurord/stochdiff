@@ -73,8 +73,17 @@ public class Reaction {
         return this.reverseRate != null ? this.reverseRate : 0;
     }
 
+    public void add(Object obj) {
+        if (obj instanceof Reactant)
+            this.p_reactants.add((Reactant)obj);
+        else if (obj instanceof Product)
+            this.p_products.add((Product)obj);
+        else
+            throw new RuntimeException("cannot add " + obj);
+    }
+
     public void resolve(HashMap<String, Specie> sphm) {
-        if (this.p_reactants.isEmpty() || this.p_products.isEmpty())
+        if (this.p_reactants.isEmpty())
             log.warn("no reactants in reaction {}", name);
         this.r_reactants = parseRefs(this.p_reactants, sphm);
         this.r_products = parseRefs(this.p_products, sphm);

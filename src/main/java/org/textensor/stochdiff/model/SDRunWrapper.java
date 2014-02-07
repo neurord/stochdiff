@@ -115,7 +115,7 @@ public class SDRunWrapper {
     private void extractOutputScheme(ReactionTable rtab) {
         OutputScheme os = sdRun.getOutputScheme();
 
-        int nos = os.outputSets.size();
+        int nos = os != null ? os.outputSets.size() : 0;
         regionsOut = new String[nos];
         dtsOut = new double[nos];
         fnmsOut = new String[nos];
@@ -125,10 +125,9 @@ public class SDRunWrapper {
         String[] specieIDs = rtab.getSpecieIDs();
         int nspec = specieIDs.length;
 
-        log.info("extracting output scheme with {} file for {} species", os.outputSets.size(), nspec);
+        log.info("extracting output scheme with {} files for {} species", nos, nspec);
 
-
-        for (int i = 0; i < os.outputSets.size(); i++) {
+        for (int i = 0; i < nos; i++) {
             OutputSet oset = os.outputSets.get(i);
 
             if (oset.hasdt())

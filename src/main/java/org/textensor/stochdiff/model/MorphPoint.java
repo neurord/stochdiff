@@ -21,13 +21,13 @@ public class MorphPoint {
     @XmlAttribute public String label;
 
 
-    private Segment r_segment;
+    transient private Segment r_segment;
 
-    protected MorphPoint r_peerPoint;
+    transient protected MorphPoint r_peerPoint;
 
-    private ArrayList<MorphPoint> neighbors;
+    transient private ArrayList<MorphPoint> neighbors;
 
-    private ArrayList<MorphPoint> offsetNeighbors;
+    transient private ArrayList<MorphPoint> offsetNeighbors;
 
 
     transient HashMap<MorphPoint, String> segidHM = inst.newHashMap();

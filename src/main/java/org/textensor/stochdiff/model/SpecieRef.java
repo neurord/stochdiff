@@ -33,4 +33,9 @@ public class SpecieRef {
     public String getSpecieID() {
         return specieID;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s specieID=%s", getClass().getSimpleName(), specieID);
+    }
 }

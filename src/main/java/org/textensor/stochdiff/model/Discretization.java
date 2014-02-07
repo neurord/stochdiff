@@ -27,7 +27,7 @@ public class Discretization {
     public SurfaceLayers surfaceLayers;
 
     @XmlElement(name="MaxElementSide")
-    public List<MaxElementSide> sides;
+    public List<MaxElementSide> sides = inst.newArrayList();
 
     private HashMap<String, Double> maxSideHM;
 

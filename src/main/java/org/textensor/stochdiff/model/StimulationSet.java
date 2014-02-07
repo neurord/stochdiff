@@ -1,6 +1,6 @@
 package org.textensor.stochdiff.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.*;
 
@@ -11,7 +11,7 @@ import org.textensor.util.inst;
 public class StimulationSet {
 
     @XmlElement(name="InjectionStim")
-    public ArrayList<InjectionStim> stimProcesses;
+    public List<InjectionStim> stimProcesses = inst.newArrayList();
 
     public StimulationTable makeStimulationTable(ReactionTable rtab) {
         StimulationTable stab = new StimulationTable();

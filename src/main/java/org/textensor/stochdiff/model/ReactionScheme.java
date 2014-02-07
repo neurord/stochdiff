@@ -18,8 +18,6 @@ public class ReactionScheme {
     @XmlElement(name="Specie")
     private final ArrayList<Specie> species = inst.newArrayList();
 
-    private final transient HashMap<String, Specie> specieHM = inst.newHashMap();
-
     @XmlElement(name="Reaction")
     private final ArrayList<Reaction> reactions = inst.newArrayList();
 
@@ -29,41 +27,36 @@ public class ReactionScheme {
             throw new RuntimeException("overwriting key " + key + " with new value");
     }
 
-    public void add(Object obj) {
-        if (obj instanceof Specie) {
-            Specie sp = (Specie) obj;
-            sp.setIndex(this.species.size());
-            this.species.add(sp);
-            hmPut(this.specieHM, sp.getID(), sp);
-            if (!sp.getName().equals(sp.getID()))
-                hmPut(this.specieHM, sp.getName(), sp);
-        } else if (obj instanceof Reaction) {
-            reactions.add((Reaction)obj);
-        } else {
-            throw new RuntimeException("cannot add " + obj + " to reaction scheme ");
-        }
-    }
-
     public void resolve() {
+        HashMap<String, Specie> hm = inst.newHashMap();
+        int index = 0;
+
+        for (Specie sp: this.species) {
+            sp.setIndex(index++);
+            hmPut(hm, sp.getID(), sp);
+            if (!sp.getName().equals(sp.getID()))
+                hmPut(hm, sp.getName(), sp);
+        }
+
         for (Reaction r : reactions)
-            r.resolve(this.specieHM);
+            r.resolve(hm);
     }
 
     protected String[] getSpecieIDs() {
         String[] ret = new String[species.size()];
         int ict = 0;
-        for (Specie sp : species) {
+        for (Specie sp : species)
             ret[ict++] = sp.getID();
-        }
+
         return ret;
     }
 
     protected double[] getDiffusionConstants() {
         double[] ret = new double[species.size()];
         int ict = 0;
-        for (Specie sp : species) {
+        for (Specie sp : species)
             ret[ict++] = sp.getDiffusionConstant();
-        }
+
         return ret;
     }
 

@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.annotation.*;
 
-@XmlRootElement(namespace="http://model.stochdiff.textensor.org", name="SDRun")
+@XmlRootElement(name="SDRun")
 public class SDRun {
     static final Logger log = LogManager.getLogger(SDRun.class);
 
@@ -93,7 +93,7 @@ public class SDRun {
         morphology.resolve();
     }
 
-    // just getters and setters from here on;
+    // just getters from here on;
 
     public distribution_t getDistribution() {
         return distribution_t.valueOf(this.distribution);
@@ -108,33 +108,19 @@ public class SDRun {
         return stateSaveInterval;
     }
 
-
-    public void setOutputScheme(OutputScheme outputScheme) {
-        this.outputScheme = outputScheme;
-    }
-
     public OutputScheme getOutputScheme() {
         return outputScheme;
-    }
-
-    public void setReactionScheme(ReactionScheme reactionScheme) {
-        this.reactionScheme = reactionScheme;
     }
 
     public ReactionScheme getReactionScheme() {
         return reactionScheme;
     }
 
-    public void setStimulationSet(StimulationSet stimulationSet) {
-        this.stimulationSet = stimulationSet;
-    }
-
     public StimulationSet getStimulationSet() {
-        return stimulationSet;
-    }
-
-    public void setMorphology(Morphology morphology) {
-        this.morphology = morphology;
+        if (this.stimulationSet != null)
+            return this.stimulationSet;
+        else
+            return new StimulationSet();
     }
 
     public Morphology getMorphology() {
@@ -143,10 +129,6 @@ public class SDRun {
 
     public Discretization getDiscretization() {
         return discretization;
-    }
-
-    public void setInitialConditions(InitialConditions initialConditions) {
-        this.initialConditions = initialConditions;
     }
 
     public InitialConditions getInitialConditions() {

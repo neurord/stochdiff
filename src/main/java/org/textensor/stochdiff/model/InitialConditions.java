@@ -28,18 +28,31 @@ public class InitialConditions {
 
     public FitConstraints fitConstraints;
 
-    ConcentrationSet defaultConcs;
+    transient private ConcentrationSet defaultConcs;
 
     public synchronized HashMap<String, ConcentrationSet> getConcentrationSets() {
-        if (concSetHM == null)
-            concSetHM = listToRegionMap(this.concentrationSets);
-        return concSetHM;
+        if (this.concSetHM == null)
+            this.concSetHM = listToRegionMap(this.concentrationSets);
+        return this.concSetHM;
+    }
+
+    public synchronized ConcentrationSet getDefaultConcentrations() {
+        if (this.defaultConcs == null) {
+            for (ConcentrationSet set: this.concentrationSets)
+                if (!set.hasRegion()) {
+                    this.defaultConcs = set;
+                    break;
+                }
+            if (this.defaultConcs == null)
+                this.defaultConcs = new ConcentrationSet();
+        }
+        return this.defaultConcs;
     }
 
     public synchronized HashMap<String, SurfaceDensitySet> getSurfaceDensitySets() {
-        if (sdSetHM == null)
-            sdSetHM = listToRegionMap(this.sdSets);
-        return sdSetHM;
+        if (this.sdSetHM == null)
+            this.sdSetHM = listToRegionMap(this.sdSets);
+        return this.sdSetHM;
     }
 
     public ArrayList<FloatValued> getFloatValuedElements() {
@@ -58,30 +71,27 @@ public class InitialConditions {
 
 
     public double[] getDefaultNanoMolarConcentrations(String[] spl) {
-        if (defaultConcs != null) {
-            double[] ret = defaultConcs.getNanoMolarConcentrations(spl);
+        double[] ret = this.getDefaultConcentrations().getNanoMolarConcentrations(spl);
 
-            // set to zero where previously undefined (indicated by
-            // negative return from getNanoMolarConcentrations)
-            for (int i = 0; i < ret.length; i++)
-                if (ret[i] < 0)
-                    ret[i] = 0;
+        // set to zero where previously undefined (indicated by
+        // negative return from getNanoMolarConcentrations)
+        for (int i = 0; i < ret.length; i++)
+            if (ret[i] < 0)
+                ret[i] = 0;
 
-            return ret;
-        } else
-            return new double[spl.length];
+        return ret;
     }
 
     public boolean hasConcentrationsFor(String rnm) {
-        return (rnm.equals("default") || concSetHM.containsKey(rnm));
+        return rnm.equals("default") || this.getConcentrationSets().containsKey(rnm);
     }
 
 
     public double[] getRegionConcentrations(String rnm, String[] spl) {
-        if (concSetHM.containsKey(rnm))
-            return concSetHM.get(rnm).getNanoMolarConcentrations(spl);
+        if (this.getConcentrationSets().containsKey(rnm))
+            return this.getConcentrationSets().get(rnm).getNanoMolarConcentrations(spl);
         else if (rnm.equals("default"))
-            return defaultConcs.getNanoMolarConcentrations(spl);
+            return this.getDefaultConcentrations().getNanoMolarConcentrations(spl);
         else {
             log.error("want concentrations for unknown region '{}'", rnm);
             throw new RuntimeException("want concentrations for unknown region " + rnm);
@@ -90,12 +100,12 @@ public class InitialConditions {
 
 
     public boolean hasSurfaceDensitiesFor(String rnm) {
-        return (sdSetHM.containsKey(rnm));
+        return this.getSurfaceDensitySets().containsKey(rnm);
     }
 
     public double[] getRegionSurfaceDensities(String rnm, String[] spl) {
-        if (sdSetHM.containsKey(rnm))
-            return sdSetHM.get(rnm).getPicoSurfaceDensities(spl);
+        if (this.getSurfaceDensitySets().containsKey(rnm))
+            return this.getSurfaceDensitySets().get(rnm).getPicoSurfaceDensities(spl);
         else {
             log.error("want surface densities for unknown region '{}'", rnm);
             throw new RuntimeException("want surface densities for unknown region " + rnm);
@@ -113,15 +123,16 @@ public class InitialConditions {
     public static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
         HashMap<String, T> hm = inst.newHashMap();
 
-        for(T item: list)
-            if (item.hasRegion()) {
-                T old = hm.put(item.getRegion(), item);
-                if (old != null) {
-                    log.error("Duplicate {} for region '{}'",
-                              item.getClass().getSimpleName(), item.getRegion());
-                    throw new RuntimeException("Duplicate " + item.getClass());
+        if (list != null)
+            for(T item: list)
+                if (item.hasRegion()) {
+                    T old = hm.put(item.getRegion(), item);
+                    if (old != null) {
+                        log.error("Duplicate {} for region '{}'",
+                                  item.getClass().getSimpleName(), item.getRegion());
+                        throw new RuntimeException("Duplicate " + item.getClass());
+                    }
                 }
-            }
 
         return hm;
     }
