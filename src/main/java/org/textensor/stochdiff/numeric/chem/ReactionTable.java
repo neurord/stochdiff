@@ -16,7 +16,7 @@ public class ReactionTable {
     public final int nreaction;
     public final int nspecie;
 
-    private String[] speciesIDs;
+    private String[] species;
     private double[] diffusionConstants;
 
     private final int[][] reactantIndices;
@@ -83,19 +83,19 @@ public class ReactionTable {
         log.debug("ireact={}/{} {}→{} rate={}",
                   ireact, nreaction, aidx, bidx, rate);
 
-        assert this.speciesIDs != null;
+        assert this.species != null;
 
         Integer dupl = findDuplicates(aidx[0]);
         if (dupl != null) {
-            log.error("Duplicate reactant {} in reaction {}: {}", speciesIDs[dupl], ireact,
-                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.speciesIDs));
+            log.error("Duplicate reactant {} in reaction {}: {}", species[dupl], ireact,
+                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.species));
             throw new RuntimeException("Duplicate reactant in reaction " + ireact);
         }
 
         dupl = findDuplicates(bidx[0]);
         if (dupl != null) {
-            log.error("Duplicate product {} in reaction {}: {}", speciesIDs[dupl], ireact,
-                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.speciesIDs));
+            log.error("Duplicate product {} in reaction {}: {}", species[dupl], ireact,
+                      getReactionSignature(aidx[0], aidx[1], bidx[0], bidx[1], this.species));
             throw new RuntimeException("Duplicate product in reaction " + ireact);
         }
 
@@ -110,14 +110,14 @@ public class ReactionTable {
     }
 
 
-    public void setSpeciesIDs(String[] sa) {
-        speciesIDs = sa;
+    public void setSpecies(String[] sa) {
+        species = sa;
     }
 
 
-    public String[] getSpecieIDs() {
-        assert speciesIDs != null;
-        return speciesIDs;
+    public String[] getSpecies() {
+        assert species != null;
+        return species;
     }
 
     public static String getReactionSignature(int[] rr, int[] rs, int[] pp, int[] ps, String[] ids) {
@@ -314,7 +314,7 @@ public class ReactionTable {
     }
 
     public int getSpecieIndex(String specieID) {
-        String[] sa = getSpecieIDs();
+        String[] sa = getSpecies();
 
         for (int i = 0; i < nspecie; i++)
             if (sa[i].equals(specieID))

@@ -42,7 +42,7 @@ public class ReactionScheme {
             r.resolve(hm);
     }
 
-    protected String[] getSpecieIDs() {
+    protected String[] getSpecies() {
         String[] ret = new String[species.size()];
         int ict = 0;
         for (Specie sp : species)
@@ -74,7 +74,7 @@ public class ReactionScheme {
 
         ReactionTable rtab = new ReactionTable(n, species.size());
 
-        rtab.setSpeciesIDs(getSpecieIDs());
+        rtab.setSpecies(getSpecies());
         rtab.setDiffusionConstants(getDiffusionConstants());
 
         int i = 0;

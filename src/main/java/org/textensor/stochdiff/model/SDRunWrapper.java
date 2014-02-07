@@ -52,7 +52,7 @@ public class SDRunWrapper {
         extractGrid();
 
         this.ispecout = findOutputSpecies(sdRun.outputSpecies,
-                                          reactionTable.getSpecieIDs());
+                                          reactionTable.getSpecies());
     }
 
     private void extractTables() {
@@ -60,7 +60,7 @@ public class SDRunWrapper {
 
         stimulationTable = sdRun.getStimulationSet().makeStimulationTable(reactionTable);
 
-        speciesList = reactionTable.getSpecieIDs();
+        speciesList = reactionTable.getSpecies();
 
         baseConcentrations = sdRun.getInitialConditions()
                                   .getDefaultNanoMolarConcentrations(speciesList);
@@ -122,8 +122,8 @@ public class SDRunWrapper {
         specNamesOut = new String[nos][];
         specIndexesOut = new int[nos][];
 
-        String[] specieIDs = rtab.getSpecieIDs();
-        int nspec = specieIDs.length;
+        String[] species = rtab.getSpecies();
+        int nspec = species.length;
 
         log.info("extracting output scheme with {} files for {} species", nos, nspec);
 
@@ -147,7 +147,7 @@ public class SDRunWrapper {
 
             for (int k = 0; k < specNamesOut[i].length; k++)
                 for (int kq = 0; kq < nspec; kq++)
-                    if (specNamesOut[i][k].equalsIgnoreCase(specieIDs[kq]))
+                    if (specNamesOut[i][k].equalsIgnoreCase(species[kq]))
                         specIndexesOut[i][k] = kq;
         }
     }
@@ -279,9 +279,8 @@ public class SDRunWrapper {
         return this.regionsOut;
     }
 
-    // XXX: rename this
-    public String[] getSpecieIDs() {
-        return this.reactionTable.getSpecieIDs();
+    public String[] getSpecies() {
+        return this.reactionTable.getSpecies();
     }
 
     public int[] getOutputSpecies() {

@@ -10,7 +10,7 @@ public class StaticCalc extends BaseCalc {
     VolumeGrid vgrid;
     int nel;
     int nspec;
-    String[] specieIDs;
+    String[] species;
     double[] volumes;
     boolean[] submembranes;
     String[] regionLabels;
@@ -44,7 +44,7 @@ public class StaticCalc extends BaseCalc {
         nel = vgrid.getNElements();
 
         nspec = rtab.getNSpecies();
-        specieIDs = rtab.getSpecieIDs();
+        species = rtab.getSpecies();
 
 
 
@@ -138,8 +138,8 @@ public class StaticCalc extends BaseCalc {
         int[] ret = new int[sid.length];
         for (int i = 0; i < sid.length; i++) {
             boolean got = false;
-            for (int j = 0; j <specieIDs.length; j++) {
-                if (sid[i].equals(specieIDs[j])) {
+            for (int j = 0; j <species.length; j++) {
+                if (sid[i].equals(species[j])) {
                     ret[i] = j;
                     got = true;
                 }

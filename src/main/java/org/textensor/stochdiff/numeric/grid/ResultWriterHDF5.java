@@ -337,10 +337,10 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSpecies(int[] ispecout, IGridCalc source)
             throws Exception
         {
-            String[] specieIDs = source.getSource().getSpecieIDs();
+            String[] species = source.getSource().getSpecies();
             String[] outSpecies = new String[ispecout.length];
             for (int i = 0; i < ispecout.length; i++)
-                outSpecies[i] = specieIDs[ispecout[i]];
+                outSpecies[i] = species[ispecout[i]];
 
             Dataset ds = writeVector("species", this.model, outSpecies);
             setAttribute(ds, "TITLE", "names of saved species");
@@ -816,7 +816,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             log.debug("state saved at t={} ms for trial {}", time, source.trial());
             int nel = source.getNumberElements();
-            int nspecie = source.getSource().getSpecieIDs().length;
+            int nspecie = source.getSource().getSpecies().length;
             if (source.preferConcs())
                 this.writeSavedStateD(nel, nspecie, source);
             else
@@ -830,7 +830,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             // the file on creation...
             Dataset obj = (Dataset) output.get("/simulation/state");
             int nel = source.getNumberElements();
-            int nspecie = source.getSource().getSpecieIDs().length;
+            int nspecie = source.getSource().getSpecies().length;
             if (obj == null)
                 throw new RuntimeException("state hasn't been saved");
             if (source.preferConcs()) {

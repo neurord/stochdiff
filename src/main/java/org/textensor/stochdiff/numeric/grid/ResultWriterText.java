@@ -250,7 +250,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     private String getGridConcsText(double time, int nel, int[] ispecout, IGridCalc source) {
-        final String[] specieIDs = source.getSource().getSpecieIDs();
+        final String[] species = source.getSource().getSpecies();
         StringBuffer sb = new StringBuffer();
         // TODO tag specific to integer quantities;
         int nspecout = ispecout.length;
@@ -259,7 +259,7 @@ public class ResultWriterText implements ResultWriter {
 
         sb.append("gridConcentrations " + nel + " " + nspecout + " " + time + " ");
         for (int i = 0; i < nspecout; i++)
-            sb.append(specieIDs[ispecout[i]] + " ");
+            sb.append(species[ispecout[i]] + " ");
         sb.append("\n");
 
         for (int i = 0; i < nel; i++) {
@@ -298,7 +298,7 @@ public class ResultWriterText implements ResultWriter {
         final int[][] specIndexesOut = source.getSource().getSpecIndexesOut();
         final String[] regionsOut = source.getSource().getRegionsOut();
         final String[] regionLabels = vgrid.getRegionLabels();
-        final String[] specieIDs = source.getSource().getSpecieIDs();
+        final String[] species = source.getSource().getSpecies();
         final boolean[] submembranes = vgrid.getSubmembranes();
         final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
 
@@ -335,7 +335,7 @@ public class ResultWriterText implements ResultWriter {
                     }
                     // WK
 
-                    sb.append("_Spc_" + specieIDs[specIndexesOut[filenum][j]]);
+                    sb.append("_Spc_" + species[specIndexesOut[filenum][j]]);
                 }
             }
         }
@@ -358,17 +358,17 @@ public class ResultWriterText implements ResultWriter {
     }
 
     protected String getStateText(IGridCalc source) {
-        String[] specieIDs = source.getSource().getSpecieIDs();
+        String[] species = source.getSource().getSpecies();
         int nel = source.getNumberElements();
 
         StringBuffer sb = new StringBuffer();
-        sb.append("nrds " + nel + " " + specieIDs.length + "\n");
-        for (int i = 0; i < specieIDs.length; i++) {
-            sb.append(specieIDs[i] + " ");
+        sb.append("nrds " + nel + " " + species.length + "\n");
+        for (int i = 0; i < species.length; i++) {
+            sb.append(species[i] + " ");
         }
         sb.append("\n");
         for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < specieIDs.length; j++) {
+            for (int j = 0; j < species.length; j++) {
                 if (source.preferConcs())
                     sb.append(stringd(source.getGridPartConc(i, j)));
                 else
@@ -421,7 +421,7 @@ public class ResultWriterText implements ResultWriter {
 
     public Object loadState(String fnm, IGridCalc source) {
             int nel = source.getNumberElements();
-            String[] species = source.getSource().getSpecieIDs();
+            String[] species = source.getSource().getSpecies();
             double[][] state = this._readInitialState(fnm, nel, species.length, species);
             if (source.preferConcs())
                 return state;

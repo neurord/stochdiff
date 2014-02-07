@@ -852,7 +852,7 @@ public class NextEventQueue {
         int[][] neighbors = grid.getPerElementNeighbors();
         double[][] couplings = grid.getPerElementCouplingConstants();
         double[] fdiff = rtab.getDiffusionConstants();
-        String[] species = rtab.getSpecieIDs();
+        String[] species = rtab.getSpecies();
 
         ArrayList<NextDiffusion> ans = inst.newArrayList(3 * neighbors.length);
 
@@ -879,7 +879,7 @@ public class NextEventQueue {
             RS = rtab.getReactantStochiometry(),
             PS = rtab.getProductStochiometry(),
             RP = rtab.getReactantPowers();
-        String[] species = rtab.getSpecieIDs();
+        String[] species = rtab.getSpecies();
 
         ArrayList<NextReaction> ans = inst.newArrayList(RI.length * volumes.length);
 
@@ -904,7 +904,7 @@ public class NextEventQueue {
                                                   ReactionTable rtab,
                                                   StimulationTable stimtab,
                                                   int[][] stimtargets) {
-        String[] species = rtab.getSpecieIDs();
+        String[] species = rtab.getSpecies();
         ArrayList<NextStimulation> ans = inst.newArrayList(stimtargets.length * 3);
 
         for (int i = 0; i < stimtab.getStimulations().size(); i++) {
