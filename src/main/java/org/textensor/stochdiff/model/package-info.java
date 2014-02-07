@@ -14,7 +14,10 @@
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlJavaTypeAdapter(value=StringTrimAdapter.class, type=String.class)
 @XmlSchema(namespace="http://stochdiff.textensor.org",
-           elementFormDefault=XmlNsForm.QUALIFIED)
+           elementFormDefault=XmlNsForm.QUALIFIED,
+           xmlns={
+               @XmlNs(prefix="", namespaceURI="http://stochdiff.textensor.org")
+           })
 package org.textensor.stochdiff.model;
 
 import javax.xml.bind.annotation.*;
