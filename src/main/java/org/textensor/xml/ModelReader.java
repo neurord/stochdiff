@@ -24,6 +24,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.XMLFilterImpl;
 
 import java.util.List;
@@ -68,6 +69,14 @@ public class ModelReader<T> {
             if (this.sdrun_seen && uri.equals(""))
                 uri = STOCHDIFF_NS;
             super.endElement(uri, localName, qName);
+        }
+
+        @Override
+        public void error(SAXParseException e)
+            throws SAXException
+        {
+            log.error("error: {}", (Object) e); // just stringify
+            super.error(e);
         }
     }
 
