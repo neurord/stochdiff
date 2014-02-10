@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns="http://stochdiff.textensor.org"
-        targetNamespace="http://stochdiff.textensor.org">
-
+        targetNamespace="http://stochdiff.textensor.org"
+        elementFormDefault="qualified">
 
   <xs:element name="SDRun">
     <xs:complexType>
@@ -10,6 +10,7 @@
         <xs:element ref="ReactionScheme" />
         <xs:element ref="Morphology" />
         <xs:element ref="InitialConditions" minOccurs="0" />
+        <xs:element ref="StimulationSet" minOccurs="0" />
         <xs:element ref="OutputScheme" minOccurs="0" />
 
         <xs:element ref="runtime" minOccurs="0" />
@@ -56,8 +57,9 @@
         <xs:element ref="Reactant" minOccurs="1" maxOccurs="unbounded" />
         <xs:element ref="Product" minOccurs="0" maxOccurs="unbounded"/>
 
-        <xs:element ref="forwardRate" />
-        <xs:element ref="reverseRate" minOccurs="0" />
+        <xs:element name="forwardRate" type="non-negative-real" />
+        <xs:element name="reverseRate" type="non-negative-real" minOccurs="0" />
+        <xs:element name="Q10" type="xs:double" minOccurs="0" />
       </xs:sequence>
 
       <xs:attribute name="name" type="xs:string" />
@@ -66,15 +68,31 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="Reactant" type="substrate" />
+  <xs:complexType name="substrate">
+    <xs:attribute name="specieID" type="xs:string" use="required" />
+    <xs:attribute name="n" type="xs:positiveInteger" />
+  </xs:complexType>
+
+  <xs:element name="Reactant">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="substrate">
+          <xs:attribute name="power" type="xs:positiveInteger" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="Product" type="substrate" />
-  <xs:element name="forwardRate" type="non-negative-real" />
-  <xs:element name="reverseRate" type="non-negative-real" />
 
   <xs:element name="Morphology">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="Segment" />
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="Segment" />
+          <xs:element ref="SpineType" />
+          <xs:element ref="SpineAllocation" />
+        </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -93,10 +111,41 @@
   <xs:element name="start" type="point" />
   <xs:element name="end" type="point" />
 
-  <xs:element name="InitialConditions">
+  <xs:element name="SpineType">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="ConcentrationSet" />
+        <xs:element ref="Section" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="id" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SpineAllocation">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:string" />
+      <xs:attribute name="spineType" type="xs:string" />
+      <xs:attribute name="region" type="xs:string" />
+      <xs:attribute name="lengthDensity" type="non-negative-real" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Section">
+    <xs:complexType>
+      <xs:attribute name="width" type="non-negative-real" />
+      <xs:attribute name="at" type="non-negative-real" />
+      <xs:attribute name="regionClass" type="xs:string" />
+      <xs:attribute name="label" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InitialConditions">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:choice>
+          <xs:element ref="ConcentrationSet" />
+          <xs:element ref="SurfaceDensitySet" />
+        </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -106,6 +155,8 @@
       <xs:sequence>
         <xs:element ref="NanoMolarity" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
+
+      <xs:attribute name="region" type="xs:string" />
     </xs:complexType>
   </xs:element>
 
@@ -113,6 +164,49 @@
     <xs:complexType>
       <xs:attribute name="specieID" type="xs:string" use="required" />
       <xs:attribute name="value" type="non-negative-real" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SurfaceDensitySet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="PicoSD" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="region" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="PicoSD">
+    <xs:complexType>
+      <xs:attribute name="specieID" type="xs:string" use="required" />
+      <xs:attribute name="value" type="non-negative-real" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="StimulationSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="InjectionStim" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InjectionStim">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="onset" type="non-negative-real" />
+        <xs:element name="duration" type="non-negative-real" />
+        <xs:element name="rate" type="non-negative-real" />
+        <xs:element name="period" type="non-negative-real" minOccurs="0" />
+        <xs:element name="end" type="non-negative-real" minOccurs="0" />
+
+        <xs:element name="interTrainInterval" type="non-negative-real" minOccurs="0" />
+        <xs:element name="numTrains" type="xs:positiveInteger" minOccurs="0" />
+      </xs:sequence>
+
+      <xs:attribute name="specieID" type="xs:string" use="required" />
+      <xs:attribute name="injectionSite" type="xs:string" use="required" />
     </xs:complexType>
   </xs:element>
 
@@ -159,26 +253,34 @@
 
   <xs:element name="discretization">
     <xs:complexType>
-      <xs:all>
-        <xs:element ref="defaultMaxElementSide" minOccurs="0" />
-        <xs:element ref="spineDeltaX" minOccurs="0" />
-        <xs:element ref="elementShape" minOccurs="0" />
-        <xs:element ref="surfaceLayer" minOccurs="0" />
-        <xs:element ref="maxAspectRatio" minOccurs="0" />
-      </xs:all>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="defaultMaxElementSide" minOccurs="0" type="non-negative-real" />
+          <xs:element name="spineDeltaX" minOccurs="0" type="non-negative-real" />
+          <xs:element name="elementShape" minOccurs="0" type="elementShape" />
+          <xs:element name="surfaceLayer" minOccurs="0" type="non-negative-real" />
+          <xs:element name="maxAspectRatio" minOccurs="0" type="non-negative-real" />
+          <xs:element ref="MaxElementSide" minOccurs="0" maxOccurs="unbounded" />
+        </xs:choice>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="defaultMaxElementSide" type="non-negative-real" />
-  <xs:element name="spineDeltaX" type="non-negative-real" />
-  <xs:element name="elementShape" type="elementShape" />
-  <xs:element name="surfaceLayer" type="non-negative-real" />
-  <xs:element name="maxAspectRatio" type="non-negative-real" />
+  <xs:element name="MaxElementSide">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="non-negative-real">
+          <xs:attribute name="region" type="xs:string" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
 
   <xs:simpleType name="elementShape">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Cuboid" />
       <xs:enumeration value="Curved" />
+      <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -186,6 +288,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="2D" />
       <xs:enumeration value="3D" />
+      <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -193,12 +296,14 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="BINOMIAL" />
       <xs:enumeration value="POISSON" />
+      <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
 
   <xs:simpleType name="algorithm">
     <xs:restriction base="xs:string">
       <xs:enumeration value="INDEPENDENT" />
+      <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -206,6 +311,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="NUMBER" />
       <xs:enumeration value="CONCENTRATION" />
+      <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -217,10 +323,6 @@
       <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
-
-  <xs:complexType name="substrate">
-    <xs:attribute name="specieID" type="xs:string" use="required" />
-  </xs:complexType>
 
   <xs:complexType name="point">
     <xs:attribute name="x" type="xs:decimal" use="required" />

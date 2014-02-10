@@ -5,24 +5,25 @@ package org.textensor.stochdiff.model;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 
+import javax.xml.bind.annotation.*;
 
 public class InjectionStim {
 
-    public String specieID;
+    @XmlAttribute public String specieID;
 
     // this should be the ID of a point in the morphology file
-    public String injectionSite;
+    @XmlAttribute public String injectionSite;
 
-    public double rate;
+    private double rate;
 
-    public double onset;
-    public double duration;
-    public double period;
-    public double end = Double.POSITIVE_INFINITY;
+    private double onset;
+    private double duration;
+    private Double period;
+    private Double end;
 
-    public double interTrainInterval; //the time interval between the end and
+    private Double interTrainInterval; //the time interval between the end and
     //the start(onset) of two consecutive input trains
-    public int numTrains = 1;
+    private Integer numTrains;
 
     public void writeTo(StimulationTable stab, ReactionTable rtab) {
         int specInd = rtab.getSpecieIndex(specieID);
@@ -30,11 +31,11 @@ public class InjectionStim {
         vrate[specInd] = rate;
         // above allows option of injecting a combination of species
 
-        if (Double.isInfinite(this.end) && numTrains > 1)
+        if (Double.isInfinite(this.getEnd()) && numTrains > 1)
             throw new RuntimeException("end must be specified with numTrains");
 
         for (int i = 0; i < numTrains; i++)
-            if (period <= 0)
+            if (period == null)
                 stab.addSquarePulse(injectionSite,
                                     vrate,
                                     onset + i*(duration + interTrainInterval),
@@ -44,5 +45,21 @@ public class InjectionStim {
                                             onset + i*((end-onset) + interTrainInterval),
                                             duration, period,
                                             end + i*((end-onset) + interTrainInterval));
+    }
+
+    public double getOnset() {
+        return this.onset;
+    }
+
+    public double getDuration() {
+        return this.duration;
+    }
+
+    public double getPeriod() {
+        return this.period != null ? this.period : Double.NaN;
+    }
+
+    public double getEnd() {
+        return this.end != null ? this.end : Double.POSITIVE_INFINITY;
     }
 }

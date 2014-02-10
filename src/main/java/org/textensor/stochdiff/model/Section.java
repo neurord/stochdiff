@@ -1,13 +1,14 @@
 package org.textensor.stochdiff.model;
 
+import javax.xml.bind.annotation.*;
 
 public class Section {
 
-    public double width;
-    public double at;
+    @XmlAttribute public Double width;
+    @XmlAttribute public Double at;
 
-    public String regionClass;
+    @XmlAttribute public String regionClass;
 
-    public String label;
+    @XmlAttribute public String label;
 
 }
