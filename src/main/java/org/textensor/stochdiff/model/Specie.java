@@ -8,17 +8,10 @@ import javax.xml.bind.annotation.*;
 public class Specie {
     static final Logger log = LogManager.getLogger(Specie.class);
 
-    @XmlAttribute
-    public String name = null;
-
-    @XmlAttribute
-    public String id = null;
-
-    @XmlAttribute
-    public double kdiff = 0;
-
-    @XmlAttribute
-    public String kdiffunit = "mu2/s";
+    @XmlAttribute private String name;
+    @XmlAttribute private String id;
+    @XmlAttribute private Double kdiff;
+    @XmlAttribute private String kdiffunit;
 
     transient private int index;
 
@@ -49,7 +42,7 @@ public class Specie {
     private double getFactor(String su) {
         // output units are microns^2/ms
 
-        if (su.equals("mu2/s"))
+        if (su == null || su.equals("mu2/s"))
             return 0.001;
 
         if (su.equals("m2/s"))

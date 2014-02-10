@@ -9,7 +9,8 @@
       <xs:all>
         <xs:element ref="ReactionScheme" />
         <xs:element ref="Morphology" />
-        <xs:element ref="InitialConditions" />
+        <xs:element ref="InitialConditions" minOccurs="0" />
+        <xs:element ref="OutputScheme" minOccurs="0" />
 
         <xs:element ref="runtime" minOccurs="0" />
         <xs:element ref="geometry" minOccurs="0" />
@@ -112,6 +113,32 @@
     <xs:complexType>
       <xs:attribute name="specieID" type="xs:string" use="required" />
       <xs:attribute name="value" type="non-negative-real" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OutputScheme">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="OutputSet" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OutputSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="OutputSpecie" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+
+      <xs:attribute name="filename" type="xs:string" />
+      <xs:attribute name="region" type="xs:string" />
+      <xs:attribute name="dt" type="non-negative-real" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="OutputSpecie">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" />
     </xs:complexType>
   </xs:element>
 

@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import javax.xml.bind.annotation.*;
 
 public class OutputSet {
-    public String filename;
-    public String region;
-    public String dt;
+    @XmlAttribute public String filename;
+    @XmlAttribute public String region;
+    @XmlAttribute public Double dt;
 
     @XmlElement(name="OutputSpecie")
     public ArrayList<OutputSpecie> outputSpec;
@@ -44,33 +44,11 @@ public class OutputSet {
     }
 
     public boolean hasdt() {
-        return (dt != null);
+        return dt != null;
     }
 
     public double getdt() {
-        return Double.parseDouble(dt);
+        //        return dt != null ? dt : 0;
+        return dt;
     }
-
-    //<--WK
-    public void print()	{
-        System.out.println("<OutputSet>");
-        System.out.print(" filename: " + filename + " |region: ");
-        if (hasRegion()) {
-            System.out.print(region);
-        } else {
-            System.out.print("Not-Specified");
-        }
-        System.out.print(" |dt: ");
-        if (hasdt()) {
-            System.out.println(dt);
-        } else {
-            System.out.println(" default");
-        }
-        System.out.println("OutputSpecies: ");
-        for (int i = 0; i < outputSpec.size(); i++) {
-            System.out.print((outputSpec.get(i)).name + " ");
-        }
-        System.out.println();
-    }
-    //WK-->
 }

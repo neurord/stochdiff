@@ -1,9 +1,10 @@
 package org.textensor.stochdiff.model;
 
+import javax.xml.bind.annotation.*;
 
 public class OutputSpecie {
 
-    public String name;
+    @XmlAttribute public String name;
 
     // public abstract double getNanoMolarConcentration();
 
