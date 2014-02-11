@@ -5,6 +5,10 @@ import java.io.Writer;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
+import java.util.ArrayDeque;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.MalformedURLException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -35,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.textensor.stochdiff.model.SDRun;
+import org.textensor.util.inst;
 
 public class ModelReader<T> {
     static final Logger log = LogManager.getLogger(ModelReader.class);
@@ -43,22 +48,31 @@ public class ModelReader<T> {
 
     public static class NamespaceFiller extends XMLFilterImpl {
         boolean sdrun_seen = false;
-        boolean warning = false;
+        boolean ns_warning = false;
+        boolean failed = false;
+
+        SAXParseException exception = null;
+
+        ArrayDeque<String> names = inst.newArrayDeque();
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts)
             throws SAXException
         {
+            this.names.push(qName);
             if (!this.sdrun_seen && localName.equals("SDRun"))
                 this.sdrun_seen = true;
             if (this.sdrun_seen && uri.equals("")) {
-                if (!this.warning) {
-                    this.warning = true;
-                    log.warn("Namespace not specified (seen at element {}), assuming {}",
-                             qName, STOCHDIFF_NS);
+                if (!this.ns_warning) {
+                    this.ns_warning = true;
+                    log.warn("{}: namespace not specified, assuming {}",
+                             this.location(), STOCHDIFF_NS);
                 }
                 uri = STOCHDIFF_NS;
             }
+            if (this.exception != null && this.exception.getMessage().contains("cvc-complex-type.2.4.a"))
+                /* clear the exception if it seems to be the appropriate type */
+                this.exception = null;
             super.startElement(uri, localName, qName, atts);
         }
 
@@ -66,16 +80,47 @@ public class ModelReader<T> {
         public void endElement(String uri, String localName, String qName)
             throws SAXException
         {
+            this.names.pop();
             if (this.sdrun_seen && uri.equals(""))
                 uri = STOCHDIFF_NS;
             super.endElement(uri, localName, qName);
+        }
+
+        void log_error(SAXParseException e) {
+            String id = e.getSystemId();
+            String path;
+            try {
+                String dec = URLDecoder.decode(id, "UTF-8");
+                URL url = new URL(dec);
+                path = url.getPath();
+            } catch(Exception error){
+                path = id;
+            }
+
+            log.error("{}:line {}:column {}: {}: {}",
+                      path, e.getLineNumber(), e.getColumnNumber(),
+                      this.location(),
+                      e.getMessage());
+        }
+
+        String location() {
+            StringBuilder sb = new StringBuilder();
+            String[] names = this.names.toArray(new String[]{});
+            for (int i = this.names.size() - 1; i >= 0; i--)
+                sb.append("/" + names[i]);
+            return sb.toString();
         }
 
         @Override
         public void error(SAXParseException e)
             throws SAXException
         {
-            log.error("error: {}", (Object) e); // just stringify
+            if (this.exception != null) {
+                log_error(this.exception);
+                this.failed = true;
+            }
+            this.exception = e;
+
             super.error(e);
         }
     }
@@ -106,7 +151,7 @@ public class ModelReader<T> {
         Schema schema = factory.newSchema(schemaSource);
         spf.setSchema(schema);
 
-        XMLFilter filter = new NamespaceFiller();
+        NamespaceFiller filter = new NamespaceFiller();
         XMLReader xr = spf.newSAXParser().getXMLReader();
         filter.setParent(xr);
 
@@ -115,12 +160,12 @@ public class ModelReader<T> {
         Unmarshaller u = jc.createUnmarshaller();
         UnmarshallerHandler uh = u.getUnmarshallerHandler();
         u.setSchema(schema);
-        
+
         filter.setContentHandler(uh);
         filter.parse(xml);
 
         T result = (T) uh.getResult();
-        if (result == null)
+        if (result == null || filter.failed)
             throw new RuntimeException("Unmarshalling failed");
 
         return result;

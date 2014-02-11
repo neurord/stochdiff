@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,6 +36,10 @@ public abstract class inst {
 
     public static <T> ArrayList<T> newArrayList(int size) {
         return new ArrayList<T>(size);
+    }
+
+    public static <T> ArrayDeque<T> newArrayDeque() {
+        return new ArrayDeque<T>();
     }
 
     public static <K,V> HashMap<K,V> newHashMap() {
