@@ -298,8 +298,8 @@ public class NextEventQueue {
             } else {
                 double normal =  this._new_time(current);
 
-                log.debug("{}: waiting {} {}→{}",
-                          this, normal - current, current, normal);
+                log.debug("waiting {} {}→{}",
+                          normal - current, current, normal);
                 this.setEvent(1, false, current, normal);
             }
 
@@ -402,7 +402,7 @@ public class NextEventQueue {
          * Calulate leap_time based on the limit on variance
          * and expected extents.
          * t &lt; tolerance / fdiff * min(X1, X2) / |X2-X1|
-         * t &lt; tolerance / fdiff * min(X1, X2) / (X2+X1)
+         * t &lt; tolerance² / fdiff * min(X1, X2) / (X2+X1)
          */
         @Override
         public double leap_time(double current, double tolerance) {
@@ -416,7 +416,7 @@ public class NextEventQueue {
                  t2 = tolerance * Xm / this.fdiff / (X1 + X2),
                  ans = Math.min(t1, t2);
 
-             log.debug("leap time: min(E→{}, V→{}) → {}", this, t1, t2, ans);
+             log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
              return ans;
         }
 
