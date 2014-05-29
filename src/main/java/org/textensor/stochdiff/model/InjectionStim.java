@@ -34,17 +34,17 @@ public class InjectionStim {
         if (Double.isInfinite(this.getEnd()) && numTrains > 1)
             throw new RuntimeException("end must be specified with numTrains");
 
-        for (int i = 0; i < numTrains; i++)
+        for (int i = 0; i < this.getNumTrains(); i++)
             if (period == null)
                 stab.addSquarePulse(injectionSite,
                                     vrate,
-                                    onset + i*(duration + interTrainInterval),
+                                    onset + i*(duration + this.getInterTrainInterval()),
                                     duration);
             else
                 stab.addPeriodicSquarePulse(injectionSite, vrate,
-                                            onset + i*((end-onset) + interTrainInterval),
+                                            onset + i*((end-onset) + this.getInterTrainInterval()),
                                             duration, period,
-                                            end + i*((end-onset) + interTrainInterval));
+                                            end + i*((end-onset) + this.getInterTrainInterval()));
     }
 
     public double getOnset() {
@@ -61,5 +61,13 @@ public class InjectionStim {
 
     public double getEnd() {
         return this.end != null ? this.end : Double.POSITIVE_INFINITY;
+    }
+
+    public int getNumTrains() {
+        return this.numTrains != null ? this.numTrains : 1;
+    }
+
+    public double getInterTrainInterval() {
+        return this.interTrainInterval != null ? this.interTrainInterval : 0;
     }
 }
