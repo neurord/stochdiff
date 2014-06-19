@@ -133,11 +133,29 @@ public class NextEventQueue {
         final String signature;
         final private int[] reactants;
 
+        /**
+         * wait_start: when the event was schedules. This is only used when logging
+         * individual events.
+         */
         private double wait_start;
+        /**
+         * time: when the event is scheduled to occur. Absolute time.
+         */
         protected double time;
+        /**
+         * extent: how many "instances" of this event are scheduled to occur. Must
+         * be greater than 0.
+         */
         protected int extent;
+        /**
+         * leap: when the event was generated as an "exact" event (false), or "leap"
+         * event (true). In the first case, extent must be 1.
+         */
         protected boolean leap;
 
+        /**
+         * propensity: speed with which this event occurs in unchanging conditions
+         */
         double propensity;
 
         public abstract IGridCalc.EventType event_type();
@@ -401,19 +419,33 @@ public class NextEventQueue {
         /**
          * Calulate leap_time based on the limit on variance
          * and expected extents.
-         * t &lt; tolerance / fdiff * min(X1, X2) / |X2-X1|
-         * t &lt; tolerance² / fdiff * min(X1, X2) / (X2+X1)
+         *
+         * Assume X1 &lt; X2.
+         * If
+         *   |X1 - (X1+X2)/2| &gt; tolerance * X1
+         * limit on mean change is always satisfied.
+         * Otherwise:
+         *   p &lt; 1 - (1 + tolerance * X1 / (X1 - (X1+X2)/2))**0.5
+         *   t &lt; -1 / 2fdiff * log [ 1 + tolerance X1 / (X1 - (X1+X2)/2) ]
+         *
+         * If
+         *   X1 + X2 &lt; 4 * tolerance² X1²
+         * limit on variance is always satisfied.
+         * Otherwise:
+         *   p &lt; [ 1 - (1-4*tolerance² X1² / (X1+X2))**0.5 ] / 2
+         *   t &lt; -1/fdiff log [ 1/2 + 1/2 (1-4*tolerance² X1² / (X1+X2))**0.5 ]
          */
         @Override
         public double leap_time(double current, double tolerance) {
             int
                 X1 = particles[this.element()][this.sp],
                 X2 = particles[this.element2][this.sp],
-                Xm = Math.min(X1, X2);
+                Xm = Math.min(X1, X2),
+                Xtotal = X1 + X2;
 
              double
-                 t1 = tolerance * Xm / this.fdiff / Math.abs(X1 - X2),
-                 t2 = tolerance * Xm / this.fdiff / (X1 + X2),
+                 t1 = Math.log(1 + tolerance * Xm / (Xm - Xtotal/2)) / -2 / this.fdiff,
+                 t2 = Math.log(0.5 + 0.5 * Math.sqrt((1-4*tolerance*tolerance * Xm*Xm / Xtotal))) / -this.fdiff,
                  ans = Math.min(t1, t2);
 
              log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
