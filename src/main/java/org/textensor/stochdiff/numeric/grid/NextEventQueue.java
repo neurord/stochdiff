@@ -135,6 +135,14 @@ public class NextEventQueue {
         final private int[] reactants;
 
         /**
+         * P_+ and P_- variables - the count of predependent reactions which sometimes increase
+         * propensity, and the count of predependent reactions which sometimes decrease propensity
+         * of this reaction.
+         */
+        private int plus_count;
+        private int minus_count;
+
+        /**
          * wait_start: when the event was schedules. This is only used when logging
          * individual events.
          */
@@ -348,12 +356,16 @@ public class NextEventQueue {
 
         public abstract void addRelations(Collection<? extends NextEvent> coll);
 
-        protected void addDependent(NextEvent ev) {
-            if (this.dependent.contains(ev))
-                return;
+        protected void addDependent(NextEvent ev, boolean plus, boolean minus) {
+            assert !this.dependent.contains(ev): this;
 
             this.dependent.add(ev);
             ev.dependon.add(this);
+
+            if (plus)
+                ev.plus_count ++;
+            if (minus)
+                ev.minus_count ++;
         }
     }
 
@@ -467,7 +479,12 @@ public class NextEventQueue {
                     (e.element() == this.element() ||
                      e.element() == this.element2) &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.addDependent(e);
+
+                    /* For simplicity, forward diffusion is added as +, and
+                       backward diffusion is added as -, even though we know
+                       that the combined reaction is always +-.
+                    */
+                    this.addDependent(e, true, false);
         }
 
         @Override
@@ -602,20 +619,24 @@ public class NextEventQueue {
             // FIXME: update for second order reactions
         }
 
+        private void maybeAddRelation(NextEvent e) {
+            for (int r1: e.reactants())
+                for (int i = 0; i < this.substrates.length; i++)
+                    if (this.substrates[i] == r1) {
+                        boolean minus = ArrayUtil.intersect(e.reactants(), this.reactants());
+                        boolean plus = ArrayUtil.intersect(e.reactants(), this.products);
+                        assert minus || plus : this;
+
+                        this.addDependent(e, plus, minus);
+
+                        return;
+                    }
+        }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this && e.element() == this.element())
-                    for (int r1: e.reactants())
-                        for (int i = 0; i < this.substrates.length; i++)
-                            if (this.substrates[i] == r1) {
-                                this.addDependent(e);
-
-                                assert ArrayUtil.intersect(e.reactants(), this.reactants())
-                                    || ArrayUtil.intersect(e.reactants(), this.products): this;
-
-                                break;
-                            }
+                    this.maybeAddRelation(e);
         }
 
         @Override
@@ -811,7 +832,7 @@ public class NextEventQueue {
                 if (e != this &&
                     e.element() == this.element() &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.addDependent(e);
+                    this.addDependent(e, true, false);
         }
 
         @Override
@@ -977,23 +998,24 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
+        for (NextEvent ev: e) {
+            ev.addRelations(e);
+            if (verbose)
+                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+        }
+
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
             for (NextEvent ev: obj.queue.nodes) {
-                log.info("{} → {} prop={} t={}", ev.index(),
-                         ev, ev.propensity, ev.time());
+                log.info("{} → {} prop={} t={} P₊={} P₋={}", ev.index(),
+                         ev, ev.propensity, ev.time(),
+                         ev.plus_count, ev.minus_count);
                 if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
                     log.info("{} — {} will happen at infinity",
                              ev.index() + 1, obj.queue.nodes.length-1);
                     break;
                 }
             }
-        }
-
-        for (NextEvent ev: e) {
-            ev.addRelations(e);
-            if (verbose)
-                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
         }
 
         log_dependency_edges(e);
