@@ -30,6 +30,7 @@ public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
 
     final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
+    final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);
 
     public interface Node {
         int index();
@@ -996,6 +997,9 @@ public class NextEventQueue {
         }
 
         log_dependency_edges(e);
+
+        if (only_init)
+            System.exit(0);
 
         return obj;
     }
