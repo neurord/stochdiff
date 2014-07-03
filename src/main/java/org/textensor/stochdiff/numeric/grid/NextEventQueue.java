@@ -135,12 +135,28 @@ public class NextEventQueue {
         final private int[] reactants;
 
         /**
+         * Utility table of coefficients in s_jk definition.
+         *
+         * s_jk = | sum_i (v_ij n_ik / X_i) |
+         *                 ^^^^^^^^^
+         * The first index goes over substrates, the second over species.
+         * This means that
+         *
+         * s_jk for dependent[k] is
+         *      = | sum_i ( scoeff_ki[k, i] / X_substrate[i] ) |
+         */
+        private List<int[]> scoeff_ki = inst.newArrayList();
+
+        /**
          * P_+ and P_- variables - the count of predependent reactions which sometimes increase
          * propensity, and the count of predependent reactions which sometimes decrease propensity
          * of this reaction.
+         *
+         * count_both is the number of reactions which are both + and -.
          */
         private int plus_count;
         private int minus_count;
+        private int count_both;
 
         /**
          * wait_start: when the event was schedules. This is only used when logging
@@ -197,6 +213,9 @@ public class NextEventQueue {
         public double time() {
             return this.time;
         }
+
+        public abstract int[] substrates();
+        public abstract int[] substrate_stoichiometry();
 
         /**
          * Add and remove particles as appropriate for this event type.
@@ -354,8 +373,6 @@ public class NextEventQueue {
             return element;
         }
 
-        public abstract void addRelations(Collection<? extends NextEvent> coll);
-
         protected void addDependent(NextEvent ev, boolean plus, boolean minus) {
             assert !this.dependent.contains(ev): this;
 
@@ -366,7 +383,15 @@ public class NextEventQueue {
                 ev.plus_count ++;
             if (minus)
                 ev.minus_count ++;
+            if (plus && minus)
+                ev.count_both ++;
+
+            this.scoeff_ki.add(scoeff_ki(this.substrates(), this.substrate_stoichiometry(),
+                                         ev.substrates(), ev.substrate_stoichiometry()));
+            assert this.scoeff_ki.size() == this.dependent.size();
         }
+
+        public abstract void addRelations(Collection<? extends NextEvent> coll);
     }
 
     static void log_dependency_edges(ArrayList<NextEvent> events) {
@@ -428,6 +453,17 @@ public class NextEventQueue {
         public double _propensity() {
             return this.fdiff * particles[this.element()][this.sp];
         }
+
+        @Override
+        public int[] substrates() {
+            return new int[]{ this.sp };
+        }
+
+        @Override
+        public int[] substrate_stoichiometry() {
+            return new int[]{ -1 };
+        }
+
 
         /**
          * Calulate leap_time based on the limit on variance
@@ -525,6 +561,29 @@ public class NextEventQueue {
             }
 
         return new int[][] {ArrayUtil.toArray(si), ArrayUtil.toArray(ss)};
+    }
+
+    /**
+     * Calculate a row of scoeff_ki table, for dependent reaction k described
+     * by substrates2 and substrate_stoichiometry2.
+     */
+    public static int[] scoeff_ki(int[] substrates, int[] substrate_stoichiometry,
+                                  int[] substrates2, int[] substrate_stoichiometry2)
+    {
+        assert substrates.length == substrate_stoichiometry.length;
+        assert substrates2.length == substrate_stoichiometry2.length;
+
+        int[] ans = new int[substrates.length];
+
+        for (int i = 0; i < substrates.length; i++)
+            /* if we find no match, we leave 0 in the array */
+            for (int ii = 0; ii < substrates2.length; ii++)
+                if (substrates2[ii] == substrates[i]) {
+                    ans[i] = substrate_stoichiometry[i] * substrate_stoichiometry2[ii];
+                    break;
+                }
+
+        return ans;
     }
 
     public class NextReaction extends NextEvent {
@@ -678,6 +737,18 @@ public class NextEventQueue {
         }
 
         @Override
+        public int[] substrates() {
+            assert this.substrates != null;
+            return this.substrates;
+        }
+
+        @Override
+        public int[] substrate_stoichiometry() {
+            assert this.substrate_stoichiometry != null;
+            return this.substrate_stoichiometry;
+        }
+
+        @Override
         public String toString() {
             return String.format("%s el.%d %s",
                                  getClass().getSimpleName(),
@@ -795,6 +866,16 @@ public class NextEventQueue {
         @Override
         public double _propensity() {
             return this.stim.rates[this.sp] / this.neighbors;
+        }
+
+        @Override
+        public int[] substrates() {
+            return new int[]{ this.sp };
+        }
+
+        @Override
+        public int[] substrate_stoichiometry() {
+            return new int[]{ 1 };
         }
 
         @Override
@@ -1006,16 +1087,29 @@ public class NextEventQueue {
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
+
+            int total_plus = 0, total_minus = 0, total_both = 0;
+            boolean in_infinity = false;
+
             for (NextEvent ev: obj.queue.nodes) {
-                log.info("{} → {} prop={} t={} P₊={} P₋={}", ev.index(),
-                         ev, ev.propensity, ev.time(),
-                         ev.plus_count, ev.minus_count);
-                if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
-                    log.info("{} — {} will happen at infinity",
-                             ev.index() + 1, obj.queue.nodes.length-1);
-                    break;
+                total_plus += ev.plus_count;
+                total_minus += ev.minus_count;
+                total_both += ev.count_both;
+
+                if (!in_infinity) {
+                    log.info("{} → {} prop={} t={} P₊={} P₋={} (P±={})", ev.index(),
+                             ev, ev.propensity, ev.time(),
+                             ev.plus_count, ev.minus_count, ev.count_both);
+
+                    if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
+                        log.info("{} — {} will happen at infinity",
+                                 ev.index() + 1, obj.queue.nodes.length-1);
+                        in_infinity = true;
+                    }
                 }
             }
+
+            log.info("ΣP₊={} ΣP₋={} (ΣP±={})", total_plus, total_minus, total_both);
         }
 
         log_dependency_edges(e);
