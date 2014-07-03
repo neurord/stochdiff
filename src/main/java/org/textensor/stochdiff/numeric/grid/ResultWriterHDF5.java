@@ -411,16 +411,16 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "UNITS", "indexes");
             }
             {
-                int[][] stochio = table.getReactantStochiometry();
-                Dataset ds = writeArray("reactant_stochiometry", group, stochio, -1);
-                setAttribute(ds, "TITLE", "reactant stochiometry");
+                int[][] stoichio = table.getReactantStoichiometry();
+                Dataset ds = writeArray("reactant_stoichiometry", group, stoichio, -1);
+                setAttribute(ds, "TITLE", "reactant stoichiometry");
                 setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
                 setAttribute(ds, "UNITS", "indexes");
             }
             {
-                int[][] stochio = table.getProductStochiometry();
-                Dataset ds = writeArray("product_stochiometry", group, stochio, -1);
-                setAttribute(ds, "TITLE", "product stochiometry");
+                int[][] stoichio = table.getProductStoichiometry();
+                Dataset ds = writeArray("product_stoichiometry", group, stoichio, -1);
+                setAttribute(ds, "TITLE", "product stoichiometry");
                 setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
                 setAttribute(ds, "UNITS", "indexes");
             }

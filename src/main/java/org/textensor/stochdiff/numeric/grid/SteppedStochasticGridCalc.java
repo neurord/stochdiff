@@ -71,8 +71,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     int[][] reactantIndices;
     int[][] productIndices;
 
-    int[][] reactantStochiometry;
-    int[][] productStochiometry;
+    int[][] reactantStoichiometry;
+    int[][] productStoichiometry;
 
     /**
      * Propensity powers for true second- and higher-order reactions.
@@ -104,8 +104,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         reactantIndices = rtab.getReactantIndices();
         productIndices = rtab.getProductIndices();
 
-        reactantStochiometry = rtab.getReactantStochiometry();
-        productStochiometry = rtab.getProductStochiometry();
+        reactantStoichiometry = rtab.getReactantStoichiometry();
+        productStoichiometry = rtab.getProductStoichiometry();
         reactantPowers = rtab.getReactantPowers();
 
         lnvolumes = ArrayUtil.log(volumes);
@@ -300,8 +300,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         int[] ri = reactantIndices[ireac];
         int[] pi = productIndices[ireac];
 
-        int[] rs = reactantStochiometry[ireac];
-        int[] ps = productStochiometry[ireac];
+        int[] rs = reactantStoichiometry[ireac];
+        int[] ps = productStoichiometry[ireac];
 
         Object[] java_sucks = calculatePropensity(ri, pi, rs, ps,
                                                   reactantPowers[ireac],
@@ -454,7 +454,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
 
     /* Total number of possible reactions is the smallest number of
-     * particles divided by stochiometry.
+     * particles divided by stoichiometry.
      */
     public static Object[] calculatePropensity(int[] ri, int[] pi,
                                                int[] rs, int[] ps,

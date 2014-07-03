@@ -22,8 +22,8 @@ public class ReactionTable {
     private final int[][] reactantIndices;
     private final int[][] productIndices;
 
-    private final int[][] reactantStochiometry;
-    private final int[][] productStochiometry;
+    private final int[][] reactantStoichiometry;
+    private final int[][] productStoichiometry;
 
     private final int[][] reactantPowers;
 
@@ -39,8 +39,8 @@ public class ReactionTable {
         this.reactantIndices = new int[nreaction][];
         this.productIndices = new int[nreaction][];
 
-        this.reactantStochiometry = new int[nreaction][];
-        this.productStochiometry = new int[nreaction][];
+        this.reactantStoichiometry = new int[nreaction][];
+        this.productStoichiometry = new int[nreaction][];
 
         this.reactantPowers = new int[nreaction][];
 
@@ -57,14 +57,14 @@ public class ReactionTable {
                 sb.append(format("%s%d (%d/%d)",
                                  i == 0 ? "" : ", ",
                                  reactantIndices[r][i],
-                                 reactantStochiometry[r][i],
+                                 reactantStoichiometry[r][i],
                                  reactantPowers[r][i]));
             sb.append(" --> ");
             for (int i = 0; i < productIndices[r].length; i++)
                 sb.append(format("%s%d (%d)",
                                  i == 0 ? "" : ", ",
                                  productIndices[r][i],
-                                 productStochiometry[r][i]));
+                                 productStoichiometry[r][i]));
             sb.append("   rate " + rates[r] + " \n");
         }
         log.info(sb);
@@ -100,11 +100,11 @@ public class ReactionTable {
         }
 
         reactantIndices[ireact] = aidx[0];
-        reactantStochiometry[ireact] = aidx[1];
+        reactantStoichiometry[ireact] = aidx[1];
         reactantPowers[ireact] = aidx[2];
 
         productIndices[ireact] = bidx[0];
-        productStochiometry[ireact] = bidx[1];
+        productStoichiometry[ireact] = bidx[1];
 
         rates[ireact] = rate;
     }
@@ -186,7 +186,7 @@ public class ReactionTable {
                 for (int index: productIndices[ireac])
                     a[index][ireac] += 1;
 
-                // FIXME: what about stochiometry?!!!
+                // FIXME: what about stoichiometry?!!!
             }
             productionMatrix = new Matrix(a);
         }
@@ -213,7 +213,7 @@ public class ReactionTable {
             for (int index: productIndices[ireac])
                 vr[index] += r;
 
-            // FIXME: what about stochiometry?!!!
+            // FIXME: what about stoichiometry?!!!
         }
         return new Column(vr);
     }
@@ -295,15 +295,15 @@ public class ReactionTable {
     /**
      * The number of particles destroyed in the reaction (by specie).
      */
-    public int[][] getReactantStochiometry() {
-        return reactantStochiometry;
+    public int[][] getReactantStoichiometry() {
+        return reactantStoichiometry;
     }
 
     /**
      * The number of particles created in the reaction (by specie).
      */
-    public int[][] getProductStochiometry() {
-        return productStochiometry;
+    public int[][] getProductStoichiometry() {
+        return productStoichiometry;
     }
 
     /**

@@ -495,7 +495,7 @@ public class NextEventQueue {
         }
     }
 
-    public static int[][] stochiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
+    public static int[][] stoichiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
         ArrayList<Integer>
             si = inst.newArrayList(),
             ss = inst.newArrayList();
@@ -511,7 +511,7 @@ public class NextEventQueue {
             if (j == pi.length) {       // product not found
                 si.add(ri[i]);
                 ss.add(-rs[i]);
-            } else if(rs[i] != ps[j]) { // stoichimetry coefficient is nonzero
+            } else if(rs[i] != ps[j]) { // stoichiometry coefficient is nonzero
                 assert ri[i] == pi[j];
                 si.add(ri[i]);
                 ss.add(ps[j] - rs[i]);
@@ -530,9 +530,9 @@ public class NextEventQueue {
     public class NextReaction extends NextEvent {
         final int[]
             products,
-            reactant_stochiometry, product_stochiometry,
+            reactant_stoichiometry, product_stoichiometry,
             reactant_powers,
-            substrates, substrate_stochiometry;
+            substrates, substrate_stoichiometry;
         final int index;
         final double rate, volume;
 
@@ -541,31 +541,31 @@ public class NextEventQueue {
          * @param element voxel number
          * @param reactants indices of reactants
          * @param products indices of products
-         * @param reactant_stochiometry stochiometry of reactants
-         * @param product_stochiometry stochiometry of products
+         * @param reactant_stoichiometry stoichiometry of reactants
+         * @param product_stoichiometry stoichiometry of products
          * @param reactant_powers coefficients of reactants
          * @param signature string to use in logging
          * @param rate rate of reaction
          * @param volume voxel volume
          */
         NextReaction(int index, int element, int[] reactants, int[] products,
-                     int[] reactant_stochiometry, int[] product_stochiometry,
+                     int[] reactant_stoichiometry, int[] product_stoichiometry,
                      int[] reactant_powers, String signature,
                      double rate, double volume) {
             super(element, signature, reactants);
             this.index = index;
             this.products = products;
-            this.reactant_stochiometry = reactant_stochiometry;
-            this.product_stochiometry = product_stochiometry;
+            this.reactant_stoichiometry = reactant_stoichiometry;
+            this.product_stoichiometry = product_stoichiometry;
             this.reactant_powers = reactant_powers;
 
             this.rate = rate;
             this.volume = volume;
 
-            int[][] tmp = stochiometry(reactants, reactant_stochiometry,
-                                       products, product_stochiometry);
+            int[][] tmp = stoichiometry(reactants, reactant_stoichiometry,
+                                       products, product_stoichiometry);
             this.substrates = tmp[0];
-            this.substrate_stochiometry = tmp[1];
+            this.substrate_stoichiometry = tmp[1];
 
             this.propensity = this._propensity();
             this.setEvent(1, false, 0.0,
@@ -589,15 +589,15 @@ public class NextEventQueue {
             for (int i = 0; i < this.reactants().length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.reactants()[i]] /
-                                    this.propensity / this.reactant_stochiometry[i]);
+                                    this.propensity / this.reactant_stoichiometry[i]);
             for (int i = 0; i < this.products.length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.products[i]] /
-                                    this.propensity / this.product_stochiometry[i]);
+                                    this.propensity / this.product_stoichiometry[i]);
 
             log.debug("{}: leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
                       this,
-                      this.substrates, this.substrate_stochiometry,
+                      this.substrates, this.substrate_stoichiometry,
                       tolerance, X, time);
 
             /* Make sure time is NaN or >= 0. */
@@ -612,7 +612,7 @@ public class NextEventQueue {
 
             int n = Integer.MAX_VALUE;
             for (int i = 0; i < this.reactants().length; i++)
-                n = Math.min(n, X[this.reactants()[i]] / this.reactant_stochiometry[i]);
+                n = Math.min(n, X[this.reactants()[i]] / this.reactant_stoichiometry[i]);
 
             return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
 
@@ -646,7 +646,7 @@ public class NextEventQueue {
                      int count) {
             for (int i = 0; i < this.reactants().length; i++)
                 if (particles[this.element()][this.reactants()[i]]
-                    < this.reactant_stochiometry[i] * count) {
+                    < this.reactant_stoichiometry[i] * count) {
                     log.error("{} prop={} {}→{} pow={} extent={}: {}", this, this.propensity,
                               this.reactants(), this.products, this.reactant_powers,
                               count, particles[this.element()]);
@@ -655,18 +655,18 @@ public class NextEventQueue {
 
             for (int i = 0; i < this.reactants().length; i++)
                 updatePopulation(this.element(), this.reactants()[i],
-                                 this.reactant_stochiometry[i] * -count, this);
+                                 this.reactant_stoichiometry[i] * -count, this);
             for (int i = 0; i < this.products.length; i++)
                 updatePopulation(this.element(), this.products[i],
-                                 this.product_stochiometry[i] * count, this);
+                                 this.product_stoichiometry[i] * count, this);
             reactionEvents[this.index] += count;
         }
 
         @Override
         public double _propensity() {
             double prop = ExactStochasticGridCalc.calculatePropensity(this.reactants(), this.products,
-                                                                      this.reactant_stochiometry,
-                                                                      this.product_stochiometry,
+                                                                      this.reactant_stoichiometry,
+                                                                      this.product_stoichiometry,
                                                                       this.reactant_powers,
                                                                       this.rate,
                                                                       this.volume,
@@ -930,8 +930,8 @@ public class NextEventQueue {
         int[][]
             RI = rtab.getReactantIndices(),
             PI = rtab.getProductIndices(),
-            RS = rtab.getReactantStochiometry(),
-            PS = rtab.getProductStochiometry(),
+            RS = rtab.getReactantStoichiometry(),
+            PS = rtab.getProductStoichiometry(),
             RP = rtab.getReactantPowers();
         String[] species = rtab.getSpecies();
 
