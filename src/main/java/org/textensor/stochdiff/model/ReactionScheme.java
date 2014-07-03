@@ -83,11 +83,11 @@ public class ReactionScheme {
             int[][] products = r.getProductIndices();
 
             if (r.getForwardRate() > 0)
-                rtab.setReactionData(i++, reactants, products, r.getForwardRate());
+                rtab.setReactionData(i++, reactants, products, r.getForwardRate(), false);
 
             if (r.getReverseRate() > 0)
                 if (products[1].length > 0)
-                    rtab.setReactionData(i++, products, reactants, r.getReverseRate());
+                    rtab.setReactionData(i++, products, reactants, r.getReverseRate(), true);
                 else
                     throw new RuntimeException("reaction with non-zero rate but no reactants: "
                                                + r.getID());

@@ -27,6 +27,8 @@ public class ReactionTable {
 
     private final int[][] reactantPowers;
 
+    private final int[] reversiblePairs;
+
     private final double[] rates;
 
     private Matrix productionMatrix;
@@ -43,6 +45,8 @@ public class ReactionTable {
         this.productStoichiometry = new int[nreaction][];
 
         this.reactantPowers = new int[nreaction][];
+
+        this.reversiblePairs = new int[nreaction];
 
         this.rates = new double[nreaction];
     }
@@ -79,7 +83,7 @@ public class ReactionTable {
         return null;
     }
 
-    public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate) {
+    public void setReactionData(int ireact, int[][] aidx, int[][] bidx, double rate, boolean is_reverse) {
         log.debug("ireact={}/{} {}→{} rate={}",
                   ireact, nreaction, aidx, bidx, rate);
 
@@ -107,6 +111,11 @@ public class ReactionTable {
         productStoichiometry[ireact] = bidx[1];
 
         rates[ireact] = rate;
+
+        if (is_reverse)
+            this.reversiblePairs[ireact] = ireact - 1;
+        else
+            this.reversiblePairs[ireact] = -1;
     }
 
 
@@ -311,6 +320,15 @@ public class ReactionTable {
      */
     public int[][] getReactantPowers() {
         return reactantPowers;
+    }
+
+    /**
+     * Returns an array of indicies of the "other" reaction. Each
+     * pair only gets one entry. If a reaction is not reversible, -1
+     * is set.
+     */
+    public int[] getReversiblePairs() {
+        return this.reversiblePairs;
     }
 
     public int getSpecieIndex(String specieID) {

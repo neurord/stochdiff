@@ -514,13 +514,14 @@ public class NextEventQueue {
                 if (e != this &&
                     (e.element() == this.element() ||
                      e.element() == this.element2) &&
-                    ArrayUtil.intersect(e.reactants(), this.sp))
+                    ArrayUtil.intersect(e.reactants(), this.sp)) {
 
-                    /* For simplicity, forward diffusion is added as +, and
-                       backward diffusion is added as -, even though we know
-                       that the combined reaction is always +-.
-                    */
-                    this.addDependent(e, true, false);
+                    /* To avoid duplication, diffusion is added to the P numbers
+                     * for the direction from lesser to bigger element only.
+                     */
+                    boolean add = this.element() < this.element2;
+                    this.addDependent(e, add, add);
+                }
         }
 
         @Override
@@ -594,6 +595,8 @@ public class NextEventQueue {
             substrates, substrate_stoichiometry;
         final int index;
         final double rate, volume;
+
+        private NextReaction reverse_reaction;
 
         /**
          * @param index the index of this reaction in reactions array
@@ -678,6 +681,18 @@ public class NextEventQueue {
             // FIXME: update for second order reactions
         }
 
+        public boolean isReversible() {
+            return this.reverse_reaction != null;
+        }
+
+        public void addReverse(NextReaction other) {
+            assert this.reverse_reaction == null;
+            assert other.reverse_reaction == null;
+
+            this.reverse_reaction = other;
+            other.reverse_reaction = this;
+        }
+
         private void maybeAddRelation(NextEvent e) {
             for (int r1: e.reactants())
                 for (int i = 0; i < this.substrates.length; i++)
@@ -686,7 +701,13 @@ public class NextEventQueue {
                         boolean plus = ArrayUtil.intersect(e.reactants(), this.products);
                         assert minus || plus : this;
 
-                        this.addDependent(e, plus, minus);
+                        /* To avoid duplication, for reversible reactions,
+                         * reaction is added to the P numbers for the direction
+                         * from lesser to bigger index only.
+                         */
+                        boolean add = !this.isReversible() ||
+                            this.index < this.reverse_reaction.index;
+                        this.addDependent(e, add && plus, add && minus);
 
                         return;
                     }
@@ -913,6 +934,9 @@ public class NextEventQueue {
                 if (e != this &&
                     e.element() == this.element() &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
+
+                    /* We know that this only ever adds molecules, so is always in plus group.
+                     */
                     this.addDependent(e, true, false);
         }
 
@@ -1014,6 +1038,10 @@ public class NextEventQueue {
             RS = rtab.getReactantStoichiometry(),
             PS = rtab.getProductStoichiometry(),
             RP = rtab.getReactantPowers();
+        int[] reversible_pairs = rtab.getReversiblePairs();
+
+        log.debug("reversible_pairs: {}", reversible_pairs);
+
         String[] species = rtab.getSpecies();
 
         ArrayList<NextReaction> ans = inst.newArrayList(RI.length * volumes.length);
@@ -1029,6 +1057,14 @@ public class NextEventQueue {
                                          rate, volumes[el]));
             }
         }
+
+        for (int r = 0; r < rtab.getNReaction(); r++)
+            if (reversible_pairs[r] >= 0)
+                for (int el = 0; el < volumes.length; el++) {
+                    NextReaction one = ans.get(r * volumes.length + el);
+                    NextReaction two = ans.get(reversible_pairs[r] * volumes.length + el);
+                    one.addReverse(two);
+                }
 
         log.info("Created {} reaction events", ans.size());
 
