@@ -361,7 +361,7 @@ public class NextEventQueue {
             }
         }
 
-        Collection<NextEvent>
+        List<NextEvent>
             dependent = inst.newArrayList(),
             dependon = inst.newArrayList();
 
@@ -478,11 +478,10 @@ public class NextEventQueue {
          *   t &lt; -1 / 2fdiff * log [ 1 + tolerance X1 / (X1 - (X1+X2)/2) ]
          *
          * If
-         *   X1 + X2 &lt; 4 * tolerance² X1²
+         *   X1 &lt; X1 + X2 / 4 / tolerance²
          * limit on variance is always satisfied.
          * Otherwise:
-         *   p &lt; [ 1 - (1-4*tolerance² X1² / (X1+X2))**0.5 ] / 2
-         *   t &lt; -1/fdiff log [ 1/2 + 1/2 (1-4*tolerance² X1² / (X1+X2))**0.5 ]
+         *   t &lt; -1/4/fdiff log (1 - 4*tolerance² X1 / (X1+X2))
          */
         @Override
         public double leap_time(double current, double tolerance) {
@@ -494,7 +493,7 @@ public class NextEventQueue {
 
              double
                  t1 = Math.log(1 + tolerance * Xm / (Xm - Xtotal/2)) / -2 / this.fdiff,
-                 t2 = Math.log(0.5 + 0.5 * Math.sqrt((1-4*tolerance*tolerance * Xm*Xm / Xtotal))) / -this.fdiff,
+                 t2 = Math.log(1 - 4*tolerance*tolerance * Xm / Xtotal) / -this.fdiff / 4,
                  ans = Math.min(t1, t2);
 
              log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
