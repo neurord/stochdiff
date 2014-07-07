@@ -89,7 +89,7 @@ public class NextEventQueue {
                     return Double.compare(a.time(), b.time());
                 }
             };
-            log.info("sorting {} nodes ({})", nodes.length, "" + nodes);
+            log.info("Sorting {} nodes", nodes.length);
             Arrays.sort(nodes, c);
 
             for (int i = 0; i < nodes.length; i++)
@@ -208,6 +208,9 @@ public class NextEventQueue {
         public void setIndex(int index) {
             this.index = index;
         }
+
+        public abstract boolean isReversible();
+        public abstract boolean isReverseOf(NextEvent other);
 
         @Override
         public double time() {
@@ -508,6 +511,16 @@ public class NextEventQueue {
             return stepper.versatile_ngo("neq diffusion", n, this.propensity * time / n);
         }
 
+        @Override
+        public boolean isReversible() {
+            return true;
+        }
+
+        @Override
+        public boolean isReverseOf(NextEvent other) {
+            return other.index() == this.index2;
+        }
+
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
@@ -525,9 +538,9 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el.%d→%d %s",
+            return String.format("%s %s el.%d→%d",
                                  getClass().getSimpleName(),
-                                 element(), element2, signature);
+                                 signature, element(), element2);
         }
     }
 
@@ -680,8 +693,14 @@ public class NextEventQueue {
             // FIXME: update for second order reactions
         }
 
+        @Override
         public boolean isReversible() {
             return this.reverse_reaction != null;
+        }
+
+        @Override
+        public boolean isReverseOf(NextEvent other) {
+            return other == this.reverse_reaction;
         }
 
         public void addReverse(NextReaction other) {
@@ -928,6 +947,15 @@ public class NextEventQueue {
             return stepper.poissonStep(this.propensity * time);
         }
 
+        @Override
+        public boolean isReversible() {
+            return false;
+        }
+
+        @Override
+        public boolean isReverseOf(NextEvent other) {
+            return false;
+        }
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
@@ -1114,10 +1142,30 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
+        log.info("Creating dependency graphs");
         for (NextEvent ev: e) {
             ev.addRelations(e);
-            if (verbose)
-                log.debug("dependent {}:{} → {}", ev.index(), ev, ev.dependent);
+
+            /* skip diffusion by default, since it's mostly boring */
+            if (verbose && !(ev instanceof NextDiffusion)) {
+                int boring = 0;
+
+                log.debug("dependent {}:{}", ev.index(), ev);
+                for (int i = 0; i < ev.dependent.size(); i++) {
+                    NextEvent dep = ev.dependent.get(i);
+                    int[] coeff = ev.scoeff_ki.get(i);
+                    int sum = ArrayUtil.abssum(coeff);
+                    if (ev.isReverseOf(dep))
+                        log.debug("      → {}reverse {}", sum==1?"boring ":"", coeff);
+                    else if (sum == 1)
+                        boring ++;
+                    else
+                        log.debug("      → {} {}", dep, coeff);
+                }
+
+                if (boring > 0)
+                    log.debug("      → + {} boring single-specie first-order deps", boring);
+            }
         }
 
         if (verbose) {

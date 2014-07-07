@@ -297,6 +297,13 @@ public class ArrayUtil {
         return s;
     }
 
+    public static int abssum(int[] a) {
+        int s = 0;
+        for (int x: a)
+            s += Math.abs(x);
+        return s;
+    }
+
     public static long product(long[] a) {
         long s = 1;
         for (long x: a)
