@@ -89,8 +89,10 @@ public class SDRun {
     private algorithm_t algorithmID;
 
     public void resolve() {
-        reactionScheme.resolve();
-        morphology.resolve();
+        if (this.reactionScheme != null)
+            reactionScheme.resolve();
+        if (this.morphology != null)
+            morphology.resolve();
     }
 
     // just getters from here on;
