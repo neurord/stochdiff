@@ -139,13 +139,13 @@ public class NextEventQueue {
          *
          * s_jk = | sum_i (v_ij n_ik / X_i) |
          *                 ^^^^^^^^^
-         * The first index goes over substrates, the second over species.
+         * The first index goes over reactions, the second over species.
          * This means that
          *
          * s_jk for dependent[k] is
          *      = | sum_i ( scoeff_ki[k, i] / X_substrate[i] ) |
          */
-        private List<int[]> scoeff_ki = inst.newArrayList();
+        protected List<int[]> scoeff_ki = inst.newArrayList();
 
         /**
          * P_+ and P_- variables - the count of predependent reactions which sometimes increase
@@ -283,6 +283,7 @@ public class NextEventQueue {
                 if (!(higher && lower))
                     throw new RuntimeException();
             }
+
             this.old_pop = pop;
             return old;
         }
@@ -477,7 +478,6 @@ public class NextEventQueue {
          *   |X1 - (X1+X2)/2| &gt; tolerance * X1
          * limit on mean change is always satisfied.
          * Otherwise:
-         *   p &lt; 1 - (1 + tolerance * X1 / (X1 - (X1+X2)/2))**0.5
          *   t &lt; -1 / 2fdiff * log [ 1 + tolerance X1 / (X1 - (X1+X2)/2) ]
          *
          * If
