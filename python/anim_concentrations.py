@@ -160,6 +160,7 @@ class DrawerSet(object):
 
 def animate_drawing(opts):
     file = tables.openFile(opts.file)
+    trial = file.get_node('/trial{}'.format(opts.trial))
     ss = DrawerSet(trial.model, trial.simulation, opts)
     indexes = itertools.cycle(ss.items)
     ss.animate(indexes)
@@ -170,6 +171,7 @@ def save_drawings(opts, suboffset=None, subtotal=1):
         matplotlib.use('Agg')
 
     file = tables.openFile(opts.file)
+    trial = file.get_node('/trial{}'.format(opts.trial))
     ss = DrawerSet(trial.model, trial.simulation, opts)
     if opts.save:
         if suboffset is None:
@@ -210,26 +212,27 @@ def _conn(dst, a, b, penwidth=None, label=None):
     opts = dot_opts(penwidth=penwidth, label=label)
     print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
 
-def _connections(dst, regions, connections, couplings):
+COLORDICT = {'dendrite':'lightblue'}
+def _connections(dst, model):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
-    print('\tnode [color=blue,style=filled,fillcolor=lightblue];', file=dst)
-    for region in regions:
-        print('\t"{}";'.format(region), file=dst)
-    for i in range(connections.shape[0]):
-        for j, coupl in zip(connections[i], couplings[i]):
+    print('\tnode [color=blue,style=filled];', file=dst)
+    for i in range(model.neighbors.shape[0]):
+        region = model.regions[model.grid.cols.region[i]]
+        fillcolor = COLORDICT.get(region, 'grey')
+        print('\t"{}" {};'.format(i, dot_opts(fillcolor=fillcolor)), file=dst)
+        for j, coupl in zip(model.neighbors[i], model.couplings[i]):
             if j < 0:
                 break
             coupl = _logclip(coupl, 3)
-            _conn(dst, regions[i], regions[j], coupl)
+            _conn(dst, i, j, coupl)
     print('}', file=dst)
 
 def dot_connections(filename):
     file = tables.openFile(filename)
-    model = trial.model
-    regions = model.regions[1:] # skip "default" in first position
-    _connections(sys.stdout, regions, model.neighbors, model.couplings)
+    trial = file.get_node('/trial{}'.format(opts.trial))
+    _connections(sys.stdout, trial.model)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
@@ -241,20 +244,20 @@ def _reaction_name(rr, rr_s, pp, pp_s, species):
 def reaction_name(num, model):
     single = isinstance(num, int)
     l = [_reaction_name(model.reactions.reactants[num],
-                        model.reactions.reactant_stochiometry[num],
+                        model.reactions.reactant_stoichiometry[num],
                         model.reactions.products[num],
-                        model.reactions.product_stochiometry[num],
+                        model.reactions.product_stoichiometry[num],
                         model.species)
          for num in ([num] if single else num)]
     return l[0] if single else numpy.array(l)
 
-def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates):
+def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rates):
     print('digraph Reactions {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=green,style=filled,fillcolor=lightgreen];', file=dst)
-    for rr, rr_s, pp, pp_s, rate in zip(reactants, r_stochio,
-                                        products, p_stochio, rates):
+    for rr, rr_s, pp, pp_s, rate in zip(reactants, r_stoichio,
+                                        products, p_stoichio, rates):
         name = _reaction_name(rr, rr_s, pp, pp_s, species)
         print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
         for j, s in zip(rr, rr_s):
@@ -272,10 +275,11 @@ def _productions(dst, species, reactants, r_stochio, products, p_stochio, rates)
 
 def dot_productions(filename):
     file = tables.openFile(filename)
+    trial = file.get_node('/trial{}'.format(opts.trial))
     model = trial.model
     _productions(sys.stdout, model.species,
-                 model.reactions.reactants, model.reactions.reactant_stochiometry,
-                 model.reactions.products, model.reactions.product_stochiometry,
+                 model.reactions.reactants, model.reactions.reactant_stoichiometry,
+                 model.reactions.products, model.reactions.product_stoichiometry,
                  model.reactions.rates)
 
 def specie_indices(items, species):
