@@ -241,7 +241,7 @@ public class NextEventQueue {
         /**
          * Calculate propensity of this event.
          */
-        abstract double _propensity();
+        abstract double calcPropensity();
 
         /**
          * Calculate the time for which <b>this reaction</b> changes the population
@@ -277,7 +277,7 @@ public class NextEventQueue {
         double _update_propensity(boolean warn) {
             double old = this.propensity;
             int[] pop = this.reactantPopulation();
-            this.propensity = this._propensity();
+            this.propensity = this.calcPropensity();
             if (warn && this.propensity != 0 && this.propensity == old) {
                 boolean higher = false;
                 boolean lower = false;
@@ -441,7 +441,7 @@ public class NextEventQueue {
             this.sp = sp;
             this.fdiff = fdiff;
 
-            this.propensity = this._propensity();
+            this.propensity = this.calcPropensity();
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
@@ -465,8 +465,10 @@ public class NextEventQueue {
         }
 
         @Override
-        public double _propensity() {
-            return this.fdiff * particles[this.element()][this.sp];
+        public double calcPropensity() {
+            double ans = this.fdiff * particles[this.element()][this.sp];
+            assert ans >= 0: ans;
+            return ans;
         }
 
         @Override
@@ -656,7 +658,7 @@ public class NextEventQueue {
             this.substrates = tmp[0];
             this.substrate_stoichiometry = tmp[1];
 
-            this.propensity = this._propensity();
+            this.propensity = this.calcPropensity();
             this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
@@ -763,7 +765,7 @@ public class NextEventQueue {
                     log.error("{} prop={} {}→{} pow={} extent={}: {}", this, this.propensity,
                               this.reactants(), this.products, this.reactant_powers,
                               count, particles[this.element()]);
-                    log.info("reaculated prop={}", this._propensity());
+                    log.info("reaculated prop={}", this.calcPropensity());
                 }
 
             for (int i = 0; i < this.reactants().length; i++)
@@ -776,18 +778,18 @@ public class NextEventQueue {
         }
 
         @Override
-        public double _propensity() {
-            double prop = ExactStochasticGridCalc.calculatePropensity(this.reactants(), this.products,
-                                                                      this.reactant_stoichiometry,
-                                                                      this.product_stoichiometry,
-                                                                      this.reactant_powers,
-                                                                      this.rate,
-                                                                      this.volume,
-                                                                      particles[this.element()]);
+        public double calcPropensity() {
+            double ans = ExactStochasticGridCalc.calculatePropensity(this.reactants(), this.products,
+                                                                     this.reactant_stoichiometry,
+                                                                     this.product_stoichiometry,
+                                                                     this.reactant_powers,
+                                                                     this.rate,
+                                                                     this.volume,
+                                                                     particles[this.element()]);
             //  log.debug("{}: rate={} vol={} propensity={}",
-            //        this, this.rate, this.volume, prop);
-
-            return prop;
+            //        this, this.rate, this.volume, ans);
+            assert ans >= 0: ans;
+            return ans;
         }
 
         @Override
@@ -830,7 +832,7 @@ public class NextEventQueue {
             this.neighbors = neighbors;
             this.stim = stim;
 
-            this.propensity = this._propensity();
+            this.propensity = this.calcPropensity();
             this.setEvent(1, false, 0.0, this._new_time(0));
 
             log.info("Created {}: t={} [{}]", this, this.time, this.stim);
@@ -918,8 +920,10 @@ public class NextEventQueue {
         }
 
         @Override
-        public double _propensity() {
-            return this.stim.rates[this.sp] / this.neighbors;
+        public double calcPropensity() {
+            double ans = this.stim.rates[this.sp] / this.neighbors;
+            assert ans >= 0: ans;
+            return ans;
         }
 
         @Override
