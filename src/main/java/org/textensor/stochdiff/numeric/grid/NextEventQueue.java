@@ -247,13 +247,16 @@ public class NextEventQueue {
          * Calculate the time for which <b>this reaction</b> changes the population
          * of <b>products</b> by ɛ. Propensity is not recalculated, so must be brought
          * up-to-date externally.
+         *
+         * @answer is time relative to @current.
          */
         abstract double leap_time(double current, double tolerance);
 
         /**
          * Calculate the <b>expected</b> time of a single exact execution.
-         * Propensity is not recalculated, so must be brought
-         * up-to-date externally.
+         * Propensity is not recalculated, so must be brought up-to-date externally.
+         *
+         * @answer is time relative to @current.
          */
         double exact_time(double current) {
             return 1 / this.propensity;
@@ -264,6 +267,12 @@ public class NextEventQueue {
          */
         abstract int leap_count(double current, double time);
 
+        /**
+         * Calculate the <b>putative</b> time of a single exact execution.
+         * Propensity is not recalculated, so must be brought up-to-date externally.
+         *
+         * @answer is absolute time.
+         */
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
             log.debug("exponential time for prop={} → time={}", this.propensity, exp);
@@ -345,9 +354,9 @@ public class NextEventQueue {
                 : this.leap_time(current, tolerance);
 
             log.debug("deps: {}", this.dependent);
-            log.debug("options: wait {}, leap {}", exact - current, leap);
+            log.debug("options: wait {}, leap {}", exact, leap);
 
-            if (leap_min_jump != 0 && leap > (exact - current) * leap_min_jump) {
+            if (leap_min_jump != 0 && leap > exact * leap_min_jump) {
                 assert update_times;
 
                 int count = this.leap_count(current, leap);
@@ -483,8 +492,7 @@ public class NextEventQueue {
 
 
         /**
-         * Calulate leap_time based on the limit on variance
-         * and expected extents.
+         * Calculate leap_time based on the limit on variance and expected extents.
          *
          * Assume X1 &lt; X2.
          * If
@@ -498,6 +506,8 @@ public class NextEventQueue {
          * limit on variance is always satisfied.
          * Otherwise:
          *   t &lt; -1/4/fdiff log (1 - 4*tolerance² X1 / (X1+X2))
+         *
+         * @returns time step relative to @current.
          */
         @Override
         public double leap_time(double current, double tolerance) {
@@ -911,7 +921,7 @@ public class NextEventQueue {
 
         @Override
         double exact_time(double current) {
-            return _continous_delta_to_real_time(current, super.exact_time(current), false);
+            return _continous_delta_to_real_time(current, super.exact_time(current), false) - current;
         }
 
         @Override
