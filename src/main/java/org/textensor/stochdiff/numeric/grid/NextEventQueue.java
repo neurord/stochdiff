@@ -511,19 +511,25 @@ public class NextEventQueue {
          */
         @Override
         public double leap_time(double current, double tolerance) {
-            int
+            final int
                 X1 = particles[this.element()][this.sp],
                 X2 = particles[this.element2][this.sp],
                 Xm = Math.min(X1, X2),
                 Xtotal = X1 + X2;
 
-             double
-                 t1 = Math.log(1 + tolerance * Xm / (Xm - Xtotal/2)) / -2 / this.fdiff,
-                 t2 = Math.log(1 - 4*tolerance*tolerance * Xm / Xtotal) / -this.fdiff / 4,
-                 ans = Math.min(t1, t2);
+            final double arg = 1 + tolerance * Xm / (Xm - Xtotal/2);
+            final double ans,
+                t2 = Math.log(1 - 4*tolerance*tolerance * Xm / Xtotal) / -this.fdiff / 4;
+            if (arg > 0) {
+                final double t1 = Math.log(arg) / -2 / this.fdiff;
+                ans = Math.min(t1, t2);
+                log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
+            } else {
+                ans = t2;
+                log.debug("leap time: min({}, {}, E→inf, V→{}) → {}", X1, X2, t2, ans);
+            }
 
-             log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
-             return ans;
+            return ans;
         }
 
         @Override
