@@ -19,8 +19,8 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     private long real_start_time;
 
     NextEventQueue neq;
-    ArrayList<IGridCalc.Event> events
-        = log_events ? new ArrayList<IGridCalc.Event>() : null;
+    ArrayList<IGridCalc.Happening> events
+        = log_events ? new ArrayList<IGridCalc.Happening>() : null;
 
     public ExactStochasticGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
@@ -92,8 +92,14 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         return ans;
     }
 
+    @Override
     public Collection<IGridCalc.Event> getEvents() {
-        Collection<IGridCalc.Event> recent = this.events;
+        return this.neq.getEvents();
+    }
+
+    @Override
+    public Collection<IGridCalc.Happening> getHappenings() {
+        Collection<IGridCalc.Happening> recent = this.events;
         /* If it was null, it should stay null. Otherwise, reinitalize. */
         if (recent != null)
             this.events = inst.newArrayList();

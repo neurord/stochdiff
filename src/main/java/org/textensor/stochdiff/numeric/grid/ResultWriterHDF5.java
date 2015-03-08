@@ -203,9 +203,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected H5ScalarDS diffusion_events;
         protected H5ScalarDS reaction_events;
         protected Group events;
-        protected List<IGridCalc.Event> events_cache;
+        protected List<IGridCalc.Happening> events_cache;
         protected H5ScalarDS
-            events_event, events_type, events_kind,
+            events_event, events_kind,
             events_extent, events_time, events_waited;
         protected Dataset saved_state = null;
 
@@ -311,6 +311,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             this.writeStimulationData(source);
             this.writeReactionData(source);
+            this.writeReactionDependencies(source);
         }
 
         protected void writeSimulationData(IGridCalc source)
@@ -431,6 +432,65 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "TITLE", "reaction rates");
                 setAttribute(ds, "LAYOUT", "[nreact]");
                 setAttribute(ds, "UNITS", "transitions/ms");
+            }
+        }
+
+        protected void writeReactionDependencies(IGridCalc source)
+            throws Exception
+        {
+            Group group = output.createGroup("dependencies", this.model);
+            setAttribute(group, "TITLE", "dependency scheme");
+
+            {
+                Collection<IGridCalc.Event> events = source.getEvents();
+                String[] descriptions = new String[events.size()];
+                int[] types = new int[events.size()];
+                int[] elements = new int[events.size()];
+                int[][] dependent = new int[events.size()][];
+
+                int i = 0;
+                for (IGridCalc.Event event: events) {
+                    descriptions[i] = event.description();
+                    types[i] = event.event_type().ordinal();
+                    elements[i] = event.element();
+
+                    assert event.index() == i;
+
+                    Collection<IGridCalc.Event> dep = event.dependent();
+                    dependent[i] = new int[dep.size()];
+                    int j = 0;
+                    for (IGridCalc.Event child: dep)
+                        dependent[i][j++] = child.index();
+                    i++;
+                }
+
+                {
+                    Dataset ds = writeVector("descriptions", group, descriptions);
+                    setAttribute(ds, "TITLE", "signatures of reaction channels");
+                    setAttribute(ds, "LAYOUT", "[nchannel]");
+                    setAttribute(ds, "UNITS", "text");
+                }
+
+                {
+                    Dataset ds = writeVector("elements", group, elements);
+                    setAttribute(ds, "TITLE", "voxel numbers of reaction channels");
+                    setAttribute(ds, "LAYOUT", "[nchannel]");
+                    setAttribute(ds, "UNITS", "index");
+                }
+
+                {
+                    Dataset ds = writeVector("types", group, types);
+                    setAttribute(ds, "TITLE", "types of reaction channels");
+                    setAttribute(ds, "LAYOUT", "[nchannel]");
+                    setAttribute(ds, "UNITS", "enumeration");
+                }
+
+                {
+                    Dataset ds = writeArray("dependent", group, dependent, -1);
+                    setAttribute(ds, "TITLE", "dependent reaction channels");
+                    setAttribute(ds, "LAYOUT", "[nchannel x ndependent*]");
+                    setAttribute(ds, "UNITS", "indexes");
+                }
             }
         }
 
@@ -662,12 +722,6 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                       "",
                                                       CACHE_SIZE2);
 
-            this.events_type = createExtensibleArray("types", this.events, int_t,
-                                                     "type of the event that happened",
-                                                     "[type]",
-                                                     "",
-                                                     CACHE_SIZE2);
-
             this.events_kind = createExtensibleArray("kinds", this.events, int_t,
                                                      "mechanism of the event that happened",
                                                      "[kind]",
@@ -699,7 +753,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeEvents(double time, IGridCalc source)
             throws Exception
         {
-            final Collection<IGridCalc.Event> events = source.getEvents();
+            final Collection<IGridCalc.Happening> events = source.getHappenings();
             if (events == null) {
                 if (!initEvents_warning) {
                     log.warn("No events, not writing anything");
@@ -729,14 +783,15 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.events_event.write(data);
             }
 
+            /*
             {
                 extendExtensibleArray(this.events_type, n);
                 int[] data = (int[]) this.events_type.getData();
-                for (int i = 0; i < n; i++) {
-                    data[i] = this.events_cache.get(i).type().ordinal();
-                }
+                for (int i = 0; i < n; i++)
+                    data[i] = this.events_cache.get(i).event_type().ordinal();
                 this.events_type.write(data);
             }
+            */
 
             {
                 extendExtensibleArray(this.events_kind, n);
@@ -912,6 +967,19 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         Dataset ds = this.output.createScalarDS(name, parent,
                                                 double_t, dims, null, null,
+                                                0, items);
+        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
+                 name, xJoined(dims), "", "");
+        return ds;
+    }
+
+    protected Dataset writeVector(String name, Group parent, int... items)
+        throws Exception
+    {
+        long[] dims = {items.length};
+
+        Dataset ds = this.output.createScalarDS(name, parent,
+                                                int_t, dims, null, null,
                                                 0, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");

@@ -54,6 +54,7 @@ parser.add_argument('file')
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
+parser.add_argument('--dependencies', action='store_true')
 parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
@@ -61,6 +62,8 @@ parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
+parser.add_argument('--num-elements', type=int,
+                    help='take only the first so many elements')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--style', default='-')
 parser.add_argument('--time', type=time_range, default=(None, None))
@@ -212,7 +215,7 @@ def _conn(dst, a, b, penwidth=None, label=None):
     opts = dot_opts(penwidth=penwidth, label=label)
     print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
 
-COLORDICT = {'dendrite':'lightblue'}
+REGION_COLORDICT = {'dendrite':'lightblue'}
 def _connections(dst, model):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
@@ -220,7 +223,7 @@ def _connections(dst, model):
     print('\tnode [color=blue,style=filled];', file=dst)
     for i in range(model.neighbors.shape[0]):
         region = model.regions[model.grid.cols.region[i]]
-        fillcolor = COLORDICT.get(region, 'grey')
+        fillcolor = REGION_COLORDICT.get(region, 'grey')
         print('\t"{}" {};'.format(i, dot_opts(fillcolor=fillcolor)), file=dst)
         for j, coupl in zip(model.neighbors[i], model.couplings[i]):
             if j < 0:
@@ -233,6 +236,35 @@ def dot_connections(filename):
     file = tables.openFile(filename)
     trial = file.get_node('/trial{}'.format(opts.trial))
     _connections(sys.stdout, trial.model)
+
+TYPE_COLORDICT = {0:'lightblue', 1:'grey', 2:'orange'}
+def _dependencies(dst, model):
+    print('digraph Dependencies {', file=dst)
+    print('\trankdir=LR;', file=dst)
+    print('\tsplines=true;', file=dst)
+    print('\tnode [color=blue,style=filled,shape=point];', file=dst)
+    d = model.dependencies
+    for i in range(d.dependent.shape[0]):
+        fillcolor = TYPE_COLORDICT.get(d.types[i], 'grey')
+        desc = d.descriptions[i].decode('utf-8')[4:]
+        elem = d.elements[i]
+        if opts.num_elements is not None and elem >= opts.num_elements:
+            continue
+        print('\t"{}" {};'.format(desc, dot_opts(fillcolor=fillcolor)), file=dst)
+        for j in d.dependent[i]:
+            if j < 0:
+                break
+            elem = d.elements[j]
+            if opts.num_elements is not None and elem >= opts.num_elements:
+                continue
+            _conn(dst, desc, d.descriptions[j].decode('utf-8')[4:])
+
+    print('}', file=dst)
+
+def dot_dependencies(filename):
+    file = tables.openFile(filename)
+    trial = file.get_node('/trial{}'.format(opts.trial))
+    _dependencies(sys.stdout, trial.model)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
@@ -349,6 +381,8 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
         dot_connections(opts.file)
+    elif opts.dependencies:
+        dot_dependencies(opts.file)
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history is not None:

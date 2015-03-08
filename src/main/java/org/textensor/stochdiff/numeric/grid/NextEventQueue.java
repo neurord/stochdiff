@@ -127,7 +127,7 @@ public class NextEventQueue {
     int leap_extent = 0;
     int normal_waits = 0;
 
-    public abstract class NextEvent implements Node {
+    public abstract class NextEvent implements Node, IGridCalc.Event {
         int index;
 
         final private int element;
@@ -202,6 +202,16 @@ public class NextEventQueue {
         @Override
         public int index() {
             return this.index;
+        }
+
+        @Override
+        public int element() {
+            return this.element;
+        }
+
+        @Override
+        public String description() {
+            return this.toString();
         }
 
         @Override
@@ -300,7 +310,7 @@ public class NextEventQueue {
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
                     double current,
-                    List<IGridCalc.Event> events) {
+                    List<IGridCalc.Happening> events) {
 
             assert this.extent >= 0: this.extent;
 
@@ -308,8 +318,8 @@ public class NextEventQueue {
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
-                events.add(new Happening(this.index(), this.event_type(),
-                                         this.leap ? IGridCalc.EventKind.LEAP : IGridCalc.EventKind.EXACT,
+                events.add(new Happening(this.index(),
+                                         this.leap ? IGridCalc.HappeningKind.LEAP : IGridCalc.HappeningKind.EXACT,
                                          this.extent, current, current - this.wait_start));
 
             if (changed) {
@@ -369,12 +379,13 @@ public class NextEventQueue {
             dependent = inst.newArrayList(),
             dependon = inst.newArrayList();
 
-        public int[] reactants() {
-            return this.reactants;
+        @Override
+        public Collection<IGridCalc.Event> dependent() {
+            return new ArrayList<IGridCalc.Event>(this.dependent);
         }
 
-        public int element() {
-            return element;
+        public int[] reactants() {
+            return this.reactants;
         }
 
         protected void addDependent(NextEvent ev, boolean plus, boolean minus) {
@@ -544,6 +555,10 @@ public class NextEventQueue {
         }
     }
 
+    /**
+     * Calculates a joint array of stoichiometries from reactants @ri, @rs and products @pi, @ps.
+     * @returns a pair of arrays: the indices and the stoichiometries.
+     */
     public static int[][] stoichiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
         ArrayList<Integer>
             si = inst.newArrayList(),
@@ -1199,6 +1214,10 @@ public class NextEventQueue {
 
         if (only_init)
             System.exit(0);
+        try {
+            Thread.sleep(1000);
+        } catch(InterruptedException exc) {
+        }
 
         return obj;
     }
@@ -1212,7 +1231,7 @@ public class NextEventQueue {
                           int[][] reactionEvents,
                           int[][][] diffusionEvents,
                           int[][] stimulationEvents,
-                          List<IGridCalc.Event> events) {
+                          List<IGridCalc.Happening> events) {
         NextEvent ev = this.queue.first();
         assert ev != null;
         double now = ev.time;
@@ -1233,21 +1252,22 @@ public class NextEventQueue {
         return now;
     }
 
-    public class Happening implements IGridCalc.Event {
-        int index;
-        IGridCalc.EventType type;
-        IGridCalc.EventKind kind;
-        int extent;
-        double time, waited;
+    public Collection<IGridCalc.Event> getEvents() {
+        return new ArrayList<IGridCalc.Event>(Arrays.asList(this.queue.nodes));
+    }
+
+    public class Happening implements IGridCalc.Happening {
+        final int index;
+        final IGridCalc.HappeningKind kind;
+        final int extent;
+        final double time, waited;
 
         public Happening(int index,
-                         IGridCalc.EventType type,
-                         IGridCalc.EventKind kind,
+                         IGridCalc.HappeningKind kind,
                          int extent,
                          double time,
                          double waited) {
             this.index = index;
-            this.type = type;
             this.kind = kind;
             this.extent = extent;
             this.time = time;
@@ -1260,12 +1280,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public IGridCalc.EventType type() {
-            return this.type;
-        }
-
-        @Override
-        public IGridCalc.EventKind kind() {
+        public IGridCalc.HappeningKind kind() {
             return this.kind;
         }
 

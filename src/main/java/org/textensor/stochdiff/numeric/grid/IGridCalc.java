@@ -33,19 +33,27 @@ public interface IGridCalc {
         STIMULATION,
     }
 
-    public enum EventKind {
+    public enum HappeningKind {
         EXACT,
         LEAP,
     }
 
     public interface Event {
         int index();
-        EventType type();
-        EventKind kind();
+        int element();
+        String description();
+        EventType event_type();
+        Collection<Event> dependent();
+    }
+
+    public interface Happening {
+        int index();
+        HappeningKind kind();
         int extent();
         double time();
         double waited();
     }
 
     Collection<Event> getEvents();
+    Collection<Happening> getHappenings();
 }

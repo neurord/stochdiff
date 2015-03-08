@@ -38,6 +38,10 @@ public abstract class inst {
         return new ArrayList<T>(size);
     }
 
+    public static <T> ArrayList<T> newArrayList(Collection<? extends T> c) {
+        return new ArrayList<T>(c);
+    }
+
     public static <T> ArrayDeque<T> newArrayDeque() {
         return new ArrayDeque<T>();
     }

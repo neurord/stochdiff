@@ -490,4 +490,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     public Collection<IGridCalc.Event> getEvents() {
         return null;
     }
+    public Collection<IGridCalc.Happening> getHappenings() {
+        return null;
+    }
 }
