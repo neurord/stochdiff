@@ -503,18 +503,25 @@ public class NextEventQueue {
         /**
          * Calculate leap_time based on the limit on variance and expected extents.
          *
-         * Assume X1 &lt; X2.
-         * If
-         *   |X1 - (X1+X2)/2| &gt; tolerance * X1
-         * limit on mean change is always satisfied.
-         * Otherwise:
-         *   t &lt; -1 / 2fdiff * log [ 1 + tolerance X1 / (X1 - (X1+X2)/2) ]
          *
-         * If
-         *   X1 &lt; X1 + X2 / 4 / tolerance²
-         * limit on variance is always satisfied.
-         * Otherwise:
-         *   t &lt; -1/4/fdiff log (1 - 4*tolerance² X1 / (X1+X2))
+         * As a temporary workaround for problem of updating deterministic solutions
+         * for large times, use the following formulas:
+         *
+         *   y = (N/2 - Xm) p
+         *   V = N p/2 (1 - p/2)
+         *   p = 1 - e^{-rt}
+         *
+         * But assume linearity in y:
+         *
+         *  y' = (N/2 - Xm) rt
+         *
+         * This gives:
+         *  y' ≤ ε Xm
+         *  t  ≤ ε/r Xm/(N/2 - Xm)
+         *
+         *  V ≤ ε^2 Xm^2
+         *  p ≤ ε^2 Xm^2 2/N (approx)
+         *  t ≤ - log (1-ε^2Xm^2 2/N) / r
          *
          * @returns time step relative to @current.
          */
@@ -526,18 +533,18 @@ public class NextEventQueue {
                 Xm = Math.min(X1, X2),
                 Xtotal = X1 + X2;
 
-            final double arg = 1 + tolerance * Xm / (Xm - Xtotal/2);
-            final double ans,
-                t2 = Math.log(1 - 4*tolerance*tolerance * Xm / Xtotal) / -this.fdiff / 4;
+            final double t1 = tolerance * Xm / this.fdiff / (Xtotal/2 - Xm);
+
+            final double arg = 1 - tolerance*tolerance * Xm*Xm * 2 / Xtotal;
+            final double ans;
             if (arg > 0) {
-                final double t1 = Math.log(arg) / -2 / this.fdiff;
+                final double t2 = Math.log(arg) / -this.fdiff;
                 ans = Math.min(t1, t2);
                 log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
             } else {
-                ans = t2;
-                log.debug("leap time: min({}, {}, E→inf, V→{}) → {}", X1, X2, t2, ans);
+                ans = t1;
+                log.debug("leap time: min({}, {}, E→{}, V→inf) → {}", X1, X2, t1, ans);
             }
-
             return ans;
         }
 
