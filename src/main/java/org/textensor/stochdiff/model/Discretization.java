@@ -15,9 +15,7 @@ public class Discretization {
 
     public double spineDeltaX;
 
-
     public double defaultMaxElementSide = 1.;
-
 
     public String elementShape = "Cuboid";
 
@@ -34,7 +32,7 @@ public class Discretization {
     public synchronized HashMap<String, Double> getResolutionHM() {
         if (this.maxSideHM == null) {
             this.maxSideHM = inst.newHashMap();
-            for(MaxElementSide side: this.sides) {
+            for (MaxElementSide side: this.sides) {
                 Double old = this.maxSideHM.put(side.region, side.value);
                 if (old != null) {
                     log.error("Duplicate MaxElementSide for region '{}'", side.region);
@@ -60,5 +58,10 @@ public class Discretization {
             return new double[]{ surfaceLayer };
         else
             return new double[]{ };
+    }
+
+    public static final Discretization SINGLE_VOXEL = new Discretization();
+    static {
+        SINGLE_VOXEL.defaultMaxElementSide = Double.POSITIVE_INFINITY;
     }
 }

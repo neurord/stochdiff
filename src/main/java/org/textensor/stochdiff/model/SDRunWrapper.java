@@ -153,9 +153,11 @@ public class SDRunWrapper {
     }
 
     private void extractGrid() {
-        Morphology morph = sdRun.getMorphology();
-        TreePoint[] tpa = morph.getTreePoints();
+        final Morphology morph = sdRun.getMorphology();
+        final TreePoint[] tpa = morph.getTreePoints();
         Discretization disc = sdRun.getDiscretization();
+        if (disc == null)
+            disc = Discretization.SINGLE_VOXEL;
 
         double d = disc.defaultMaxElementSide;
 
