@@ -72,7 +72,7 @@ parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--style', default='-')
 parser.add_argument('--time', type=time_range, default=(None, None))
 parser.add_argument('--trial', type=int, default=0)
-parser.add_argument('--config', action='store_true')
+parser.add_argument('--config', type=str, nargs='?', const='')
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -387,9 +387,18 @@ def print_config(filename):
     trial = file.get_node('/trial{}'.format(opts.trial))
     xml = trial.simulation.serialized_config
     tree = etree.fromstring(xml.read()[0])
-    text = etree.tostring(tree, encoding='unicode')
-
-    print(highlight(text, XmlLexer(), Formatter()))
+    if opts.config:
+#        snippets = tree.xpath(opts.config,
+#                              namespaces=dict(ns2="http://stochdiff.textensor.org"))
+        expr = '//*[local-name() = $name]'
+        snippets = tree.xpath(expr, name=opts.config)
+    else:
+        snippets = [tree]
+    for i, what in enumerate(snippets):
+        if i > 0:
+            print()
+        text = etree.tostring(what, encoding='unicode')
+        print(highlight(text, XmlLexer(), Formatter()))
 
 if __name__ == '__main__':
     opts = parser.parse_args()
@@ -401,7 +410,7 @@ if __name__ == '__main__':
         dot_productions(opts.file)
     elif opts.history is not None:
         plot_history(opts.file, opts.history, opts)
-    elif opts.config:
+    elif opts.config is not None:
         print_config(opts.file)
     else:
         if not opts.save:
