@@ -36,6 +36,8 @@ public class Specie {
     }
 
     public double getDiffusionConstant() {
+        if (kdiff == null)
+            return 0;
         return kdiff * getFactor(kdiffunit);
     }
 
