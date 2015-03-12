@@ -44,6 +44,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     public void footer() {
         super.footer();
         log.info("Queue suffered {} swaps", this.neq.queue.swaps);
+        log.info("Accuracy control parameter ε={}", this.neq.tolerance);
         log.info("Leapt {} ({} events, {} e/l average), waited {} times",
                  this.neq.leaps, this.neq.leap_extent,
                  ((double)this.neq.leap_extent)/this.neq.leaps,

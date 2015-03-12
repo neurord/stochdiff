@@ -32,6 +32,8 @@ public class NextEventQueue {
     final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
     final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);
 
+    final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
+
     public interface Node {
         int index();
         void setIndex(int index);
@@ -105,16 +107,18 @@ public class NextEventQueue {
         void reposition(String prefix, T node) {
             assert node != null;
             T parent = this.parent(node);
-            log.debug("{}: moving {} t={} parent={}",
-                      prefix, node, node.time(), parent);
+            if (log_queue)
+                log.debug("{}: moving {} t={} parent={}",
+                          prefix, node, node.time(), parent);
 
             if (parent != null && parent.time() > node.time()) {
                 this.swap(parent, node); // original parent first
                 this.reposition(prefix, node);
             } else {
                 T littlest = this.littlestChild(node);
-                log.debug("littlest child is {} t={}", littlest,
-                          littlest != null ? littlest.time() : "-");
+                if (log_queue)
+                    log.debug("littlest child is {} t={}", littlest,
+                              littlest != null ? littlest.time() : "-");
                 if (littlest != null && node.time() > littlest.time()) {
                     this.swap(node, littlest); // original parent first
                     this.reposition(prefix + "-", node);
