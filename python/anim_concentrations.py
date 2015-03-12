@@ -345,7 +345,6 @@ def _history(simul, species, indices, region_indices, region_labels,
     pyplot.show(block=True)
 
 def find_regions(regions, spec, grid):
-    print('regions', regions, 'spec', spec)
     spec_ = range(len(regions)) if spec is None else spec
     for item in spec_:
         try:
