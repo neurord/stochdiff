@@ -12,6 +12,10 @@ import argparse
 import subprocess
 import numpy
 import tables
+from lxml import etree
+from pygments import highlight
+from pygments.lexers import XmlLexer
+from pygments.formatters import Terminal256Formatter as Formatter
 
 # TODO: support --time in animations
 
@@ -68,6 +72,7 @@ parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--style', default='-')
 parser.add_argument('--time', type=time_range, default=(None, None))
 parser.add_argument('--trial', type=int, default=0)
+parser.add_argument('--config', action='store_true')
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -377,6 +382,15 @@ def plot_history(filename, species, opts):
              simul.times[when], simul.concentrations[when],
              title=filename, opts=opts)
 
+def print_config(filename):
+    file = tables.openFile(filename)
+    trial = file.get_node('/trial{}'.format(opts.trial))
+    xml = trial.simulation.serialized_config
+    tree = etree.fromstring(xml.read()[0])
+    text = etree.tostring(tree, encoding='unicode')
+
+    print(highlight(text, XmlLexer(), Formatter()))
+
 if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.connections:
@@ -387,6 +401,8 @@ if __name__ == '__main__':
         dot_productions(opts.file)
     elif opts.history is not None:
         plot_history(opts.file, opts.history, opts)
+    elif opts.config:
+        print_config(opts.file)
     else:
         if not opts.save:
             animate_drawing(opts)
