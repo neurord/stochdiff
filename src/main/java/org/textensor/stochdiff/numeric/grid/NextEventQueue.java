@@ -546,6 +546,15 @@ public class NextEventQueue {
                 log.debug("leap time: min({}, {}, E→{}, V→inf) → {}", X1, X2, t1, ans);
             }
             return ans;
+            /*
+             static const int[] ONE = new int[]{ 1 };
+             SecondOrderSolver solver =
+                 SecondOrderSolver.make_equation(this.fdiff, this.fdiff,
+                                                 ONE, ONE, new int[]{ X1 },
+                                                 ONE, ONE, new int[]{ X2 },
+                                                 this.substrate_stoichiometry(), new int[]{X1, X2},
+                                                 this.signature);
+             */
         }
 
         @Override

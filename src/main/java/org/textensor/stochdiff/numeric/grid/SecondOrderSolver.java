@@ -7,15 +7,13 @@ public abstract class SecondOrderSolver {
        dA/dt = aA^2 + bA + c
      */
 
-    int[] species;
     int[] stoichiometry;
     int[] X0;
     String description;
     double a, b, c;
 
-    public SecondOrderSolver(int[] species, int[] stoichiometry, int[] X0,
+    public SecondOrderSolver(int[] stoichiometry, int[] X0,
                              String description, double a, double b, double c) {
-        this.species = species;
         this.stoichiometry = stoichiometry;
         this.X0 = X0;
         this.description = description;
@@ -32,7 +30,7 @@ public abstract class SecondOrderSolver {
      *  other specie, given the initial numbers (X0_left, X0_right).
      */
     double extent_to_count(double extent, int specie) {
-        assert specie < this.species.length;
+        assert specie < this.stoichiometry.length;
 
         double coeff = this.stoichiometry[specie] / this.stoichiometry[0];
         return coeff * (extent - this.X0[0]) + this.X0[specie];
@@ -51,9 +49,9 @@ public abstract class SecondOrderSolver {
      * First order equation.
      */
     static class Equation1 extends SecondOrderSolver {
-        Equation1(int[] species, int[] stoichiometry, int[] X0,
+        Equation1(int[] stoichiometry, int[] X0,
                   String description, double a, double b, double c) {
-            super(species, stoichiometry, X0, description, a, b, c);
+            super(stoichiometry, X0, description, a, b, c);
             assert this.a == 0;
             assert this.b != 0;
         }
@@ -76,9 +74,9 @@ public abstract class SecondOrderSolver {
     static class Equation2 extends SecondOrderSolver {
         final double _I0;
 
-        Equation2(int[] species, int[] stoichiometry, int[] X0,
+        Equation2(int[] stoichiometry, int[] X0,
                   String description, double a, double b, double c) {
-            super(species, stoichiometry, X0, description, a, b, c);
+            super(stoichiometry, X0, description, a, b, c);
             assert this.a != 0;
             this._I0 = I(new double[]{X0[0]}, a, b, c)[0];
         }
@@ -254,16 +252,16 @@ public abstract class SecondOrderSolver {
     public static SecondOrderSolver make_equation(double r_left, double r_right,
                                                   int[] rp, int[] rs, int[] X0_left,
                                                   int[] pp, int[] ps, int[] X0_right,
-                                                  int[] si, int[] ss, int[] X0,
+                                                  int[] ss, int[] X0,
                                                   String description) {
         assert ss[0] != 0;
 
         double[] abc = calc_abc(r_left, rp, rs, X0_left,
                                 r_right, pp, ps, X0_right);
         if (abc[0] != 0)
-            return new Equation2(si, ss, X0, description, abc[0], abc[1], abc[2]);
+            return new Equation2(ss, X0, description, abc[0], abc[1], abc[2]);
         else if (abc[1] != 0)
-            return new Equation1(si, ss, X0, description, abc[0], abc[1], abc[2]);
+            return new Equation1(ss, X0, description, abc[0], abc[1], abc[2]);
 
         throw new RuntimeException("not implemented");
     }
