@@ -13,13 +13,16 @@ import org.textensor.util.inst;
 
 public class Morphology {
 
+    @XmlElement(name="SpineType")
     public ArrayList<SpineType> spineTypes;
 
     @XmlElement(name="Segment")
     public ArrayList<Segment> segments;
 
+    @XmlElement(name="MorphPoint")
     private ArrayList<MorphPoint> p_points;
 
+    @XmlElement(name="SpineAllocation")
     private ArrayList<SpineAllocation> p_spineAllocations;
 
     transient private boolean resolved = false;

@@ -2,58 +2,48 @@ package org.textensor.stochdiff.model;
 
 import java.util.HashMap;
 
-import org.textensor.report.E;
+import javax.xml.bind.annotation.*;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import org.textensor.stochdiff.numeric.morph.SpinePopulation;
 
-
-
 public class SpineAllocation {
+    static final Logger log = LogManager.getLogger(SpineAllocation.class);
 
-    public String id;
+    @XmlAttribute public String id;
 
-    public String spineType;
-    public String region;
+    @XmlAttribute public String spineType;
+    @XmlAttribute public String region;
 
-    public double lengthDensity;
+    @XmlAttribute public double lengthDensity;
 
-    public double areaDensity;
+    @XmlAttribute public double areaDensity;
 
-    private SpineType r_spineType;
-
+    transient private SpineType r_spineType;
 
     public void resolve(HashMap<String, SpineType> stHM) {
-        if (stHM.containsKey(spineType)) {
-            r_spineType = stHM.get(spineType);
-
-        } else {
-            E.error("ref to unknown spine type " + spineType);
-        }
-
+        this.r_spineType = stHM.get(spineType);
     }
-
 
     public String getID() {
         return id;
     }
 
     public SpinePopulation makePopulation() {
-        SpinePopulation ret = null;
+        final double density;
+        if (areaDensity > 0)
+            density = this.areaDensity;
+        else if (lengthDensity > 0) {
+            log.warn("'lengthDensity' is deprecated, use 'areaDensity' instead");
+            density = this.lengthDensity;
+        } else
+            density = 0;
 
-        double density = 0.;
-        if (lengthDensity > 0) {
-            E.warning("'lengthDensity' is an erroneous name: it get treated like 'areaDensity'");
-            density = lengthDensity;
-
-        } else if (areaDensity > 0) {
-            density = areaDensity;
-        }
-
-        if (r_spineType != null && density > 0) {
-            ret = new SpinePopulation(id, r_spineType.getProfile(), region, density);
-        }
-        return ret;
-
+        if (r_spineType != null && density > 0)
+            return new SpinePopulation(id, r_spineType.getProfile(), region, density);
+        else
+            return null;
     }
-
-
 }

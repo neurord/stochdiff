@@ -1,16 +1,19 @@
 package org.textensor.stochdiff.model;
 
+import java.util.ArrayList;
+import javax.xml.bind.annotation.*;
+
 import org.textensor.stochdiff.numeric.morph.SpineProfile;
 
-import java.util.ArrayList;
 
 public class SpineType {
 
-    public String id;
+    @XmlAttribute public String id;
 
+    @XmlElement(name="Section")
     public ArrayList<Section> sections;
 
-    private SpineProfile r_profile;
+    transient private SpineProfile r_profile;
 
     public SpineProfile makeProfile() {
         int np = sections.size();
@@ -22,25 +25,20 @@ public class SpineType {
             Section sec = sections.get(i);
             vl[i] = sec.at;
             vw[i] = sec.width;
-            if (sec.regionClass != null) {
+            if (sec.regionClass != null)
                 regions[i] = sec.regionClass;
-            }
-            if (sec.label != null) {
+
+            if (sec.label != null)
                 lbls[i] = sec.label;
-            }
         }
-        SpineProfile ret = new SpineProfile(id, vl, vw, lbls, regions);
-        return ret;
+
+        return new SpineProfile(id, vl, vw, lbls, regions);
     }
-
-
 
     public SpineProfile getProfile() {
-        if (r_profile == null) {
+        if (r_profile == null)
             r_profile = makeProfile();
-        }
+
         return r_profile;
     }
-
-
 }
