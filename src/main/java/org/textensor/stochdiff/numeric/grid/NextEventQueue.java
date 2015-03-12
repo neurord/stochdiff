@@ -361,7 +361,7 @@ public class NextEventQueue {
             log.debug("options: wait {}, leap {}", exact, leap);
 
             if (current + leap > tstop) {
-                log.info("Curtailing leap {}→{} to {}", current, current + leap, tstop);
+                log.debug("Curtailing leap {}→{} to {}", current, current + leap, tstop);
                 leap = tstop - current;
             }
 
