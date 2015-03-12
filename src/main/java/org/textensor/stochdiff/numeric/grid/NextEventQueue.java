@@ -322,7 +322,7 @@ public class NextEventQueue {
         void update(int[][] reactionEvents,
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
-                    double current,
+                    double current, double tstop,
                     List<IGridCalc.Happening> events) {
 
             assert this.extent >= 0: this.extent;
@@ -354,11 +354,16 @@ public class NextEventQueue {
             this._update_propensity(false);
 
             final double exact = this.exact_time(current);
-            final double leap = leap_min_jump == 0 ? Double.NaN
+            double leap = leap_min_jump == 0 ? Double.NaN
                 : this.leap_time(current, tolerance);
 
             log.debug("deps: {}", this.dependent);
             log.debug("options: wait {}, leap {}", exact, leap);
+
+            if (current + leap > tstop) {
+                log.info("Curtailing leap {}→{} to {}", current, current + leap, tstop);
+                leap = tstop - current;
+            }
 
             if (leap_min_jump != 0 && leap > exact * leap_min_jump) {
                 assert update_times;
@@ -1270,7 +1275,7 @@ public class NextEventQueue {
         ev.update(reactionEvents,
                   diffusionEvents,
                   stimulationEvents,
-                  now,
+                  now, tstop,
                   events);
 
         return now;
