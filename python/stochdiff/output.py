@@ -1,5 +1,12 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
+
+"""Wrapper which makes reading stochdiff HDF5 output easier to use
+
+>>> out = Output('model.h5')
+>>> 
+"""
+
 from __future__ import print_function, division, unicode_literals
 
 import operator
@@ -33,6 +40,10 @@ class Simulation(object):
         return frame
 
 class Output(object):
+    """The output for a single model, 0 or more experiments
+
+    >>> out = Output('model.h5')
+    """
     def __init__(self, filename):
         self.file = tables.openFile(filename)
         self.model = Model(self.file.root.trial0.model)
@@ -43,7 +54,24 @@ class Output(object):
         sims.sort(key=operator.attrgetter('number'))
         return sims
 
-    def concentrations(self):
+    def counts(self):
+        """Aggregated table of particle counts
+
+        >>> out = Output('model.h5')
+        >>> counts = out.counts()
+        >>> counts.head(1)
+              voxel specie  trial    count
+        time                              
+        0         0      A      0  1204428
+        >>> gb = counts.reset_index().groupby(['time', 'voxel', 'specie'])
+        >>> gb.mean().head(3)
+                           trial           count
+        time voxel specie                       
+        0    0     A        14.5  1204428.433333
+        5    0     A        14.5  1192430.800000
+        10   0     A        14.5  1180586.466667
+        >>> gb.std()
+        """
         sims = self.simulations()
         data = dict((i, sim.concentrations())
                     for (i, sim) in enumerate(sims))
