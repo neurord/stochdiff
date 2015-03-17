@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
  * The conversion factor between concentrations and particle number is
  * therefore
  * nparticles = 6.022^23 * vol/10^15 * conc/10^9
- * ie, nparticles = 0.6022 * conc
+ * ie, nparticles = 0.6022 * vol * conc
  */
 
 public abstract class BaseCalc implements Runnable {
