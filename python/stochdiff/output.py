@@ -82,6 +82,48 @@ class Dependencies(object):
         for row in self._element.dependent[:]:
             yield list(n for n in row if n >= 0)
 
+class Reactions(object):
+    """Raw information about reactions
+
+    >>> out = Output('model.h5')
+    >>> reactions = out.model.reactions
+    >>> list(reactions.reactants())
+    [[0]]
+    >>> list(reactions.reactant_stoichiometry())
+    [[1]]
+    >>> list(reactions.products())
+    [[]]
+    >>> list(reactions.product_stoichiometry())
+    [[]]
+    >>> list(reactions.rates())
+    [0.002]
+    """
+    def __init__(self, element):
+        self._element = element
+
+    def reactants(self):
+        "A generator of lists of reactants (by index)"
+        for row in self._element.reactants[:]:
+            yield list(n for n in row if n >= 0)
+
+    def reactant_stoichiometry(self):
+        "A generator of lists of stoichiometries (by index)"
+        for row in self._element.reactant_stoichiometry[:]:
+            yield list(n for n in row if n >= 0)
+
+    def products(self):
+        "A generator of lists of products (by index)"
+        for row in self._element.products[:]:
+            yield list(n for n in row if n >= 0)
+
+    def product_stoichiometry(self):
+        "A generator of lists of stoichiometries (by index)"
+        for row in self._element.product_stoichiometry[:]:
+            yield list(n for n in row if n >= 0)
+
+    def rates(self):
+        "Rates of the reactions"
+        return self._element.rates
 
 class Model(object):
     """Information about the model, same for all trials
@@ -89,6 +131,7 @@ class Model(object):
     def __init__(self, element):
         self._element = element
         self.dependencies = Dependencies(self._element.dependencies)
+        self.reactions = Reactions(self._element.reactions)
 
     def species(self):
         """List of specie names
