@@ -147,6 +147,10 @@ public class ResultWriterHDF5 implements ResultWriter {
     synchronized public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[],
                                        IGridCalc source)
     {
+        /* Only write stuff for the first trial to save time and space */
+        if (source.trial() > 0)
+            return;
+
         try {
             Trial t = this.getTrial(source.trial());
             t._writeGrid(vgrid, startTime, fnmsOut, source);
@@ -191,7 +195,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     protected class Trial {
         protected final Group group;
-        protected final Group model;
+        protected Group model;
         protected final Group sim;
         protected H5ScalarDS concs;
         protected int[][][] concs_cache;
@@ -214,11 +218,17 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             this.group = group;
 
-            this.model = output.createGroup("model", group);
-            setAttribute(this.model, "TITLE", "model parameters");
-
             this.sim = output.createGroup("simulation", group);
             setAttribute(this.sim, "TITLE", "results of the simulation");
+        }
+
+        protected Group model() throws Exception {
+            if (this.model == null) {
+                this.model = output.createGroup("model", group);
+                setAttribute(this.model, "TITLE", "model parameters");
+            }
+
+            return this.model;
         }
 
         protected void _writeGrid(VolumeGrid vgrid, double startTime,
@@ -286,7 +296,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             Dataset grid =
-                output.createCompoundDS("grid", this.model, dims, null, chunks, COMPRESSION_LEVEL,
+                output.createCompoundDS("grid", this.model(), dims, null, chunks, COMPRESSION_LEVEL,
                                         memberNames, memberTypes, null, data);
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "grid", xJoined(dims), "", xJoined(chunks));
@@ -296,14 +306,14 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             {
                 Dataset ds =
-                    writeArray("neighbors", this.model, vgrid.getPerElementNeighbors(), -1);
+                    writeArray("neighbors", this.model(), vgrid.getPerElementNeighbors(), -1);
                 setAttribute(ds, "TITLE", "adjacency mapping between voxels");
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
                 setAttribute(ds, "UNITS", "indexes");
             }
             {
                 Dataset ds =
-                    writeArray("couplings", this.model, vgrid.getPerElementCouplingConstants());
+                    writeArray("couplings", this.model(), vgrid.getPerElementCouplingConstants());
                 setAttribute(ds, "TITLE", "coupling rate between voxels");
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
                 setAttribute(ds, "UNITS", "nm^2 / nm ?");
@@ -343,7 +353,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             for (int i = 0; i < ispecout.length; i++)
                 outSpecies[i] = species[ispecout[i]];
 
-            Dataset ds = writeVector("species", this.model, outSpecies);
+            Dataset ds = writeVector("species", this.model(), outSpecies);
             setAttribute(ds, "TITLE", "names of saved species");
             setAttribute(ds, "LAYOUT", "[nspecies]");
             setAttribute(ds, "UNITS", "text");
@@ -353,7 +363,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             String[] regions = source.getSource().getVolumeGrid().getRegionLabels();
-            Dataset ds = writeVector("regions", this.model, regions);
+            Dataset ds = writeVector("regions", this.model(), regions);
             setAttribute(ds, "TITLE", "names of regions");
             setAttribute(ds, "LAYOUT", "[nregions]");
             setAttribute(ds, "UNITS", "text");
@@ -364,7 +374,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             StimulationTable table = source.getSource().getStimulationTable();
 
-            Group group = output.createGroup("stimulation", this.model);
+            Group group = output.createGroup("stimulation", this.model());
             setAttribute(group, "TITLE", "stimulation parameters");
 
             {
@@ -394,7 +404,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             ReactionTable table = source.getSource().getReactionTable();
 
-            Group group = output.createGroup("reactions", this.model);
+            Group group = output.createGroup("reactions", this.model());
             setAttribute(group, "TITLE", "reaction scheme");
 
             {
@@ -438,7 +448,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeReactionDependencies(IGridCalc source)
             throws Exception
         {
-            Group group = output.createGroup("dependencies", this.model);
+            Group group = output.createGroup("dependencies", this.model());
             setAttribute(group, "TITLE", "dependency scheme");
 
             {
@@ -512,8 +522,10 @@ public class ResultWriterHDF5 implements ResultWriter {
             assert this.concs == null;
             assert this.times == null;
 
-            this.writeSpecies(ispecout, source);
-            this.writeRegionLabels(source);
+            if (source.trial() == 0) {
+                this.writeSpecies(ispecout, source);
+                this.writeRegionLabels(source);
+            }
 
             int nspecout = ispecout.length;
             if (nspecout == 0)

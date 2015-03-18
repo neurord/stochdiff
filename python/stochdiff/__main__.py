@@ -3,8 +3,6 @@
 from __future__ import print_function, division, unicode_literals
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
 import os
 import glob
 import itertools
@@ -16,6 +14,8 @@ from lxml import etree
 from pygments import highlight
 from pygments.lexers import XmlLexer
 from pygments.formatters import Terminal256Formatter as Formatter
+
+from . import output
 
 # TODO: support --time in animations
 
@@ -54,7 +54,7 @@ def filter_times(limits, times):
     return slice(a, b)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('file')
+parser.add_argument('file', type=output.Output)
 parser.add_argument('--save')
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
@@ -118,7 +118,7 @@ class DrawerSet(object):
 
         self.drawers = []
         species = model.species
-        times = sim.times
+        times = sim.times()
         num = opts.particles + opts.stimulation + opts.diffusion + opts.reaction
         shape = [(1,1), (2,1), (2,2), (2,2)][num - 1]
         pos = 1
@@ -167,9 +167,8 @@ class DrawerSet(object):
                 sys.stdout.flush()
 
 def animate_drawing(opts):
-    file = tables.openFile(opts.file)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    ss = DrawerSet(trial.model, trial.simulation, opts)
+    sim = opts.file.simulation(opts.trial)
+    ss = DrawerSet(sim.model, sim, opts)
     indexes = itertools.cycle(ss.items)
     ss.animate(indexes)
 
@@ -178,9 +177,8 @@ def save_drawings(opts, suboffset=None, subtotal=1):
     if opts.save:
         matplotlib.use('Agg')
 
-    file = tables.openFile(opts.file)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    ss = DrawerSet(trial.model, trial.simulation, opts)
+    sim = opts.file.simulation(opts.trial)
+    ss = DrawerSet(sim.model, sim, opts)
     if opts.save:
         if suboffset is None:
             indexes = ss.items
@@ -220,56 +218,56 @@ def _conn(dst, a, b, penwidth=None, label=None):
     opts = dot_opts(penwidth=penwidth, label=label)
     print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
 
-REGION_COLORDICT = {'dendrite':'lightblue'}
+REGION_COLORDICT = {'dendrite':'lightblue', 'soma':'lightgreen'}
 def _connections(dst, model):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=blue,style=filled];', file=dst)
-    for i in range(model.neighbors.shape[0]):
-        region = model.regions[model.grid.cols.region[i]]
+    for i, neigh, coupl, region in zip(model.indices(),
+                                       model.neighbors(),
+                                       model.couplings(),
+                                       model.element_regions()):
         fillcolor = REGION_COLORDICT.get(region, 'grey')
         print('\t"{}" {};'.format(i, dot_opts(fillcolor=fillcolor)), file=dst)
-        for j, coupl in zip(model.neighbors[i], model.couplings[i]):
-            if j < 0:
-                break
-            coupl = _logclip(coupl, 3)
-            _conn(dst, i, j, coupl)
+        for j, c in zip(neigh, coupl):
+            c = _logclip(c, 3)
+            _conn(dst, i, j, c)
     print('}', file=dst)
 
-def dot_connections(filename):
-    file = tables.openFile(filename)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    _connections(sys.stdout, trial.model)
+def dot_connections(output):
+    _connections(sys.stdout, output.model)
 
-TYPE_COLORDICT = {0:'lightblue', 1:'grey', 2:'orange'}
+TYPE_COLORDICT = {output.EventType.REACTION:'lightblue',
+                  output.EventType.DIFFUSION:'grey',
+                  output.EventType.STIMULATION:'orange'}
 def _dependencies(dst, model):
     print('digraph Dependencies {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=blue,style=filled,shape=point];', file=dst)
-    d = model.dependencies
-    for i in range(d.dependent.shape[0]):
-        fillcolor = TYPE_COLORDICT.get(d.types[i], 'grey')
-        desc = d.descriptions[i].decode('utf-8')[4:]
-        elem = d.elements[i]
+    deps = model.dependencies
+    elements = deps.elements()
+    descriptions = list(deps.descriptions())
+    for i, t, elem, children in zip(deps.indices(),
+                                    deps.types(),
+                                    elements,
+                                    deps.dependent()):
+        fillcolor = TYPE_COLORDICT.get(t, 'grey')
+        desc = descriptions[i][4:]
         if opts.num_elements is not None and elem >= opts.num_elements:
             continue
         print('\t"{}" {};'.format(desc, dot_opts(fillcolor=fillcolor)), file=dst)
-        for j in d.dependent[i]:
-            if j < 0:
-                break
-            elem = d.elements[j]
+        for j in children:
+            elem = elements[j]
             if opts.num_elements is not None and elem >= opts.num_elements:
                 continue
-            _conn(dst, desc, d.descriptions[j].decode('utf-8')[4:])
+            _conn(dst, desc, descriptions[j][4:])
 
     print('}', file=dst)
 
-def dot_dependencies(filename):
-    file = tables.openFile(filename)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    _dependencies(sys.stdout, trial.model)
+def dot_dependencies(output):
+    _dependencies(sys.stdout, output.model)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
@@ -298,26 +296,21 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
         name = _reaction_name(rr, rr_s, pp, pp_s, species)
         print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
         for j, s in zip(rr, rr_s):
-            if j < 0:
-                break
             _conn(dst, species[j], name, _logclip(rate, 10))
         for j, s in zip(pp, pp_s):
-            if j < 0:
-                break
             _conn(dst, name, species[j], _logclip(rate, 10))
         if not len(rr) and not len(pp):
             print('\t"{}";'.format(name), file=dst)
         print()
     print('}', file=dst)
 
-def dot_productions(filename):
-    file = tables.openFile(filename)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    model = trial.model
-    _productions(sys.stdout, model.species,
-                 model.reactions.reactants, model.reactions.reactant_stoichiometry,
-                 model.reactions.products, model.reactions.product_stoichiometry,
-                 model.reactions.rates)
+def dot_productions(output):
+    model = output.model
+    reactions = model.reactions
+    _productions(sys.stdout, model.species(),
+                 reactions.reactants(), reactions.reactant_stoichiometry(),
+                 reactions.products(), reactions.product_stoichiometry(),
+                 reactions.rates())
 
 def specie_indices(items, species):
     species = list(species)
@@ -381,11 +374,8 @@ def plot_history(filename, species, opts):
              simul.times[when], simul.concentrations[when],
              title=filename, opts=opts)
 
-def print_config(filename):
-    file = tables.openFile(filename)
-    trial = file.get_node('/trial{}'.format(opts.trial))
-    xml = trial.simulation.serialized_config
-    tree = etree.fromstring(xml.read()[0])
+def print_config(output):
+    tree = output.simulation(0).config()
     if opts.config:
 #        snippets = tree.xpath(opts.config,
 #                              namespaces=dict(ns2="http://stochdiff.textensor.org"))
