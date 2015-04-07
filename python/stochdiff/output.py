@@ -196,7 +196,7 @@ class Simulation(object):
         self.model = model
 
     def times(self):
-        return self._sim.times
+        return np.round(self._sim.times, decimals=6)
 
     def counts(self):
         data = self._sim.concentrations
