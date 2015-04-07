@@ -380,7 +380,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             {
                 String[] targets = table.getTargetIDs();
                 if (targets.length == 0) {
-                    log.info("not writing stimulation data (empty targets)");
+                    log.info("Not writing stimulation data (empty targets)");
                     return;
                 }
 
@@ -448,11 +448,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeReactionDependencies(IGridCalc source)
             throws Exception
         {
+            Collection<IGridCalc.Event> events = source.getEvents();
+            if (events == null) {
+                    log.warn("No dependency data, not writing dependency scheme");
+                    return;
+            }
+
             Group group = output.createGroup("dependencies", this.model());
             setAttribute(group, "TITLE", "dependency scheme");
 
             {
-                Collection<IGridCalc.Event> events = source.getEvents();
                 String[] descriptions = new String[events.size()];
                 int[] types = new int[events.size()];
                 int[] elements = new int[events.size()];
