@@ -8,7 +8,7 @@ import glob
 import itertools
 import argparse
 import subprocess
-import numpy
+import numpy as np
 import tables
 from lxml import etree
 from pygments import highlight
@@ -79,8 +79,8 @@ class Drawer(object):
         from matplotlib.colors import LogNorm
 
         n = names.shape[0]
-        N = numpy.arange(n)
-        V = numpy.arange(data.shape[0])
+        N = np.arange(n)
+        V = np.arange(data.shape[0])
         self.data = data
         self.times = times
         self.title = title
@@ -207,7 +207,7 @@ def make_movie(save):
     subprocess.check_call(command)
 
 def _logclip(x, offset):
-    return numpy.clip(numpy.log(x + 1e-10) + offset, 0.3, 5)
+    return np.clip(np.log(x + 1e-10) + offset, 0.3, 5)
 
 def dot_opts(**opts):
     opts = ['{}={}'.format(k, v)
@@ -284,7 +284,7 @@ def reaction_name(num, model):
                         model.reactions.product_stoichiometry[num],
                         model.species)
          for num in ([num] if single else num)]
-    return l[0] if single else numpy.array(l)
+    return l[0] if single else np.array(l)
 
 def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rates):
     print('digraph Reactions {', file=dst)
@@ -314,7 +314,7 @@ def dot_productions(output):
 
 def specie_indices(items, species):
     species = list(species)
-    return numpy.array([species.index(i) for i in items])
+    return np.array([species.index(i) for i in items])
 
 def _history(simul, species, indices, region_indices, region_labels,
              times, concentrations, title, opts):
