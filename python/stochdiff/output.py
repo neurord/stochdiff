@@ -130,10 +130,14 @@ class Model(object):
     """
     def __init__(self, element):
         self._element = element
-        self.dependencies = Dependencies(self._element.dependencies)
+        try:
+            self.dependencies = Dependencies(self._element.dependencies)
+        except tables.exceptions.NoSuchNodeError as e:
+            print(e)
+            self.dependencies = None
         self.reactions = Reactions(self._element.reactions)
 
-    def species(self):
+    def species(self, indices=None):
         """List of specie names
 
         Species are order the same as in other tables, so this table can be used to map species
@@ -143,7 +147,8 @@ class Model(object):
         >>> model.species
         ['A']
         """
-        return list(sp.decode('utf-8') for sp in self._element.species)
+        what = self._element.species[indices] if indices is not None else self._element.species
+        return list(sp.decode('utf-8') for sp in what)
 
     def grid(self):
         """Voxels of the simulation
@@ -183,9 +188,10 @@ class Model(object):
         for i, neigh in enumerate(self.neighbors()):
             yield list(coupl[i][:len(neigh)])
 
-    def region_names(self):
+    def region_names(self, indices=None):
         "Region names (by index)"
-        return [row.decode('utf-8') for row in self._element.regions]
+        what = self._element.regions[indices] if indices is not None else self._element.regions[indices]
+        return [row.decode('utf-8') for row in what]
 
 class Simulation(object):
     """Information about the results of a trial
