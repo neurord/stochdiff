@@ -34,8 +34,8 @@ public class Reaction {
 
     public Double Q10;
 
-    private ArrayList<Specie> r_reactants;
-    private ArrayList<Specie> r_products;
+    transient private ArrayList<Specie> r_reactants;
+    transient private ArrayList<Specie> r_products;
 
     public String getID() {
         return this.id != null ? this.id : generateID(this.getName());
