@@ -57,8 +57,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     public static final H5Datatype short_str_t =
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
-    static final int CACHE_SIZE1 = 1;
-    static final int CACHE_SIZE2 = 1024*1024;
+    static final int CACHE_SIZE1 = 1024;
+    static final int CACHE_SIZE2 = 64*1024;
 
     public ResultWriterHDF5(File output) {
         this.outputFile = new File(output + ".h5");
