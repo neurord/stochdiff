@@ -39,6 +39,11 @@ class EventType(enum.IntEnum):
     DIFFUSION = 1
     STIMULATION = 2
 
+class EventKind(enum.IntEnum):
+    """Event types matching IGridCalc.EventKind enumeration"""
+    EXACT = 0
+    LEAP = 1
+
 class Dependencies(object):
     """Raw information about the dependency graph
 
@@ -237,6 +242,21 @@ class Simulation(object):
 
         xml = self._sim.serialized_config
         return etree.fromstring(xml.read()[0])
+
+    def events(self):
+        "A full history of events"
+        times = self._sim.events.times
+        waited = self._sim.events.waited
+        events = self._sim.events.events
+        extents = self._sim.events.extents
+        kinds = self._sim.events.kinds
+        df = pd.DataFrame(time=times,
+                          waited=waited,
+                          event=events,
+                          extent=extents,
+                          kind=kinds)
+        df.set_index('time')
+        return df
 
 class Output(object):
     """The output for a single model, 0 or more experiments

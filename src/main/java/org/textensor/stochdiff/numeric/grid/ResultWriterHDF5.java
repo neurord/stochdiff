@@ -878,7 +878,8 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             this.events_cache.addAll(events);
 
-            this.flushEvents(time);
+            if (this.events_cache.size() > CACHE_SIZE2)
+                this.flushEvents(time);
         }
 
         protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
