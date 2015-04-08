@@ -275,7 +275,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     if (labels[i] == null)
                         labels[i] = "element" + i;
                 }
-                    data.add(labels);
+                data.add(labels);
             }
 
             {
@@ -798,19 +798,9 @@ public class ResultWriterHDF5 implements ResultWriter {
                 extendExtensibleArray(this.events_event, n);
                 int[] data = (int[]) this.events_event.getData();
                 for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).hashCode();
+                    data[i] = this.events_cache.get(i).index();
                 this.events_event.write(data);
             }
-
-            /*
-            {
-                extendExtensibleArray(this.events_type, n);
-                int[] data = (int[]) this.events_type.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).event_type().ordinal();
-                this.events_type.write(data);
-            }
-            */
 
             {
                 extendExtensibleArray(this.events_kind, n);
