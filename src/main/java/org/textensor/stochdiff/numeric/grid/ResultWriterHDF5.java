@@ -116,7 +116,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 Trial trial = k_v.getValue();
                 trial.flushConcentrations(Double.POSITIVE_INFINITY, k_v.getKey());
                 if (trial.events_cache != null)
-                    trial.flushEvents(Double.POSITIVE_INFINITY, trial.events_cache.size());
+                    trial.flushEvents(Double.POSITIVE_INFINITY);
             }
         
             this.output.close();
@@ -784,9 +784,11 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         private boolean initEvents_warning = false;
 
-        protected void flushEvents(double time, int n)
+        protected void flushEvents(double time)
             throws Exception
         {
+            int n = this.events_cache.size();
+
             log.log(n > 0 ? Level.INFO : Level.DEBUG,
                     "Writing {} events at time {}", n, time);
             if (n == 0)
@@ -832,7 +834,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.events_extent.write(data);
             }
 
-            this.events_cache = this.events_cache.subList(n, this.events_cache.size());
+            this.events_cache.clear();
         }
 
         protected void writeEvents(double time, IGridCalc source)
@@ -852,9 +854,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             this.events_cache.addAll(events);
 
-            int n = this.events_cache.size();
-            n -= n % this.events_event.getChunkSize()[0];
-            this.flushEvents(time, n);
+            this.flushEvents(time);
         }
 
         protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
