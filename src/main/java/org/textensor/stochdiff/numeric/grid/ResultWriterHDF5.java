@@ -752,32 +752,30 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             this.events = output.createGroup("events", this.sim);
 
-            this.events_event = createExtensibleArray("events", this.events, int_t,
-                                                      "index of the event that happened",
-                                                      "[event#]",
-                                                      "",
-                                                      CACHE_SIZE2);
-
-            this.events_kind = createExtensibleArray("kinds", this.events, int_t,
-                                                     "mechanism of the event that happened",
-                                                     "[kind]",
-                                                     "",
-                                                     CACHE_SIZE2);
-
-            this.events_extent = createExtensibleArray("extents", this.events, int_t,
-                                                       "the extent of the reaction or event",
-                                                       "[extent]",
-                                                       "count",
-                                                       CACHE_SIZE2);
             this.events_time = createExtensibleArray("times", this.events, double_t,
                                                      "at what time the event happened",
-                                                     "[extent]",
+                                                     "[time]",
                                                      "ms",
                                                      CACHE_SIZE2);
             this.events_waited = createExtensibleArray("waited", this.events, double_t,
                                                        "time since the previous instance of this event",
                                                        "[waited]",
                                                        "ms",
+                                                       CACHE_SIZE2);
+            this.events_event = createExtensibleArray("events", this.events, int_t,
+                                                      "index of the event that happened",
+                                                      "[event#]",
+                                                      "",
+                                                      CACHE_SIZE2);
+            this.events_kind = createExtensibleArray("kinds", this.events, int_t,
+                                                     "mechanism of the event that happened",
+                                                     "[kind]",
+                                                     "",
+                                                     CACHE_SIZE2);
+            this.events_extent = createExtensibleArray("extents", this.events, int_t,
+                                                       "the extent of the reaction or event",
+                                                       "[extent]",
+                                                       "count",
                                                        CACHE_SIZE2);
 
             long chunk_size = this.events_event.getChunkSize()[0];
@@ -793,6 +791,22 @@ public class ResultWriterHDF5 implements ResultWriter {
                     "Writing {} events at time {}", n, time);
             if (n == 0)
                 return;
+
+            {
+                extendExtensibleArray(this.events_time, n);
+                double[] data = (double[]) this.events_time.getData();
+                for (int i = 0; i < n; i++)
+                    data[i] = this.events_cache.get(i).time();
+                this.events_time.write(data);
+            }
+
+            {
+                extendExtensibleArray(this.events_waited, n);
+                double[] data = (double[]) this.events_waited.getData();
+                for (int i = 0; i < n; i++)
+                    data[i] = this.events_cache.get(i).waited();
+                this.events_waited.write(data);
+            }
 
             {
                 extendExtensibleArray(this.events_event, n);
@@ -816,22 +830,6 @@ public class ResultWriterHDF5 implements ResultWriter {
                 for (int i = 0; i < n; i++)
                     data[i] = this.events_cache.get(i).extent();
                 this.events_extent.write(data);
-            }
-
-            {
-                extendExtensibleArray(this.events_time, n);
-                double[] data = (double[]) this.events_time.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).time();
-                this.events_time.write(data);
-            }
-
-            {
-                extendExtensibleArray(this.events_waited, n);
-                double[] data = (double[]) this.events_waited.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).waited();
-                this.events_waited.write(data);
             }
 
             this.events_cache = this.events_cache.subList(n, this.events_cache.size());
