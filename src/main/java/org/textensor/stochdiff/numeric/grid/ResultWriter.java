@@ -16,4 +16,6 @@ public interface ResultWriter {
 
     void saveState(double time, String prefix, IGridCalc source);
     Object loadState(String initialStateFile, IGridCalc source);
+
+    void closeTrial(IGridCalc source);
 }

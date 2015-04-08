@@ -167,6 +167,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         log.info("Trial {}: total number of particles at the end: {}",
                  this.trial(), this.getParticleCount());
 
+        for(ResultWriter resultWriter: this.resultWriters)
+            resultWriter.closeTrial(this);
+
         long endTime = System.currentTimeMillis();
         log.info("Trial {}: total run time {} ms", this.trial(), endTime - startTime);
 

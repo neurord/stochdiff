@@ -112,13 +112,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.info("Closing output file {}", this.outputFile);
 
         try {
-            for (Map.Entry<Integer, Trial> k_v: this.trials.entrySet()) {
-                Trial trial = k_v.getValue();
-                trial.flushConcentrations(Double.POSITIVE_INFINITY, k_v.getKey());
-                if (trial.events_cache != null)
-                    trial.flushEvents(Double.POSITIVE_INFINITY);
-            }
-        
+            for (Map.Entry<Integer, Trial> k_v: this.trials.entrySet())
+                this.closeTrial(k_v.getKey());
+
             this.output.close();
         } catch(Exception e) {
             log.error("Failed to close results file {}", outputFile, e);
@@ -150,6 +146,26 @@ public class ResultWriterHDF5 implements ResultWriter {
         setAttribute(group, "TITLE", "trial " + trial);
         return new Trial(group);
     }
+
+    protected void closeTrial(int trial)
+        throws Exception
+    {
+        Trial t = this.trials.get(trial);
+        if (t == null)
+            return;
+
+        t.close();
+        this.trials.remove(trial);
+    }
+
+    @Override
+    public void closeTrial(IGridCalc source) {
+        try {
+            this.closeTrial(source.trial());
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    };
 
     @Override
     synchronized public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[],
@@ -228,6 +244,14 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             this.sim = output.createGroup("simulation", group);
             setAttribute(this.sim, "TITLE", "results of the simulation");
+        }
+
+        protected void close()
+            throws Exception
+        {
+            this.flushConcentrations(Double.POSITIVE_INFINITY);
+            if (this.events_cache != null)
+                this.flushEvents(Double.POSITIVE_INFINITY);
         }
 
         protected Group model() throws Exception {
@@ -563,12 +587,12 @@ public class ResultWriterHDF5 implements ResultWriter {
             return true;
         }
 
-        protected void flushConcentrations(double time, int trial)
+        protected void flushConcentrations(double time)
             throws Exception
         {
             if (this.concs_times_count == 0)
                 return;
-            log.debug("Writing {} stats at time {} for trial {}", this.concs_times_count, time, trial);
+            log.debug("Writing {} stats at time {}", this.concs_times_count, time);
 
             {
                 extendExtensibleArray(this.concs, this.concs_times_count);
@@ -607,7 +631,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.concs_times_count++;
 
             if (this.concs_times_count == this.times_cache.length)
-                this.flushConcentrations(time, source.trial());
+                this.flushConcentrations(time);
         }
 
         protected void initStimulationEvents(int elements, int species)

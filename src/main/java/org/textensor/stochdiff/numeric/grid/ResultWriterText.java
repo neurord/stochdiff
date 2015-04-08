@@ -433,4 +433,7 @@ public class ResultWriterText implements ResultWriter {
                 return nums;
             }
     }
+
+    @Override
+    public void closeTrial(IGridCalc source) {};
 }
