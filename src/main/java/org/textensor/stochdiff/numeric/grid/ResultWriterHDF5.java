@@ -110,7 +110,15 @@ public class ResultWriterHDF5 implements ResultWriter {
             return;
 
         log.info("Closing output file {}", this.outputFile);
+
         try {
+            for (Map.Entry<Integer, Trial> k_v: this.trials.entrySet()) {
+                Trial trial = k_v.getValue();
+                trial.flushConcentrations(Double.POSITIVE_INFINITY, k_v.getKey());
+                if (trial.events_cache != null)
+                    trial.flushEvents(Double.POSITIVE_INFINITY, trial.events_cache.size());
+            }
+        
             this.output.close();
         } catch(Exception e) {
             log.error("Failed to close results file {}", outputFile, e);
@@ -555,6 +563,37 @@ public class ResultWriterHDF5 implements ResultWriter {
             return true;
         }
 
+        protected void flushConcentrations(double time, int trial)
+            throws Exception
+        {
+            if (this.concs_times_count == 0)
+                return;
+            log.debug("Writing {} stats at time {} for trial {}", this.concs_times_count, time, trial);
+
+            {
+                extendExtensibleArray(this.concs, this.concs_times_count);
+                int[] data = (int[]) this.concs.getData();
+
+                int[][][] cache;
+                if (this.concs_times_count == this.times_cache.length)
+                    cache = this.concs_cache;
+                else
+                    cache = Arrays.copyOfRange(this.concs_cache, 0, this.concs_times_count);
+
+                ArrayUtil._flatten(data, cache, cache[0][0].length, 0);
+                this.concs.write(data);
+            }
+
+            {
+                extendExtensibleArray(this.times, this.concs_times_count);
+                double[] data = (double[]) this.times.getData();
+                System.arraycopy(this.times_cache, 0, data, 0, this.concs_times_count);
+                this.times.write(data);
+            }
+
+            this.concs_times_count = 0;
+        }
+
         protected void writeConcentrations(double time, int nel, int ispecout[], IGridCalc source)
             throws Exception
         {
@@ -567,25 +606,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.times_cache[this.concs_times_count] = time;
             this.concs_times_count++;
 
-            if (this.concs_times_count == this.times_cache.length) {
-                log.debug("Writing stats at time {} for trial {}", time, source.trial());
-
-                {
-                    extendExtensibleArray(this.concs, CACHE_SIZE1);
-                    int[] data = (int[]) this.concs.getData();
-                    ArrayUtil._flatten(data, this.concs_cache, ispecout.length, 0);
-                    this.concs.write(data);
-                }
-
-                {
-                    extendExtensibleArray(this.times, CACHE_SIZE1);
-                    double[] data = (double[]) this.times.getData();
-                    System.arraycopy(this.times_cache, 0, data, 0, this.times_cache.length);
-                    this.times.write(data);
-                }
-
-                this.concs_times_count = 0;
-            }
+            if (this.concs_times_count == this.times_cache.length)
+                this.flushConcentrations(time, source.trial());
         }
 
         protected void initStimulationEvents(int elements, int species)
@@ -652,11 +674,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             final int[][][] events = source.getDiffusionEvents();
-            if (events == null) {
-                boolean have = this.initDiffusionEvents(0, 0, 0);
-                assert !have;
+            if (events == null)
                 return;
-            }
 
             if (this.diffusion_events == null) {
                 int maxneighbors = ArrayUtil.maxLength(events);
@@ -767,28 +786,11 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         private boolean initEvents_warning = false;
 
-        protected void writeEvents(double time, IGridCalc source)
+        protected void flushEvents(double time, int n)
             throws Exception
         {
-            final Collection<IGridCalc.Happening> events = source.getHappenings();
-            if (events == null) {
-                if (!initEvents_warning) {
-                    log.warn("No events, not writing anything");
-                    initEvents_warning = true;
-                }
-                return;
-            }
-
-            if (this.events == null)
-                this.initEvents();
-
-            this.events_cache.addAll(events);
-
-            int n = this.events_cache.size();
-            n -= n % this.events_event.getChunkSize()[0];
-
             log.log(n > 0 ? Level.INFO : Level.DEBUG,
-                    "Got {} events at time {}, writing {}", events.size(), time, n);
+                    "Writing {} events at time {}", n, time);
             if (n == 0)
                 return;
 
@@ -843,6 +845,28 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             this.events_cache = this.events_cache.subList(n, this.events_cache.size());
+        }
+
+        protected void writeEvents(double time, IGridCalc source)
+            throws Exception
+        {
+            final Collection<IGridCalc.Happening> events = source.getHappenings();
+            if (events == null) {
+                if (!initEvents_warning) {
+                    log.warn("No events, not writing anything");
+                    initEvents_warning = true;
+                }
+                return;
+            }
+
+            if (this.events == null)
+                this.initEvents();
+
+            this.events_cache.addAll(events);
+
+            int n = this.events_cache.size();
+            n -= n % this.events_event.getChunkSize()[0];
+            this.flushEvents(time, n);
         }
 
         protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
