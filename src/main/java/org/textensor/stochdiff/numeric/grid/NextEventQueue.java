@@ -336,9 +336,9 @@ public class NextEventQueue {
                                          this.extent, current, current - this.wait_start));
 
             if (changed) {
-                this.execute(reactionEvents[this.element()],
-                             diffusionEvents[this.element()],
-                             stimulationEvents[this.element()],
+                this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
+                             diffusionEvents != null ? diffusionEvents[this.element()] : null,
+                             stimulationEvents != null ? stimulationEvents[this.element()] : null,
                              this.extent);
                 if (this.leap) {
                     leaps += 1;
@@ -479,7 +479,8 @@ public class NextEventQueue {
             int done = updatePopulation(this.element(), this.sp, -count, this);
             updatePopulation(this.element2, this.sp, -done, this);
 
-            diffusionEvents[this.sp][this.index2] += -done;
+            if (diffusionEvents != null)
+                diffusionEvents[this.sp][this.index2] += -done;
         }
 
         @Override
@@ -815,7 +816,9 @@ public class NextEventQueue {
             for (int i = 0; i < this.products.length; i++)
                 updatePopulation(this.element(), this.products[i],
                                  this.product_stoichiometry[i] * count, this);
-            reactionEvents[this.index] += count;
+
+            if (reactionEvents != null)
+                reactionEvents[this.index] += count;
         }
 
         @Override
@@ -890,7 +893,8 @@ public class NextEventQueue {
                      int count) {
             updatePopulation(this.element(), this.sp, count, this);
 
-            stimulationEvents[this.sp] += count;
+            if (stimulationEvents != null)
+                stimulationEvents[this.sp] += count;
         }
 
         /**

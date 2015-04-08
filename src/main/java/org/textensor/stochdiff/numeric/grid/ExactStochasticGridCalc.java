@@ -67,8 +67,6 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
             time = next;
         }
 
-        this.ninjected += ArrayUtil.sum(this.diffusionEvents);
-
         /* If next > tend, it will not be actually executed, so
          * the real end time is tend. */
         return tend - tnow;

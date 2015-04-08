@@ -9,12 +9,15 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.Settings;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class GridCalc extends BaseCalc implements IGridCalc {
     static final Logger log = LogManager.getLogger(GridCalc.class);
+
+    final static boolean count_events = Settings.getProperty("stochdiff.count_events", false);
 
     ReactionTable rtab;
 
@@ -47,9 +50,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
      * Shape is [nel x nspecies]. */
     int stimulationEvents[][];
 
-    int ninjected = 0;
-
-
     protected GridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
@@ -78,25 +78,18 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         surfaceAreas = grid.getExposedAreas();
 
-        // RO
-        // ----------------------
-        // System.out.println("Number of files        : " + NspeciesFilef);
-        // System.out.println("Total numer of species : " + NspeciesOutf);
+        if (count_events) {
+            this.stimulationEvents = new int[nel][nspec];
 
-        // ----------------------
-        // RO
+            this.reactionEvents = new int[nel][rtab.getNReaction()];
 
-        StimulationTable stimTab = this.wrapper.getStimulationTable();
-        this.stimulationEvents = new int[nel][nspec];
-
-        this.reactionEvents = new int[nel][rtab.getNReaction()];
-
-        this.diffusionEvents = new int[nel][nspec][];
-        for (int iel = 0; iel < nel; iel++)
-            for (int k = 0; k < nspec; k++) {
-                int nn = neighbors[iel].length;
-                diffusionEvents[iel][k] = new int[nn];
-            }
+            this.diffusionEvents = new int[nel][nspec][];
+            for (int iel = 0; iel < nel; iel++)
+                for (int k = 0; k < nspec; k++) {
+                    int nn = neighbors[iel].length;
+                    diffusionEvents[iel][k] = new int[nn];
+                }
+        }
 
         this.dt = this.wrapper.stepSize();
     }
@@ -129,9 +122,11 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
 
                 writeTime += this.wrapper.sdRun.outputInterval;
-                ArrayUtil.fill(this.stimulationEvents, 0);
-                ArrayUtil.fill(this.diffusionEvents, 0);
-                ArrayUtil.fill(this.reactionEvents, 0);
+                if (count_events) {
+                    ArrayUtil.fill(this.stimulationEvents, 0);
+                    ArrayUtil.fill(this.diffusionEvents, 0);
+                    ArrayUtil.fill(this.reactionEvents, 0);
+                }
             }
             for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
@@ -161,8 +156,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
                 for(ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
-
-        log.info("Trial {}: injected {} particles", this.trial(), ninjected);
 
         log.info("Trial {}: total number of particles at the end: {}",
                  this.trial(), this.getParticleCount());

@@ -233,7 +233,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                         for (int k = 0; k < nk; k++) {
                             int nin = this.randomRound(as);
                             int tgt = stimtargets[i][k];
-                            ninjected += nin;
                             wkA[tgt][j] += nin;
                             this.stimulationEvents[tgt][j] += nin;
                         }
