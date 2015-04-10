@@ -24,6 +24,7 @@ from __future__ import print_function, division, unicode_literals
 import operator
 import enum
 import tables
+import functools
 import numpy as np
 import pandas as pd
 from lxml import etree
@@ -280,12 +281,14 @@ class Output(object):
         trial = self.file.get_node('/trial{}'.format(num))
         return Simulation(trial.simulation, self.model)
 
+    @functools.lru_cache()
     def simulations(self):
         trials = self.file.list_nodes('/')
         sims = [Simulation(trial.simulation, self.model) for trial in trials]
         sims.sort(key=operator.attrgetter('number'))
         return sims
 
+    @functools.lru_cache()
     def counts(self):
         """Aggregated table of particle counts
 
@@ -323,6 +326,7 @@ class Output(object):
         frame = pd.DataFrame(dict(count=series))
         return frame
 
+    @functools.lru_cache()
     def concentrations(self):
         """Counts converted to concentrations using voxel volumes
 
@@ -342,6 +346,7 @@ class Output(object):
         ans.rename(columns={'count':'concentration'}, inplace=1)
         return ans
 
+    @functools.lru_cache()
     def events(self):
         "A log of events from all simulations"
         sims = self.simulations()
