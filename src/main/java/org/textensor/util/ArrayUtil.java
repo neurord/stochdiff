@@ -85,7 +85,7 @@ public class ArrayUtil {
     public static int[] _flatten(int[] flat,
                                     int[][][] array, long columns, int fill) {
         int rows = array.length > 0 ? array[0].length : 0;
-        assert flat.length == array.length * rows * columns:
+        assert flat.length >= array.length * rows * columns:
             "flat[" + flat.length + "] rows=" + rows + " columns=" + columns +
                 " array[" + array.length + "×" + array[0].length + "×" + array[0][0].length + "]";
 

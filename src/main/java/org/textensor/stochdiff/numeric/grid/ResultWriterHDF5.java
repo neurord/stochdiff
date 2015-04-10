@@ -1098,14 +1098,15 @@ public class ResultWriterHDF5 implements ResultWriter {
             length = ((double[])data).length;
         else
             assert false;
-        if (length != ArrayUtil.product(selected)) {
+        if (length != ArrayUtil.product(selected))
             log.error("howmuch={} start={} dims={} selected={}" +
-                      " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}",
+                      " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}" +
+                      "\ndata={}",
                       howmuch, start, dims, selected,
                       ds.getSelectedDims(), ds.getStride(), ds.getDims(), ds.getStartDims(),
                       ds.getMaxDims(), ds.getChunkSize(),
-                      length, ArrayUtil.product(selected));
-        }
+                      length, ArrayUtil.product(selected),
+                      data);
     }
 
     protected static void getGridNumbers(int[][] dst,
