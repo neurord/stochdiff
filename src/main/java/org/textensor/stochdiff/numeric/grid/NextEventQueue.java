@@ -34,6 +34,13 @@ public class NextEventQueue {
 
     final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
 
+    static class Numbering {
+        int count = 0;
+        public int get() {
+            return count++;
+        }
+    }
+
     public interface Node {
         int index();
         void setIndex(int index);
@@ -134,6 +141,7 @@ public class NextEventQueue {
     public abstract class NextEvent implements Node, IGridCalc.Event {
         int index;
 
+        final private int event_number;
         final private int element;
         final String signature;
         final private int[] reactants;
@@ -190,7 +198,8 @@ public class NextEventQueue {
         public abstract IGridCalc.EventType event_type();
         Happening happening;
 
-        NextEvent(int element, String signature, int... reactants) {
+        NextEvent(int event_number, int element, String signature, int... reactants) {
+            this.event_number = event_number;
             this.element = element;
             this.signature = signature;
             this.reactants = reactants;
@@ -331,7 +340,7 @@ public class NextEventQueue {
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
-                events.add(new Happening(this.index(),
+                events.add(new Happening(this.event_number,
                                          this.leap ? IGridCalc.HappeningKind.LEAP : IGridCalc.HappeningKind.EXACT,
                                          this.extent, current, current - this.wait_start));
 
@@ -451,9 +460,10 @@ public class NextEventQueue {
          * @param signature string to use in reporting
          * @param fdiff diffusion constant
          */
-        NextDiffusion(int element, int element2, int index2,
+        NextDiffusion(int event_number,
+                      int element, int element2, int index2,
                       int sp, String signature, double fdiff) {
-            super(element, signature, sp);
+            super(event_number, element, signature, sp);
             this.element2 = element2;
             this.index2 = index2;
             this.sp = sp;
@@ -681,11 +691,12 @@ public class NextEventQueue {
          * @param rate rate of reaction
          * @param volume voxel volume
          */
-        NextReaction(int index, int element, int[] reactants, int[] products,
+        NextReaction(int event_number,
+                     int index, int element, int[] reactants, int[] products,
                      int[] reactant_stoichiometry, int[] product_stoichiometry,
                      int[] reactant_powers, String signature,
                      double rate, double volume) {
-            super(element, signature, reactants);
+            super(event_number, element, signature, reactants);
             this.index = index;
             this.products = products;
             this.reactant_stoichiometry = reactant_stoichiometry;
@@ -870,8 +881,10 @@ public class NextEventQueue {
          * @param signature description
          * @param stim stimulation parameters
          */
-        NextStimulation(int element, int neighbors, int sp, String signature, Stimulation stim) {
-            super(element, signature);
+        NextStimulation(int event_number,
+                        int element, int neighbors, int sp, String signature,
+                        Stimulation stim) {
+            super(event_number, element, signature);
             this.sp = sp;
             this.neighbors = neighbors;
             this.stim = stim;
@@ -1098,7 +1111,7 @@ public class NextEventQueue {
                      tolerance, leap_min_jump);
     }
 
-    ArrayList<NextDiffusion> createDiffusions(VolumeGrid grid, ReactionTable rtab) {
+    ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {
         int[][] neighbors = grid.getPerElementNeighbors();
         double[][] couplings = grid.getPerElementCouplingConstants();
         double[] fdiff = rtab.getDiffusionConstants();
@@ -1111,7 +1124,8 @@ public class NextEventQueue {
                 int el2 = neighbors[el][j];
                 double cc = couplings[el][j];
                 for (int sp = 0; sp < fdiff.length; sp++)
-                    ans.add(new NextDiffusion(el, el2, j, sp, species[sp],
+                    ans.add(new NextDiffusion(numbering.get(),
+                                              el, el2, j, sp, species[sp],
                                               fdiff[sp] * cc));
             }
 
@@ -1120,7 +1134,7 @@ public class NextEventQueue {
         return ans;
     }
 
-    ArrayList<NextReaction> createReactions(VolumeGrid grid, ReactionTable rtab) {
+    ArrayList<NextReaction> createReactions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {
         double[] volumes = grid.getElementVolumes();
         int n = rtab.getNReaction() * volumes.length;
         int[][]
@@ -1143,7 +1157,8 @@ public class NextEventQueue {
 
             for (int el = 0; el < volumes.length; el++) {
                 String signature = getReactionSignature(ri, rs, pi, ps, species);
-                ans.add(new NextReaction(r, el, ri, pi, rs, ps, rp,
+                ans.add(new NextReaction(numbering.get(),
+                                         r, el, ri, pi, rs, ps, rp,
                                          signature,
                                          rate, volumes[el]));
             }
@@ -1162,7 +1177,8 @@ public class NextEventQueue {
         return ans;
     }
 
-    ArrayList<NextStimulation> createStimulations(VolumeGrid grid,
+    ArrayList<NextStimulation> createStimulations(Numbering numbering,
+                                                  VolumeGrid grid,
                                                   ReactionTable rtab,
                                                   StimulationTable stimtab,
                                                   int[][] stimtargets) {
@@ -1176,7 +1192,8 @@ public class NextEventQueue {
             for (int sp = 0; sp < stim.rates.length; sp++)
                 if (stim.rates[sp] > 0) {
                     for (int el: targets)
-                        ans.add(new NextStimulation(el, targets.length,
+                        ans.add(new NextStimulation(numbering.get(),
+                                                    el, targets.length,
                                                     sp,
                                                     species[sp],
                                                     stim));
@@ -1201,9 +1218,10 @@ public class NextEventQueue {
         NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance, leap_min_jump);
 
         ArrayList<NextEvent> e = inst.newArrayList();
-        e.addAll(obj.createDiffusions(grid, rtab));
-        e.addAll(obj.createReactions(grid, rtab));
-        e.addAll(obj.createStimulations(grid, rtab, stimtab, stimtargets));
+        Numbering numbering = new Numbering();
+        e.addAll(obj.createDiffusions(numbering, grid, rtab));
+        e.addAll(obj.createReactions(numbering, grid, rtab));
+        e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
         log.info("Creating dependency graphs");
