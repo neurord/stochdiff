@@ -23,6 +23,7 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.Settings;
 import static org.textensor.util.ArrayUtil.xJoined;
 import org.textensor.util.LibUtil;
 import org.textensor.util.inst;
@@ -41,7 +42,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                 "/usr/lib/jhdf5");
     }
 
-    static final int COMPRESSION_LEVEL = 6;
+    final static int compression_level = Settings.getProperty("stochdiff.compression", 0);
 
     final protected File outputFile;
     protected H5File output;
@@ -328,7 +329,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             Dataset grid =
-                output.createCompoundDS("grid", this.model(), dims, null, chunks, COMPRESSION_LEVEL,
+                output.createCompoundDS("grid", this.model(), dims, null, chunks, compression_level,
                                         memberNames, memberTypes, null, data);
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "grid", xJoined(dims), "", xJoined(chunks));
@@ -1065,7 +1066,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         H5ScalarDS ds = (H5ScalarDS)
             this.output.createScalarDS(name, parent, type,
                                        dims, maxdims, chunks,
-                                       COMPRESSION_LEVEL, null);
+                                       compression_level, null);
         ds.init();
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), xJoined(maxdims), xJoined(chunks));
