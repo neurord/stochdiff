@@ -544,8 +544,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
             throws Exception
         {
-            log.debug("Saving stats at time {} for trial {}", time, source.trial());
-
             this.writeConcentrations(time, nel, ispecout, source);
             this.writeStimulationEvents(time, source);
             this.writeDiffusionEvents(time, source);
