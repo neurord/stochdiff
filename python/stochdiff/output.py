@@ -250,13 +250,13 @@ class Simulation(object):
         events = self._sim.events.events
         extents = self._sim.events.extents
         kinds = self._sim.events.kinds
-        df = pd.DataFrame(time=times,
-                          waited=waited,
-                          event=events,
-                          extent=extents,
-                          kind=kinds)
-        df.set_index('time')
-        return df
+        df = pd.DataFrame(dict(time=times,
+                               waited=waited,
+                               event=events,
+                               extent=extents,
+                               kind=kinds))
+        df.set_index('time', inplace=True)
+        return df.reindex_axis('waited event kind extent'.split(), axis=1)
 
 class Output(object):
     """The output for a single model, 0 or more experiments
@@ -341,3 +341,13 @@ class Output(object):
         ans = counts / volumes / PUVC
         ans.rename(columns={'count':'concentration'}, inplace=1)
         return ans
+
+    def events(self):
+        "A log of events from all simulations"
+        sims = self.simulations()
+        data = dict((i, sim.events())
+                    for (i, sim) in enumerate(sims))
+        panel = pd.Panel(data)
+        frame = panel.transpose(2, 0, 1).to_frame()
+        frame.index.names = ['trial', 'time']
+        return frame
