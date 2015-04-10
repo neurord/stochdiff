@@ -1059,7 +1059,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         long[] maxdims = dims.clone();
         maxdims[0] = H5F_UNLIMITED;
         long[] chunks = dims.clone();
-        chunks[0] = dims[0];
+
+        /* avoid too small chunks */
+        chunks[0] = 1;
+        while (ArrayUtil.product(chunks) < 1024)
+            chunks[0] *= 2;
+
+        /* do not write any data in the beginning */
         dims[0] = 0;
 
         H5ScalarDS ds = (H5ScalarDS)
