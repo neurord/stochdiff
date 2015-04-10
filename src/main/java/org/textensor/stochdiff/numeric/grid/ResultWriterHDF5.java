@@ -1104,7 +1104,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             length = ((double[])data).length;
         else
             assert false;
-        if (length != ArrayUtil.product(selected))
+        if (length < ArrayUtil.product(selected))
             log.error("howmuch={} start={} dims={} selected={}" +
                       " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}" +
                       "\ndata={}",
