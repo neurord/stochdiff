@@ -234,7 +234,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                             int nin = this.randomRound(as);
                             int tgt = stimtargets[i][k];
                             wkA[tgt][j] += nin;
-                            this.stimulationEvents[tgt][j] += nin;
+                            if (this.stimulationEvents != null)
+                                this.stimulationEvents[tgt][j] += nin;
                         }
                     }
                 }
@@ -359,7 +360,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                 for (int k = 0; k < pi.length; k++)
                     nend[pi[k]] += ngo * ps[k];
 
-                this.reactionEvents[iel][ireac] += ngo;
+                if (this.reactionEvents != null)
+                    this.reactionEvents[iel][ireac] += ngo;
             }
         }
     }
@@ -389,7 +391,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     io++;
 
                 wkB[inbr[io]][k] ++;
-                this.diffusionEvents[iel][k][io] ++;
+                if (this.diffusionEvents != null)
+                    this.diffusionEvents[iel][k][io] ++;
             }
         } else {
             /* MULTINOMIAL diffusion */
