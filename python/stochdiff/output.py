@@ -246,11 +246,11 @@ class Simulation(object):
 
     def events(self):
         "A full history of events"
-        times = self._sim.events.times
-        waited = self._sim.events.waited
-        events = self._sim.events.events
-        extents = self._sim.events.extents
-        kinds = self._sim.events.kinds
+        times = self._sim.events.times[:]
+        waited = self._sim.events.waited[:]
+        events = self._sim.events.events[:]
+        extents = self._sim.events.extents[:]
+        kinds = self._sim.events.kinds[:]
         df = pd.DataFrame(dict(time=times,
                                waited=waited,
                                event=events,
@@ -352,7 +352,4 @@ class Output(object):
         sims = self.simulations()
         data = dict((i, sim.events())
                     for (i, sim) in enumerate(sims))
-        panel = pd.Panel(data)
-        frame = panel.transpose(2, 0, 1).to_frame()
-        frame.index.names = ['trial', 'time']
-        return frame
+        return pd.concat(data)
