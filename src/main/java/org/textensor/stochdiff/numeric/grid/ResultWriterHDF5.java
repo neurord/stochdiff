@@ -995,7 +995,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected Dataset writeVector(String name, Group parent, String... items)
         throws Exception
     {
-        int maxlength = ArrayUtil.maxLength(items);
+        int maxlength = ArrayUtil.maxLength(items) * 4;
         long[] dims = {items.length};
 
         H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
