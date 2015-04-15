@@ -213,6 +213,10 @@ public class NextEventQueue {
         }
 
         @Override
+        public int event_number() {
+            return this.event_number;
+        }
+
         public int index() {
             return this.index;
         }
@@ -1324,17 +1328,17 @@ public class NextEventQueue {
     }
 
     public class Happening implements IGridCalc.Happening {
-        final int index;
+        final int event_number;
         final IGridCalc.HappeningKind kind;
         final int extent;
         final double time, waited;
 
-        public Happening(int index,
+        public Happening(int event_number,
                          IGridCalc.HappeningKind kind,
                          int extent,
                          double time,
                          double waited) {
-            this.index = index;
+            this.event_number = event_number;
             this.kind = kind;
             this.extent = extent;
             this.time = time;
@@ -1342,8 +1346,8 @@ public class NextEventQueue {
         }
 
         @Override
-        public int index() {
-            return this.index;
+        public int event_number() {
+            return this.event_number;
         }
 
         @Override

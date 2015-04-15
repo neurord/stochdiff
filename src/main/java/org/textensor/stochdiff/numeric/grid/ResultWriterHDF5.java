@@ -496,20 +496,17 @@ public class ResultWriterHDF5 implements ResultWriter {
                 int[] elements = new int[events.size()];
                 int[][] dependent = new int[events.size()][];
 
-                int i = 0;
                 for (IGridCalc.Event event: events) {
+                    int i = event.event_number();
                     descriptions[i] = event.description();
                     types[i] = event.event_type().ordinal();
                     elements[i] = event.element();
-
-                    assert event.index() == i;
 
                     Collection<IGridCalc.Event> dep = event.dependent();
                     dependent[i] = new int[dep.size()];
                     int j = 0;
                     for (IGridCalc.Event child: dep)
-                        dependent[i][j++] = child.index();
-                    i++;
+                        dependent[i][j++] = child.event_number();
                 }
 
                 {
@@ -836,7 +833,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 extendExtensibleArray(this.events_event, n);
                 int[] data = (int[]) this.events_event.getData();
                 for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).index();
+                    data[i] = this.events_cache.get(i).event_number();
                 this.events_event.write(data);
             }
 

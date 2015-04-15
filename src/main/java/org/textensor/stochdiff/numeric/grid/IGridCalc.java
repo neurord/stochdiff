@@ -39,7 +39,7 @@ public interface IGridCalc {
     }
 
     public interface Event {
-        int index();
+        int event_number();
         int element();
         String description();
         EventType event_type();
@@ -47,7 +47,7 @@ public interface IGridCalc {
     }
 
     public interface Happening {
-        int index();
+        int event_number();
         HappeningKind kind();
         int extent();
         double time();
