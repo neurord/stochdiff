@@ -94,12 +94,16 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         this.dt = this.wrapper.stepSize();
     }
 
+    protected double endtime() {
+        return this.wrapper.sdRun.getEndTime();
+    }
+
     @Override
     protected void _run() {
         init();
 
         double time = this.wrapper.sdRun.getStartTime();
-        double endtime = this.wrapper.sdRun.getEndTime();
+        double endtime = this.endtime();
 
         for(ResultWriter resultWriter: this.resultWriters)
             resultWriter.writeGrid(this.wrapper.getVolumeGrid(),

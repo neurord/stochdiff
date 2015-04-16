@@ -335,7 +335,7 @@ public class NextEventQueue {
         void update(int[][] reactionEvents,
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
-                    double current, double tstop,
+                    double current, double tstop, double timelimit,
                     List<IGridCalc.Happening> events) {
 
             assert this.extent >= 0: this.extent;
@@ -373,9 +373,9 @@ public class NextEventQueue {
             log.debug("deps: {}", this.dependent);
             log.debug("options: wait {}, leap {}", exact, leap);
 
-            if (current + leap > tstop) {
-                log.debug("Curtailing leap {}→{} to {}", current, current + leap, tstop);
-                leap = tstop - current;
+            if (current + leap > timelimit) {
+                log.debug("Curtailing leap {}→{} to {}", current, current + leap, timelimit);
+                leap = timelimit - current;
             }
 
             if (leap_min_jump != 0 && leap > exact * leap_min_jump) {
@@ -1295,10 +1295,17 @@ public class NextEventQueue {
 
     /**
      * Execute an event if the next event is before tstop.
+     * @param timelimit is the maximum time that leap events are allowed to extend to.
+     * Normally this would either be either tstop or the simulation time.
+     * @param reactionEvents is an array to store reaction event counts in.
+     * If null, events will not be counted.
+     * @param diffusionEvents similar, but for diffusion events.
+     * @param stimulationEvents similar, but for stimulation events.
+     * @param events will be used to store all Hapennings, unless null.
      *
-     * @returns Time of event.
+     * @returns Time of soonest event.
      */
-    public double advance(double time, double tstop,
+    public double advance(double time, double tstop, double timelimit,
                           int[][] reactionEvents,
                           int[][][] diffusionEvents,
                           int[][] stimulationEvents,
@@ -1317,7 +1324,7 @@ public class NextEventQueue {
         ev.update(reactionEvents,
                   diffusionEvents,
                   stimulationEvents,
-                  now, tstop,
+                  now, tstop, timelimit,
                   events);
 
         return now;

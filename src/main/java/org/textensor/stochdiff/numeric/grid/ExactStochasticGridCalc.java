@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Collection;
 
 import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 
@@ -14,6 +15,8 @@ import org.apache.logging.log4j.LogManager;
 
 public class ExactStochasticGridCalc extends StochasticGridCalc {
     static final Logger log = LogManager.getLogger(ExactStochasticGridCalc.class);
+
+    final static boolean curtail_leaps = Settings.getProperty("stochdiff.curtail_leaps", false);
 
     /* Timestamp when queue creation was finished */
     private long real_start_time;
@@ -57,8 +60,11 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
 
     @Override
     public double advance(double tnow, double tend) {
+        double endtime = this.endtime();
+
         for(double time = tnow; time < tend; ) {
             double next = this.neq.advance(time, tend,
+                                           curtail_leaps ? tend : endtime,
                                            this.reactionEvents,
                                            this.diffusionEvents,
                                            this.stimulationEvents,
