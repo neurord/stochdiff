@@ -59,7 +59,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
     static final int CACHE_SIZE1 = 1024;
-    static final int CACHE_SIZE2 = 64*1024;
+    static final int CACHE_SIZE2 = 8*1024;
 
     public ResultWriterHDF5(File output) {
         this.outputFile = new File(output + ".h5");
@@ -252,7 +252,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             this.flushConcentrations(Double.POSITIVE_INFINITY);
             if (this.events_cache != null)
-                this.flushEvents(Double.POSITIVE_INFINITY);
+                this.flushEvents(Double.POSITIVE_INFINITY, true);
         }
 
         protected Group model() throws Exception {
@@ -804,56 +804,63 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         private boolean initEvents_warning = false;
 
-        protected void flushEvents(double time)
+        protected void flushEvents(double time, boolean all)
             throws Exception
         {
             int n = this.events_cache.size();
+            if (!all)
+                n -= n % CACHE_SIZE2;
 
-            log.log(Level.DEBUG, "Writing {} events at time {}", n, time);
-            if (n == 0)
-                return;
+            int howmuch, m;
+            for (m = 0; m < n; m += howmuch) {
+                howmuch = Math.min(n - m, CACHE_SIZE2);
+                log.log(Level.DEBUG, "Writing {} events at time {}", howmuch, time);
 
-            {
-                extendExtensibleArray(this.events_time, n);
-                double[] data = (double[]) this.events_time.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).time();
-                this.events_time.write(data);
+                {
+                    extendExtensibleArray(this.events_time, howmuch);
+                    double[] data = (double[]) this.events_time.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).time();
+                    this.events_time.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.events_waited, howmuch);
+                    double[] data = (double[]) this.events_waited.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).waited();
+                    this.events_waited.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.events_event, howmuch);
+                    int[] data = (int[]) this.events_event.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).event_number();
+                    this.events_event.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.events_kind, howmuch);
+                    int[] data = (int[]) this.events_kind.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).kind().ordinal();
+                    this.events_kind.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.events_extent, howmuch);
+                    int[] data = (int[]) this.events_extent.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).extent();
+                    this.events_extent.write(data);
+                }
             }
 
-            {
-                extendExtensibleArray(this.events_waited, n);
-                double[] data = (double[]) this.events_waited.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).waited();
-                this.events_waited.write(data);
-            }
-
-            {
-                extendExtensibleArray(this.events_event, n);
-                int[] data = (int[]) this.events_event.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).event_number();
-                this.events_event.write(data);
-            }
-
-            {
-                extendExtensibleArray(this.events_kind, n);
-                int[] data = (int[]) this.events_kind.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).kind().ordinal();
-                this.events_kind.write(data);
-            }
-
-            {
-                extendExtensibleArray(this.events_extent, n);
-                int[] data = (int[]) this.events_extent.getData();
-                for (int i = 0; i < n; i++)
-                    data[i] = this.events_cache.get(i).extent();
-                this.events_extent.write(data);
-            }
-
-            this.events_cache.clear();
+            if (m == this.events_cache.size())
+                this.events_cache.clear();
+            else if (m > 0)
+                this.events_cache = this.events_cache.subList(n, this.events_cache.size());
         }
 
         protected void writeEvents(double time, IGridCalc source)
@@ -874,7 +881,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.events_cache.addAll(events);
 
             if (this.events_cache.size() > CACHE_SIZE2)
-                this.flushEvents(time);
+                this.flushEvents(time, false);
         }
 
         protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
