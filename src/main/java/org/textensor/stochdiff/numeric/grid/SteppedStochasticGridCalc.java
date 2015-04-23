@@ -418,13 +418,15 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
                 wkB[iel][k] -= ngo2;
                 wkB[inbr[j]][k] += ngo2;
-                this.diffusionEvents[iel][k][j] += ngo2;
+                if (this.diffusionEvents != null)
+                    this.diffusionEvents[iel][k][j] += ngo2;
                 ngo -= ngo2;
             } //end of loop through all but last neighbor
 
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
-            this.diffusionEvents[iel][k][inbr.length - 1] += ngo;
+            if (this.diffusionEvents != null)
+                this.diffusionEvents[iel][k][inbr.length - 1] += ngo;
 
             if (wkB[iel][k] < 0)
                 log.warn("parallelAndSharedDiffusionStep multinomial: wkB[iel][k] = {} is negative",
@@ -449,7 +451,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     io++;
 
                 wkB[inbr[io]][k] += 1;
-                this.diffusionEvents[iel][k][io] ++;
+                if (this.diffusionEvents != null)
+                    this.diffusionEvents[iel][k][io] ++;
             }
         }
     }
