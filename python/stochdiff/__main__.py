@@ -55,7 +55,7 @@ def filter_times(limits, times):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file', type=output.Output)
-parser.add_argument('--save')
+parser.add_argument('--save', nargs='?', const=True)
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
 parser.add_argument('--dependencies', action='store_true')
@@ -318,9 +318,13 @@ def specie_indices(items, species):
 
 def _history(simul, species, region_indices, region_labels,
              times, counts, title, opts):
+
+    import matplotlib
+    if opts.save:
+        matplotlib.use('Agg')
     from matplotlib import pyplot
 
-    full_title = 'particle numbers in {}: species {}'.format(title,
+    full_title = '{}, particle numbers of species {}'.format(title,
                                                              ', '.join(species))
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
@@ -335,7 +339,12 @@ def _history(simul, species, region_indices, region_labels,
             ax.plot(times, y, opts.style, color=next(colors),
                     label='{} in {}'.format(name, rlabel))
     ax.legend(loc='best')
-    pyplot.show(block=True)
+    if opts.save:
+        fname = opts.save + ', particle numbers of species {}.svg'.format(', '.join(species))
+        f.savefig(fname)
+        print('saved {}'.format(fname))
+    else:
+        pyplot.show(block=True)
 
 def find_regions(regions, spec):
     if spec:
@@ -385,6 +394,9 @@ def print_config(output):
 
 if __name__ == '__main__':
     opts = parser.parse_args()
+    if opts.save is True:
+        opts.save = os.path.splitext(opts.file.file.filename)[0]
+
     if opts.connections:
         dot_connections(opts.file)
     elif opts.dependencies:
