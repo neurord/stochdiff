@@ -327,24 +327,26 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
             /* Update the new quantities in npn */
 
-            int navail = nend[ri[0]] / rs[0];
-            for (int k = 1; k < ri.length; k++) {
-                int navail2 = nend[ri[k]] / rs[k];
-                if (navail2 < navail)
-                    navail = navail2;
-            }
+            if (ri.length > 0) {
+                int navail = nend[ri[0]] / rs[0];
+                for (int k = 1; k < ri.length; k++) {
+                    int navail2 = nend[ri[k]] / rs[k];
+                    if (navail2 < navail)
+                        navail = navail2;
+                }
 
-            if (ngo > navail) {
-                /* TODO as for diffusion, we've got more particles going
-                 * than there actually are. Should regenerate all
-                 * reactions on this element
-                 * or use a binomial to share them out
-                 * or use a smaller timestep.
-                 */
-                if (++reactionStep_nwarn2 < 500)
-                    log.warn("reaction {} ran out of particles - need {} but have {}",
-                             ireac, ngo, navail);
-                ngo = navail;
+                if (ngo > navail) {
+                    /* TODO as for diffusion, we've got more particles going
+                     * than there actually are. Should regenerate all
+                     * reactions on this element
+                     * or use a binomial to share them out
+                     * or use a smaller timestep.
+                     */
+                    if (++reactionStep_nwarn2 < 500)
+                        log.warn("reaction {} ran out of particles - need {} but have {}",
+                                 ireac, ngo, navail);
+                    ngo = navail;
+                }
             }
 
             if (ngo > 0) {
