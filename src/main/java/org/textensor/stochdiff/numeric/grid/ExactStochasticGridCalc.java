@@ -83,15 +83,20 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
                                              int[] rp,
                                              double rate, double vol,
                                              int[] nstart) {
-        double ans = rate;
+        double ans = rate * vol;
+
         for (int i = 0; i < ri.length; i++) {
             /* Special case for pseudo-higher-order reactions to make
-               sure that the population doesn't go negative. */
+               sure that the population doesn't go negative.
+               Stoichiometry is only used for this check. */
             if (nstart[ri[i]] < rs[i])
                 return 0;
-            ans *= nstart[ri[i]];
-            for (int p = 1; p < rp[i]; p++)
-                ans *= (nstart[ri[i]] - p) * PARTICLES_PUVC / vol;
+
+            /* Reactants must have non-zero stoichiometry, but can have nil power.
+               Reactants with nil power do not appear in the propensity formula, except
+               for the stoichiometry check above. */
+            for (int p = 0; p < rp[i]; p++)
+                ans *= (nstart[ri[i]] - p) * NM_PER_PARTICLE_PUV / vol;
         }
 
         return ans;
