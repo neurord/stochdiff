@@ -219,11 +219,4 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         else
             return i < intlogs.length ? intlogs[i] : Math.log(i);
     }
-
-    protected static double ln_propensity(int n, int p) {
-        if (p == 0)
-            return 0;
-        else
-            return p * intlog(n);
-    }
 }

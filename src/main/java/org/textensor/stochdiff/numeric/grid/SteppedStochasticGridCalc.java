@@ -457,39 +457,35 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
     }
 
-
     /* Total number of possible reactions is the smallest number of
      * particles divided by stoichiometry.
+     *
+     * @returns propensity and maximum reaction extent
      */
     public static Object[] calculatePropensity(int[] ri, int[] pi,
                                                int[] rs, int[] ps,
                                                int[] rp,
                                                double lnrate, double lnvol,
                                                int[] nstart) {
-        double lnp = lnrate;
+        double lnp = lnrate + lnvol;
 
-        int n = nstart[ri[0]];
-        int ns = n / rs[0];
-        int p = rp[0];
-        for (int k = 1; k < ri.length; k++) {
-            int nk = nstart[ri[k]];
-            int nks = nk / rs[k];
-            int pk = rp[k];
+        int ns = Integer.MAX_VALUE;
 
-            if (nks < ns) {
-                lnp += ln_propensity(n, p);
-                n = nk;
+        for (int k = 0; k < ri.length; k++) {
+            int n = nstart[ri[k]];
+            int p = rp[k];
+            int nks = n / rs[k];
+
+            if (nks < ns)
                 ns = nks;
-                p = pk;
-            } else {
-                lnp += intlog(nk) * pk;
-            }
 
-            lnp -= lnvol + LN_PARTICLES_PUVC;
+            if (p > 0)
+                /* FIXME: use falling factorial */
+                lnp += p * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
         }
-        lnp += ln_propensity(n - 1, p - 1) - intlog(p) - (p - 1) * (lnvol + LN_PARTICLES_PUVC);
 
-        return new Object[]{lnp, n};
+        log.info("lnrate={} lnvol={} rp={} → lnp={},ns={}", lnrate, lnvol, rp, lnp, ns);
+        return new Object[]{lnp, ns};
     }
 
     public Collection<IGridCalc.Event> getEvents() {
