@@ -121,7 +121,7 @@ public class Reaction {
             ret[2][i] = refs.get(i).getPower();
             assert ret[0][i] >= 0;
             assert ret[1][i] >= 1;
-            assert ret[2][i] >= 1;
+            assert ret[2][i] >= 0;
         }
 
         return ret;

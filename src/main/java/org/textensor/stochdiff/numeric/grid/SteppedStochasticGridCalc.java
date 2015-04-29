@@ -468,6 +468,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                                                double lnrate, double lnvol,
                                                int[] nstart) {
         double lnp = lnrate + lnvol;
+        boolean modified = false;
 
         int ns = Integer.MAX_VALUE;
 
@@ -479,10 +480,16 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             if (nks < ns)
                 ns = nks;
 
-            if (p > 0)
+            if (p > 0) {
                 /* FIXME: use falling factorial */
                 lnp += p * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
+                modified = true;
+            }
         }
+
+        if (!modified && ns > 0)
+            /* Apply a kludge so the stepper can generate a proper random number */
+            lnp -= intlog(ns);
 
         log.info("lnrate={} lnvol={} rp={} → lnp={},ns={}", lnrate, lnvol, rp, lnp, ns);
         return new Object[]{lnp, ns};

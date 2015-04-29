@@ -77,7 +77,7 @@
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="substrate">
-          <xs:attribute name="power" type="xs:positiveInteger" />
+          <xs:attribute name="power" type="non-negative-integer" />
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -334,6 +334,12 @@
 
   <xs:simpleType name="non-negative-real">
     <xs:restriction base="xs:double">
+      <xs:minInclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="non-negative-integer">
+    <xs:restriction base="xs:integer">
       <xs:minInclusive value="0" />
     </xs:restriction>
   </xs:simpleType>
