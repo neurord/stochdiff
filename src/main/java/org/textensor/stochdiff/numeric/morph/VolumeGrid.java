@@ -337,15 +337,11 @@ public class VolumeGrid {
                 int[] ms = getMatches(areaHM, sti);
                 if (ms != null && ms.length > 0) {
                     ret[i] = ms;
-                } else {
-                    ret[i] = new int[0];
-                    E.warning("There are no matches for target: " + sti);
-                }
+                } else
+                    throw new RuntimeException("There are no matches for target: " + sti);
 
-            } else {
-                E.warning("An action is defined for area " + sti + " but there are no points with this label");
-                ret[i] = new int[0];
-            }
+            } else
+                throw new RuntimeException("An action is defined for area " + sti + " but there are no points with this label");
         }
         return ret;
     }

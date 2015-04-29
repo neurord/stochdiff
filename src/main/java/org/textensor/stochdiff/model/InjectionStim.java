@@ -31,8 +31,11 @@ public class InjectionStim {
         vrate[specInd] = rate;
         // above allows option of injecting a combination of species
 
-        if (Double.isInfinite(this.getEnd()) && numTrains > 1)
+        if (Double.isInfinite(this.getEnd()) && this.getNumTrains() > 1)
             throw new RuntimeException("end must be specified with numTrains");
+
+        if (injectionSite == null)
+            throw new RuntimeException("injectionSite must be specified");
 
         for (int i = 0; i < this.getNumTrains(); i++)
             if (period == null)
