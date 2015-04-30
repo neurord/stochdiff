@@ -28,6 +28,35 @@ public class StimulationTable {
                                  getClass().getSimpleName(), site,
                                  onset, duration, period, end);
         }
+
+        public double effectiveRate(double start, double dt) {
+            if (Double.isNaN(this.period))
+                return pulseOverlap(start, dt, this.onset, this.duration);
+            else {
+                // just compare with nearest pulse
+                // NB, assumes dt smaller than interpulse interval
+                int ipulse = (int)((start - this.onset) / this.period + 0.5);
+                double pons = this.onset + ipulse * this.period;
+                return pulseOverlap(start, dt, pons, this.duration);
+            }
+        }
+
+        private double pulseOverlap(double t, double dt, double ons, double dur) {
+            if (t + dt < ons || t > ons + dur)
+                return 0;
+            else if (t >= ons && t + dt <= ons + dur)
+                // fully inside;
+                return 1;
+            else if (t <= ons && t + dt >= ons + dur)
+                // spans whole pulse;
+                return dur / dt;
+            else if (t <= ons)
+                // straddles start
+                return (t + dt - ons) / dt;
+            else
+                // straddles end;
+                return (ons + dur - t) / dt;
+        }
     }
 
     private final ArrayList<Stimulation> stims = inst.newArrayList();
@@ -48,48 +77,13 @@ public class StimulationTable {
         double[][] ret = new double[getNStim()][nspec];
         for (int i = 0; i < ret.length; i++) {
             Stimulation stim = this.stims.get(i);
-            double f = effectiveRate(time, dt,
-                                     stim.onset, stim.duration, stim.period, stim.end);
+            double f = stim.effectiveRate(time, dt);
 
             if (f > 0)
                 for (int j = 0; j < nspec; j++)
                     ret[i][j] = f * stim.rates[j] * dt;
         }
         return ret;
-    }
-
-    private double effectiveRate(double t, double dt, double ons, double dur, double per, double end) {
-        if (per < 0)
-            return pulseOverlap(t, dt, ons, dur);
-        else {
-            if (t > end)
-                return 0;
-            else {
-                // just compare with nearest pulse
-                // NB, assumes dt smaller than interpulse interval
-                int ipulse = (int)((t - ons) / per + 0.5);
-                double pons = ons + ipulse * per;
-                return pulseOverlap(t, dt, pons, dur);
-            }
-        }
-    }
-
-
-    private double pulseOverlap(double t, double dt, double ons, double dur) {
-        if (t + dt < ons || t > ons + dur)
-            return 0;
-        else if (t >= ons && t + dt <= ons + dur)
-            // fully inside;
-            return 1;
-        else if (t <= ons && t + dt >= ons + dur)
-            // spans whole pulse;
-            return dur / dt;
-        else if (t <= ons)
-            // straddles start
-            return (t + dt - ons) / dt;
-        else
-            // straddles end;
-            return (ons + dur - t) / dt;
     }
 
     public int getNStim() {
@@ -106,26 +100,4 @@ public class StimulationTable {
             ret[i] = this.stims.get(i).site;
         return ret;
     }
-
-
-    /*
-     * following is an alternative stimulation approach - could be useful within
-     * the main calculation loop?
-     *  // update position in each injection profile. If the value for this //
-     * step is non-zero, just add them to the correspoinding element of // wkA //
-     * Extensions: could need // - distributed injections (shared over multiple
-     * volumes) // - solution injections (multiple species from one profile)
-     *
-     * for (int iin = 0; iin < ninjection; iin++) { double finj =
-     * injvals[iin][injpos[iin]]; // if the next step will take us over a step
-     * edge in the injection, // need to work scale by the amount of time in each
-     * part if (tnow + dt > injsteps[iin][injpos[iin]+1]) { double fns = (tnow +
-     * dt - injsteps[iin][injpos[iin]+1]) / dt; injpos[iin] += 1;
-     *
-     * finj = (1. - fns) * finj + fns + injvals[iin][injpos[iin]];
-     *
-     * int np = (int)(finj * dt); if (np > 0) { wkA[injelt[iin]][injspec[iin]] +=
-     * np; } } }
-     */
-
 }
