@@ -208,7 +208,8 @@ class Simulation(object):
         self.model = model
 
     def times(self):
-        return np.round(self._sim.times, decimals=6)
+        times = self._sim.times[:]
+        return np.round(times, decimals=max(3-int(np.log10(times.max())), 0))
 
     def counts(self):
         data = self._sim.concentrations
