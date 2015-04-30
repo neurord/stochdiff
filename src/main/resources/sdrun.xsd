@@ -71,17 +71,10 @@
   <xs:complexType name="substrate">
     <xs:attribute name="specieID" type="xs:string" use="required" />
     <xs:attribute name="n" type="xs:positiveInteger" />
+    <xs:attribute name="power" type="non-negative-integer" />
   </xs:complexType>
 
-  <xs:element name="Reactant">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="substrate">
-          <xs:attribute name="power" type="non-negative-integer" />
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
+  <xs:element name="Reactant" type="substrate" />
 
   <xs:element name="Product" type="substrate" />
 
