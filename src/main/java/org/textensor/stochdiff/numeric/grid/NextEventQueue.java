@@ -928,10 +928,10 @@ public class NextEventQueue {
             double tp;
 
             if (Double.isNaN(this.stim.period)) {
-                tc = Math.max(current, this.stim.onset); /* beginning of the relevant period,
-                                                            expressed in real time */
-                tp = tc - this.stim.onset;               /* real time since the beggining of
-                                                            the relevant period */
+                tc = this.stim.onset;                         /* beginning of the relevant period,
+                                                                 expressed in real time */
+                tp = Math.max(current - this.stim.onset, 0);  /* real time since the beggining of
+                                                                 the relevant period */
             } else {
                 double nc = (current - this.stim.onset) / this.stim.period;
                 if (nc < 0)
@@ -973,7 +973,10 @@ public class NextEventQueue {
 
         @Override
         double exact_time(double current) {
-            return _continous_delta_to_real_time(current, super.exact_time(current), false) - current;
+            double cont = super.exact_time(current);
+            double real = _continous_delta_to_real_time(current, cont, false);
+            // log.debug("exact_time: current={} + {} → {} ({} advance)", current, cont, real, real - current);
+            return real - current;
         }
 
         @Override
@@ -1315,7 +1318,7 @@ public class NextEventQueue {
         double now = ev.time;
 
         if (now > tstop) {
-            log.debug("Next event is {} time {}, past stop at {}", ev, time, tstop);
+            log.debug("Next event is {} time {}, past stop at {}", ev, now, tstop);
             return tstop;
         } else
             log.debug("Advanced {}→{} with event {} {} extent={}",
