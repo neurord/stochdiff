@@ -38,11 +38,12 @@ public class InitialConditions {
 
     public synchronized ConcentrationSet getDefaultConcentrations() {
         if (this.defaultConcs == null) {
-            for (ConcentrationSet set: this.concentrationSets)
-                if (!set.hasRegion()) {
-                    this.defaultConcs = set;
-                    break;
-                }
+            if (this.concentrationSets != null)
+                for (ConcentrationSet set: this.concentrationSets)
+                    if (!set.hasRegion()) {
+                        this.defaultConcs = set;
+                        break;
+                    }
             if (this.defaultConcs == null)
                 this.defaultConcs = new ConcentrationSet();
         }
