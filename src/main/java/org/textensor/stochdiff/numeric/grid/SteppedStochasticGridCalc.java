@@ -503,7 +503,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             /* Apply a kludge so the stepper can generate a proper random number */
             lnp -= intlog(ns);
 
-        log.info("lnrate={} lnvol={} rp={} → lnp={},ns={}", lnrate, lnvol, rp, lnp, ns);
         return new Object[]{lnp, ns};
     }
 
