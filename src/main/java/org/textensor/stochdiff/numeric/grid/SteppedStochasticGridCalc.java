@@ -90,6 +90,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     double[][] pSharedOut;
     double[][][] fSharedExit;
 
+    int event_count = 0;
+
     public SteppedStochasticGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
@@ -238,6 +240,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                                 this.stimulationEvents[tgt][j] += nin;
                         }
                     }
+
+                    this.event_count ++;
                 }
             }
         }
@@ -270,6 +274,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                             assert false;
                         }
                     }
+
+                    this.event_count ++;
                 }
             }
         }
@@ -284,14 +290,22 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             // volume
             int[] nstart = wkB[iel], nend = wkA[iel];
 
-            for (int ireac = 0; ireac < rtab.getNReaction(); ireac++)
+            for (int ireac = 0; ireac < rtab.getNReaction(); ireac++) {
                 reactionStep(nstart, nend, iel, ireac);
+                this.event_count ++;
+            }
         }
 
         // now wkA contains the actual numbers again;
         if ((tend - tnow) - dt > 0.01 * dt)
             log.warn("Step {} is different than dt={}", tend - tnow, dt);
+
         return dt;
+    }
+
+    @Override
+    protected long eventCount() {
+        return this.event_count;
     }
 
     private int reactionStep_nwarn1, reactionStep_nwarn2;

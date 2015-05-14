@@ -43,6 +43,8 @@ public class DeterministicGridCalc extends GridCalc {
     double[][] wktm1;
     double[][] wkC;
 
+    int event_count = 0;
+
     public DeterministicGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
@@ -186,6 +188,8 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
+        this.event_count += nel * nspec;
+
         double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
 
         // reaction step;
@@ -207,11 +211,13 @@ public class DeterministicGridCalc extends GridCalc {
                         concinc[i] += pinj[i] * fconc * eltstimshare[stimnum][iel];
                         if (concinc[i] < 0)
                             log.error("negative concentration: {}", concinc);
+                        this.event_count ++;
                     }
                 }
             }
 
             reacStep(wkC[iel], dt, concnull ? null : concinc);
+            this.event_count += wkC[iel].length;
         }
 
         // cycle the solution arrays
@@ -222,6 +228,11 @@ public class DeterministicGridCalc extends GridCalc {
         wkC = wkT;
 
         return dt;
+    }
+
+    @Override
+    protected long eventCount() {
+        return this.event_count;
     }
 
     private void reacStep(double[] concs, double deltat, double[] concinc) {

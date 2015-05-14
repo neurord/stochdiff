@@ -50,12 +50,17 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
         log.info("Accuracy control parameter ε={}", this.neq.tolerance);
         log.info("Leapt {} ({} events, {} e/l average), waited {} times",
                  this.neq.leaps, this.neq.leap_extent,
-                 ((double)this.neq.leap_extent)/this.neq.leaps,
+                 (double)this.neq.leap_extent / this.neq.leaps,
                  this.neq.normal_waits);
 
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.wrapper.sdRun.getEndTime() - this.wrapper.sdRun.getStartTime())/time;
         log.info("Real simulation took {} ms, {} ms/s", time, speed);
+    }
+
+    @Override
+    protected long eventCount() {
+        return this.neq.leaps + this.neq.normal_waits;
     }
 
     @Override

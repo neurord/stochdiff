@@ -117,10 +117,19 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         double[] writeTimeArray = new double[this.wrapper.fnmsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
 
+        long old_events = 0;
+        long old_wall_time = System.currentTimeMillis();
         while (time <= endtime) {
 
             if (time >= writeTime) {
-                log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
+                long events = this.eventCount();
+                long wall_time = System.currentTimeMillis();
+                double speed = (double)(events - old_events) / (wall_time - old_wall_time);
+                log.info("Trial {}: time {} dt={} events={} {}/ms",
+                         this.trial(), time, dt,
+                         events - old_events, (int) speed);
+                old_events = events;
+                old_wall_time = wall_time;
 
                 for(ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
@@ -177,6 +186,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     protected abstract double advance(double now, double end);
 
     protected void footer() {}
+
+    abstract protected long eventCount();
 
     @Override
     public int getNumberElements() {
