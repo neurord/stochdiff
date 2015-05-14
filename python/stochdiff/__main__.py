@@ -14,6 +14,7 @@ from lxml import etree
 from pygments import highlight
 from pygments.lexers import XmlLexer
 from pygments.formatters import Terminal256Formatter as Formatter
+import pandas as pd
 
 from . import output
 
@@ -56,6 +57,7 @@ def filter_times(limits, times):
 parser = argparse.ArgumentParser()
 parser.add_argument('file', type=output.Output)
 parser.add_argument('--save', nargs='?', const=True)
+parser.add_argument('--save-data', nargs='?', const=True)
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
 parser.add_argument('--dependencies', action='store_true')
@@ -316,6 +318,13 @@ def specie_indices(items, species):
     species = list(species)
     return np.array([species.index(i) for i in items])
 
+def generate_histories(species, region_indices, region_labels,
+                       times, counts):
+    for name in species:
+        for rlabel, rindi in zip(region_labels, region_indices):
+            y = counts.loc[rindi][name].values
+            yield times, y, name, rlabel
+
 def _history(simul, species, region_indices, region_labels,
              times, counts, title, opts):
 
@@ -333,11 +342,10 @@ def _history(simul, species, region_indices, region_labels,
     ax.set_xlabel('t / ms')
     ax.set_ylabel('particle numbers')
     colors = itertools.cycle('rgbkcmy')
-    for name in species:
-        for rlabel, rindi in zip(region_labels, region_indices):
-            y = counts.loc[rindi][name].values
-            ax.plot(times, y, opts.style, color=next(colors),
-                    label='{} in {}'.format(name, rlabel))
+    for x, y, name, rlabel in generate_histories(species, region_indices, region_labels,
+                                                 times, counts):
+        ax.plot(x, y, opts.style, color=next(colors),
+                label='{} in {}'.format(name, rlabel))
     ax.legend(loc='best')
     if opts.save:
         fname = opts.save + ', particle numbers of species {}.svg'.format(', '.join(species))
@@ -345,6 +353,17 @@ def _history(simul, species, region_indices, region_labels,
         print('saved {}'.format(fname))
     else:
         pyplot.show(block=True)
+
+def _history_data(simul, species, region_indices, region_labels,
+                  times, counts, title, opts):
+    data = generate_histories(species, region_indices, region_labels,
+                              times, counts)
+    xx, yy, names, rlabels = zip(*data)
+    d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
+    df = pd.DataFrame(d, index=xx[0])
+    fname = opts.save_data + ', particle numbers.pickle'
+    df.to_pickle(fname)
+    print('saved', fname)
 
 def find_regions(regions, spec):
     if spec:
@@ -372,10 +391,16 @@ def plot_history(output, species):
     region_indices = np.arange(len(regions))[(regions[:, None] == region_numbers).any(axis=1)]
     region_labels = model.region_names(region_numbers)
 
-    _history(simul, species,
-             region_indices, region_labels,
-             simul.times()[when], simul.counts()[when],
-             title=output.file.filename, opts=opts)
+    if opts.save_data:
+        _history_data(simul, species,
+                      region_indices, region_labels,
+                      simul.times()[when], simul.counts()[when],
+                      title=output.file.filename, opts=opts)
+    else:
+        _history(simul, species,
+                 region_indices, region_labels,
+                 simul.times()[when], simul.counts()[when],
+                 title=output.file.filename, opts=opts)
 
 def print_config(output):
     tree = output.simulation(0).config()
@@ -396,6 +421,8 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     if opts.save is True:
         opts.save = os.path.splitext(opts.file.file.filename)[0]
+    if opts.save_data is True:
+        opts.save_data = os.path.splitext(opts.file.file.filename)[0]
 
     if opts.connections:
         dot_connections(opts.file)
