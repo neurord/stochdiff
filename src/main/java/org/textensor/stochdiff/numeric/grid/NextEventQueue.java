@@ -34,7 +34,7 @@ public class NextEventQueue {
 
     final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
 
-    static class Numbering {
+    public static class Numbering {
         int count = 0;
         public int get() {
             return count++;

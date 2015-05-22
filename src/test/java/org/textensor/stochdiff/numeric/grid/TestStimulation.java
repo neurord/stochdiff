@@ -29,9 +29,10 @@ public class TestStimulation {
         @Override public long used() { return 0; }
     }
 
-    NextEventQueue queue = new NextEventQueue(new FakeRandom(), new int[1][1]);
+    NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], 0.1, 1);
+    NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
-        queue.createStimulations(null, stimtab, new int[][]{{0}});
+        queue.createStimulations(numbering, null, null, stimtab, new int[][]{{0}});
 
     @Test
     public void testStim() {
@@ -46,7 +47,7 @@ public class TestStimulation {
         assertEquals(stims.size(), 1);
 
         NextEventQueue.NextStimulation ev = stims.get(0);
-        assertEquals(ev._propensity(), rates[0]);
+        assertEquals(ev.calcPropensity(), rates[0]);
 
         assertEquals(ev.time(), stim.onset + 1/rates[0]);
 

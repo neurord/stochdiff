@@ -68,8 +68,9 @@ public class TestStepGenerator {
 
         final double p = mean / ntot;
 
+        final StepGenerator stepper = new InterpolatingStepGenerator(distribution_t.BINOMIAL, random);
         for (int i = 0; i < ntrials; i++)
-            nsp += StepGenerator.gaussianStep(ntot, p, random.gaussian(), random.random());
+            nsp += stepper.gaussianStep(ntot, p);
 
         double sigma = Math.sqrt(mean * (ntrials - mean) / ntrials) * Math.sqrt(ntrials);
         log.info("gaussian step: mean={} σ={} expect={} actual={}({}σ)",
@@ -80,8 +81,8 @@ public class TestStepGenerator {
     @DataProvider
     public static Object[][] simple() {
         return TestUtil.multiply
-            (   new Object[]{ InterpolatingStepGenerator.getBinomialGenerator(),
-                              InterpolatingStepGenerator.getPoissonGenerator() },
+            (   new Object[]{ new InterpolatingStepGenerator(distribution_t.BINOMIAL, new MersenneTwister(0)),
+                              new InterpolatingStepGenerator(distribution_t.POISSON, new MersenneTwister(0)) },
                 new Object[]{
                     new Object[]{ 1, 0., 0., 0 }, // fails now because only n>=2 is supported
                     new Object[]{ 2, 0., 0., 0 },
@@ -107,9 +108,10 @@ public class TestStepGenerator {
     @DataProvider
     public static Object[][] randomized() {
         Random r = new Random();
+
         return TestUtil.multiply
-            (   new Object[]{ InterpolatingStepGenerator.getBinomialGenerator(),
-                              InterpolatingStepGenerator.getPoissonGenerator() },
+            (   new Object[]{ new InterpolatingStepGenerator(distribution_t.BINOMIAL, new MersenneTwister(0)),
+                              new InterpolatingStepGenerator(distribution_t.POISSON, new MersenneTwister(0)) },
                 new Object[]{   /* n, lnp, rs, expected */
                     new Object[]{ 2 + r.nextInt(120), Float.NEGATIVE_INFINITY,
                                   rs(r, 1000000), 0 },
