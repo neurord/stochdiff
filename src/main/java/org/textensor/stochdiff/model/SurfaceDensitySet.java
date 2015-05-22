@@ -12,16 +12,16 @@ public class SurfaceDensitySet implements Regional {
 
     @XmlAttribute public String region;
 
-    @XmlElement(name="SurfaceDensity")
-    public ArrayList<SurfaceDensity> sds;
+    @XmlElement(name="PicoSD")
+    public ArrayList<PicoSD> sds;
 
-    transient HashMap<String, SurfaceDensity> sdHM;
+    transient HashMap<String, PicoSD> sdHM;
 
-    public HashMap<String, SurfaceDensity> getSurfaceDensityHM() {
+    public HashMap<String, PicoSD> getSurfaceDensityHM() {
         if (sdHM == null) {
             sdHM = inst.newHashMap();
             if (sds != null)
-                for (SurfaceDensity sd : sds)
+                for (PicoSD sd : sds)
                     sdHM.put(sd.specieID, sd);
         }
         return sdHM;
@@ -29,7 +29,7 @@ public class SurfaceDensitySet implements Regional {
 
     public double[] getPicoSurfaceDensities(String[] ids) {
         double[] ret = new double[ids.length];
-        HashMap<String, SurfaceDensity> chm = getSurfaceDensityHM();
+        HashMap<String, PicoSD> chm = getSurfaceDensityHM();
 
         for (int i = 0; i < ids.length; i++)
             if (chm.containsKey(ids[i]))

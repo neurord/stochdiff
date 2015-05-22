@@ -1,9 +1,13 @@
 package org.textensor.stochdiff.model;
 
+import org.textensor.stochdiff.inter.FloatValued;
 
-public class PicoSD extends SurfaceDensity {
+import javax.xml.bind.annotation.*;
 
-    public double value;
+public class PicoSD implements FloatValued {
+
+    @XmlAttribute public String specieID;
+    @XmlAttribute public double value;
 
     public double getPicoMoleSurfaceDensity() {
         return value;

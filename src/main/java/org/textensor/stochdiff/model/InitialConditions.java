@@ -21,7 +21,7 @@ public class InitialConditions {
 
     transient private HashMap<String, ConcentrationSet> concSetHM;
 
-    @XmlElement(name="SurfanceDensitySet")
+    @XmlElement(name="SurfaceDensitySet")
     public ArrayList<SurfaceDensitySet> sdSets;
 
     transient private HashMap<String, SurfaceDensitySet> sdSetHM;

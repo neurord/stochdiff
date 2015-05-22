@@ -335,7 +335,7 @@ The actual size of the elements depends on the total radius or length of the com
 
     If maxelementsize is large enough to create only a single voxel in the height dimension
     (single submembrane voxel and no cytosolic voxels) then the initial condition specification
-    "surfaceDensitySet" will give half the total number of molecules compared to smaller
+    <SurfaceDensitySet> will give half the total number of molecules compared to smaller
     maxelementsize producing two submembrane voxels with 1 or more cytosolic voxels.
 
 The timestep statement specifies the time step, in milliseconds, used in fixed step calculations:
