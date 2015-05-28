@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Collection;
 
 import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.SDCalcType;
 import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-public class ExactStochasticGridCalc extends StochasticGridCalc {
-    static final Logger log = LogManager.getLogger(ExactStochasticGridCalc.class);
+public class AdaptiveGridCalc extends StochasticGridCalc {
+    static final Logger log = LogManager.getLogger(AdaptiveGridCalc.class);
 
     final static boolean curtail_leaps = Settings.getProperty("stochdiff.curtail_leaps", false);
 
@@ -25,7 +26,7 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     ArrayList<IGridCalc.Happening> events
         = log_events ? new ArrayList<IGridCalc.Happening>() : null;
 
-    public ExactStochasticGridCalc(int trial, SDRunWrapper sdm) {
+    public AdaptiveGridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
     }
 
@@ -33,10 +34,16 @@ public class ExactStochasticGridCalc extends StochasticGridCalc {
     public final void init() {
         super.init();
 
+        SDCalcType calculationType = SDCalcType.valueOf(this.wrapper.sdRun.calculation);
+        assert calculationType == SDCalcType.GRID_EXACT ||
+               calculationType == SDCalcType.GRID_ADAPTIVE;
+        boolean adaptive = calculationType == SDCalcType.GRID_ADAPTIVE;
+
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
                                          this.wrapper.getVolumeGrid(), rtab,
                                          this.wrapper.getStimulationTable(),
                                          this.wrapper.getStimulationTargets(),
+                                         adaptive,
                                          this.wrapper.sdRun.tolerance,
                                          this.wrapper.sdRun.leap_min_jump,
                                          this.trial() == 0);

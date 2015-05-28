@@ -29,7 +29,7 @@ public class TestStimulation {
         @Override public long used() { return 0; }
     }
 
-    NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], 0.1, 1);
+    NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], true, 0.1, 1);
     NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
         queue.createStimulations(numbering, null, null, stimtab, new int[][]{{0}});

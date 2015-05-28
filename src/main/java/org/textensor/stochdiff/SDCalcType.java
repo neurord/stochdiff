@@ -2,7 +2,7 @@ package org.textensor.stochdiff;
 
 import org.textensor.stochdiff.numeric.grid.DeterministicGridCalc;
 import org.textensor.stochdiff.numeric.grid.SteppedStochasticGridCalc;
-import org.textensor.stochdiff.numeric.grid.ExactStochasticGridCalc;
+import org.textensor.stochdiff.numeric.grid.AdaptiveGridCalc;
 import org.textensor.stochdiff.numeric.pool.*;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.model.SDRunWrapper;
@@ -34,7 +34,8 @@ public enum SDCalcType {
     SMP_RK4(RungeKutta4PoolCalc.class),
     GRID_STEPPED_CONTINUOUS(DeterministicGridCalc.class),
     GRID_STEPPED_STOCHASTIC(SteppedStochasticGridCalc.class),
-    GRID_STEPPED_EXACT(ExactStochasticGridCalc.class);
+    GRID_EXACT(AdaptiveGridCalc.class),
+    GRID_ADAPTIVE(AdaptiveGridCalc.class);
 
     static final Logger log = LogManager.getLogger(SDCalcType.class);
 

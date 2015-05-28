@@ -332,6 +332,39 @@ public class NextEventQueue {
             return pop;
         }
 
+        void pick_time(double current, double timelimit, double tolerance) {
+
+            final double exact = this.exact_time(current);
+
+            if (adaptive) {
+                double leap = this.leap_time(current, tolerance);
+
+                log.debug("deps: {}", this.dependent);
+                log.debug("options: wait {}, leap {}", exact, leap);
+
+                if (current + leap > timelimit) {
+                    log.debug("Curtailing leap {}→{} to {}", current, current + leap, timelimit);
+                    leap = timelimit - current;
+                }
+
+                if (leap > exact * leap_min_jump) {
+                    assert update_times;
+
+                    int count = this.leap_count(current, leap);
+
+                    log.debug("{}: leaping {} {}→{}, extent {}",
+                              this, leap, current, current + leap, count);
+                    this.setEvent(count, true, current, current + leap);
+                    return;
+                }
+            }
+
+            double normal =  this._new_time(current);
+
+            log.debug("waiting {} {}→{}", normal - current, current, normal);
+            this.setEvent(1, false, current, normal);
+        }
+
         void update(int[][] reactionEvents,
                     int[][][] diffusionEvents,
                     int[][] stimulationEvents,
@@ -366,34 +399,7 @@ public class NextEventQueue {
             // after execution, but there's nothing to warn about.
             this._update_propensity(false);
 
-            final double exact = this.exact_time(current);
-            double leap = leap_min_jump == 0 ? Double.NaN
-                : this.leap_time(current, tolerance);
-
-            log.debug("deps: {}", this.dependent);
-            log.debug("options: wait {}, leap {}", exact, leap);
-
-            if (current + leap > timelimit) {
-                log.debug("Curtailing leap {}→{} to {}", current, current + leap, timelimit);
-                leap = timelimit - current;
-            }
-
-            if (leap_min_jump != 0 && leap > exact * leap_min_jump) {
-                assert update_times;
-
-                int count = this.leap_count(current, leap);
-
-                log.debug("{}: leaping {} {}→{}, extent {}",
-                          this, leap, current, current + leap, count);
-                this.setEvent(count, true, current, current + leap);
-            } else {
-                double normal =  this._new_time(current);
-
-                log.debug("waiting {} {}→{}",
-                          normal - current, current, normal);
-                this.setEvent(1, false, current, normal);
-            }
-
+            pick_time(current, timelimit, tolerance);
             queue.reposition("update", this);
 
             for (NextEvent dep: this.dependent) {
@@ -838,13 +844,13 @@ public class NextEventQueue {
 
         @Override
         public double calcPropensity() {
-            double ans = ExactStochasticGridCalc.calculatePropensity(this.reactants(), this.products,
-                                                                     this.reactant_stoichiometry,
-                                                                     this.product_stoichiometry,
-                                                                     this.reactant_powers,
-                                                                     this.rate,
-                                                                     this.volume,
-                                                                     particles[this.element()]);
+            double ans = AdaptiveGridCalc.calculatePropensity(this.reactants(), this.products,
+                                                              this.reactant_stoichiometry,
+                                                              this.product_stoichiometry,
+                                                              this.reactant_powers,
+                                                              this.rate,
+                                                              this.volume,
+                                                              particles[this.element()]);
             //  log.debug("{}: rate={} vol={} propensity={}",
             //        this, this.rate, this.volume, ans);
             assert ans >= 0: ans;
@@ -1069,6 +1075,11 @@ public class NextEventQueue {
     final double tolerance;
 
     /**
+     * When false, exact stochastic simulation is performed.
+     */
+    boolean adaptive;
+
+    /**
      * How many times our calculated allowed leap must be longer than
      * normal event waiting time, for us to choose leaping.
      * C.f. SDRun.leap_min_jump.
@@ -1099,6 +1110,7 @@ public class NextEventQueue {
     public NextEventQueue(RandomGenerator random,
                           StepGenerator stepper,
                           int[][] particles,
+                          boolean adaptive,
                           double tolerance,
                           double leap_min_jump) {
         this.random = random != null ? random : new MersenneTwister();
@@ -1108,7 +1120,7 @@ public class NextEventQueue {
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
         this.tolerance = tolerance;
-
+        this.adaptive = adaptive;
         this.leap_min_jump = leap_min_jump;
 
         if (leap_min_jump == 0)
@@ -1219,10 +1231,11 @@ public class NextEventQueue {
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
                                         int[][] stimtargets,
+                                        boolean adaptive,
                                         double tolerance,
                                         double leap_min_jump,
                                         boolean verbose) {
-        NextEventQueue obj = new NextEventQueue(random, stepper, particles, tolerance, leap_min_jump);
+        NextEventQueue obj = new NextEventQueue(random, stepper, particles, adaptive, tolerance, leap_min_jump);
 
         ArrayList<NextEvent> e = inst.newArrayList();
         Numbering numbering = new Numbering();
