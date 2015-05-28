@@ -24,7 +24,6 @@ public class SDCalc {
     static final Logger log = LogManager.getLogger(SDCalc.class);
 
     final SDRun sdRun;
-    final SDCalcType calculationType;
 
     final String[] writers = Settings.getPropertyList("stochdiff.writers", "text");
     final int trials = Settings.getProperty("stochdiff.trials", 1);
@@ -34,7 +33,6 @@ public class SDCalc {
 
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;
-        this.calculationType = SDCalcType.valueOf(sdr.calculation);
 
         if (trials > 1 && sdr.simulationSeed > 0) {
             log.warn("Ignoring fixed simulation seed");
@@ -61,6 +59,7 @@ public class SDCalc {
     }
 
     protected BaseCalc prepareCalc(int trial, SDRunWrapper wrapper) {
+        SDCalcType calculationType = SDCalcType.valueOf(wrapper.sdRun.calculation);
         BaseCalc calc = calculationType.getCalc(trial, wrapper);
         for (ResultWriter resultWriter: this.resultWriters)
                 calc.addResultWriter(resultWriter);
