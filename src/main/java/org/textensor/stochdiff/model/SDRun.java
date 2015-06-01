@@ -78,7 +78,7 @@ public class SDRun {
      * How many times our calculated allowed leap must be longer than
      * normal event waiting time, for us to choose leaping.
      */
-    public double leap_min_jump = 5.0;
+    public double leap_min_jump = 1.0;
 
     public String calculation;
 
