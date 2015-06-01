@@ -1123,11 +1123,11 @@ public class NextEventQueue {
         this.adaptive = adaptive;
         this.leap_min_jump = leap_min_jump;
 
-        if (leap_min_jump == 0)
-            log.info("Leaping disabled");
-        else
+        if (this.adaptive)
             log.info("Using {} as leap tolerance, jumping when {} times longer",
                      tolerance, leap_min_jump);
+        else
+            log.info("Leaping disabled");
     }
 
     ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {
