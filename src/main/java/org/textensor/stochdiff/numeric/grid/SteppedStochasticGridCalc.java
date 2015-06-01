@@ -120,21 +120,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         wkB = new int[nel][nspec];
         ArrayUtil.copy(wkA, wkB);
 
-        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
-
-        // apply initial conditions over the grid
-        for (int i = 0; i < nel; i++) {
-            double a = surfaceAreas[i];
-            double[] scs = regsd[eltregions[i]];
-            if (a > 0 && scs != null) {
-                for (int j = 0; j < nspec; j++)
-                    if (Double.isNaN(scs[j])) {
-                        // means not specified by the user;
-                    } else
-                        wkA[i][j] = wkB[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
-            }
-        }
-
         String statefile = this.wrapper.sdRun.initialStateFile;
         if (statefile != null) {
             if (this.resultWriters.size() == 0) {

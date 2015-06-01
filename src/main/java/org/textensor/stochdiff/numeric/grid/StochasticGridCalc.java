@@ -34,12 +34,27 @@ public abstract class StochasticGridCalc extends GridCalc {
         assert(nspec > 0);
         wkA = new int[nel][nspec];
 
+        /* volume concentrations */
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
             double[] rcs = this.wrapper.getRegionConcentrations()[eltregions[i]];
 
             for (int j = 0; j < nspec; j++)
                 wkA[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);
+        }
+
+        /* surface concentrations */
+        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
+
+        // apply initial conditions over the grid
+        for (int i = 0; i < nel; i++) {
+            double a = this.surfaceAreas[i];
+            double[] scs = regsd[this.eltregions[i]];
+            if (a > 0 && scs != null)
+                for (int j = 0; j < nspec; j++)
+                    if (!Double.isNaN(scs[j]))
+                        // nan means not specified by the user;
+                        wkA[i][j] += this.randomRound(a * scs[j] * PARTICLES_PUASD);
         }
     }
 
