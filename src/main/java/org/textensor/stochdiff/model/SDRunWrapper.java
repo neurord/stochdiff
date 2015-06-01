@@ -159,7 +159,7 @@ public class SDRunWrapper {
         if (disc == null)
             disc = Discretization.SINGLE_VOXEL;
 
-        double d = disc.defaultMaxElementSide;
+        double d = disc.getDefaultMaxElementSide();
 
         // <--WK 6 22 2007
         // (1) iterate through all endpoints and their associated radii.
