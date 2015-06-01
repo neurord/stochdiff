@@ -1142,10 +1142,12 @@ public class NextEventQueue {
             for (int j = 0; j < neighbors[el].length; j++) {
                 int el2 = neighbors[el][j];
                 double cc = couplings[el][j];
-                for (int sp = 0; sp < fdiff.length; sp++)
-                    ans.add(new NextDiffusion(numbering.get(),
-                                              el, el2, j, sp, species[sp],
-                                              fdiff[sp] * cc));
+                if (cc > 0)
+                    for (int sp = 0; sp < fdiff.length; sp++)
+                        if (fdiff[sp] > 0)
+                            ans.add(new NextDiffusion(numbering.get(),
+                                                      el, el2, j, sp, species[sp],
+                                                      fdiff[sp] * cc));
             }
 
         log.info("Created {} diffusion events", ans.size());
