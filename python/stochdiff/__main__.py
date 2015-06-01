@@ -220,7 +220,7 @@ def _conn(dst, a, b, penwidth=None, label=None):
     opts = dot_opts(penwidth=penwidth, label=label)
     print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
 
-REGION_COLORDICT = {'dendrite':'lightblue', 'soma':'lightgreen'}
+REGION_COLORDICT = {'dendrite':'lightblue', 'soma':'cyan'}
 def _connections(dst, model):
     print('digraph Connections {', file=dst)
     print('\trankdir=LR;', file=dst)
@@ -292,7 +292,7 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
     print('digraph Reactions {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
-    print('\tnode [color=green,style=filled,fillcolor=lightgreen];', file=dst)
+    print('\tnode [color=green,style=filled];', file=dst)
     for rr, rr_s, pp, pp_s, rate in zip(reactants, r_stoichio,
                                         products, p_stoichio, rates):
         name = _reaction_name(rr, rr_s, pp, pp_s, species)
