@@ -196,7 +196,7 @@ class Model(object):
 
     def region_names(self, indices=None):
         "Region names (by index)"
-        what = self._element.regions[indices] if indices is not None else self._element.regions[indices]
+        what = self._element.regions[indices] if indices is not None else self._element.regions
         return [row.decode('utf-8') for row in what]
 
 class Simulation(object):
