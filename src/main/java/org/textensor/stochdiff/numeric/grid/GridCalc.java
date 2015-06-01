@@ -122,14 +122,20 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         while (time <= endtime) {
 
             if (time >= writeTime) {
-                long events = this.eventCount();
                 long wall_time = System.currentTimeMillis();
-                double speed = (double)(events - old_events) / (wall_time - old_wall_time);
-                log.info("Trial {}: time {} dt={} events={} {}/ms",
-                         this.trial(), time, dt,
-                         events - old_events, (int) speed);
-                old_events = events;
-                old_wall_time = wall_time;
+                if (wall_time > old_wall_time + 100) {
+                    /* avoid printing statistics with very low accuracy */
+                    long events = this.eventCount();
+                    double speed = (double)(events - old_events)
+                        / (wall_time - old_wall_time);
+                    log.info("Trial {}: time {} dt={} events={} {}/ms",
+                             this.trial(), time, dt,
+                             events - old_events, (int) speed);
+
+                    old_events = events;
+                    old_wall_time = wall_time;
+                } else
+                    log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
 
                 for(ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
