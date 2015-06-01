@@ -27,7 +27,6 @@ public class Discretization {
     @XmlJavaTypeAdapter(DoubleListAdapter.class)
     List<Double> surfaceLayers;
 
-    @XmlElement(name="MaxElementSide")
     private List<MaxElementSide> maxElementSide;
 
     transient private HashMap<String, Double> maxSideHM;
@@ -39,8 +38,8 @@ public class Discretization {
                 for (MaxElementSide side: this.maxElementSide) {
                     Double old = this.maxSideHM.put(side.region, side.value);
                     if (old != null) {
-                        log.error("Duplicate MaxElementSide for region '{}'", side.region);
-                        throw new RuntimeException("Duplicate MaxElementSide");
+                        log.error("Duplicate maxElementSide for region '{}'", side.region);
+                        throw new RuntimeException("Duplicate maxElementSide");
                     }
                 }
         }

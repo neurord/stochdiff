@@ -253,13 +253,13 @@
           <xs:element name="elementShape" minOccurs="0" type="elementShape" />
           <xs:element name="surfaceLayers" minOccurs="0" />
           <xs:element name="maxAspectRatio" minOccurs="0" type="non-negative-real" />
-          <xs:element ref="MaxElementSide" minOccurs="0" maxOccurs="unbounded" />
+          <xs:element ref="maxElementSide" minOccurs="0" maxOccurs="unbounded" />
         </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="MaxElementSide">
+  <xs:element name="maxElementSide">
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="non-negative-real">

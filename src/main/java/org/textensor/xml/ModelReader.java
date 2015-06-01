@@ -60,6 +60,8 @@ public class ModelReader<T> {
             throws SAXException
         {
             this.names.push(qName);
+
+            /* support for namespace-less elements */
             if (!this.sdrun_seen && localName.equals("SDRun"))
                 this.sdrun_seen = true;
             if (this.sdrun_seen && uri.equals("")) {
@@ -73,6 +75,11 @@ public class ModelReader<T> {
             if (this.exception != null && this.exception.getMessage().contains("cvc-complex-type.2.4.a"))
                 /* clear the exception if it seems to be the appropriate type */
                 this.exception = null;
+
+            /* rename MaxElementSide to maxElementSide */
+            if (this.sdrun_seen && uri.equals(STOCHDIFF_NS) && localName.equals("MaxElementSide"))
+                localName = "maxElementSide";
+
             super.startElement(uri, localName, qName, atts);
         }
 
