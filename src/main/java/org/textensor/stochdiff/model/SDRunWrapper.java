@@ -177,7 +177,8 @@ public class SDRunWrapper {
         }
 
         d = Math.min(d, ArrayUtil.min(candidate_grid_sizes));
-        log.info("subvolume grid size is: {}", d);
+        log.info("subvolume grid size is: {} (from {}, {})",
+                 d, disc.getDefaultMaxElementSide(), candidate_grid_sizes);
 
         final geometry_t vgg = geometry_t.fromString(sdRun.geometry);
 

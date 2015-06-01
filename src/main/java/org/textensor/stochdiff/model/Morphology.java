@@ -19,8 +19,7 @@ public class Morphology {
     @XmlElement(name="Segment")
     public ArrayList<Segment> segments;
 
-    @XmlElement(name="MorphPoint")
-    private ArrayList<MorphPoint> p_points;
+    transient private ArrayList<MorphPoint> p_points;
 
     @XmlElement(name="SpineAllocation")
     private ArrayList<SpineAllocation> p_spineAllocations;
@@ -68,9 +67,9 @@ public class Morphology {
      */
 
     public TreePoint[] getTreePoints() {
-        if (!resolved) {
+        if (!resolved)
             resolve();
-        }
+
         ArrayList<TreePoint> tpts = new ArrayList<TreePoint>();
         HashMap<MorphPoint, TreePoint> mtHM = new HashMap<MorphPoint, TreePoint>();
         int ic = 0;
@@ -78,33 +77,27 @@ public class Morphology {
             TreePoint tp = mp.toTreePoint();
             tpts.add(tp);
             mtHM.put(mp, tp);
-            tp.setWork(ic);
-            ic++;
+            tp.setWork(ic++);
         }
         for (MorphPoint mp : p_points) {
             TreePoint tp = mtHM.get(mp);
             for (MorphPoint pn : mp.getNeighbors()) {
                 TreePoint tpn = mtHM.get(pn);
-                if (tp.getWork() < tpn.getWork()) {
+                if (tp.getWork() < tpn.getWork())
                     TreePoint.neighborize(tp, tpn);
-                }
             }
 
-            for (MorphPoint pn : mp.segidHM.keySet()) {
+            for (MorphPoint pn : mp.segidHM.keySet())
                 tp.setIDWith(mtHM.get(pn), mp.segidHM.get(pn));
-            }
 
-            for (MorphPoint pn : mp.regionHM.keySet()) {
+            for (MorphPoint pn : mp.regionHM.keySet())
                 tp.setRegionWith(mtHM.get(pn), mp.regionHM.get(pn));
-            }
 
-
-            if (mp.hasOffsetChildren()) {
+            if (mp.hasOffsetChildren())
                 for (MorphPoint oc : mp.getOffsetChildren()) {
                     TreePoint tpc = mtHM.get(oc);
                     tp.addOffsetChild(tpc);
                 }
-            }
         }
 
         TreePoint[] ret = tpts.toArray(new TreePoint[0]);
