@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.*;
 
 import org.textensor.util.inst;
+import org.textensor.util.ArrayUtil;
+import org.textensor.xml.DoubleListAdapter;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -19,15 +22,16 @@ public class Discretization {
 
     public String elementShape = "Cuboid";
 
-    public double surfaceLayer = 0;
     public double maxAspectRatio= 0;
 
-    public SurfaceLayers surfaceLayers;
+    @XmlElement(name="surfaceLayers")
+    @XmlJavaTypeAdapter(DoubleListAdapter.class)
+    List<Double> surfaceLayers;
 
     @XmlElement(name="MaxElementSide")
     public List<MaxElementSide> sides = inst.newArrayList();
 
-    private HashMap<String, Double> maxSideHM;
+    transient private HashMap<String, Double> maxSideHM;
 
     public synchronized HashMap<String, Double> getResolutionHM() {
         if (this.maxSideHM == null) {
@@ -52,12 +56,7 @@ public class Discretization {
     }
 
     public double[] getSurfaceLayers() {
-        if (surfaceLayers != null)
-            return surfaceLayers.getValues();
-        else if (surfaceLayer > 0)
-            return new double[]{ surfaceLayer };
-        else
-            return new double[]{ };
+        return ArrayUtil.toPrimitiveArray(this.surfaceLayers);
     }
 
     public static final Discretization SINGLE_VOXEL = new Discretization();

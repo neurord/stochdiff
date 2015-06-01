@@ -251,7 +251,7 @@
           <xs:element name="defaultMaxElementSide" minOccurs="0" type="non-negative-real" />
           <xs:element name="spineDeltaX" minOccurs="0" type="non-negative-real" />
           <xs:element name="elementShape" minOccurs="0" type="elementShape" />
-          <xs:element name="surfaceLayer" minOccurs="0" type="non-negative-real" />
+          <xs:element name="surfaceLayers" minOccurs="0" />
           <xs:element name="maxAspectRatio" minOccurs="0" type="non-negative-real" />
           <xs:element ref="MaxElementSide" minOccurs="0" maxOccurs="unbounded" />
         </xs:choice>

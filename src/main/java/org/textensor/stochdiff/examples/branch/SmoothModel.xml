@@ -33,7 +33,7 @@
  	<!-- these two are just for curved discretizations. The surface layer lets you specify a 
  	     different depth for the outer layer of elements. The aspect ratio is the maximum departure from a cube 
  	     allowed before an element is subdivided -->
- 	<surfaceLayer>0.1</surfaceLayer>
+	<surfaceLayers>0.1</surfaceLayers>
  	<maxAspectRatio>3</maxAspectRatio>
     
     
