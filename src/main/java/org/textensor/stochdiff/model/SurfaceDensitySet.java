@@ -8,7 +8,11 @@ import javax.xml.bind.annotation.*;
 import org.textensor.stochdiff.inter.FloatValued;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class SurfaceDensitySet implements Regional {
+    static final Logger log = LogManager.getLogger(SurfaceDensitySet.class);
 
     @XmlAttribute public String region;
 
@@ -37,6 +41,7 @@ public class SurfaceDensitySet implements Regional {
             else
                 ret[i] = Double.NaN;
 
+        log.debug("pico surface densities: {} → {}", ids, ret);
         return ret;
     }
 

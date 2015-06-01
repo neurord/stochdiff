@@ -168,10 +168,10 @@ public class SDRunWrapper {
         // (3) select the smallest among the divided radii values as d.
         double[] candidate_grid_sizes = new double[tpa.length];
         for (int i = 0; i < tpa.length; i++) {
-            double diameter = tpa[i].r * 2.0;
-            double denominator = 1.0;
+            double diameter = tpa[i].r * 2;
+            double denominator = 1;
             while (diameter / denominator > d)
-                denominator += 2.0; // divide by successive odd numbers
+                denominator += 2; // divide by successive odd numbers
 
             candidate_grid_sizes[i] = diameter / denominator;
         }
