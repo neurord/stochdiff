@@ -119,6 +119,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         long old_events = 0;
         long old_wall_time = System.currentTimeMillis();
+
+        log.info("dt={} dtsOut={} saveStateTime={}", dt, this.wrapper.dtsOut, stateSaveTime);
+
         while (time <= endtime) {
 
             if (time >= writeTime) {

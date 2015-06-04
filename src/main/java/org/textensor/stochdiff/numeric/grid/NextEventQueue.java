@@ -33,6 +33,7 @@ public class NextEventQueue {
     final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);
 
     final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
+    final static boolean log_propensity = Settings.getProperty("stochdiff.neq.log_propensity", false);
 
     public static class Numbering {
         int count = 0;
@@ -292,7 +293,8 @@ public class NextEventQueue {
          */
         double _new_time(double current) {
             double exp = random.exponential(this.propensity);
-            log.debug("exponential time for prop={} → time={}", this.propensity, exp);
+            if (this.propensity > 0)
+                log.debug("exponential time for prop={} → time={}", this.propensity, exp);
             return current + exp;
         }
 
@@ -318,6 +320,10 @@ public class NextEventQueue {
                         this, old, this.propensity, old_pop, pop, this.extent);
                 if (!(higher && lower))
                     throw new RuntimeException();
+            } else if (log_propensity) {
+                log.debug("particles el.{}: {}", this.element(), particles[this.element()]);
+                log.debug("{}: propensity changed {} → {} (n={} → {}), extent={}",
+                          this, old, this.propensity, old_pop, pop, this.extent);
             }
 
             this.old_pop = pop;
