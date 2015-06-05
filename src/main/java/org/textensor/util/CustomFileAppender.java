@@ -1,12 +1,12 @@
 package org.textensor.util;
 
+import java.io.Serializable;
+
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender;
-import org.apache.logging.log4j.core.config.plugins.Plugin;
-import org.apache.logging.log4j.core.config.plugins.PluginFactory;
-import org.apache.logging.log4j.core.config.plugins.PluginAttr;
-import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.*;
+import org.apache.logging.log4j.core.config.*;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.Appender;
@@ -33,27 +33,45 @@ public final class CustomFileAppender extends AbstractAppender {
     }
 
     public void append(LogEvent e) {
-        for (Appender appender: this.appenders) {
+        for (Appender appender: this.appenders)
             appender.append(e);
-        }
     }
 
     @PluginFactory
     public static CustomFileAppender createAppender
-        (@PluginAttr("name") String name,
-         @PluginAttr("suppressExceptions") String suppress,
-         @PluginElement("layout") Layout layout,
-         @PluginElement("filters") Filter filter) {
-
-        final boolean handleExceptions = suppress == null ? true : Boolean.valueOf(suppress);
+        (@PluginAttribute(value="fileName")
+         String fileName,
+         @PluginAttribute(value="append")
+         String append,
+         @PluginAttribute(value="locking")
+         String locking,
+         @PluginAttribute(value="name")
+         String name,
+         @PluginAttribute(value="immediateFlush")
+         String immediateFlush,
+         @PluginAttribute(value="ignoreExceptions")
+         String ignore,
+         @PluginAttribute(value="bufferedIo")
+         String bufferedIo,
+         @PluginAttribute(value="bufferSize")
+         String bufferSizeStr,
+         @PluginElement(value="Layout")
+         Layout<? extends Serializable> layout,
+         @PluginElement(value="Filter")
+         Filter filter,
+         @PluginAttribute(value="advertise")
+         String advertise,
+         @PluginAttribute(value="advertiseUri")
+         String advertiseUri,
+         @PluginConfiguration
+         Configuration config) {
 
         if (name == null) {
             LOGGER.error("No name provided for CustomFileAppender");
             return null;
         }
 
-        final CustomFileAppender instance =
-            new CustomFileAppender(name, filter, layout, handleExceptions);
+        final CustomFileAppender instance = new CustomFileAppender(name, filter, layout, false);
 
         if (CustomFileAppender.instance != null) {
             LOGGER.error("No support for multiple CustomFileAppenders");
@@ -74,7 +92,7 @@ public final class CustomFileAppender extends AbstractAppender {
 
         final FileAppender appender =
             FileAppender.createAppender(filename, "false", "false", filename,
-                                        "true", "false", "true",
+                                        "true", "false", "true", "131072",
                                         instance.getLayout(),
                                         instance.getFilter(),
                                         "false", "false",

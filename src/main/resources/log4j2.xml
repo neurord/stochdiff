@@ -5,11 +5,10 @@
       <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}"/>
     </Console>
 
-    <CustomFile name="model-logfile">
-      <PatternLayout>
-        <pattern>%d{HH:mm:ss.SSS} %level %logger - %msg%n</pattern>
-      </PatternLayout>
+    <CustomFile name="model-logfile" fileName="...">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} - %msg%n"/>
     </CustomFile>
+
   </appenders>
   <loggers>
     <root level="debug">
