@@ -2,7 +2,7 @@ package org.textensor.util;
 
 import java.io.Serializable;
 
-import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender;
 import org.apache.logging.log4j.core.config.plugins.*;
@@ -90,13 +90,14 @@ public final class CustomFileAppender extends AbstractAppender {
             return;
         }
 
-        final FileAppender appender =
-            FileAppender.createAppender(filename, "false", "false", filename,
-                                        "true", "false", "true", "131072",
-                                        instance.getLayout(),
-                                        instance.getFilter(),
-                                        "false", "false",
-                                        new DefaultConfiguration());
+        final AbstractAppender appender =
+            MemoryMappedFileAppender.createAppender(filename,
+                                                    "false", filename,
+                                                    "false", "8192", "false",
+                                                    instance.getLayout(),
+                                                    instance.getFilter(),
+                                                    "false", "false",
+                                                    new DefaultConfiguration());
         LOGGER.info("registering custom logfile '{}'", appender);
         instance.appenders.add(appender);
     }
