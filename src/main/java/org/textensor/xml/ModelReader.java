@@ -67,7 +67,7 @@ public class ModelReader<T> {
             if (this.sdrun_seen && uri.equals("")) {
                 if (!this.ns_warning) {
                     this.ns_warning = true;
-                    log.warn("{}: namespace not specified, assuming {}",
+                    log.info("{}: namespace not specified, assuming {}",
                              this.location(), STOCHDIFF_NS);
                 }
                 uri = STOCHDIFF_NS;
