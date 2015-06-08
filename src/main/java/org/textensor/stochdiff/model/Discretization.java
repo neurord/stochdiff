@@ -16,13 +16,13 @@ import org.apache.logging.log4j.LogManager;
 public class Discretization {
     static final Logger log = LogManager.getLogger(Discretization.class);
 
-    public Double spineDeltaX;
+    private Double spineDeltaX;
 
     private Double defaultMaxElementSide;
 
     private String elementShape;
 
-    public Double maxAspectRatio;
+    private Double maxAspectRatio;
 
     @XmlJavaTypeAdapter(DoubleListAdapter.class)
     List<Double> surfaceLayers;
@@ -44,6 +44,14 @@ public class Discretization {
                 }
         }
         return this.maxSideHM;
+    }
+
+    public double getSpineDeltaX() {
+        if (this.spineDeltaX == null)
+            // FIXME: what should the default value be? 1.0 or inf?
+            return 1.0;
+        else
+            return this.spineDeltaX;
     }
 
     public boolean curvedElements() {

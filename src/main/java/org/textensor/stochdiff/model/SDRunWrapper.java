@@ -191,7 +191,9 @@ public class SDRunWrapper {
             volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),  vgg, sdRun.depth2D);
         }
 
-        SpineLocator.locate(sdRun.spineSeed, morph.getSpineDistribution(), disc.spineDeltaX,
+        SpineLocator.locate(sdRun.spineSeed,
+                            morph.getSpineDistribution(),
+                            disc.getSpineDeltaX(),
                             volumeGrid);
         volumeGrid.fix();
 
