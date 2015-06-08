@@ -3,7 +3,7 @@ package org.textensor.stochdiff.reduce;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.catacomb.util.FileUtil;
+import org.textensor.util.FileUtil;
 import org.textensor.report.E;
 import org.textensor.stochdiff.inter.FloatValued;
 import org.textensor.stochdiff.inter.SDState;

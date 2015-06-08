@@ -2,9 +2,6 @@ package org.textensor.stochdiff.numeric.grid;
 
 import java.io.File;
 
-import org.catacomb.util.FileUtil;
-import org.textensor.report.E;
-
 import java.io.*;
 
 import java.util.HashMap;
@@ -15,6 +12,8 @@ import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
+import org.textensor.util.FileUtil;
+import org.textensor.report.E;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
