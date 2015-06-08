@@ -3,12 +3,17 @@ package org.textensor.stochdiff;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.textensor.xml.ModelReader;
 import org.textensor.stochdiff.model.SDRun;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import org.textensor.util.CustomFileAppender;
 
@@ -34,6 +39,43 @@ public class StochDiff {
         }
     }
 
+    /**
+     * Set log4j2 log levels based on properties:
+     * log.&lt;logger-name&gt;=info|debug|warning|...
+     */
+    public static void setLogLevels() {
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+        boolean any = false;
+
+        Properties props = System.getProperties();
+        for (String key : props .stringPropertyNames())
+            if (key.startsWith("log.")) {
+                String logger = "org.textensor." + key.substring(4);
+                String value = props.getProperty(key);
+                Level level;
+                try {
+                    level = Level.toLevel(value.toUpperCase());
+                } catch(IllegalArgumentException e) {
+                    continue;
+                }
+
+                LoggerConfig loggerConfig = config.getLoggerConfig(logger);
+                if (!loggerConfig.getName().equals(logger)) {
+                    log.warn("Failed to find logger \"{}\"", logger);
+                    continue;
+                }
+
+                log.debug("Logging level {}={}", logger, level);
+                loggerConfig.setLevel(level);
+                any = true;
+            }
+
+        if (any)
+            /* This causes all Loggers to refetch information from their LoggerConfig. */
+            ctx.updateLoggers();
+    }
+
     public static void main(String[] argv) throws Exception {
         File modelFile = null;
         final File outputFile;
@@ -57,6 +99,8 @@ public class StochDiff {
                 s = s.substring(0, s.lastIndexOf("."));
             outputFile = new File(s);
         }
+
+        setLogLevels();
 
         final String logfile = outputFile + ".log";
         CustomFileAppender.addFileAppender(logfile);

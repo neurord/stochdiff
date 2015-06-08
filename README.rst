@@ -369,12 +369,29 @@ To run a simulation from the command line the following command should be issued
 
 .. code-block:: bash
 
-   java - jar NeuroRD.jar model.xml model.out >> model.log
+   java - jar NeuroRD.jar model.xml model.out
 
-where NeuroRD.jar file contain the NeuroRD executable byte-code, model.xml is the model file (“master” file that specifies the other files) and model.out is the main output file. If additional output files are specified using the output scheme file, their names will be created by suffix appending to the main output file name. If no model.out file is specified, then the default output file names is the input file name without the .xml suffix.  A number of messages will be printed at execution time and “>> model.log” redirects them to a log file for later examination if needed.  Or you can leave of the >> model.log and the information will print to the screen.
+where NeuroRD.jar file contain the NeuroRD executable byte-code, model.xml is the model file (“master” file that specifies the other files) and model.out is the main output file. If additional output files are specified using the output scheme file, their names will be created by suffix appending to the main output file name. If no model.out file is specified, then the default output file names is the input file name without the .xml suffix.  A number of messages will be printed at execution time. The same set of messages is printed to standard output and to a log file (the log file has the same name as the model file, except the “.log” extension).
 
 1) The java executable is in the PATH for the current user in UNIX.
 2) NeuroRD.jar and model.xml are located in the same directory from where the command is issued or the full paths for these files have to be included as well.
 3) Model.out is in the same directory from where the command is issued or the full path for the output file has to be included as well.
 
 Three (or more) output files are generated.  One is the model.out file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the IO.xml file.
+
+Logging
+~~~~~~~
+
+Log4j2 is used for manage logging. It may be configured in the usual ways: https://logging.apache.org/log4j/2.0/manual/configuration.html. The default configuration prints most messages as INFO level. This can be changed by overriding the log2j.xml configuration file completely, or by overriding the configuration for specific loggers:
+
+.. code-block:: shell
+
+    java -Dlog.<logger-name>=<level> ...
+
+where level can be one of `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `OFF`. For example:
+
+.. code-block:: shell
+
+    java -Dlog.stochdiff.numeric.grid.NextEventQueue=debug ...
+
+By default, the same output is printed to the console and to the log file (named after the model file, but with “.log” at the end).
