@@ -46,17 +46,15 @@ public class StochDiff {
     public static void setLogLevels() {
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
-        boolean any = false;
 
         Properties props = System.getProperties();
         for (String key : props .stringPropertyNames())
             if (key.startsWith("log.")) {
                 String logger = "org.textensor." + key.substring(4);
                 String value = props.getProperty(key);
-                Level level;
-                try {
-                    level = Level.toLevel(value.toUpperCase());
-                } catch(IllegalArgumentException e) {
+                Level level = Level.getLevel(value.toUpperCase());
+                if (level == null) {
+                    log.warn("Unrecognized level \"{}\"", value);
                     continue;
                 }
 
@@ -68,12 +66,7 @@ public class StochDiff {
 
                 log.debug("Logging level {}={}", logger, level);
                 loggerConfig.setLevel(level);
-                any = true;
             }
-
-        if (any)
-            /* This causes all Loggers to refetch information from their LoggerConfig. */
-            ctx.updateLoggers();
     }
 
     public static void main(String[] argv) throws Exception {
