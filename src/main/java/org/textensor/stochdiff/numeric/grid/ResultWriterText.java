@@ -13,7 +13,6 @@ import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.FileUtil;
-import org.textensor.report.E;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -57,18 +56,19 @@ public class ResultWriterText implements ResultWriter {
                     writer.write(magic + "\n");
             }
         } catch (Exception ex) {
-            E.error("cannot create file writer " + ex);
+            log.error("cannot create file writer", ex);
+            throw new RuntimeException(ex);
         }
     }
 
     public void writeString(String sdat) {
-        if (writer != null) {
+        if (writer != null)
             try {
                 writer.write(sdat, 0, sdat.length());
             } catch (Exception ex) {
-                E.error("cannot write: " + ex);
+                log.error("cannot write:", ex);
+                throw new RuntimeException(ex);
             }
-        }
     }
 
     @Override
@@ -80,11 +80,11 @@ public class ResultWriterText implements ResultWriter {
                 try {
                     writer.close();
                 } catch (Exception ex) {
-                    E.error("ex " + ex);
+                    log.error("Closing failed", ex);
                 }
                 writer = null;
             } else
-                E.error("data not written (earlier errors)");
+                log.error("data not written (earlier errors)");
 
             for (ResultWriterText rw : siblings.values())
                 rw.close();
@@ -157,7 +157,7 @@ public class ResultWriterText implements ResultWriter {
         if (fin.exists())
             ret = FileUtil.readStringFromFile(fin);
         else
-            E.error("No such file " + fin.getAbsolutePath());
+            log.error("No such file \"{}\"", fin.getAbsolutePath());
 
         return ret;
     }
@@ -204,7 +204,8 @@ public class ResultWriterText implements ResultWriter {
             fwk.delete();
 
         } catch (Exception ex) {
-            E.error("cannot prune data file: " + ex);
+            log.error("Cannot prune data file", ex);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -220,7 +221,7 @@ public class ResultWriterText implements ResultWriter {
         if (vgrid.isCurved())
                 this.writeToSiblingFileAndClose(vgrid.getAsElementsText(), "-elements.tri");
 
-        E.info("Written elements mesh file");
+        log.info("Written elements mesh file");
 
         for (int i = 0; i < fnmsOut.length; i++) {
             String sibsuf = "-" + fnmsOut[i] + "-conc.txt";
@@ -404,16 +405,14 @@ public class ResultWriterText implements ResultWriter {
             if (ArrayUtil.arraysMatch(sds.specids, specids)) {
                 ret = sds.getData();
             } else {
-                E.error("initial conditions species mismatch ");
-                for (int i = 0; i < specids.length; i++) {
-                    E.info("species " + i + " " + specids[i] + " " + sds.specids[i]);
-                }
+                log.error("Initial conditions species mismatch");
+                for (int i = 0; i < specids.length; i++)
+                    log.warn("species {} {} {}", i, specids[i], sds.specids[i]);
             }
-        } else {
+        } else
             throw new RuntimeException("initial conditions file does not match model: elements "
                                        + nel + ", " + sds.nel +
                                        "  species: " + nspec + ", " + sds.nspec);
-        }
 
         return ret;
     }
