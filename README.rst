@@ -379,6 +379,21 @@ where NeuroRD.jar file contain the NeuroRD executable byte-code, model.xml is th
 
 Three (or more) output files are generated.  One is the model.out file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the IO.xml file.
 
+Overrides
+~~~~~~~~~
+
+XML configuration can be overriden on the commandline:
+
+.. code-block:: shell
+
+    java -Dstochdiff.sdrun.<element>=<value> ...
+
+For example, to set /SDRun/discretization/maxElementSide to 3:
+
+.. code-block:: shell
+
+    java -Dstochdiff.sdrun.discretization.maxElementSide=3
+
 Logging
 ~~~~~~~
 

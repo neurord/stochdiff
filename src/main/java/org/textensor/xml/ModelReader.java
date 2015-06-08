@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
+import java.util.Properties;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.MalformedURLException;
@@ -55,6 +56,14 @@ public class ModelReader<T> {
 
         ArrayDeque<String> names = inst.newArrayDeque();
 
+        HashMap<String, String> overrides = inst.newHashMap();
+        {
+            Properties props = System.getProperties();
+            for (String key : props .stringPropertyNames())
+                if (key.startsWith("stochdiff.sdrun") || key.startsWith("stochdiff.SDRun"))
+                    overrides.put("SDRun" + key.substring(15), props.getProperty(key));
+        }
+
         @Override
         public void startElement(String uri, String localName, String qName, Attributes atts)
             throws SAXException
@@ -68,7 +77,7 @@ public class ModelReader<T> {
                 if (!this.ns_warning) {
                     this.ns_warning = true;
                     log.info("{}: namespace not specified, assuming {}",
-                             this.location(), STOCHDIFF_NS);
+                             this.location(false), STOCHDIFF_NS);
                 }
                 uri = STOCHDIFF_NS;
             }
@@ -93,6 +102,23 @@ public class ModelReader<T> {
             super.endElement(uri, localName, qName);
         }
 
+        @Override
+        public void characters(char[] ch, int start, int length)
+            throws SAXException
+        {
+            String loc = this.location(true);
+            String override = this.overrides.get(loc);
+            if (override != null) {
+                String s = new String(ch, start, length).trim();
+                log.info("Overriding {}: {} → {}", loc, s, override);
+                ch = override.toCharArray();
+                start = 0;
+                length = ch.length;
+            }
+
+            super.characters(ch, start, length);
+        }
+
         void log_error(SAXParseException e) {
             String id = e.getSystemId();
             String path;
@@ -106,15 +132,15 @@ public class ModelReader<T> {
 
             log.error("{}:line {}:column {}: {}: {}",
                       path, e.getLineNumber(), e.getColumnNumber(),
-                      this.location(),
+                      this.location(false),
                       e.getMessage());
         }
 
-        String location() {
+        String location(boolean dots) {
             StringBuilder sb = new StringBuilder();
             String[] names = this.names.toArray(new String[]{});
             for (int i = this.names.size() - 1; i >= 0; i--)
-                sb.append("/" + names[i]);
+                sb.append((dots ? (sb.length() > 0 ? "." : "") : "/") + names[i]);
             return sb.toString();
         }
 
