@@ -30,7 +30,7 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
         rtab = this.wrapper.getReactionTable();
         rtab.print();
 
-        mconc = new Column(this.wrapper.getNanoMolarConcentrations());
+        mconc = new Column(this.wrapper.sdRun.getBaseConcentrations());
         dt = this.wrapper.sdRun.fixedStepDt;
     }
 

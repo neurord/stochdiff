@@ -20,8 +20,6 @@ public class SDRunWrapper {
 
     private VolumeGrid volumeGrid;
 
-    public double[] baseConcentrations;
-
     public double[][] regionConcentrations;
     public double[][] regionSurfaceDensities;
 
@@ -42,9 +40,6 @@ public class SDRunWrapper {
     }
 
     private void extractTables() {
-        baseConcentrations = sdRun.getInitialConditions()
-                                  .getDefaultNanoMolarConcentrations(this.getSpecies());
-
         /*
          * RCC - not sure restricting the output regions is useful for the ccviz
          * file?
@@ -148,6 +143,7 @@ public class SDRunWrapper {
 
     private double[][] makeRegionConcentrations(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
+        double[] baseConcentrations = this.sdRun.getBaseConcentrations();
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
         String[] species = this.getSpecies();
@@ -179,11 +175,6 @@ public class SDRunWrapper {
                 ret[i] = icons.getRegionSurfaceDensities(sra[i], species);
 
         return ret;
-    }
-
-    public double[] getNanoMolarConcentrations() {
-        assert this.baseConcentrations != null;
-        return this.baseConcentrations;
     }
 
     public double[][] getRegionConcentrations() {
