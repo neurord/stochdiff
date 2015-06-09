@@ -185,18 +185,18 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    synchronized public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
+    synchronized public void writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeGridConcs(time, nel, ispecout, source);
+            t._writeOutputInterval(time, nel, ispecout, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    synchronized public void writeGridConcsDumb(int i, double time, int nel, String fnamepart,
-                                                IGridCalc source) {}
+    synchronized public void writeOutputScheme(int i, double time, int nel, String fnamepart,
+                                               IGridCalc source) {}
 
     @Override
     synchronized public void saveState(double time, String prefix, IGridCalc source) {
@@ -539,7 +539,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        public void _writeGridConcs(double time, int nel, int ispecout[], IGridCalc source)
+        public void _writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source)
             throws Exception
         {
             this.writeConcentrations(time, nel, ispecout, source);

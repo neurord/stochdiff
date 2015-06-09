@@ -140,8 +140,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 } else
                     log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
 
-                for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
+                for (ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.writeOutputInterval(time, nel, this.wrapper.getOutputSpecies(), this);
 
                 writeTime += this.wrapper.sdRun.outputInterval;
                 if (count_events) {
@@ -153,7 +153,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
                     for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
+                        resultWriter.writeOutputScheme(i, time, nel, this.wrapper.fnmsOut[i], this);
                     writeTimeArray[i] += Double.valueOf(this.wrapper.dtsOut[i]);
                 }
 
@@ -172,12 +172,12 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         if (writeTime < time + this.wrapper.sdRun.outputInterval / 10) {
             log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
             for(ResultWriter resultWriter: this.resultWriters)
-                resultWriter.writeGridConcs(time, nel, this.wrapper.getOutputSpecies(), this);
+                resultWriter.writeOutputInterval(time, nel, this.wrapper.getOutputSpecies(), this);
         }
         for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
             if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeGridConcsDumb(i, time, nel, this.wrapper.fnmsOut[i], this);
+                    resultWriter.writeOutputScheme(i, time, nel, this.wrapper.fnmsOut[i], this);
 
         log.info("Trial {}: total number of particles at the end: {}",
                  this.trial(), this.getParticleCount());

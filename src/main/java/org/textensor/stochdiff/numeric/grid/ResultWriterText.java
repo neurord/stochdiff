@@ -271,7 +271,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeGridConcs(double time, int nel, int ispecout[], IGridCalc source) {
+    public void writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source) {
         String concs = this.getGridConcsText(time, nel, ispecout, source);
         this.writeString(concs);
     }
@@ -345,8 +345,8 @@ public class ResultWriterText implements ResultWriter {
 
 
     @Override
-    public void writeGridConcsDumb(int i, double time, int nel, String fnamepart, IGridCalc source) {
-        log.debug("writeGridConcsDumb: i={} time={} nel={} fnamepart={}", i, time, nel, fnamepart);
+    public void writeOutputScheme(int i, double time, int nel, String fnamepart, IGridCalc source) {
+        log.debug("writeOutputScheme: i={} time={} nel={} fnamepart={}", i, time, nel, fnamepart);
         String text = getGridConcsPlainText_dumb(i, time, nel, source);
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
