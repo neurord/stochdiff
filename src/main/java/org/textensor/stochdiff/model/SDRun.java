@@ -187,11 +187,15 @@ public class SDRun {
         return ans;
     }
 
+    public String[] getSpecies() {
+        return this.getReactionScheme().getSpecies();
+    }
+
     public int[] getOutputSpecies() {
         if (this._outputSpecies == null) {
             ReactionScheme rs = this.getReactionScheme();
             this._outputSpecies = outputSpecieIndices(this.outputSpecies,
-                                                      rs.getSpecies());
+                                                      this.getSpecies());
         }
         return this._outputSpecies;
     }

@@ -224,7 +224,7 @@ public class SDRunWrapper {
     }
 
     public String[] getSpecies() {
-        return this.sdRun.getReactionScheme().getSpecies();
+        return this.sdRun.getSpecies();
     }
 
     public String serialize() {
