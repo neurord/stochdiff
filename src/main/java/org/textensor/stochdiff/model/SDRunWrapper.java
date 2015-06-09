@@ -1,9 +1,5 @@
 package org.textensor.stochdiff.model;
 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
 import org.textensor.stochdiff.disc.SpineLocator;
 import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
 import org.textensor.stochdiff.disc.TreeCurvedElementDiscretizer;
@@ -22,19 +18,14 @@ import org.apache.logging.log4j.LogManager;
 public class SDRunWrapper {
     static final Logger log = LogManager.getLogger(SDRunWrapper.class);
 
-    public ReactionTable reactionTable;
-    public VolumeGrid volumeGrid;
-    public StimulationTable stimulationTable;
+    private ReactionTable reactionTable;
+    private VolumeGrid volumeGrid;
+    private StimulationTable stimulationTable;
 
     public double[] baseConcentrations;
 
     public double[][] regionConcentrations;
     public double[][] regionSurfaceDensities;
-
-    String[] speciesList;
-
-    // indices of output species
-    private final int[] ispecout;
 
     public int[][] specIndexesOut;
     public String[] regionsOut;
@@ -50,66 +41,23 @@ public class SDRunWrapper {
         this.sdRun = sdRun;
 
         extractGrid();
-
-        this.ispecout = findOutputSpecies(sdRun.outputSpecies,
-                                          reactionTable.getSpecies());
     }
 
     private void extractTables() {
-        reactionTable = sdRun.getReactionScheme().makeReactionTable();
+        ReactionScheme rs = sdRun.getReactionScheme();
+        reactionTable = rs.makeReactionTable();
 
         stimulationTable = sdRun.getStimulationSet().makeStimulationTable(reactionTable);
 
-        speciesList = reactionTable.getSpecies();
-
         baseConcentrations = sdRun.getInitialConditions()
-                                  .getDefaultNanoMolarConcentrations(speciesList);
+                                  .getDefaultNanoMolarConcentrations(rs.getSpecies());
 
         /*
          * RCC - not sure restricting the output regions is useful for the ccviz
-         * file? String regout = sdRun.outputRegions; if (regout == null ||
-         * regout.equals("all")) { iregout = null;
-         *
-         * } else if (regout.length() == 0 || regout.equals("none")) { iregout =
-         * new int[0];
-         *
-         * } else { iregout = getIndices(regout, speciesList); }
+         * file?
          */
 
         extractOutputScheme(reactionTable);
-    }
-
-    private static int[] findOutputSpecies(String specout, String[] species) {
-        if (specout == null || specout.equals("all"))
-            return ArrayUtil.iota(species.length);
-        else if (specout.length() == 0 || specout.equals("none"))
-            return new int[0];
-        else
-            return getIndices(specout, species);
-    }
-
-    private static int[] getIndices(String matchString, String[] species) {
-        HashMap<String, Integer> isdhm = inst.newHashMap();
-        for (int i = 0; i < species.length; i++)
-            isdhm.put(species[i], i);
-
-        StringTokenizer st = new StringTokenizer(matchString, " ,");
-        ArrayList<Integer> wk = new ArrayList<Integer>();
-        while (st.hasMoreTokens()) {
-            String so = st.nextToken();
-            if (isdhm.containsKey(so)) {
-                wk.add(isdhm.get(so));
-            } else {
-                log.error("Unknown output species '{}' " +
-                          "(requested or output but not in reaction scheme)", so);
-                throw new RuntimeException("unknown species '" + so + "'");
-            }
-        }
-        int[] ret = new int[wk.size()];
-        for (int i = 0; i < wk.size(); i++)
-            ret[i] = wk.get(i);
-
-        return ret;
     }
 
     private void extractOutputScheme(ReactionTable rtab) {
@@ -211,6 +159,7 @@ public class SDRunWrapper {
         InitialConditions icons = sdRun.getInitialConditions();
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
+        String[] species = this.sdRun.getReactionScheme().getSpecies();
         for (int i = 0; i < sra.length; i++) {
             // RCC now we get the base concentrations everywhere, and just
             // override
@@ -220,7 +169,7 @@ public class SDRunWrapper {
                 ret[i][j] = baseConcentrations[j];
 
             if (icons.hasConcentrationsFor(sra[i])) {
-                double[] wk = icons.getRegionConcentrations(sra[i], speciesList);
+                double[] wk = icons.getRegionConcentrations(sra[i], species);
                 for (int j = 0; j < nc; j++)
                     if (wk[j] >= 0.)
                         ret[i][j] = wk[j];
@@ -231,11 +180,12 @@ public class SDRunWrapper {
 
     private double[][] makeRegionSurfaceDensities(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
+        String[] species = this.sdRun.getReactionScheme().getSpecies();
 
         double[][] ret = new double[sra.length][];
         for (int i = 0; i < sra.length; i++)
             if (icons.hasSurfaceDensitiesFor(sra[i]))
-                ret[i] = icons.getRegionSurfaceDensities(sra[i], speciesList);
+                ret[i] = icons.getRegionSurfaceDensities(sra[i], species);
 
         return ret;
     }
@@ -288,11 +238,6 @@ public class SDRunWrapper {
         return this.reactionTable.getSpecies();
     }
 
-    public int[] getOutputSpecies() {
-        assert this.ispecout != null;
-        return this.ispecout;
-    }
-
     public String serialize() {
         try {
             ModelReader<SDRun> loader = new ModelReader(SDRun.class);
@@ -304,7 +249,7 @@ public class SDRunWrapper {
 
     public double stepSize() {
         return Math.min(Math.min(this.sdRun.fixedStepDt,
-                                 this.sdRun.outputInterval),
+                                 this.sdRun.getOutputInterval()),
                         this.sdRun.runtime);
     }
 }

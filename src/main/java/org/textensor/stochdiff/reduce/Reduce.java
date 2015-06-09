@@ -41,26 +41,17 @@ public class Reduce {
                 }
             }
 
-
             SDRun sdModel = loader.unmarshall(modelFile);
-            sdModel.resolve();
 
             String stxt = FileUtil.readStringFromFile(stateFile);
             SDState sdState = StateReader.readStateString(stxt);
 
-
-
             Reducer rdr = new Reducer(sdModel, sdState);
             rdr.reduce();
-
-
-
         }
     }
-
 
     private static void dump(SDRun sdr) throws Exception {
         loader.marshall(sdr, System.out);
     }
-
 }

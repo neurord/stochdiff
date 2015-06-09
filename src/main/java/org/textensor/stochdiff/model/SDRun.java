@@ -2,9 +2,15 @@
 //written by Robert Cannon
 package org.textensor.stochdiff.model;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
+import org.textensor.util.ArrayUtil;
+import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -61,10 +67,10 @@ public class SDRun {
     // time step for fixed step calculations;
     public double fixedStepDt = Float.POSITIVE_INFINITY;
 
-    // public double outputInterval=0.8;
-    public double outputInterval;
+    private double outputInterval;
 
-    public String outputSpecies;
+    private String outputSpecies;
+    private transient int[] _outputSpecies;
 
     public String outputQuantity = "NUMBER"; // either "NUMBER" or "CONCENTRATION"
 
@@ -88,13 +94,6 @@ public class SDRun {
     private distribution_t distributionID;
     private algorithm_t algorithmID;
 
-    public void resolve() {
-        if (this.reactionScheme != null)
-            reactionScheme.resolve();
-        if (this.morphology != null)
-            morphology.resolve();
-    }
-
     // just getters from here on;
 
     public distribution_t getDistribution() {
@@ -105,6 +104,9 @@ public class SDRun {
         return algorithm_t.valueOf(this.algorithm);
     }
 
+    public double getOutputInterval() {
+        return this.outputInterval;
+    }
 
     public double getStateSaveInterval() {
         return stateSaveInterval;
@@ -114,8 +116,14 @@ public class SDRun {
         return outputScheme;
     }
 
+    transient private boolean _reactionSchemeResolved = false;
     public ReactionScheme getReactionScheme() {
-        return reactionScheme;
+        if (!this._reactionSchemeResolved) {
+            if (this.reactionScheme != null)
+                this.reactionScheme.resolve();
+            this._reactionSchemeResolved =true;
+        }
+        return this.reactionScheme;
     }
 
     public StimulationSet getStimulationSet() {
@@ -125,8 +133,56 @@ public class SDRun {
             return new StimulationSet();
     }
 
+    transient private boolean _morphologyResolved = false;
     public Morphology getMorphology() {
-        return morphology;
+        if (!this._morphologyResolved) {
+            if (this.morphology != null)
+                this.morphology.resolve();
+            this._morphologyResolved =true;
+        }
+        return this.morphology;
+    }
+
+    private static int[] outputSpecieIndices(String specout, String[] species) {
+        if (specout == null || specout.equals("all"))
+            return ArrayUtil.iota(species.length);
+        else if (specout.length() == 0 || specout.equals("none"))
+            return new int[0];
+        else
+            return getIndices(specout, species);
+    }
+
+    private static int[] getIndices(String matchString, String[] species) {
+        HashMap<String, Integer> isdhm = inst.newHashMap();
+        for (int i = 0; i < species.length; i++)
+            isdhm.put(species[i], i);
+
+        StringTokenizer st = new StringTokenizer(matchString, " ,");
+        ArrayList<Integer> wk = new ArrayList<Integer>();
+        while (st.hasMoreTokens()) {
+            String so = st.nextToken();
+            if (isdhm.containsKey(so)) {
+                wk.add(isdhm.get(so));
+            } else {
+                log.error("Unknown output species '{}' " +
+                          "(requested or output but not in reaction scheme)", so);
+                throw new RuntimeException("unknown species '" + so + "'");
+            }
+        }
+        int[] ret = new int[wk.size()];
+        for (int i = 0; i < wk.size(); i++)
+            ret[i] = wk.get(i);
+
+        return ret;
+    }
+
+    public int[] getOutputSpecies() {
+        if (this._outputSpecies == null) {
+            ReactionScheme rs = this.getReactionScheme();
+            this._outputSpecies = outputSpecieIndices(this.outputSpecies,
+                                                      rs.getSpecies());
+        }
+        return this._outputSpecies;
     }
 
     public Discretization getDiscretization() {

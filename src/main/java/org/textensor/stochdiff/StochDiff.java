@@ -99,7 +99,6 @@ public class StochDiff {
         CustomFileAppender.addFileAppender(logfile);
 
         SDRun sdModel = loader.unmarshall(modelFile);
-        sdModel.resolve();
 
         SDCalc sdCalc = new SDCalc(sdModel, outputFile);
         sdCalc.run();

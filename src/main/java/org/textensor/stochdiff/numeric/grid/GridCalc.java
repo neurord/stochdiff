@@ -141,9 +141,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
 
                 for (ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeOutputInterval(time, nel, this.wrapper.getOutputSpecies(), this);
+                    resultWriter.writeOutputInterval(time, nel, this.wrapper.sdRun.getOutputSpecies(), this);
 
-                writeTime += this.wrapper.sdRun.outputInterval;
+                writeTime += this.wrapper.sdRun.getOutputInterval();
                 if (count_events) {
                     ArrayUtil.fill(this.stimulationEvents, 0);
                     ArrayUtil.fill(this.diffusionEvents, 0);
@@ -169,10 +169,10 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 break;
         }
 
-        if (writeTime < time + this.wrapper.sdRun.outputInterval / 10) {
+        if (writeTime < time + this.wrapper.sdRun.getOutputInterval() / 10) {
             log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
             for(ResultWriter resultWriter: this.resultWriters)
-                resultWriter.writeOutputInterval(time, nel, this.wrapper.getOutputSpecies(), this);
+                resultWriter.writeOutputInterval(time, nel, this.wrapper.sdRun.getOutputSpecies(), this);
         }
         for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
             if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
