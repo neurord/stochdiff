@@ -19,7 +19,6 @@ public class SDRunWrapper {
     static final Logger log = LogManager.getLogger(SDRunWrapper.class);
 
     private VolumeGrid volumeGrid;
-    private StimulationTable stimulationTable;
 
     public double[] baseConcentrations;
 
@@ -43,8 +42,6 @@ public class SDRunWrapper {
     }
 
     private void extractTables() {
-        stimulationTable = sdRun.getStimulationSet().makeStimulationTable(this.getReactionTable());
-
         baseConcentrations = sdRun.getInitialConditions()
                                   .getDefaultNanoMolarConcentrations(this.getSpecies());
 
@@ -146,8 +143,7 @@ public class SDRunWrapper {
         regionSurfaceDensities = makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
 
         stimulationTargets =
-            volumeGrid.getAreaIndexes(this.stimulationTable.getTargetIDs());
-
+            volumeGrid.getAreaIndexes(this.getStimulationTable().getTargetIDs());
     }
 
     private double[][] makeRegionConcentrations(String[] sra) {
@@ -205,8 +201,7 @@ public class SDRunWrapper {
     }
 
     public StimulationTable getStimulationTable() {
-        assert this.stimulationTable != null;
-        return this.stimulationTable;
+        return this.sdRun.getStimulationTable();
     }
 
     public int[][] getStimulationTargets() {

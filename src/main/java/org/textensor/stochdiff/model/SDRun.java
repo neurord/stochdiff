@@ -11,6 +11,7 @@ import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
+import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 import org.textensor.xml.StringListAdapter;
@@ -138,11 +139,16 @@ public class SDRun {
         return this.reactionTable;
     }
 
-    public StimulationSet getStimulationSet() {
-        if (this.stimulationSet != null)
-            return this.stimulationSet;
-        else
-            return new StimulationSet();
+    transient private StimulationTable stimulationTable;
+    public StimulationTable getStimulationTable() {
+        if (this.stimulationTable == null) {
+            if (this.stimulationSet != null)
+                this.stimulationTable = this.stimulationSet.makeStimulationTable(this.getReactionTable());
+            else
+                this.stimulationTable = new StimulationTable();
+            assert this.stimulationTable != null;
+        }
+        return this.stimulationTable;
     }
 
     transient private boolean _morphologyResolved = false;
