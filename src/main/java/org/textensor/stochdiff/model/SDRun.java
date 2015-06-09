@@ -10,6 +10,7 @@ import java.util.List;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
+import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 import org.textensor.xml.StringListAdapter;
@@ -128,6 +129,13 @@ public class SDRun {
             this._reactionSchemeResolved =true;
         }
         return this.reactionScheme;
+    }
+
+    transient private ReactionTable reactionTable;
+    public ReactionTable getReactionTable() {
+        if (this.reactionTable == null)
+            this.reactionTable = this.getReactionScheme().makeReactionTable();
+        return this.reactionTable;
     }
 
     public StimulationSet getStimulationSet() {

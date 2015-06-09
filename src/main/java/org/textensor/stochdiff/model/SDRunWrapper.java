@@ -18,7 +18,6 @@ import org.apache.logging.log4j.LogManager;
 public class SDRunWrapper {
     static final Logger log = LogManager.getLogger(SDRunWrapper.class);
 
-    private ReactionTable reactionTable;
     private VolumeGrid volumeGrid;
     private StimulationTable stimulationTable;
 
@@ -44,23 +43,20 @@ public class SDRunWrapper {
     }
 
     private void extractTables() {
-        ReactionScheme rs = sdRun.getReactionScheme();
-        reactionTable = rs.makeReactionTable();
-
-        stimulationTable = sdRun.getStimulationSet().makeStimulationTable(reactionTable);
+        stimulationTable = sdRun.getStimulationSet().makeStimulationTable(this.getReactionTable());
 
         baseConcentrations = sdRun.getInitialConditions()
-                                  .getDefaultNanoMolarConcentrations(rs.getSpecies());
+                                  .getDefaultNanoMolarConcentrations(this.getSpecies());
 
         /*
          * RCC - not sure restricting the output regions is useful for the ccviz
          * file?
          */
 
-        extractOutputScheme(reactionTable);
+        extractOutputScheme(this.getSpecies());
     }
 
-    private void extractOutputScheme(ReactionTable rtab) {
+    private void extractOutputScheme(String[] species) {
         OutputScheme os = sdRun.getOutputScheme();
 
         int nos = os != null ? os.outputSets.size() : 0;
@@ -70,7 +66,6 @@ public class SDRunWrapper {
         specNamesOut = new String[nos][];
         specIndexesOut = new int[nos][];
 
-        String[] species = rtab.getSpecies();
         int nspec = species.length;
 
         log.info("extracting output scheme with {} files for {} species", nos, nspec);
@@ -159,7 +154,7 @@ public class SDRunWrapper {
         InitialConditions icons = sdRun.getInitialConditions();
         int nc = baseConcentrations.length;
         double[][] ret = new double[sra.length][];
-        String[] species = this.sdRun.getReactionScheme().getSpecies();
+        String[] species = this.getSpecies();
         for (int i = 0; i < sra.length; i++) {
             // RCC now we get the base concentrations everywhere, and just
             // override
@@ -180,7 +175,7 @@ public class SDRunWrapper {
 
     private double[][] makeRegionSurfaceDensities(String[] sra) {
         InitialConditions icons = sdRun.getInitialConditions();
-        String[] species = this.sdRun.getReactionScheme().getSpecies();
+        String[] species = this.getSpecies();
 
         double[][] ret = new double[sra.length][];
         for (int i = 0; i < sra.length; i++)
@@ -206,8 +201,7 @@ public class SDRunWrapper {
     }
 
     public ReactionTable getReactionTable() {
-        assert this.reactionTable != null;
-        return this.reactionTable;
+        return this.sdRun.getReactionTable();
     }
 
     public StimulationTable getStimulationTable() {
@@ -235,7 +229,7 @@ public class SDRunWrapper {
     }
 
     public String[] getSpecies() {
-        return this.reactionTable.getSpecies();
+        return this.sdRun.getReactionScheme().getSpecies();
     }
 
     public String serialize() {
