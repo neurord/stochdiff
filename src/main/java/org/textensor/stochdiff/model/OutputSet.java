@@ -12,17 +12,13 @@ public class OutputSet {
     @XmlAttribute public Double dt;
 
     @XmlElement(name="OutputSpecie")
-    public ArrayList<OutputSpecie> outputSpec;
-
-    public int getNumberOfOutputSpecies() {
-        return outputSpec.size();
-    }
+    public ArrayList<OutputSpecie> outputSpecies;
 
     public String[] getNamesOfOutputSpecies() {
-        int ns = outputSpec.size();
+        int ns = outputSpecies != null ? outputSpecies.size() : 0;
         String[] ret = new String[ns];
         for (int i = 0; i < ns; i++)
-            ret[i] = outputSpec.get(i).name;
+            ret[i] = outputSpecies.get(i).name;
 
         return ret;
     }
