@@ -5,17 +5,20 @@ package org.textensor.stochdiff.model;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.List;
 
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
+import org.textensor.xml.StringListAdapter;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.*;
 
 @XmlRootElement(name="SDRun")
 public class SDRun {
@@ -69,7 +72,8 @@ public class SDRun {
 
     private double outputInterval;
 
-    private String outputSpecies;
+    @XmlJavaTypeAdapter(StringListAdapter.class)
+    private List<String> outputSpecies;
     private transient int[] _outputSpecies;
 
     public String outputQuantity = "NUMBER"; // either "NUMBER" or "CONCENTRATION"
@@ -143,37 +147,30 @@ public class SDRun {
         return this.morphology;
     }
 
-    private static int[] outputSpecieIndices(String specout, String[] species) {
-        if (specout == null || specout.equals("all"))
+    private static int[] outputSpecieIndices(List<String> specout, String[] species) {
+        if (specout == null)
             return ArrayUtil.iota(species.length);
-        else if (specout.length() == 0 || specout.equals("none"))
-            return new int[0];
-        else
-            return getIndices(specout, species);
-    }
 
-    private static int[] getIndices(String matchString, String[] species) {
-        HashMap<String, Integer> isdhm = inst.newHashMap();
-        for (int i = 0; i < species.length; i++)
-            isdhm.put(species[i], i);
+        HashMap<String, Integer> map = inst.newHashMap();
+        for (int i = 0; i < species.length; i++) {
+            if (species[i].equals("all"))
+                return ArrayUtil.iota(species.length);
+            map.put(species[i], i);
+        }
 
-        StringTokenizer st = new StringTokenizer(matchString, " ,");
-        ArrayList<Integer> wk = new ArrayList<Integer>();
-        while (st.hasMoreTokens()) {
-            String so = st.nextToken();
-            if (isdhm.containsKey(so)) {
-                wk.add(isdhm.get(so));
-            } else {
+        int[] ans = new int[specout.size()];
+        int i = 0;
+        for (String so: specout) {
+            Integer k = map.get(so);
+            if (k == null) {
                 log.error("Unknown output species '{}' " +
                           "(requested or output but not in reaction scheme)", so);
                 throw new RuntimeException("unknown species '" + so + "'");
             }
+            ans[i++] = k;
         }
-        int[] ret = new int[wk.size()];
-        for (int i = 0; i < wk.size(); i++)
-            ret[i] = wk.get(i);
 
-        return ret;
+        return ans;
     }
 
     public int[] getOutputSpecies() {
