@@ -1,6 +1,7 @@
 package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.HashMap;
@@ -50,6 +51,36 @@ public class InitialConditions {
         return this.defaultConcs;
     }
 
+    public double[][] makeRegionConcentrations(String[] sra, String[] species) {
+        double[] baseConcentrations = this.getDefaultConcentrations().getNanoMolarConcentrations(species);
+        double[][] ret = new double[sra.length][];
+        for (int i = 0; i < sra.length; i++) {
+            /* Use base concentrations everywhere, and just
+             * override with those values which are explicitly set.
+             */
+            ret[i] = Arrays.copyOf(baseConcentrations, baseConcentrations.length);
+
+            if (this.hasConcentrationsFor(sra[i])) {
+                double[] wk = this.getRegionConcentrations(sra[i], species);
+                for (int j = 0; j < baseConcentrations.length; j++)
+                    // FIXME: use nans
+                    if (wk[j] >= 0.)
+                        ret[i][j] = wk[j];
+            }
+        }
+        return ret;
+    }
+
+    public double[][] makeRegionSurfaceDensities(String[] sra, String[] species) {
+        double[][] ret = new double[sra.length][];
+        for (int i = 0; i < sra.length; i++)
+            if (this.hasSurfaceDensitiesFor(sra[i]))
+                ret[i] = this.getRegionSurfaceDensities(sra[i], species);
+
+        return ret;
+    }
+
+
     public synchronized HashMap<String, SurfaceDensitySet> getSurfaceDensitySets() {
         if (this.sdSetHM == null)
             this.sdSetHM = listToRegionMap(this.sdSets);
@@ -68,19 +99,6 @@ public class InitialConditions {
                 sdSet.addFloatValued(afv);
 
         return afv;
-    }
-
-
-    public double[] getDefaultNanoMolarConcentrations(String[] spl) {
-        double[] ret = this.getDefaultConcentrations().getNanoMolarConcentrations(spl);
-
-        // set to zero where previously undefined (indicated by
-        // negative return from getNanoMolarConcentrations)
-        for (int i = 0; i < ret.length; i++)
-            if (ret[i] < 0)
-                ret[i] = 0;
-
-        return ret;
     }
 
     public boolean hasConcentrationsFor(String rnm) {

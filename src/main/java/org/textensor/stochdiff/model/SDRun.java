@@ -208,10 +208,6 @@ public class SDRun {
         return initialConditions;
     }
 
-    public double[] getBaseConcentrations() {
-        return this.getInitialConditions().getDefaultNanoMolarConcentrations(this.getSpecies());
-    }
-
     public double getStartTime() {
         return starttime;
     }

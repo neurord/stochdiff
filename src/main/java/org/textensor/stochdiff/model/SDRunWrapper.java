@@ -20,9 +20,6 @@ public class SDRunWrapper {
 
     private VolumeGrid volumeGrid;
 
-    public double[][] regionConcentrations;
-    public double[][] regionSurfaceDensities;
-
     public int[][] specIndexesOut;
     public String[] regionsOut;
     public double[] dtsOut;
@@ -134,57 +131,18 @@ public class SDRunWrapper {
 
         extractTables();
 
-        regionConcentrations = makeRegionConcentrations(volumeGrid.getRegionLabels());
-        regionSurfaceDensities = makeRegionSurfaceDensities(volumeGrid.getRegionLabels());
-
         stimulationTargets =
             volumeGrid.getAreaIndexes(this.getStimulationTable().getTargetIDs());
     }
 
-    private double[][] makeRegionConcentrations(String[] sra) {
-        InitialConditions icons = sdRun.getInitialConditions();
-        double[] baseConcentrations = this.sdRun.getBaseConcentrations();
-        int nc = baseConcentrations.length;
-        double[][] ret = new double[sra.length][];
-        String[] species = this.getSpecies();
-        for (int i = 0; i < sra.length; i++) {
-            // RCC now we get the base concentrations everywhere, and just
-            // override
-            // those values that are explicitly set elsewhere
-            ret[i] = new double[baseConcentrations.length];
-            for (int j = 0; j < nc; j++)
-                ret[i][j] = baseConcentrations[j];
-
-            if (icons.hasConcentrationsFor(sra[i])) {
-                double[] wk = icons.getRegionConcentrations(sra[i], species);
-                for (int j = 0; j < nc; j++)
-                    if (wk[j] >= 0.)
-                        ret[i][j] = wk[j];
-            }
-        }
-        return ret;
-    }
-
-    private double[][] makeRegionSurfaceDensities(String[] sra) {
-        InitialConditions icons = sdRun.getInitialConditions();
-        String[] species = this.getSpecies();
-
-        double[][] ret = new double[sra.length][];
-        for (int i = 0; i < sra.length; i++)
-            if (icons.hasSurfaceDensitiesFor(sra[i]))
-                ret[i] = icons.getRegionSurfaceDensities(sra[i], species);
-
-        return ret;
-    }
-
     public double[][] getRegionConcentrations() {
-        assert this.regionConcentrations != null;
-        return this.regionConcentrations;
+        String[] regions = this.volumeGrid.getRegionLabels();
+        return this.sdRun.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies());
     }
 
     public double[][] getRegionSurfaceDensities() {
-        assert this.regionSurfaceDensities != null;
-        return this.regionSurfaceDensities;
+        String[] regions = this.volumeGrid.getRegionLabels();
+        return this.sdRun.getInitialConditions().makeRegionSurfaceDensities(regions, this.getSpecies());
     }
 
     public ReactionTable getReactionTable() {
