@@ -230,7 +230,7 @@ public class SDRunWrapper {
     }
 
     public String[] getRegionsOut() {
-        assert this.specIndexesOut != null;
+        assert this.regionsOut != null;
         return this.regionsOut;
     }
 
