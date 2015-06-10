@@ -20,11 +20,11 @@ public class SDRunWrapper {
 
     private VolumeGrid volumeGrid;
 
-    public int[][] specIndexesOut;
-    public String[] regionsOut;
+    private int[][] specIndexesOut;
+    private String[] regionsOut;
     public double[] dtsOut;
     public String[] fnmsOut;
-    public String[][] specNamesOut;
+    private String[][] specNamesOut;
 
     private int[][] stimulationTargets;
 
@@ -34,15 +34,6 @@ public class SDRunWrapper {
         this.sdRun = sdRun;
 
         extractGrid();
-    }
-
-    private void extractTables() {
-        /*
-         * RCC - not sure restricting the output regions is useful for the ccviz
-         * file?
-         */
-
-        extractOutputScheme(this.getSpecies());
     }
 
     private void extractOutputScheme(String[] species) {
@@ -129,7 +120,7 @@ public class SDRunWrapper {
                             volumeGrid);
         volumeGrid.fix();
 
-        extractTables();
+        this.extractOutputScheme(this.getSpecies());
 
         stimulationTargets =
             volumeGrid.getAreaIndexes(this.getStimulationTable().getTargetIDs());
