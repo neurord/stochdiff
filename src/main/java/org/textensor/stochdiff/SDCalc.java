@@ -42,7 +42,7 @@ public class SDCalc {
         for (String type: writers) {
             final ResultWriter writer;
             if (type.equals("text")) {
-                writer = new ResultWriterText(output, false);
+                writer = new ResultWriterText(output, sdr, sdr.getOutputSets(), sdr.getSpecies(), false);
                 log.info("Using text writer for {}", writer.outputFile());
             } else if (type.equals("h5")) {
                 writer = new ResultWriterHDF5(output);

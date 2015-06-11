@@ -2,9 +2,6 @@
 //written by Robert Cannon
 package org.textensor.stochdiff.model;
 
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 import java.util.List;
 
 import org.textensor.stochdiff.numeric.BaseCalc;
@@ -24,7 +21,7 @@ import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.*;
 
 @XmlRootElement(name="SDRun")
-public class SDRun {
+public class SDRun implements IOutputSet {
     static final Logger log = LogManager.getLogger(SDRun.class);
 
     @XmlElement(name="ReactionScheme")
@@ -40,7 +37,7 @@ public class SDRun {
     private InitialConditions initialConditions;
 
     @XmlElement(name="OutputScheme")
-    private OutputScheme outputScheme;
+    public OutputScheme outputScheme;
 
     private Discretization discretization;
 
@@ -77,7 +74,6 @@ public class SDRun {
 
     @XmlJavaTypeAdapter(StringListAdapter.class)
     private List<String> outputSpecies;
-    private transient int[] _outputSpecies;
 
     public String outputQuantity = "NUMBER"; // either "NUMBER" or "CONCENTRATION"
 
@@ -115,6 +111,16 @@ public class SDRun {
         return geometry_t.fromString(this.geometry);
     }
 
+    @Override
+    public String getRegion() {
+        return null;
+    }
+
+    @Override
+    public double getOutputInterval(double fallback) {
+        return this.outputInterval;
+    }
+
     public double getOutputInterval() {
         return this.outputInterval;
     }
@@ -123,8 +129,11 @@ public class SDRun {
         return stateSaveInterval;
     }
 
-    public OutputScheme getOutputScheme() {
-        return outputScheme;
+    public List<OutputSet> getOutputSets() {
+        if (this.outputScheme != null)
+            return this.outputScheme.outputSets;
+        else
+            return null;
     }
 
     transient private boolean _reactionSchemeResolved = false;
@@ -166,43 +175,18 @@ public class SDRun {
         return this.morphology;
     }
 
-    private static int[] outputSpecieIndices(List<String> specout, String[] species) {
-        if (specout == null)
-            return ArrayUtil.iota(species.length);
-
-        HashMap<String, Integer> map = inst.newHashMap();
-        for (int i = 0; i < species.length; i++) {
-            if (species[i].equals("all"))
-                return ArrayUtil.iota(species.length);
-            map.put(species[i], i);
-        }
-
-        int[] ans = new int[specout.size()];
-        int i = 0;
-        for (String so: specout) {
-            Integer k = map.get(so);
-            if (k == null) {
-                log.error("Unknown output species '{}' " +
-                          "(requested or output but not in reaction scheme)", so);
-                throw new RuntimeException("unknown species '" + so + "'");
-            }
-            ans[i++] = k;
-        }
-
-        return ans;
-    }
-
     public String[] getSpecies() {
         return this.getReactionScheme().getSpecies();
     }
 
-    public int[] getOutputSpecies() {
-        if (this._outputSpecies == null) {
-            ReactionScheme rs = this.getReactionScheme();
-            this._outputSpecies = outputSpecieIndices(this.outputSpecies,
-                                                      this.getSpecies());
-        }
-        return this._outputSpecies;
+    @Override
+    public List<String> getNamesOfOutputSpecies() {
+        return this.outputSpecies;
+    }
+
+    @Override
+    public int[] getIndicesOfOutputSpecies(String[] species) {
+        return OutputSet.outputSpecieIndices("outputSpecies", this.outputSpecies, species);
     }
 
     public Discretization getDiscretization() {

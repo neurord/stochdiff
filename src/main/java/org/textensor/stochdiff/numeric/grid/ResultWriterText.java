@@ -4,12 +4,14 @@ import java.io.File;
 
 import java.io.*;
 
+import java.util.List;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.inter.StateReader;
+import org.textensor.stochdiff.model.IOutputSet;
 import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.FileUtil;
@@ -30,10 +32,22 @@ public class ResultWriterText implements ResultWriter {
 
     final protected HashMap<String, ResultWriterText> siblings = inst.newHashMap();
 
-    public ResultWriterText(File output, boolean writeConcentration) {
-        this.writeConcentration = writeConcentration;
+    final String[] species;
+    final IOutputSet outputSet;
+    final List<? extends IOutputSet> outputSets;
 
-        outputFile = new File(output + ".out");
+    public ResultWriterText(File output,
+                            IOutputSet primary,
+                            List<? extends IOutputSet> outputSets,
+                            String[] species,
+                            boolean writeConcentration) {
+
+        this.writeConcentration = writeConcentration;
+        this.outputFile = new File(output + ".out");
+
+        this.species = species;
+        this.outputSet = primary;
+        this.outputSets = outputSets;
     }
 
     public boolean isContinuation() {
@@ -106,7 +120,7 @@ public class ResultWriterText implements ResultWriter {
         if (ret == null) {
             String fnm = FileUtil.getRootName(this.outputFile) + extn;
             File f = new File(outputFile.getParentFile(), fnm);
-            ret = new ResultWriterText(f, this.writeConcentration);
+            ret = new ResultWriterText(f, null, null, this.species, this.writeConcentration);
             ret.init(null);
             siblings.put(extn, ret);
         }
@@ -217,7 +231,7 @@ public class ResultWriterText implements ResultWriter {
             this.writeString(vgrid.getAsText());
 
         this.writeToSiblingFileAndClose(vgrid.getAsTableText(), "-mesh.txt");
-            
+
         if (vgrid.isCurved())
                 this.writeToSiblingFileAndClose(vgrid.getAsElementsText(), "-elements.tri");
 

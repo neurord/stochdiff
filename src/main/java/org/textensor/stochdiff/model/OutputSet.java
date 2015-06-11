@@ -1,12 +1,20 @@
-//5 16 2007: written by RO; modified by WK
-
 package org.textensor.stochdiff.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+
+import org.textensor.util.inst;
+import org.textensor.util.ArrayUtil;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.annotation.*;
 
-public class OutputSet {
+public class OutputSet implements IOutputSet {
+    static final Logger log = LogManager.getLogger(OutputSet.class);
+
     @XmlAttribute public String filename;
     @XmlAttribute public String region;
     @XmlAttribute public Double dt;
@@ -14,37 +22,67 @@ public class OutputSet {
     @XmlElement(name="OutputSpecie")
     public ArrayList<OutputSpecie> outputSpecies;
 
-    public String[] getNamesOfOutputSpecies() {
-        int ns = outputSpecies != null ? outputSpecies.size() : 0;
-        String[] ret = new String[ns];
-        for (int i = 0; i < ns; i++)
-            ret[i] = outputSpecies.get(i).name;
+    @Override
+    public List<String> getNamesOfOutputSpecies() {
+        if (this.outputSpecies == null)
+            return null;
 
-        return ret;
+        List<String> names = inst.newArrayList();
+        for (OutputSpecie out: this.outputSpecies)
+            names.add(out.name);
+        return names;
     }
 
-    public boolean hasRegion()  {
-        return region != null;
+    public static int[] outputSpecieIndices(String where, List<String> specout, String[] species) {
+        if (specout == null)
+            return ArrayUtil.iota(species.length);
+
+        HashMap<String, Integer> map = inst.newHashMap();
+        for (int i = 0; i < species.length; i++) {
+            if (species[i].equals("all"))
+                return ArrayUtil.iota(species.length);
+            map.put(species[i], i);
+        }
+
+        int[] ans = new int[specout.size()];
+        int i = 0;
+        for (String so: specout) {
+            Integer k = map.get(so);
+            if (k == null) {
+                log.error("Unknown output species '{}' " +
+                          "(requested for output in {} but not found in ReactionScheme)", so, where);
+                throw new RuntimeException("Unknown species '" + so + "'");
+            }
+            ans[i++] = k;
+        }
+
+        return ans;
     }
 
+    @Override
+    public int[] getIndicesOfOutputSpecies(String[] species) {
+        List<String> output = this.getNamesOfOutputSpecies();
+        String where = "OutputSet " + (filename != null ? filename : "w/o filename");
+        return outputSpecieIndices(where, output, species);
+    }
+
+    @Override
     public String getRegion() {
-        return region;
-    }
-
-    public boolean hasFname() {
-        return filename != null;
+        if (region != null)
+            return region;
+        else
+            return "default";
     }
 
     public String getFname() {
         return filename;
     }
 
-    public boolean hasdt() {
-        return dt != null;
-    }
-
-    public double getdt() {
-        //        return dt != null ? dt : 0;
-        return dt;
+    @Override
+    public double getOutputInterval(double fallback) {
+        if (this.dt != null)
+            return this.dt;
+        else
+            return fallback;
     }
 }

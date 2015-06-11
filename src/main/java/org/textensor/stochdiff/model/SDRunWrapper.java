@@ -37,7 +37,7 @@ public class SDRunWrapper {
     }
 
     private void extractOutputScheme(String[] species) {
-        OutputScheme os = sdRun.getOutputScheme();
+        OutputScheme os = this.sdRun.outputScheme;
 
         int nos = os != null ? os.outputSets.size() : 0;
         regionsOut = new String[nos];
@@ -53,19 +53,10 @@ public class SDRunWrapper {
         for (int i = 0; i < nos; i++) {
             OutputSet oset = os.outputSets.get(i);
 
-            if (oset.hasdt())
-                dtsOut[i] = oset.getdt();
-            else
-                dtsOut[i] += sdRun.fixedStepDt;
-
+            dtsOut[i] = oset.getOutputInterval(sdRun.fixedStepDt);
             fnmsOut[i] = oset.getFname();
-            specNamesOut[i] = oset.getNamesOfOutputSpecies();
-
-            if (oset.hasRegion())
-                regionsOut[i] = oset.getRegion();
-            else
-                regionsOut[i] = "default"; // RC uses "default" as default value
-
+            specNamesOut[i] = oset.getNamesOfOutputSpecies().toArray(new String[0]);
+            regionsOut[i] = oset.getRegion();
             specIndexesOut[i] = new int[specNamesOut[i].length];
 
             for (int k = 0; k < specNamesOut[i].length; k++)
