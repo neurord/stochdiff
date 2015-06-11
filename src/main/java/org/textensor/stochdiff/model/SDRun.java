@@ -112,7 +112,7 @@ public class SDRun {
     }
 
     public geometry_t getGeometry() {
-        return geometry_t.valueOf(this.geometry);
+        return geometry_t.fromString(this.geometry);
     }
 
     public double getOutputInterval() {
