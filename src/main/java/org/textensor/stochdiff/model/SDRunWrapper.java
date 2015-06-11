@@ -78,9 +78,7 @@ public class SDRunWrapper {
     private void extractGrid() {
         final Morphology morph = sdRun.getMorphology();
         final TreePoint[] tpa = morph.getTreePoints();
-        Discretization disc = sdRun.getDiscretization();
-        if (disc == null)
-            disc = Discretization.SINGLE_VOXEL;
+        final Discretization disc = sdRun.getDiscretization();
 
         double d = disc.getDefaultMaxElementSide();
 
@@ -103,7 +101,7 @@ public class SDRunWrapper {
         log.info("subvolume grid size is: {} (from {}, {})",
                  d, disc.getDefaultMaxElementSide(), candidate_grid_sizes);
 
-        final geometry_t vgg = geometry_t.fromString(sdRun.geometry);
+        final geometry_t vgg = sdRun.getGeometry();
 
         if (disc.curvedElements()) {
             TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);

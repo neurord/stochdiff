@@ -10,6 +10,7 @@ import java.util.List;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.util.ArrayUtil;
@@ -56,7 +57,7 @@ public class SDRun {
 
     public String action;
 
-    public String geometry = "2D";
+    private String geometry = "2D";
     public double depth2D = 0.5;
 
     public double runtime;
@@ -108,6 +109,10 @@ public class SDRun {
 
     public algorithm_t getAlgorithm() {
         return algorithm_t.valueOf(this.algorithm);
+    }
+
+    public geometry_t getGeometry() {
+        return geometry_t.valueOf(this.geometry);
     }
 
     public double getOutputInterval() {
@@ -201,7 +206,10 @@ public class SDRun {
     }
 
     public Discretization getDiscretization() {
-        return discretization;
+        if (discretization != null)
+            return discretization;
+        else
+            return Discretization.SINGLE_VOXEL;
     }
 
     public InitialConditions getInitialConditions() {
