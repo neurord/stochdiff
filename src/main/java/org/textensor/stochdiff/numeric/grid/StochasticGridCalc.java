@@ -54,7 +54,7 @@ public abstract class StochasticGridCalc extends GridCalc {
                 for (int j = 0; j < nspec; j++)
                     if (!Double.isNaN(scs[j]))
                         // nan means not specified by the user;
-                        wkA[i][j] += this.randomRound(a * scs[j] * PARTICLES_PUASD);
+                        wkA[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
         }
     }
 
