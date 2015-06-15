@@ -20,11 +20,7 @@ public class SDRunWrapper {
 
     private VolumeGrid volumeGrid;
 
-    private int[][] specIndexesOut;
-    private String[] regionsOut;
     public double[] dtsOut;
-    public String[] fnmsOut;
-    private String[][] specNamesOut;
 
     private int[][] stimulationTargets;
 
@@ -40,11 +36,7 @@ public class SDRunWrapper {
         OutputScheme os = this.sdRun.outputScheme;
 
         int nos = os != null ? os.outputSets.size() : 0;
-        regionsOut = new String[nos];
         dtsOut = new double[nos];
-        fnmsOut = new String[nos];
-        specNamesOut = new String[nos][];
-        specIndexesOut = new int[nos][];
 
         int nspec = species.length;
 
@@ -54,15 +46,6 @@ public class SDRunWrapper {
             OutputSet oset = os.outputSets.get(i);
 
             dtsOut[i] = oset.getOutputInterval(sdRun.fixedStepDt);
-            fnmsOut[i] = oset.getFname();
-            specNamesOut[i] = oset.getNamesOfOutputSpecies().toArray(new String[0]);
-            regionsOut[i] = oset.getRegion();
-            specIndexesOut[i] = new int[specNamesOut[i].length];
-
-            for (int k = 0; k < specNamesOut[i].length; k++)
-                for (int kq = 0; kq < nspec; kq++)
-                    if (specNamesOut[i][k].equalsIgnoreCase(species[kq]))
-                        specIndexesOut[i][k] = kq;
         }
     }
 
@@ -140,16 +123,6 @@ public class SDRunWrapper {
     public VolumeGrid getVolumeGrid() {
         assert this.volumeGrid != null;
         return this.volumeGrid;
-    }
-
-    public int[][] getSpecIndexesOut() {
-        assert this.specIndexesOut != null;
-        return this.specIndexesOut;
-    }
-
-    public String[] getRegionsOut() {
-        assert this.regionsOut != null;
-        return this.regionsOut;
     }
 
     public String[] getSpecies() {

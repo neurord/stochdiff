@@ -22,6 +22,7 @@ import ncsa.hdf.object.h5.H5ScalarDS;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
+import org.textensor.stochdiff.model.IOutputSet;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.Settings;
 import static org.textensor.util.ArrayUtil.xJoined;
@@ -61,9 +62,23 @@ public class ResultWriterHDF5 implements ResultWriter {
     static final int CACHE_SIZE1 = 1024;
     static final int CACHE_SIZE2 = 8*1024;
 
-    public ResultWriterHDF5(File output) {
+    final String[] species;
+    final int[] ispecout;
+    final IOutputSet outputSet;
+    final List<? extends IOutputSet> outputSets;
+
+    public ResultWriterHDF5(File output,
+                            IOutputSet primary,
+                            List<? extends IOutputSet> outputSets,
+                            String[] species) {
+
         this.outputFile = new File(output + ".h5");
         log.debug("Writing HDF5 to {}", this.outputFile);
+
+        this.species = species;
+        this.ispecout = primary.getIndicesOfOutputSpecies(species);
+        this.outputSet = primary;
+        this.outputSets = outputSets;
     }
 
     private int users = 0;
@@ -169,8 +184,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     };
 
     @Override
-    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[],
-                                       IGridCalc source)
+    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
     {
         /* Only write stuff for the first trial to save time and space */
         if (source.trial() > 0)
@@ -178,25 +192,24 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeGrid(vgrid, startTime, fnmsOut, source);
+            t._writeGrid(vgrid, startTime, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    synchronized public void writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source) {
+    synchronized public void writeOutputInterval(double time, int nel, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeOutputInterval(time, nel, ispecout, source);
+            t._writeOutputInterval(time, nel, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    synchronized public void writeOutputScheme(int i, double time, int nel, String fnamepart,
-                                               IGridCalc source) {}
+    synchronized public void writeOutputScheme(int i, double time, int nel, IGridCalc source) {}
 
     @Override
     synchronized public void saveState(double time, String prefix, IGridCalc source) {
@@ -227,7 +240,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected H5ScalarDS times;
         protected double[] times_cache;
         protected int concs_times_count;
-        protected H5ScalarDS species;
         protected H5ScalarDS stimulation_events;
         protected H5ScalarDS diffusion_events;
         protected H5ScalarDS reaction_events;
@@ -264,8 +276,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             return this.model;
         }
 
-        protected void _writeGrid(VolumeGrid vgrid, double startTime,
-                                  String fnmsOut[], IGridCalc source)
+        protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
             throws Exception
         {
             this.writeSimulationData(source);
@@ -378,10 +389,9 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeSpecies(int[] ispecout, IGridCalc source)
+        protected void writeSpecies()
             throws Exception
         {
-            String[] species = source.getSource().getSpecies();
             String[] outSpecies = new String[ispecout.length];
             for (int i = 0; i < ispecout.length; i++)
                 outSpecies[i] = species[ispecout[i]];
@@ -539,24 +549,24 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        public void _writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source)
+        public void _writeOutputInterval(double time, int nel, IGridCalc source)
             throws Exception
         {
-            this.writeConcentrations(time, nel, ispecout, source);
+            this.writeConcentrations(time, nel, source);
             this.writeStimulationEvents(time, source);
             this.writeDiffusionEvents(time, source);
             this.writeReactionEvents(time, source);
             this.writeEvents(time, source);
         }
 
-        protected boolean initConcentrations(int nel, int[] ispecout, IGridCalc source)
+        protected boolean initConcentrations(int nel, IGridCalc source)
             throws Exception
         {
             assert this.concs == null;
             assert this.times == null;
 
             if (source.trial() == 0) {
-                this.writeSpecies(ispecout, source);
+                this.writeSpecies();
                 this.writeRegionLabels(source);
             }
 
@@ -614,11 +624,11 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.concs_times_count = 0;
         }
 
-        protected void writeConcentrations(double time, int nel, int ispecout[], IGridCalc source)
+        protected void writeConcentrations(double time, int nel, IGridCalc source)
             throws Exception
         {
             if (this.concs == null)
-                if (!this.initConcentrations(nel, ispecout, source))
+                if (!this.initConcentrations(nel, source))
                     return;
 
             getGridNumbers(this.concs_cache[this.concs_times_count],

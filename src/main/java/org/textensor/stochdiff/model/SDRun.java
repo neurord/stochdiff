@@ -117,6 +117,11 @@ public class SDRun implements IOutputSet {
     }
 
     @Override
+    public String getIdentifier() {
+        return "out";
+    }
+
+    @Override
     public double getOutputInterval(double fallback) {
         return this.outputInterval;
     }

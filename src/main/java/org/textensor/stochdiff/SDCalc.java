@@ -45,7 +45,7 @@ public class SDCalc {
                 writer = new ResultWriterText(output, sdr, sdr.getOutputSets(), sdr.getSpecies(), false);
                 log.info("Using text writer for {}", writer.outputFile());
             } else if (type.equals("h5")) {
-                writer = new ResultWriterHDF5(output);
+                writer = new ResultWriterHDF5(output, sdr, sdr.getOutputSets(), sdr.getSpecies());
                 log.info("Using HDF5 writer for {}", writer.outputFile());
             } else {
                 log.error("Unknown writer '{}'", type);

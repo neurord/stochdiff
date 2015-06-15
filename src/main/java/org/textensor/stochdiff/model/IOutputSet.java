@@ -3,6 +3,7 @@ package org.textensor.stochdiff.model;
 import java.util.List;
 
 public interface IOutputSet {
+    String getIdentifier();
     List<String> getNamesOfOutputSpecies();
     int[] getIndicesOfOutputSpecies(String[] species);
     String getRegion();

@@ -16,13 +16,13 @@ public interface ResultWriter {
 
     File outputFile();
 
-    void writeGrid(VolumeGrid vgrid, double startTime, String fnmsOut[], IGridCalc source);
+    void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source);
 
     /* Write the output specified in the first way. */
-    void writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source);
+    void writeOutputInterval(double time, int nel, IGridCalc source);
 
     /* Write the output specified in the second way. */
-    void writeOutputScheme(int i, double time, int nel, String fnamepart, IGridCalc source);
+    void writeOutputScheme(int i, double time, int nel, IGridCalc source);
 
     void saveState(double time, String prefix, IGridCalc source);
     Object loadState(String initialStateFile, IGridCalc source);

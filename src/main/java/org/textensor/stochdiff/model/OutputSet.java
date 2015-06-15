@@ -68,14 +68,15 @@ public class OutputSet implements IOutputSet {
 
     @Override
     public String getRegion() {
-        if (region != null)
-            return region;
+        if (this.region != null)
+            return this.region;
         else
             return "default";
     }
 
-    public String getFname() {
-        return filename;
+    @Override
+    public String getIdentifier() {
+        return this.filename;
     }
 
     @Override

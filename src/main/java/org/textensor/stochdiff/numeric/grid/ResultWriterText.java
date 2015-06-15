@@ -33,6 +33,7 @@ public class ResultWriterText implements ResultWriter {
     final protected HashMap<String, ResultWriterText> siblings = inst.newHashMap();
 
     final String[] species;
+    final int[] ispecout;
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
 
@@ -46,7 +47,13 @@ public class ResultWriterText implements ResultWriter {
         this.outputFile = new File(output + ".out");
 
         this.species = species;
-        this.outputSet = primary;
+        if (primary != null) {
+            this.ispecout = primary.getIndicesOfOutputSpecies(species);
+            this.outputSet = primary;
+        } else {
+            this.ispecout = null;
+            this.outputSet = null;
+        }
         this.outputSets = outputSets;
     }
 
@@ -224,7 +231,7 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeGrid(VolumeGrid vgrid, double startTime, String[] fnmsOut, IGridCalc source) {
+    public void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source) {
         assert vgrid.isCurved() || vgrid.isCuboid();
 
         if (!this.isContinuation())
@@ -237,9 +244,9 @@ public class ResultWriterText implements ResultWriter {
 
         log.info("Written elements mesh file");
 
-        for (int i = 0; i < fnmsOut.length; i++) {
-            String sibsuf = "-" + fnmsOut[i] + "-conc.txt";
-            String shead = getGridConcsHeadings_dumb(i, vgrid, source);
+        for (IOutputSet out: this.outputSets) {
+            String sibsuf = "-" + out.getIdentifier() + "-conc.txt";
+            String shead = getGridConcsHeadings_dumb(out, vgrid, source);
             StringTokenizer st = new StringTokenizer(shead);
             int nt = st.countTokens();
 
@@ -285,45 +292,47 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeOutputInterval(double time, int nel, int ispecout[], IGridCalc source) {
-        String concs = this.getGridConcsText(time, nel, ispecout, source);
+    public void writeOutputInterval(double time, int nel, IGridCalc source) {
+        String concs = this.getGridConcsText(time, nel, this.ispecout, source);
         this.writeString(concs);
     }
 
-    private String getGridConcsPlainText_dumb(int filenum, double time, int nel, IGridCalc source) {
-        final int[][] specIndexesOut = source.getSource().getSpecIndexesOut();
+    private String getGridConcsPlainText_dumb(IOutputSet output, double time, int nel, IGridCalc source) {
+        final String[] species = source.getSource().getSpecies();
+
         final String[] regionLabels = source.getSource().getVolumeGrid().getRegionLabels();
         final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
-        final String[] regionsOut = source.getSource().getRegionsOut();
+
+        final String region = output.getRegion();
+        final int[] indices = output.getIndicesOfOutputSpecies(species);
 
         StringBuffer sb = new StringBuffer();
         sb.append(stringd(time));
 
-        for (int j = 0; j < specIndexesOut[filenum].length; j++)
+        for (int specie: indices)
             for (int i = 0; i < nel; i++)
-                if (regionsOut[filenum].equals("default") || regionsOut[filenum].equals(regionLabels[eltRegions[i]]))
-                    sb.append(this.formatNumber(i, specIndexesOut[filenum][j], source));
+                if (region.equals("default") || region.equals(regionLabels[eltRegions[i]]))
+                    sb.append(this.formatNumber(i, specie, source));
 
         sb.append("\n");
         return sb.toString();
     }
 
-    private String getGridConcsHeadings_dumb(int filenum, VolumeGrid vgrid, IGridCalc source) {
-        final int[][] specIndexesOut = source.getSource().getSpecIndexesOut();
-        final String[] regionsOut = source.getSource().getRegionsOut();
-        final String[] regionLabels = vgrid.getRegionLabels();
+    private String getGridConcsHeadings_dumb(IOutputSet output, VolumeGrid vgrid, IGridCalc source) {
         final String[] species = source.getSource().getSpecies();
         final boolean[] submembranes = vgrid.getSubmembranes();
+        final String[] regionLabels = vgrid.getRegionLabels();
         final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
 
         StringBuffer sb = new StringBuffer();
         sb.append("time");
 
-        for (int j = 0; j < specIndexesOut[filenum].length; j++) {
-            for (int i = 0; i < vgrid.getNElements(); i++) {
+        final int[] indices = output.getIndicesOfOutputSpecies(species);
+        final String region = output.getRegion();
 
-                // WK 6 17 2007
-                if (regionsOut[filenum].equals("default") || regionsOut[filenum].equals(regionLabels[eltRegions[i]])) {
+        for (int specie: indices)
+            for (int i = 0; i < vgrid.getNElements(); i++)
+                if (region.equals("default") || region.equals(regionLabels[eltRegions[i]])) {
                     sb.append(" Vol_" + i);
                     sb.append("_" + regionLabels[eltRegions[i]]);
 
@@ -347,21 +356,21 @@ public class ResultWriterText implements ResultWriter {
                         else
                             sb.append("_" + vgrid.getLabel(i));
                     }
-                    // WK
 
-                    sb.append("_Spc_" + species[specIndexesOut[filenum][j]]);
+                    sb.append("_Spc_" + species[specie]);
                 }
-            }
-        }
+
         sb.append("\n");
         return sb.toString();
     }
 
 
     @Override
-    public void writeOutputScheme(int i, double time, int nel, String fnamepart, IGridCalc source) {
+    public void writeOutputScheme(int i, double time, int nel, IGridCalc source) {
+        IOutputSet output = this.outputSets.get(i);
+        String fnamepart = output.getIdentifier();
         log.debug("writeOutputScheme: i={} time={} nel={} fnamepart={}", i, time, nel, fnamepart);
-        String text = getGridConcsPlainText_dumb(i, time, nel, source);
+        String text = getGridConcsPlainText_dumb(output, time, nel, source);
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
 

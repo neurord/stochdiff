@@ -106,15 +106,14 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         double endtime = this.endtime();
 
         for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(this.wrapper.getVolumeGrid(),
-                                   time, this.wrapper.fnmsOut, this);
+            resultWriter.writeGrid(this.wrapper.getVolumeGrid(), time, this);
 
         log.info("Trial {}: running from time={} ms to time={} ms", this.trial(), time, endtime);
 
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
 
-        double[] writeTimeArray = new double[this.wrapper.fnmsOut.length];
+        double[] writeTimeArray = new double[this.wrapper.dtsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
 
         long old_events = 0;
@@ -141,9 +140,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
 
                 for (ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeOutputInterval(time, nel,
-                                                     this.wrapper.sdRun.getIndicesOfOutputSpecies(this.species),
-                                                     this);
+                    resultWriter.writeOutputInterval(time, nel, this);
 
                 writeTime += this.wrapper.sdRun.getOutputInterval();
                 if (count_events) {
@@ -152,10 +149,10 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     ArrayUtil.fill(this.reactionEvents, 0);
                 }
             }
-            for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
+            for (int i = 0; i < this.wrapper.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
                     for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.writeOutputScheme(i, time, nel, this.wrapper.fnmsOut[i], this);
+                        resultWriter.writeOutputScheme(i, time, nel, this);
                     writeTimeArray[i] += Double.valueOf(this.wrapper.dtsOut[i]);
                 }
 
@@ -174,12 +171,12 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         if (writeTime < time + this.wrapper.sdRun.getOutputInterval() / 10) {
             log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
             for(ResultWriter resultWriter: this.resultWriters)
-                resultWriter.writeOutputInterval(time, nel, this.wrapper.sdRun.getIndicesOfOutputSpecies(this.species), this);
+                resultWriter.writeOutputInterval(time, nel, this);
         }
-        for (int i = 0; i < this.wrapper.fnmsOut.length; i++)
+        for (int i = 0; i < this.wrapper.dtsOut.length; i++)
             if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
                 for(ResultWriter resultWriter: this.resultWriters)
-                    resultWriter.writeOutputScheme(i, time, nel, this.wrapper.fnmsOut[i], this);
+                    resultWriter.writeOutputScheme(i, time, nel, this);
 
         log.info("Trial {}: total number of particles at the end: {}",
                  this.trial(), this.getParticleCount());
