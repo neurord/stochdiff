@@ -1,8 +1,10 @@
 package org.textensor.stochdiff.numeric.grid;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.IOutputSet;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
@@ -50,8 +52,24 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
      * Shape is [nel x nspecies]. */
     int stimulationEvents[][];
 
+    final double[] dtsOut;
+
+    private static double[] makeDtsOut(List<? extends IOutputSet> outputs, double fallback) {
+        int nos = outputs != null ? outputs.size() : 0;
+        double[] dtsOut = new double[nos];
+
+        log.info("Extracting dts for {} output files", nos);
+
+        for (int i = 0; i < nos; i++)
+            dtsOut[i] = outputs.get(i).getOutputInterval(fallback);
+
+        return dtsOut;
+    }
+
     protected GridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
+
+        this.dtsOut = makeDtsOut(this.wrapper.sdRun.getOutputSets(), this.wrapper.sdRun.fixedStepDt);
     }
 
     protected void init() {
@@ -113,13 +131,13 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
 
-        double[] writeTimeArray = new double[this.wrapper.dtsOut.length];
+        double[] writeTimeArray = new double[this.dtsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
 
         long old_events = 0;
         long old_wall_time = System.currentTimeMillis();
 
-        log.info("dt={} dtsOut={} saveStateTime={}", dt, this.wrapper.dtsOut, stateSaveTime);
+        log.info("dt={} dtsOut={} saveStateTime={}", dt, this.dtsOut, stateSaveTime);
 
         while (time <= endtime) {
 
@@ -149,11 +167,11 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     ArrayUtil.fill(this.reactionEvents, 0);
                 }
             }
-            for (int i = 0; i < this.wrapper.dtsOut.length; i++)
+            for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
                     for(ResultWriter resultWriter: this.resultWriters)
                         resultWriter.writeOutputScheme(i, time, nel, this);
-                    writeTimeArray[i] += Double.valueOf(this.wrapper.dtsOut[i]);
+                    writeTimeArray[i] += Double.valueOf(this.dtsOut[i]);
                 }
 
             if (time < endtime) {
@@ -173,8 +191,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             for(ResultWriter resultWriter: this.resultWriters)
                 resultWriter.writeOutputInterval(time, nel, this);
         }
-        for (int i = 0; i < this.wrapper.dtsOut.length; i++)
-            if (time >= writeTimeArray[i] + Double.valueOf(this.wrapper.dtsOut[i] / 10))
+        for (int i = 0; i < this.dtsOut.length; i++)
+            if (time >= writeTimeArray[i] + Double.valueOf(this.dtsOut[i] / 10))
                 for(ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeOutputScheme(i, time, nel, this);
 

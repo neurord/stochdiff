@@ -20,8 +20,6 @@ public class SDRunWrapper {
 
     private VolumeGrid volumeGrid;
 
-    public double[] dtsOut;
-
     private int[][] stimulationTargets;
 
     public final SDRun sdRun;
@@ -30,23 +28,6 @@ public class SDRunWrapper {
         this.sdRun = sdRun;
 
         extractGrid();
-    }
-
-    private void extractOutputScheme(String[] species) {
-        OutputScheme os = this.sdRun.outputScheme;
-
-        int nos = os != null ? os.outputSets.size() : 0;
-        dtsOut = new double[nos];
-
-        int nspec = species.length;
-
-        log.info("extracting output scheme with {} files for {} species", nos, nspec);
-
-        for (int i = 0; i < nos; i++) {
-            OutputSet oset = os.outputSets.get(i);
-
-            dtsOut[i] = oset.getOutputInterval(sdRun.fixedStepDt);
-        }
     }
 
     private void extractGrid() {
@@ -91,8 +72,6 @@ public class SDRunWrapper {
                             disc.getSpineDeltaX(),
                             volumeGrid);
         volumeGrid.fix();
-
-        this.extractOutputScheme(this.getSpecies());
 
         stimulationTargets =
             volumeGrid.getAreaIndexes(this.getStimulationTable().getTargetIDs());

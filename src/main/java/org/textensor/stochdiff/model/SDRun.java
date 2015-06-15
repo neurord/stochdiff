@@ -134,7 +134,7 @@ public class SDRun implements IOutputSet {
         return stateSaveInterval;
     }
 
-    public List<OutputSet> getOutputSets() {
+    public List<? extends IOutputSet> getOutputSets() {
         if (this.outputScheme != null)
             return this.outputScheme.outputSets;
         else
