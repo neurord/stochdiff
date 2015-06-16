@@ -200,6 +200,12 @@ public class ResultWriterHDF5 implements ResultWriter {
         try {
             Trial t = this.getTrial(source.trial());
             t._writeGrid(vgrid, startTime, source);
+
+            t.writeSimulationData(source);
+            t.writeStimulationData(source);
+            t.writeReactionData(source);
+            t.writeReactionDependencies(source);
+            t.writeOutputSpecies();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -323,6 +329,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected class Trial {
         protected final Group group;
         protected Group model;
+        protected Group output_info;
         protected final Group sim;
         protected ConcentrationOutput concs1;
         protected List<ConcentrationOutput> concs2 = inst.newArrayList();
@@ -357,18 +364,25 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         protected Group model() throws Exception {
             if (this.model == null) {
-                this.model = output.createGroup("model", group);
+                this.model = output.createGroup("model", this.group);
                 setAttribute(this.model, "TITLE", "model parameters");
             }
 
             return this.model;
         }
 
+        protected Group output_info() throws Exception {
+            if (this.output_info == null) {
+                this.output_info = output.createGroup("output", this.group);
+                setAttribute(this.output_info, "TITLE", "output species");
+            }
+
+            return this.output_info;
+        }
+
         protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
             throws Exception
         {
-            this.writeSimulationData(source);
-
             log.debug("Writing grid at time {} for trial {}", startTime, source.trial());
             int n = vgrid.getNElements();
             long[]
@@ -450,10 +464,6 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
                 setAttribute(ds, "UNITS", "nm^2 / nm ?");
             }
-
-            this.writeStimulationData(source);
-            this.writeReactionData(source);
-            this.writeReactionDependencies(source);
         }
 
         protected void writeSimulationData(IGridCalc source)
@@ -480,14 +490,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSpecies()
             throws Exception
         {
-            String[] outSpecies = new String[ispecout1.length];
-            for (int i = 0; i < ispecout1.length; i++)
-                outSpecies[i] = species[ispecout1[i]];
-
-            Dataset ds = writeVector("species", this.model(), outSpecies);
-            setAttribute(ds, "TITLE", "names of saved species");
-            setAttribute(ds, "LAYOUT", "[nspecies]");
-            setAttribute(ds, "UNITS", "text");
+            writeSpecieVector("species", "names of all species", this.model(), species, null);
         }
 
         protected void writeRegionLabels(IGridCalc source)
@@ -635,6 +638,24 @@ public class ResultWriterHDF5 implements ResultWriter {
                     setAttribute(ds, "UNITS", "indexes");
                 }
             }
+        }
+
+        protected void writeOutputSpecies()
+            throws Exception
+        {
+            /* We cannot use getNamesOfOutputSpecies() because it has various special
+             * rules like support for "all". Instead we use precalulcated lists of specie
+             * indices. */
+            if (ispecout1 != null)
+                writeSpecieVector("output_species", "names of output species", this.output_info(),
+                                  species, ispecout1);
+            if (outputSets != null)
+                for (int i = 0; i < outputSets.size(); i++) {
+                    IOutputSet set = outputSets.get(i);
+                    Group group = output.createGroup(set.getIdentifier(), this.output_info());
+                    writeSpecieVector("output_species", "names of output species", group,
+                                      species, ispecout2[i]);
+                }
         }
 
         public void _writeOutput1(double time, int nel, IGridCalc source)
@@ -1134,6 +1155,25 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
+    }
+
+    protected void writeSpecieVector(String name, String title,
+                                     Group parent, String[] species, int[] which)
+        throws Exception
+    {
+        final String[] specout;
+        if (which == null)
+            specout = species;
+        else {
+            specout = new String[which.length];
+            for (int i = 0; i < which.length; i++)
+                specout[i] = species[which[i]];
+        }
+
+        Dataset ds = writeVector(name, parent, specout);
+        setAttribute(ds, "TITLE", title);
+        setAttribute(ds, "LAYOUT", "[nspecies]");
+        setAttribute(ds, "UNITS", "text");
     }
 
     protected H5ScalarDS createExtensibleArray(String name, Group parent, Datatype type,
