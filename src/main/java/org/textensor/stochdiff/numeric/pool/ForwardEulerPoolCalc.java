@@ -1,11 +1,13 @@
 package org.textensor.stochdiff.numeric.pool;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.math.Column;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
+    static final Logger log = LogManager.getLogger(ForwardEulerPoolCalc.class);
 
     public ForwardEulerPoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);
@@ -20,7 +22,7 @@ public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
 
         mconc.positivize();
 
-        E.info(" advanced fepc " + time);
+        log.info("advanced fepc {}", time);
         mconc.print();
 
         return dt;
@@ -30,8 +32,4 @@ public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
         // TODO Auto-generated method stub
         return 0;
     }
-
-
-
-
 }

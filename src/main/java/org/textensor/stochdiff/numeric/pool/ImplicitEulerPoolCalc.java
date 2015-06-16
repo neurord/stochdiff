@@ -1,10 +1,11 @@
 package org.textensor.stochdiff.numeric.pool;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * This evolves concentrations such that the concentration change is computed from the
@@ -21,7 +22,7 @@ import org.textensor.stochdiff.numeric.math.Column;
 
 
 public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
-
+    static final Logger log = LogManager.getLogger(ImplicitEulerPoolCalc.class);
 
     int maxIterationsSoFar;
 
@@ -61,7 +62,7 @@ public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
                 dc.decrementBy(w);
             }
             if (iit > 12) {
-                E.error(" failed to converge");
+                log.error("Failed to converge");
                 break;
             }
         } while (erhs > 1.e-7);
