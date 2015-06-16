@@ -56,9 +56,9 @@ public class SDRun implements IOutputSet {
     private String geometry = "2D";
     public double depth2D = 0.5;
 
-    public double runtime;
-    public double starttime;
-    public double endtime;
+    private Double runtime;
+    private Double starttime;
+    private Double endtime;
 
     public String output;
 
@@ -212,14 +212,17 @@ public class SDRun implements IOutputSet {
     }
 
     public double getStartTime() {
-        return starttime;
+        if (this.starttime != null)
+            return this.starttime;
+        else
+            return 0;
     }
 
     public double getEndTime() {
-        if (endtime > 0)
-            return endtime;
-        else if (runtime > 0)
-            return runtime - getStartTime();
+        if (this.endtime != null)
+            return this.endtime;
+        else if (this.runtime != 0)
+            return this.runtime + getStartTime();
         else {
             log.error("Either runtime or endtime must be specified in the model file");
             throw new RuntimeException("Either runtime or endtime must be specified in the model file");

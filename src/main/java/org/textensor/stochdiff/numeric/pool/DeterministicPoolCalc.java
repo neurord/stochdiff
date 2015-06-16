@@ -40,12 +40,12 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
 
         mconc.print();
 
-        time = 0.;
-        double runtime = this.wrapper.sdRun.runtime;
+        time = this.wrapper.sdRun.getStartTime();
+        double endtime = this.wrapper.sdRun.getEndTime();
 
         dpcInit();
 
-        while (time < runtime)
+        while (time < endtime)
             time += advance();
     }
 
