@@ -3,7 +3,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.util.List;
 import java.util.Collection;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.SDCalcType;
 import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
@@ -26,7 +26,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
     ArrayList<IGridCalc.Happening> events
         = log_events ? new ArrayList<IGridCalc.Happening>() : null;
 
-    public AdaptiveGridCalc(int trial, SDRunWrapper sdm) {
+    public AdaptiveGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 
@@ -34,18 +34,18 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
     public final void init() {
         super.init();
 
-        SDCalcType calculationType = SDCalcType.valueOf(this.wrapper.sdRun.calculation);
+        SDCalcType calculationType = SDCalcType.valueOf(this.sdRun.calculation);
         assert calculationType == SDCalcType.GRID_EXACT ||
                calculationType == SDCalcType.GRID_ADAPTIVE;
         boolean adaptive = calculationType == SDCalcType.GRID_ADAPTIVE;
 
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
-                                         this.wrapper.getVolumeGrid(), rtab,
-                                         this.wrapper.getStimulationTable(),
-                                         this.wrapper.getStimulationTargets(),
+                                         this.sdRun.getVolumeGrid(), rtab,
+                                         this.sdRun.getStimulationTable(),
+                                         this.sdRun.getStimulationTargets(),
                                          adaptive,
-                                         this.wrapper.sdRun.tolerance,
-                                         this.wrapper.sdRun.leap_min_jump,
+                                         this.sdRun.tolerance,
+                                         this.sdRun.leap_min_jump,
                                          this.trial() == 0);
         this.real_start_time = System.currentTimeMillis();
     }
@@ -61,7 +61,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                  this.neq.normal_waits);
 
         long time = System.currentTimeMillis() - this.real_start_time;
-        double speed = 1000*(this.wrapper.sdRun.getEndTime() - this.wrapper.sdRun.getStartTime())/time;
+        double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
         log.info("Real simulation took {} ms, {} ms/s", time, speed);
     }
 

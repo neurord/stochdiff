@@ -9,7 +9,6 @@ import org.textensor.stochdiff.inter.FloatValued;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.model.InitialConditions;
 import org.textensor.stochdiff.model.SDRun;
-import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.StaticCalc;
 import org.textensor.stochdiff.numeric.math.Matrix;
@@ -75,8 +74,7 @@ public class Reducer {
         E.info("The template provides " + nv + " accessible concentration values");
 
         // StaticCalc maps the model onto the array of concentrations for each element
-        SDRunWrapper wrapper = new SDRunWrapper(sdr);
-        staticCalc = new StaticCalc(0, wrapper);
+        staticCalc = new StaticCalc(0, sdr);
         staticCalc.init();
         vols = staticCalc.getVolumes();
         nspec = staticCalc.getNSpec();

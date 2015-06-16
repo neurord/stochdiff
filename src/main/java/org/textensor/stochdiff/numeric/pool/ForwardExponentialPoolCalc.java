@@ -1,6 +1,6 @@
 package org.textensor.stochdiff.numeric.pool;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
@@ -25,7 +25,7 @@ import org.textensor.stochdiff.numeric.math.Column;
 
 public class ForwardExponentialPoolCalc extends DeterministicPoolCalc {
 
-    public ForwardExponentialPoolCalc(int trial, SDRunWrapper sdm) {
+    public ForwardExponentialPoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 

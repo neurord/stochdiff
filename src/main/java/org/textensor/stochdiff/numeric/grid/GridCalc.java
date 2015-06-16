@@ -3,7 +3,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.util.Arrays;
 import java.util.List;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.model.IOutputSet;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.math.Column;
@@ -66,24 +66,24 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         return dtsOut;
     }
 
-    protected GridCalc(int trial, SDRunWrapper sdm) {
-        super(trial, sdm);
+    protected GridCalc(int trial, SDRun sdRun) {
+        super(trial, sdRun);
 
-        this.dtsOut = makeDtsOut(this.wrapper.sdRun.getOutputSets(), this.wrapper.sdRun.getFixedStepDt());
+        this.dtsOut = makeDtsOut(this.sdRun.getOutputSets(), this.sdRun.getFixedStepDt());
     }
 
     protected void init() {
-        stateSaveTime = wrapper.sdRun.getStateSaveInterval();
+        stateSaveTime = this.sdRun.getStateSaveInterval();
         if (stateSaveTime <= 0.0) {
             stateSaveTime = 1.e9;
         }
 
-        VolumeGrid grid = this.wrapper.getVolumeGrid();
+        VolumeGrid grid = this.sdRun.getVolumeGrid();
 
         nel = grid.getNElements();
         volumes = grid.getElementVolumes();
 
-        rtab = this.wrapper.getReactionTable();
+        rtab = this.sdRun.getReactionTable();
         species = rtab.getSpecies();
         nspec = rtab.getNSpecies();
 
@@ -109,22 +109,22 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 }
         }
 
-        this.dt = this.wrapper.stepSize();
+        this.dt = this.sdRun.stepSize();
     }
 
     protected double endtime() {
-        return this.wrapper.sdRun.getEndTime();
+        return this.sdRun.getEndTime();
     }
 
     @Override
     protected void _run() {
         init();
 
-        double time = this.wrapper.sdRun.getStartTime();
+        double time = this.sdRun.getStartTime();
         double endtime = this.endtime();
 
         for(ResultWriter resultWriter: this.resultWriters)
-            resultWriter.writeGrid(this.wrapper.getVolumeGrid(), time, this);
+            resultWriter.writeGrid(this.sdRun.getVolumeGrid(), time, this);
 
         log.info("Trial {}: running from time={} ms to time={} ms", this.trial(), time, endtime);
 
@@ -160,7 +160,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 for (ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeOutputInterval(time, nel, this);
 
-                writeTime += this.wrapper.sdRun.getOutputInterval();
+                writeTime += this.sdRun.getOutputInterval();
                 if (count_events) {
                     ArrayUtil.fill(this.stimulationEvents, 0);
                     ArrayUtil.fill(this.diffusionEvents, 0);
@@ -179,14 +179,14 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
                 if (time >= stateSaveTime) {
                     for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.saveState(time, this.wrapper.sdRun.stateSavePrefix, this);
-                    stateSaveTime += this.wrapper.sdRun.getStateSaveInterval();
+                        resultWriter.saveState(time, this.sdRun.stateSavePrefix, this);
+                    stateSaveTime += this.sdRun.getStateSaveInterval();
                 }
             } else
                 break;
         }
 
-        if (writeTime < time + this.wrapper.sdRun.getOutputInterval() / 10) {
+        if (writeTime < time + this.sdRun.getOutputInterval() / 10) {
             log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
             for(ResultWriter resultWriter: this.resultWriters)
                 resultWriter.writeOutputInterval(time, nel, this);

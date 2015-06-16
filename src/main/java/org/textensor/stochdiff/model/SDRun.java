@@ -18,6 +18,7 @@ import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 import org.textensor.xml.StringListAdapter;
+import org.textensor.xml.ModelReader;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -305,5 +306,30 @@ public class SDRun implements IOutputSet {
         }
 
         return this.stimulationTargets;
+    }
+
+    public double[][] getRegionConcentrations() {
+        String[] regions = this.getVolumeGrid().getRegionLabels();
+        return this.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies());
+    }
+
+    public double[][] getRegionSurfaceDensities() {
+        String[] regions = this.getVolumeGrid().getRegionLabels();
+        return this.getInitialConditions().makeRegionSurfaceDensities(regions, this.getSpecies());
+    }
+
+    public String serialize() {
+        try {
+            ModelReader<SDRun> loader = new ModelReader(SDRun.class);
+            return loader.marshall(this);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public double stepSize() {
+        return Math.min(Math.min(this.getFixedStepDt(),
+                                 this.getOutputInterval()),
+                        this.getEndTime() - this.getStartTime());
     }
 }

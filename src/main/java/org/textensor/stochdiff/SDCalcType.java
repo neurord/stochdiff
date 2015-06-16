@@ -5,8 +5,7 @@ import org.textensor.stochdiff.numeric.grid.SteppedStochasticGridCalc;
 import org.textensor.stochdiff.numeric.grid.AdaptiveGridCalc;
 import org.textensor.stochdiff.numeric.pool.*;
 import org.textensor.stochdiff.numeric.BaseCalc;
-import org.textensor.stochdiff.model.SDRunWrapper;
-import org.textensor.report.E;
+import org.textensor.stochdiff.model.SDRun;
 import java.lang.reflect.Constructor;
 
 import org.apache.logging.log4j.Logger;
@@ -45,10 +44,9 @@ public enum SDCalcType {
         this.cls = cls;
     }
 
-    public BaseCalc getCalc(int trial, SDRunWrapper sdr) {
-        BaseCalc ret = null;
+    public BaseCalc getCalc(int trial, SDRun sdr) {
         try {
-            Class[] argTyp = {Integer.TYPE, SDRunWrapper.class};
+            Class[] argTyp = {Integer.TYPE, SDRun.class};
             Constructor constructor = this.cls.getConstructor(argTyp);
             Object[] args = {trial, sdr};
             return (BaseCalc)(constructor.newInstance(args));

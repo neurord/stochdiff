@@ -1,6 +1,6 @@
 package org.textensor.stochdiff.numeric.pool;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 
 
 /*
@@ -13,7 +13,7 @@ import org.textensor.stochdiff.model.SDRunWrapper;
 
 public class RungeKutta4PoolCalc extends DeterministicPoolCalc {
 
-    public RungeKutta4PoolCalc(int trial, SDRunWrapper sdm) {
+    public RungeKutta4PoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 

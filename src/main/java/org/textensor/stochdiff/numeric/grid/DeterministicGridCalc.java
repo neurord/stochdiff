@@ -8,7 +8,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.math.Column;
 import org.textensor.stochdiff.numeric.math.Matrix;
@@ -45,7 +45,7 @@ public class DeterministicGridCalc extends GridCalc {
 
     int event_count = 0;
 
-    public DeterministicGridCalc(int trial, SDRunWrapper sdm) {
+    public DeterministicGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 
@@ -57,7 +57,7 @@ public class DeterministicGridCalc extends GridCalc {
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
         /* AB Dec 16 2011 - eltstims needs to be 2D, determine target element and share for each */
-        int numStim = this.wrapper.getStimulationTable().getNStim();
+        int numStim = this.sdRun.getStimulationTable().getNStim();
         eltstims = new int[numStim][nel];
         eltstimshare = new double[numStim][nel];
         for (int stimnum = 0; stimnum < numStim; stimnum++) {
@@ -66,7 +66,7 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-        int[][] stimtargets = this.wrapper.getStimulationTargets();
+        int[][] stimtargets = this.sdRun.getStimulationTargets();
         for (int i = 0; i < stimtargets.length; i++) {
             //asti are the list of voxels to receive particles
             int[] asti = stimtargets[i];
@@ -86,8 +86,8 @@ public class DeterministicGridCalc extends GridCalc {
         wktm1 = new double[nel][nspec];
         wkC = new double[nel][nspec];
 
-        double[][] regcon = this.wrapper.getRegionConcentrations();
-        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
+        double[][] regcon = this.sdRun.getRegionConcentrations();
+        double[][] regsd = this.sdRun.getRegionSurfaceDensities();
 
         for (int i = 0; i < nel; i++) {
             double[] rcs = regcon[eltregions[i]];
@@ -124,9 +124,9 @@ public class DeterministicGridCalc extends GridCalc {
             }
         }
 
-        if (this.wrapper.sdRun.initialStateFile != null) {
+        if (this.sdRun.initialStateFile != null) {
             double[][] cc = (double[][])
-                resultWriters.get(0).loadState(this.wrapper.sdRun.initialStateFile, this);
+                resultWriters.get(0).loadState(this.sdRun.initialStateFile, this);
             ArrayUtil.copy(cc, this.wkA);
             ArrayUtil.copy(cc, this.wktm1);
         }
@@ -190,7 +190,7 @@ public class DeterministicGridCalc extends GridCalc {
 
         this.event_count += nel * nspec;
 
-        double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
+        double[][] stims = this.sdRun.getStimulationTable().getStimsForInterval(tnow, dt);
 
         // reaction step;
         for (int iel = 0; iel < nel; iel++) {

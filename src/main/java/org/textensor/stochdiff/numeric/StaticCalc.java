@@ -1,7 +1,9 @@
 package org.textensor.stochdiff.numeric;
 
-import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRunWrapper;
+import java.util.Arrays;
+
+import org.textensor.stochdiff.model.SDRun;
+import static org.textensor.stochdiff.model.OutputSet.outputSpecieIndices;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 
@@ -20,7 +22,7 @@ public class StaticCalc extends BaseCalc {
     double[][] wkA;
 
 
-    public StaticCalc(int trial, SDRunWrapper sdr) {
+    public StaticCalc(int trial, SDRun sdr) {
         super(trial, sdr);
     }
 
@@ -38,8 +40,8 @@ public class StaticCalc extends BaseCalc {
 
     public void init() {
 
-        rtab = this.wrapper.getReactionTable();
-        vgrid = this.wrapper.getVolumeGrid();
+        rtab = this.sdRun.getReactionTable();
+        vgrid = this.sdRun.getVolumeGrid();
 
         nel = vgrid.getNElements();
 
@@ -69,8 +71,8 @@ public class StaticCalc extends BaseCalc {
 
 
     public void reinit() {
-        double[][] regcon = this.wrapper.getRegionConcentrations();
-        double[][] regsd = this.wrapper.getRegionSurfaceDensities();
+        double[][] regcon = this.sdRun.getRegionConcentrations();
+        double[][] regsd = this.sdRun.getRegionSurfaceDensities();
 
         for (int i = 0; i < nel; i++) {
             double[] rcs = regcon[eltregions[i]];
@@ -132,23 +134,9 @@ public class StaticCalc extends BaseCalc {
         return volumes;
     }
 
-
-
     public int[] getSpecieIndexes(String[] sid) {
-        int[] ret = new int[sid.length];
-        for (int i = 0; i < sid.length; i++) {
-            boolean got = false;
-            for (int j = 0; j <species.length; j++) {
-                if (sid[i].equals(species[j])) {
-                    ret[i] = j;
-                    got = true;
-                }
-            }
-            if (!got) {
-                E.error("Can't find species: " + sid[i]);
-            }
-        }
-        return ret;
+        return outputSpecieIndices(this.getClass().getName(),
+                                   Arrays.asList(sid),
+                                   this.sdRun.getSpecies());
     }
-
 }

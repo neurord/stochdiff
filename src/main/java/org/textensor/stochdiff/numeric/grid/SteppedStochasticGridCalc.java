@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
@@ -92,7 +92,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
     int event_count = 0;
 
-    public SteppedStochasticGridCalc(int trial, SDRunWrapper sdm) {
+    public SteppedStochasticGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 
@@ -120,7 +120,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         wkB = new int[nel][nspec];
         ArrayUtil.copy(wkA, wkB);
 
-        String statefile = this.wrapper.sdRun.initialStateFile;
+        String statefile = this.sdRun.initialStateFile;
         if (statefile != null) {
             if (this.resultWriters.size() == 0) {
                 log.error("Unable to read state because writers are disabled");
@@ -198,7 +198,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     @Override
     public double advance(double tnow, double tend) {
         // add in any injections
-        double[][] stims = this.wrapper.getStimulationTable().getStimsForInterval(tnow, dt);
+        double[][] stims = this.sdRun.getStimulationTable().getStimsForInterval(tnow, dt);
         for (int i = 0; i < stims.length; i++) {
             double[] astim = stims[i];
             for (int j = 0; j < astim.length; j++) {
@@ -212,7 +212,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     // TODO - allow stim type (deterministic or poisson etc) in
                     // config;
 
-                    int[][] stimtargets = this.wrapper.getStimulationTargets();
+                    int[][] stimtargets = this.sdRun.getStimulationTargets();
                     int nk = stimtargets[i].length;
                     if (nk > 0) {
                         double as = astim[j] / nk;

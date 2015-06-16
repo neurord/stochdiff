@@ -1,13 +1,13 @@
 package org.textensor.stochdiff.numeric.pool;
 
 import org.textensor.report.E;
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.math.Column;
 
 
 public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
 
-    public ForwardEulerPoolCalc(int trial, SDRunWrapper sdm) {
+    public ForwardEulerPoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 

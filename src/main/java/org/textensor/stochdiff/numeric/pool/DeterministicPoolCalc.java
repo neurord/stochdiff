@@ -1,6 +1,6 @@
 package org.textensor.stochdiff.numeric.pool;
 
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.math.Column;
@@ -21,17 +21,17 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
 
     double time;
 
-    public DeterministicPoolCalc(int trial, SDRunWrapper sdm) {
+    public DeterministicPoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
 
 
     public final void init() {
-        rtab = this.wrapper.getReactionTable();
+        rtab = this.sdRun.getReactionTable();
         rtab.print();
 
-        mconc = new Column(this.wrapper.getRegionConcentrations()[0]);
-        dt = this.wrapper.sdRun.getFixedStepDt();
+        mconc = new Column(this.sdRun.getRegionConcentrations()[0]);
+        dt = this.sdRun.getFixedStepDt();
     }
 
     @Override
@@ -40,8 +40,8 @@ public abstract class DeterministicPoolCalc extends BaseCalc {
 
         mconc.print();
 
-        time = this.wrapper.sdRun.getStartTime();
-        double endtime = this.wrapper.sdRun.getEndTime();
+        time = this.sdRun.getStartTime();
+        double endtime = this.sdRun.getEndTime();
 
         dpcInit();
 

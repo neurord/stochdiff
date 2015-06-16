@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
-import org.textensor.stochdiff.model.SDRunWrapper;
+import org.textensor.stochdiff.model.SDRun;
 
 public interface IGridCalc {
     /*
@@ -18,7 +18,7 @@ public interface IGridCalc {
 
     boolean preferConcs();
 
-    SDRunWrapper getSource();
+    SDRun getSource();
     long getSimulationSeed();
 
     int getNumberElements();

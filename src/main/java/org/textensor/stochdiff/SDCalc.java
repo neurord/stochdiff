@@ -6,9 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.SDRun;
-import org.textensor.stochdiff.model.SDRunWrapper;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
@@ -58,20 +56,19 @@ public class SDCalc {
         //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
     }
 
-    protected BaseCalc prepareCalc(int trial, SDRunWrapper wrapper) {
-        SDCalcType calculationType = SDCalcType.valueOf(wrapper.sdRun.calculation);
-        BaseCalc calc = calculationType.getCalc(trial, wrapper);
+    protected BaseCalc prepareCalc(int trial) {
+        SDCalcType calculationType = SDCalcType.valueOf(this.sdRun.calculation);
+        BaseCalc calc = calculationType.getCalc(trial, this.sdRun);
         for (ResultWriter resultWriter: this.resultWriters)
                 calc.addResultWriter(resultWriter);
         return calc;
     }
 
     public void run() {
-        SDRunWrapper wrapper = new SDRunWrapper(this.sdRun);
-        log.info("Wrapper is ready, beginning calculations");
+        log.info("Beginning calculations ({} trials)", this.trials);
 
         if (trials == 1)
-            this.prepareCalc(0, wrapper).run();
+            this.prepareCalc(0).run();
         else {
             int poolSize = threads > 0 ? threads : Runtime.getRuntime().availableProcessors();
             ExecutorService pool = Executors.newFixedThreadPool(poolSize);
@@ -79,19 +76,18 @@ public class SDCalc {
 
             for (int i = 0; i < trials; i++) {
                 log.info("Starting trial {}", i);
-                pool.execute(this.prepareCalc(i, wrapper));
+                pool.execute(this.prepareCalc(i));
             }
 
             log.info("Executing shutdown of pool {}", pool);
             pool.shutdown();
-            while (true) {
+            while (true)
                 try {
                     pool.awaitTermination(1, TimeUnit.MINUTES);
                     return;
                 } catch(InterruptedException e) {
                     log.info("Waiting: {}", pool);
                 }
-            }
         }
     }
 }

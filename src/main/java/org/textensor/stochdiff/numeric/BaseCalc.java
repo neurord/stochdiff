@@ -70,32 +70,32 @@ public abstract class BaseCalc implements Runnable {
     final public boolean writeConcentration;
 
     private final int trial;
-    protected SDRunWrapper wrapper;
+    protected SDRun sdRun;
 
-    public BaseCalc(int trial, SDRunWrapper wrapper) {
+    public BaseCalc(int trial, SDRun sdRun) {
         this.trial = trial;
-        this.wrapper = wrapper;
+        this.sdRun = sdRun;
 
-        this.distID = wrapper.sdRun.getDistribution();
-        this.algoID = wrapper.sdRun.getAlgorithm();
+        this.distID = sdRun.getDistribution();
+        this.algoID = sdRun.getAlgorithm();
         this.writeConcentration =
-            output_t.valueOf(wrapper.sdRun.outputQuantity) == output_t.CONCENTRATION;
-        log.info("Writing particle numbers as {}s", wrapper.sdRun.outputQuantity);
+            output_t.valueOf(sdRun.outputQuantity) == output_t.CONCENTRATION;
+        log.info("Writing particle numbers as {}s", sdRun.outputQuantity);
     }
 
     public int trial() {
         return this.trial;
     }
 
-    public SDRunWrapper getSource() {
-        return this.wrapper;
+    public SDRun getSource() {
+        return this.sdRun;
     }
 
     private long seed = -1;
     public long getSimulationSeed() {
-        if (seed == -1) {
-            if (wrapper.sdRun.simulationSeed > 0)
-                seed = wrapper.sdRun.simulationSeed;
+        if (this.seed == -1) {
+            if (this.sdRun.simulationSeed > 0)
+                seed = this.sdRun.simulationSeed;
             else
                 seed = Math.abs(new Random().nextInt());
             log.info("Trial {}: running with simulationSeed {}", this.trial(), seed);
