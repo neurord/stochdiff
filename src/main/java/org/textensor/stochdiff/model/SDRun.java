@@ -51,7 +51,6 @@ public class SDRun implements IOutputSet {
     public double stateSaveInterval;
     public String stateSavePrefix;
 
-
     public String action;
 
     private String geometry = "2D";
@@ -68,7 +67,7 @@ public class SDRun implements IOutputSet {
     public int simulationSeed;
 
     // time step for fixed step calculations;
-    public double fixedStepDt = Float.POSITIVE_INFINITY;
+    private Double fixedStepDt;
 
     private double outputInterval;
 
@@ -132,6 +131,13 @@ public class SDRun implements IOutputSet {
 
     public double getStateSaveInterval() {
         return stateSaveInterval;
+    }
+
+    public double getFixedStepDt() {
+        if (this.fixedStepDt != null)
+            return this.fixedStepDt;
+        else
+            return Float.POSITIVE_INFINITY;
     }
 
     public List<? extends IOutputSet> getOutputSets() {

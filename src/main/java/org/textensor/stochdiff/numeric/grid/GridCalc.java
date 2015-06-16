@@ -69,7 +69,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     protected GridCalc(int trial, SDRunWrapper sdm) {
         super(trial, sdm);
 
-        this.dtsOut = makeDtsOut(this.wrapper.sdRun.getOutputSets(), this.wrapper.sdRun.fixedStepDt);
+        this.dtsOut = makeDtsOut(this.wrapper.sdRun.getOutputSets(), this.wrapper.sdRun.getFixedStepDt());
     }
 
     protected void init() {

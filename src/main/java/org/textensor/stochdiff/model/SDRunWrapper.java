@@ -118,7 +118,7 @@ public class SDRunWrapper {
     }
 
     public double stepSize() {
-        return Math.min(Math.min(this.sdRun.fixedStepDt,
+        return Math.min(Math.min(this.sdRun.getFixedStepDt(),
                                  this.sdRun.getOutputInterval()),
                         this.sdRun.runtime);
     }
