@@ -4,9 +4,14 @@ package org.textensor.stochdiff.model;
 
 import java.util.List;
 
+import org.textensor.stochdiff.disc.SpineLocator;
+import org.textensor.stochdiff.disc.TreeBoxDiscretizer;
+import org.textensor.stochdiff.disc.TreeCurvedElementDiscretizer;
 import org.textensor.stochdiff.numeric.BaseCalc;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.BaseCalc.algorithm_t;
+import org.textensor.stochdiff.numeric.morph.TreePoint;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
@@ -89,6 +94,9 @@ public class SDRun implements IOutputSet {
 
     private distribution_t distributionID;
     private algorithm_t algorithmID;
+
+    private transient VolumeGrid volumeGrid;
+    private transient int[][] stimulationTargets;
 
     // just getters from here on;
 
@@ -239,5 +247,63 @@ public class SDRun implements IOutputSet {
             }
         }
         return ret;
+    }
+
+    public synchronized VolumeGrid getVolumeGrid() {
+        if (this.volumeGrid == null) {
+            final Morphology morph = this.getMorphology();
+            final TreePoint[] tpa = morph.getTreePoints();
+            final Discretization disc = this.getDiscretization();
+
+            double d = disc.getDefaultMaxElementSide();
+
+            // <--WK 6 22 2007
+            // (1) iterate through all endpoints and their associated radii.
+            // (2) divide each radius by successively increasing odd numbers until
+            // the divided value becomes less than the defaultMaxElementSide.
+            // (3) select the smallest among the divided radii values as d.
+            double[] candidate_grid_sizes = new double[tpa.length];
+            for (int i = 0; i < tpa.length; i++) {
+                double diameter = tpa[i].r * 2;
+                double denominator = 1;
+                while (diameter / denominator > d)
+                    denominator += 2; // divide by successive odd numbers
+
+                candidate_grid_sizes[i] = diameter / denominator;
+            }
+
+            d = Math.min(d, ArrayUtil.min(candidate_grid_sizes));
+            log.info("subvolume grid size is: {} (from {}, {})",
+                     d, disc.getDefaultMaxElementSide(), candidate_grid_sizes);
+
+            if (disc.curvedElements()) {
+                TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);
+                volumeGrid = tced.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),
+                                            disc.getMaxAspectRatio());
+
+            } else {
+                TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
+                volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),
+                                           this.getGeometry(), this.depth2D);
+            }
+
+            SpineLocator.locate(this.spineSeed,
+                                morph.getSpineDistribution(),
+                                disc.getSpineDeltaX(),
+                                volumeGrid);
+            volumeGrid.fix();
+        }
+
+        return this.volumeGrid;
+    }
+
+    public synchronized int[][] getStimulationTargets() {
+        if (this.stimulationTargets == null) {
+            VolumeGrid grid = this.getVolumeGrid();
+            String[] targets = this.getStimulationTable().getTargetIDs();
+            this.stimulationTargets = grid.getAreaIndexes(targets);
+        }
+
+        return this.stimulationTargets;
     }
 }
