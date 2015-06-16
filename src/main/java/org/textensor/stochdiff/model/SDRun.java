@@ -41,12 +41,6 @@ public class SDRun implements IOutputSet {
 
     private Discretization discretization;
 
-    public String reactionSchemeFile;
-    public String morphologyFile;
-    public String stimulationFile;
-    public String initialConditionsFile;
-    public String outputSchemeFile;
-
     public String initialStateFile;
     public double stateSaveInterval;
     public String stateSavePrefix;
