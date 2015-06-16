@@ -22,31 +22,20 @@ public class ConcentrationSet implements Regional {
     public HashMap<String, Concentration> getConcHM() {
         if (concHM == null) {
             concHM = new HashMap<String, Concentration>();
-            if (concentrations != null) {
-                for (Concentration c : concentrations) {
+            if (concentrations != null)
+                for (Concentration c : concentrations)
                     concHM.put(c.specieID, c);
-                }
-            }
         }
         return concHM;
     }
 
-
-    public double[] getNanoMolarConcentrations(String[] ids) {
-        double[] ret = new double[ids.length];
-        HashMap<String, Concentration> chm = getConcHM();
-
-        for (int i = 0; i < ids.length; i++) {
-            if (chm.containsKey(ids[i])) {
-                ret[i] = chm.get(ids[i]).getNanoMolarConcentration();
-            } else {
-                ret[i] = -1.;
-            }
-        }
-
-        return ret;
+    public Double getNanoMolarConcentration(String id) {
+        Concentration conc = this.getConcHM().get(id);
+        if (conc == null)
+            return null;
+        else
+            return conc.getNanoMolarConcentration();
     }
-
 
     public boolean hasRegion() {
         return region != null;

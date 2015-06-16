@@ -37,7 +37,7 @@ public class InitialConditions {
         return this.concSetHM;
     }
 
-    public synchronized ConcentrationSet getDefaultConcentrations() {
+    private ConcentrationSet getDefaultConcentrations() {
         if (this.defaultConcs == null) {
             if (this.concentrationSets != null)
                 for (ConcentrationSet set: this.concentrationSets)
@@ -51,21 +51,16 @@ public class InitialConditions {
         return this.defaultConcs;
     }
 
-    public double[][] makeRegionConcentrations(String[] sra, String[] species) {
-        double[] baseConcentrations = this.getDefaultConcentrations().getNanoMolarConcentrations(species);
-        double[][] ret = new double[sra.length][];
-        for (int i = 0; i < sra.length; i++) {
-            /* Use base concentrations everywhere, and just
-             * override with those values which are explicitly set.
-             */
-            ret[i] = Arrays.copyOf(baseConcentrations, baseConcentrations.length);
+    public double[][] makeRegionConcentrations(String[] regions, String[] species) {
+        ConcentrationSet defaults = this.getDefaultConcentrations();
+        double[][] ret = new double[regions.length][species.length];
+        for (int i = 0; i < regions.length; i++) {
+            ConcentrationSet set = this.getConcentrationSets().getOrDefault(regions[i], defaults);
 
-            if (this.hasConcentrationsFor(sra[i])) {
-                double[] wk = this.getRegionConcentrations(sra[i], species);
-                for (int j = 0; j < baseConcentrations.length; j++)
-                    // FIXME: use nans
-                    if (wk[j] >= 0.)
-                        ret[i][j] = wk[j];
+            for (int j = 0; j < species.length; j++) {
+                Double val = set.getNanoMolarConcentration(species[j]);
+                if (val != null)
+                    ret[i][j] = val;
             }
         }
         return ret;
@@ -100,23 +95,6 @@ public class InitialConditions {
 
         return afv;
     }
-
-    public boolean hasConcentrationsFor(String rnm) {
-        return rnm.equals("default") || this.getConcentrationSets().containsKey(rnm);
-    }
-
-
-    public double[] getRegionConcentrations(String rnm, String[] spl) {
-        if (this.getConcentrationSets().containsKey(rnm))
-            return this.getConcentrationSets().get(rnm).getNanoMolarConcentrations(spl);
-        else if (rnm.equals("default"))
-            return this.getDefaultConcentrations().getNanoMolarConcentrations(spl);
-        else {
-            log.error("want concentrations for unknown region '{}'", rnm);
-            throw new RuntimeException("want concentrations for unknown region " + rnm);
-        }
-    }
-
 
     public boolean hasSurfaceDensitiesFor(String rnm) {
         return this.getSurfaceDensitySets().containsKey(rnm);
