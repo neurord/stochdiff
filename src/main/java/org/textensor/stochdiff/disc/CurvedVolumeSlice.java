@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.disc;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 import org.textensor.stochdiff.numeric.morph.CurvedVolumeElement;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
@@ -409,9 +408,8 @@ public class CurvedVolumeSlice {
             ret[nre + i] = ret[nre + i - 1] + sla[nsur - 1 - i];
         }
 
-        if (Math.abs(ret[nre + nsur - 1] - r) > 1.e-6) {
-            E.error("radius miscount " + r + " " + ret[nre + nsur - 1]);
-        }
+        assert Math.abs(ret[nre + nsur - 1] - r) < 1.e-6;
+
         String s = " ";
         for (int i = 0; i < ret.length; i++) {
             s += ret[i] + " ";

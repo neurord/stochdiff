@@ -3,13 +3,13 @@ package org.textensor.stochdiff.disc;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class TreeUtil {
-
-
-
+    static final Logger log = LogManager.getLogger(TreeUtil.class);
 
     public static void parentizeFrom(TreePoint base, TreePoint[] srcPoints) {
         for (TreePoint tp : srcPoints) {
@@ -78,40 +78,31 @@ public class TreeUtil {
         for (int i = 1; i < tp.nnbr; i++) {
             wk = tp.nbr[i];
             if (tp.distanceTo(wk) < 0.1) {
-                if (wk.nnbr >= 2) {
+                if (wk.nnbr >= 2)
                     wk = wk.nbr[1];
-                } else {
-                    E.error("problem orienting children of " + tp);
-                }
+                else
+                    log.error("problem orienting children of {}", tp);
             }
             ds[i][0] = wk.getX() - tp.getX();
             ds[i][1] = wk.getY() - tp.getY();
         }
 
         double[] ang = new double[tp.nnbr];
-        for (int i = 0; i < tp.nnbr; i++) {
+        for (int i = 0; i < tp.nnbr; i++)
             ang[i] = Math.atan2(ds[i][1], ds[i][0]);
-        }
-        for (int i = 1; i < tp.nnbr; i++) {
+        for (int i = 1; i < tp.nnbr; i++)
             ang[i] = ((ang[i] - ang[0]) + 4 * Math.PI) % (2 * Math.PI);
-        }
         ang[0] = 0;
 
         // E.info("angles rel to parent: " + ang[1] + " " + ang[2]);
 
-        if (tp.nnbr == 3) {
-            if (ang[1] > ang[2]) {
-                // E.info("switching children");
-                TreePoint dum = tp.nbr[1];
-                tp.nbr[1] = tp.nbr[2];
-                tp.nbr[2] = dum;
-            }
+        assert tp.nnbr == 3: "can't handle points with more than three neighbors yet";
 
-        } else {
-            E.missing("can't handle points with more than three neighbors yet");
+        if (ang[1] > ang[2]) {
+            // E.info("switching children");
+            TreePoint dum = tp.nbr[1];
+            tp.nbr[1] = tp.nbr[2];
+            tp.nbr[2] = dum;
         }
-
     }
-
-
 }

@@ -1,7 +1,5 @@
 package org.textensor.stochdiff.numeric.math;
 
-import org.textensor.report.E;
-
 /*
  * MersenneTwister based on http://cs.gmu.edu/~eclab/projects/ecj/
  *
@@ -227,7 +225,6 @@ public class MersenneTwister implements RandomGenerator {
 
         long t3 = System.currentTimeMillis();
 
-        E.info("times: " + (t2 - t1) + " " + (t3 - t2) + " " + dg / nran + " " + dp / nran);
+        System.out.println("times: " + (t2 - t1) + " " + (t3 - t2) + " " + dg / nran + " " + dp / nran);
     }
-
 }

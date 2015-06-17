@@ -1,7 +1,5 @@
 package org.textensor.vis;
 
-import org.textensor.report.E;
-
 public class VolElt {
 
     int[] lens;

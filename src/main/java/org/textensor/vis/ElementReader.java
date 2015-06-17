@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 
-import org.textensor.report.E;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ElementReader {
+    static final Logger log = LogManager.getLogger(ElementReader.class);
 
     File fsrc;
 
@@ -59,7 +61,7 @@ public class ElementReader {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        E.info("loaded " + elts.size() + " curved volume elements");
+        log.info("loaded " + elts.size() + " curved volume elements");
     }
 
     private int nextInt(StreamTokenizer tz) throws IOException {

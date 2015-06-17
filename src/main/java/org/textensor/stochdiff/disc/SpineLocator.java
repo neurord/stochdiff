@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Random;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.math.RandomMath;
@@ -15,7 +14,11 @@ import org.textensor.stochdiff.numeric.morph.*;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public abstract class SpineLocator {
+    static final Logger log = LogManager.getLogger(SpineLocator.class);
 
     public static void locate(int seed, SpineDistribution dist, double delta, VolumeGrid grid) {
 
@@ -51,10 +54,10 @@ public abstract class SpineLocator {
                 }
             }
 
-            if (surfA.size() <= 0) {
-                E.warning("there no elements labelled with " + reg + " but it is referenced from spine allocation");
+            if (surfA.size() <= 0)
+                log.warn("There no elements labelled \"{}\" but it is referenced from spine allocation", reg);
 
-            } else {
+            else {
                 double[] eltSA = new double[surfA.size()];
 
                 double sum = 0.;
@@ -85,18 +88,17 @@ public abstract class SpineLocator {
                 				}
                 */
                 if (nspines > eltSA.length) {
-                    E.error("too many spines (need more than one per segment");
+                    log.warn("too many spines (need more than one per segment)");
                     nspines = (int)(eltSA.length);
                 }
 
-                E.info("Surface area for spine group  " + popid + " on " + reg + " is " + sum + ". nspines=" + nspines);
+                log.info("Surface area for spine group  " + popid + " on " + reg + " is " + sum + ". nspines=" + nspines);
 
                 int ndone = 0;
 
-                if (avgNoSpines > 0. && nspines == 0) {
-                    E.info("spines : although the density is non-zero, random allocation "
-                           + "gives no spines for region " + reg + " (avg=" + avgNoSpines + ")");
-                }
+                if (avgNoSpines > 0 && nspines == 0)
+                    log.info("spines : although the density is non-zero, random allocation "
+                             + "gives no spines for region \"{}\" (avg={})", reg, avgNoSpines);
 
                 ArrayList<Integer> positionA = new ArrayList<Integer>();
                 while (ndone < nspines) {
@@ -104,10 +106,10 @@ public abstract class SpineLocator {
                     int posInArray = ArrayUtil.findBracket(eltSA, abelow);
 
                     if (posInArray < 0) {
-                        E.info("tot area " + totalArea);
-                        E.dump("cannot get pos " + abelow, eltSA);
+                        log.info("Total area: {}", totalArea);
+                        log.error("Cannot get pos {}. {}", abelow, eltSA);
+                        throw new RuntimeException("Cannot get pos " + abelow);
                     }
-
 
                     if (volumes.contains(surfVE.get(posInArray))) {
                         // already got a spine - go round again;

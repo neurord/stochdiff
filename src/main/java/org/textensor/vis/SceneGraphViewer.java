@@ -55,14 +55,13 @@ import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import org.textensor.report.E;
-
-
 import com.sun.j3d.utils.geometry.Sphere;
 
-
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class SceneGraphViewer implements ActionListener, MouseListener, MouseMotionListener, ChangeListener {
+    static final Logger log = LogManager.getLogger(SceneGraphViewer.class);
 
     JPanel panel;
 
@@ -419,9 +418,8 @@ public class SceneGraphViewer implements ActionListener, MouseListener, MouseMot
         } else if (s.equals("showall")) {
             showAll();
 
-        } else {
-            E.error("unhandled " + s);
-        }
+        } else
+            log.error("unhandled " + s);
     }
 
 

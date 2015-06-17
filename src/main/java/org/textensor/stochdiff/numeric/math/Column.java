@@ -1,8 +1,5 @@
 package org.textensor.stochdiff.numeric.math;
 
-import org.textensor.report.E;
-
-
 public final class Column {
 
     int n;
@@ -113,7 +110,7 @@ public final class Column {
             }
         }
         sb.append(")");
-        E.info("column: " + sb.toString());
+        System.out.println("column: " + sb.toString());
     }
 
     public void positivize() {

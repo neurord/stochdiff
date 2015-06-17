@@ -3,7 +3,6 @@ package org.textensor.stochdiff.numeric.chem;
 import static java.lang.String.format;
 import java.util.Arrays;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.stochdiff.numeric.math.Column;
 
@@ -337,14 +336,9 @@ public class ReactionTable {
         for (int i = 0; i < nspecie; i++)
             if (sa[i].equals(specieID))
                 return i;
-        E.dump("specs", sa);
-        throw new RuntimeException("cannot find specie " + specieID +
-                                   " required for stimulation");
+        log.error("Cannot find specie {}", specieID);
+        throw new RuntimeException("Cannot find specie " + specieID);
     }
 
-
     // could also be useful to hava analytic derivatives of the above residuals
-
-
-
 }

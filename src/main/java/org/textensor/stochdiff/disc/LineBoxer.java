@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * Take a structure expressed as TreePoints each of which knows thier
@@ -26,11 +27,10 @@ import org.textensor.stochdiff.numeric.morph.VolumeLine;
  *  Use the DiscBoxer for a full 3D grid.
  */
 
-
-
 // TODO - make a subclass of Boxer, share with VolumeBoxer, pull
 // various things up
 public class LineBoxer {
+    static final Logger log = LogManager.getLogger(LineBoxer.class);
 
     TreePoint[] srcPoints;
 
@@ -109,7 +109,7 @@ public class LineBoxer {
                 } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
                     // E.info("first pt after branch " + tpn);
                     TreePoint par = tp.parent;
-                    E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
+                    log.info("starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
 
                     vg = baseGrid(tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
@@ -198,9 +198,8 @@ public class LineBoxer {
 
     public VolumeLine baseSoftGrid(TreePoint tpa, TreePoint tpb, String lbl,
                                    String rgn, double delta) {
-        if (surfaceLayers != null && surfaceLayers.length > 0) {
-            E.warning("surface layers are incompatible with soft grid - ignoring");
-        }
+        if (surfaceLayers != null && surfaceLayers.length > 0)
+            log.warn("Surface layers are incompatible with soft grid - ignoring");
 
         // allows the cells to grow or shrink a little to fill the line;
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
@@ -216,5 +215,4 @@ public class LineBoxer {
 
         return ret;
     }
-
 }

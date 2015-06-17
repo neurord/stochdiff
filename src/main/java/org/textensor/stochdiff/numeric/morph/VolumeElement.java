@@ -4,7 +4,6 @@ package org.textensor.stochdiff.numeric.morph;
 
 import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.geom.Position;
 import org.textensor.util.inst;
 
@@ -139,9 +138,7 @@ public abstract class VolumeElement {
 
     public void coupleTo(VolumeElement vx, double ca) {
         // ca is the area of contact between the elements;
-        if (fixcon) {
-            E.warning("adding a connection after they've already been used?");
-        }
+        assert !fixcon;
         connections.add(new ElementConnection(this, vx, ca));
     }
 

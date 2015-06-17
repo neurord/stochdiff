@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.disc;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.TreeWriter;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;

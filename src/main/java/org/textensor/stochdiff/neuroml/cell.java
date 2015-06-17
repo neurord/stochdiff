@@ -3,12 +3,15 @@ package org.textensor.stochdiff.neuroml;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.Transitional;
 import org.textensor.stochdiff.model.Morphology;
 import org.textensor.stochdiff.model.Segment;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class cell implements Transitional {
+    static final Logger log = LogManager.getLogger(cell.class);
 
     public String name;
 
@@ -52,7 +55,8 @@ public class cell implements Transitional {
         for (segment seg : segs) {
             Segment s = seg.getStochDiffSegment(cableHM);
             ret.segments.add(s);
-            E.info("added a segment " + s);
+
+            log.info("Added segment {}", s);
         }
 
         return ret;

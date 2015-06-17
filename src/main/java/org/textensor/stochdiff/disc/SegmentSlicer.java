@@ -6,11 +6,12 @@ package org.textensor.stochdiff.disc;
 
 import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 
-
 import java.util.HashMap;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * divided into segments either with fixed lengths or with
@@ -24,10 +25,8 @@ import java.util.HashMap;
  * cylinders. The discretization respects the actual points of the
  * structure to which stimuli or recorders may be attached.
  */
-
-
-
 public class SegmentSlicer {
+    static final Logger log = LogManager.getLogger(SegmentSlicer.class);
 
     TreePoint[] srcPoints;
 
@@ -124,10 +123,10 @@ public class SegmentSlicer {
                                 cpb.alignTop(cpa, cpa.largestNeighborNot(cpb), cpa.partBranchOffset);
                                 cpa.partBranchOffset += 2 * cpb.r;
 
-                            } else {
-                                E.warning("distance between points is smaller than the desired element size " + dab + " " + localDelta + " " +
-                                          cpa + " " + cpb);
-                            }
+                            } else
+                                log.warn("Distance between points is smaller than the desired element size {} {} {} {}",
+                                         dab, localDelta, cpa, cpb);
+
                             nadd = 0;
                         }
 
@@ -166,10 +165,9 @@ public class SegmentSlicer {
                         //WK-->
 
 
-                    } else if (sdstyle == BALANCED) {
-                        subdiv[i][j] = getBalancedSubdivision(cpa, cpb);
                     } else {
-                        E.error("unknown subdib style " + sdstyle);
+                        assert sdstyle == BALANCED: sdstyle;
+                        subdiv[i][j] = getBalancedSubdivision(cpa, cpb);
                     }
                     nnp += subdiv[i][j].length;
                 }
@@ -177,8 +175,8 @@ public class SegmentSlicer {
         }
 
         if (np + nnp > maxnp) {
-            E.error("not discretizing: needs too many points (" + (np + nnp) + ")");
-            return;
+            log.error("not discretizing: need too many points ({})", np + nnp);
+            throw new RuntimeException("need to many points");
         }
 
         TreePoint[] pr = new TreePoint[np + nnp];
@@ -254,7 +252,8 @@ public class SegmentSlicer {
         // don't do them in the loop above because it could mess up the search for
         // later ones
         for (TreePoint[] tpa : cns) {
-            E.info("patching in " + tpa[1] + " as child of nearest in parent segment: " + tpa[0]);
+            log.info("Patching in {} as child of nearest in parent segment: {}",
+                     tpa[1], tpa[0]);
             TreePoint.neighborize(tpa[0], tpa[1]);
         }
         outPoints = pr;
@@ -334,10 +333,9 @@ public class SegmentSlicer {
                         dpos[i] = (x - xa) / dab;
                     }
                 }
-                if (Math.abs(xb - x) > 1.e-5) {
-                    E.error("segment division " + xa + " " + xb + " " + x + " " + nadd + " " + dab + " "
-                            + ra + " " + rb);
-                }
+                if (Math.abs(xb - x) > 1.e-5)
+                    log.warn("segment division " + xa + " " + xb + " " + x + " " + nadd + " " + dab + " "
+                             + ra + " " + rb);
             }
         }
         return dpos;

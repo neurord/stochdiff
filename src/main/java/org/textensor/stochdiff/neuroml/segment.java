@@ -2,13 +2,15 @@ package org.textensor.stochdiff.neuroml;
 
 import java.util.HashMap;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.model.EndPoint;
 import org.textensor.stochdiff.model.MorphPoint;
 import org.textensor.stochdiff.model.Segment;
 
-public class segment {
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
+public class segment {
+    static final Logger log = LogManager.getLogger(segment.class);
 
     public String name;
     public String id;
@@ -50,7 +52,7 @@ public class segment {
             if (cableHM.containsKey(cable))
                 ret.region = cableHM.get(cable);
             else
-                E.warning("segment refers to cable " + cable + " which can't be found");
+                log.warn("segment refers to cable " + cable + " which can't be found");
         }
 
         ret.start = new EndPoint(proximal.getID(), proximal.getX(), proximal.getY(), proximal.getZ(), proximal.getR());

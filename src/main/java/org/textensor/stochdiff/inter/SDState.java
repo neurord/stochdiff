@@ -1,7 +1,5 @@
 package org.textensor.stochdiff.inter;
 
-import org.textensor.report.E;
-
 public class SDState {
 
     public int nel;

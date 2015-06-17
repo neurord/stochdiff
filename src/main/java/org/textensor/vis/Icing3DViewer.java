@@ -10,11 +10,11 @@ import java.util.HashSet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.textensor.report.E;
-
-
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class Icing3DViewer implements Visualizer {
+    static final Logger log = LogManager.getLogger(Icing3DViewer.class);
 
     double scaleFactor = 1.;
 
@@ -104,7 +104,7 @@ public class Icing3DViewer implements Visualizer {
             sceneGraphViewer.setSceneGraph(sgb.getSceneGraph(), null);
 
         } else {
-            E.error("cannot build viewable from " + obj);
+            log.error("cannot build viewable from " + obj);
         }
     }
 
@@ -163,7 +163,7 @@ public class Icing3DViewer implements Visualizer {
             try {
                 ret = new Color(Integer.decode(s).intValue());
             } catch (Exception ex) {
-                E.warning("dodgy color " + s);
+                log.warn("dodgy color " + s);
                 ret = Color.red;
             }
         } else {

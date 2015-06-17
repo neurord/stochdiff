@@ -2,7 +2,6 @@ package org.textensor.stochdiff.neuroml;
 
 import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.Transitional;
 
 public class morphml implements Transitional {
@@ -26,14 +25,13 @@ public class morphml implements Transitional {
     public cell getMorphMLCell() {
         if (cells != null && cells.size() > 0) {
             Object obj = cells.get(0);
-            try {
-                if (obj instanceof Transitional) {
-                    obj = ((Transitional)obj).getFinal();
+            if (obj instanceof Transitional)
+                try {
+                    obj = ((Transitional) obj).getFinal();
+                } catch (Exception ex) {
+                    throw new RuntimeException("cannot convert from " + obj);
                 }
-            } catch (Exception ex) {
-                E.error("cannot convert from " + obj);
-            }
-            return (cell)obj;
+            return (cell) obj;
         }
         return null;
     }

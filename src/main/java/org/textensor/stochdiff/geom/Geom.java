@@ -1,8 +1,5 @@
 package org.textensor.stochdiff.geom;
 
-import org.textensor.report.E;
-
-
 public final class Geom {
 
 
@@ -51,7 +48,7 @@ public final class Geom {
 
 
     public static Rotation fromZRotation(Vector v) {
-        E.missing("untested - probably wrong");
+        assert false: "not tested, probably wrong";
         Vector v1 = unitZ();
         double phi = angleBetween(v1, v);
         GRotation gr1 = aboutYRotation(phi);

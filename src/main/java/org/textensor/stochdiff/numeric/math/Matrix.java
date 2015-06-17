@@ -1,7 +1,5 @@
 package org.textensor.stochdiff.numeric.math;
 
-import org.textensor.report.E;
-
 public final class Matrix extends Object implements Cloneable {
 
     public double a[][];
@@ -254,7 +252,7 @@ public final class Matrix extends Object implements Cloneable {
         mr.zero();
 
         if (n2 != m.n1) {
-            E.error("incompatible dims in Matrix.prod: A: " + n1 + " " + n2 + "   B: " + m.n1 + " " + m.n2);
+            throw new RuntimeException("incompatible dims in Matrix.prod: A: " + n1 + " " + n2 + "   B: " + m.n1 + " " + m.n2);
 
         } else {
             for (int i = 0; i < n1; i++) {

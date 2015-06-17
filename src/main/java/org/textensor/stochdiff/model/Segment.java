@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
-import org.textensor.report.E;
-
 public class Segment {
 
     @XmlAttribute public String id;
@@ -58,17 +56,10 @@ public class Segment {
 
 
     public void checkHasPositions() {
-        if (start.hasPosition()) {
-            // OK
-        } else {
-            E.error("start point of " + id + " still has no position " + start.writePos());
-        }
-        if (end.hasPosition()) {
-            // OK
-        } else {
-            E.error("start point of " + id + " still has no position " + start.writePos());
-        }
+        if (!start.hasPosition())
+            throw new RuntimeException("Start point of " + id + " still has no position " + start.writePos());
+
+        if (!end.hasPosition())
+            throw new RuntimeException("Start point of " + id + " still has no position " + end.writePos());
     }
-
-
 }

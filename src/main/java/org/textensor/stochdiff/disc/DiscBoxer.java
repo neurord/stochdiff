@@ -2,14 +2,12 @@ package org.textensor.stochdiff.disc;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
 import org.textensor.stochdiff.numeric.morph.VolumeSlice;
-
-import java.util.ArrayList;
 
 /*
  * Take a structure expressed as TreePoints each of which knows thier
@@ -19,9 +17,6 @@ import java.util.ArrayList;
  * The output will be the boxes (positions, volumes etc) and coupling
  * constants.
  */
-
-
-
 public class DiscBoxer {
 
     TreePoint[] srcPoints;
@@ -37,9 +32,8 @@ public class DiscBoxer {
     public DiscBoxer(TreePoint[] pts, double[] sl) {
         srcPoints = pts;
         surfaceLayers = sl;
-        if (sl != null && sl.length > 0) {
-            E.missing("3d cuboid mesh doesn't handle surface layers yet");
-        }
+        if (sl != null && sl.length > 0)
+            throw new RuntimeException("3d cuboid mesh doesn't handle surface layers yet");
     }
 
 

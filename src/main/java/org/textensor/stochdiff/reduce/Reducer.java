@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.textensor.util.FileUtil;
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.FloatValued;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.model.InitialConditions;
@@ -14,7 +13,11 @@ import org.textensor.stochdiff.numeric.StaticCalc;
 import org.textensor.stochdiff.numeric.math.Matrix;
 import org.textensor.xml.ModelReader;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class Reducer {
+    static final Logger log = LogManager.getLogger(Reducer.class);
 
     // the base model specification
     SDRun sdr;
@@ -60,7 +63,7 @@ public class Reducer {
     public void reduce()
         throws Exception
     {
-        E.info("Starting reduce");
+        log.info("Starting reduce");
         icon = sdr.getInitialConditions();
         afv = icon.getFloatValuedElements();
         nv = afv.size();
@@ -71,7 +74,7 @@ public class Reducer {
         double x0 = 10.0;
         double dx = 0.1;
 
-        E.info("The template provides " + nv + " accessible concentration values");
+        log.info("The template provides {} accessible concentration values", nv);
 
         // StaticCalc maps the model onto the array of concentrations for each element
         staticCalc = new StaticCalc(0, sdr);
@@ -92,9 +95,9 @@ public class Reducer {
 
 
         int nconc = c0.length;
-        E.info("The template provides " + nv + " variable quantities");
-        E.info("After discretization there are " + nconc + " state variables arising from " + nspec + " species in "
-               + nel + " elements");
+        log.info("The template provides {} variable quantities", nv);
+        log.info("After discretization there are {} state variables arising from {} species in {} elements",
+                 nconc, nspec, nel);
 
         // bm will contain the derivatives of the concentrations with respect to the variables
         double[][] bm = new double[nconc][nv];
@@ -152,7 +155,7 @@ public class Reducer {
             for (int i = 0; i < ncn; i++) {
                 ss += " " + spres[i] + "(" + ispeccon[i] + ") ";
             }
-            E.info(" " + ncn + " constraint(s) on totals for species " + ss);
+            log.info("{} constraint(s) on totals for species {}", ncn, ss);
 
             // q is the constraint matrix
             double[][] q = new double[ncn][nv];
@@ -201,7 +204,7 @@ public class Reducer {
         }
         String fout = "reduce-fit.xml";
         ic_loader.marshall(icon, fout);
-        E.info("New initial conditions have been written to " + fout);
+        log.info("New initial conditions have been written to {}", fout);
     }
 
     public void showFit(double[] newvars, double[] mcdat) {
@@ -211,7 +214,7 @@ public class Reducer {
 
         double[][] cfit = staticCalc.getElementConcentrations();
 
-        E.info("Average concentrations by species: ");
+        log.info("Average concentrations by species: ");
         for (int ispec = 0; ispec < nspec; ispec++) {
             double a = 0;
             double b = 0;
@@ -225,13 +228,8 @@ public class Reducer {
             }
             a /= vtot;
             b /= vtot;
-            E.info("    species " + ispec + " target=" + a + "  fit=" + b);
-
+            log.info("    species " + ispec + " target=" + a + "  fit=" + b);
         }
-
-
-
-
     }
 
 
@@ -242,7 +240,7 @@ public class Reducer {
             for (int j = 0; j < nspec; j++) {
                 sl += String.format("%12.3f", dat[i][j]) + " ";
             }
-            E.info(sl);
+            log.info(sl);
         }
     }
 }

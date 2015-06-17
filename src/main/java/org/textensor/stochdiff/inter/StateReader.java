@@ -3,12 +3,13 @@ package org.textensor.stochdiff.inter;
 import java.io.File;
 import java.util.StringTokenizer;
 
-import org.textensor.report.E;
 import org.textensor.util.FileUtil;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class StateReader {
-
-
+    static final Logger log = LogManager.getLogger(StateReader.class);
 
     public static SDState readState(String fnm) {
         String s = FileUtil.readStringFromFile(new File(fnm));
@@ -35,7 +36,7 @@ public class StateReader {
                 String[] bits = st.nextToken().split(" ");
 
                 if (bits.length != ret.nspec) {
-                    E.error("wrong length for species lists " + bits.length + " " + ret.nspec);
+                    log.warn("wrong length for specie list {}, {}", bits.length, ret.nspec);
                     readok = false;
                 } else {
                     ret.specids = bits;
@@ -63,13 +64,9 @@ public class StateReader {
         ret.conc = conc;
 
         if (!readok) {
-            E.warning("ignoring initial conditions file");
+            log.warn("ignoring initial conditions file");
             ret = null;
         }
         return ret;
     }
-
-
-
-
 }

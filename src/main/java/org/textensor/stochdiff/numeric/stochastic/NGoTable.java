@@ -2,9 +2,11 @@ package org.textensor.stochdiff.numeric.stochastic;
 
 import static java.lang.String.format;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Table of cumulative probabilities of a certain number of successes
@@ -12,6 +14,7 @@ import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
  * given.
  */
 public final class NGoTable {
+    static final Logger log = LogManager.getLogger(NGoTable.class);
 
     public final double lnp;
     public final int n;
@@ -57,10 +60,9 @@ public final class NGoTable {
              * unless something has gone wrong.
              */
             // RCC, condition was 1.e-14: should check why it doesn't always make that
-            if (Math.abs(1. - c) > 1.e-11) {
-                E.error("cumulative probability miscount? "+ c +
-                        " for n, p, nkept " + n + " " + p + " " + ncprob);
-            }
+            if (Math.abs(1. - c) > 1.e-11)
+                log.warn("cumulative probability miscount? "+ c +
+                         " for n, p, nkept " + n + " " + p + " " + ncprob);
 
             /*
              * What we actually want is the cumulative probability of n or fewer
@@ -99,10 +101,8 @@ public final class NGoTable {
 
             }
 
-            if (ncprob < 0) {
-                E.error("never terminated tabled? " + n + " " + lambda + " " +  emlambda * lampnbynfac);
-            }
-
+            if (ncprob < 0)
+                log.warn("never terminated tabled? " + n + " " + lambda + " " +  emlambda * lampnbynfac);
 
             /*
              * What we actually want is the cumulative probability of n or fewer

@@ -2,7 +2,6 @@ package org.textensor.stochdiff.reduce;
 
 import java.io.File;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.stochdiff.model.SDRun;

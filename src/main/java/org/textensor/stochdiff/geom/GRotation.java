@@ -1,8 +1,5 @@
 package org.textensor.stochdiff.geom;
 
-import org.textensor.report.E;
-
-
 public class GRotation implements Rotation {
 
     public static final int X_AXIS = 1;
@@ -13,11 +10,9 @@ public class GRotation implements Rotation {
 
     public GRotation() {
         mtx = new double[3][3];
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++)
             mtx[i][i] = 1.;
-        }
     }
-
 
     public GRotation(int axis, double angle) {
         this();
@@ -36,22 +31,14 @@ public class GRotation implements Rotation {
             mtx[2][0] = -sa;
             mtx[2][2] = ca;
 
-        } else if (axis == Z_AXIS) {
+        } else {
+            assert axis == Z_AXIS;
             mtx[0][0] = ca;
             mtx[0][1] = -sa;
             mtx[1][0] = sa;
             mtx[1][1] = ca;
-
-
-
-        } else {
-            E.error("unknown axis " + axis);
         }
     }
-
-
-
-
 
     public Vector getRotatedVector(Vector v) {
         double[] d = {v.getDX(), v.getDY(), v.getDZ()};

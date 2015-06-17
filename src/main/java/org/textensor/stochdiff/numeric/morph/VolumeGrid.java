@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.HashMap;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.disc.CurvedVolumeSlice;
 import org.textensor.stochdiff.geom.Geom;
 import org.textensor.util.inst;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class VolumeGrid {
+    static final Logger log = LogManager.getLogger(VolumeGrid.class);
 
     public enum geometry_t {
         GEOM_2D,
@@ -376,7 +379,7 @@ public class VolumeGrid {
         }
 
         for (String s : areaHM.keySet()) {
-            E.info("area key " + s);
+            log.info("area key {}", s);
 
             if (s.startsWith(pre) && s.endsWith(post)) {
                 String sin = s.substring(pre.length(), s.indexOf(post));

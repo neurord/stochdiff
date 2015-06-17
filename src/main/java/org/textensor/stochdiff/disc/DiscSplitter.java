@@ -3,13 +3,15 @@ package org.textensor.stochdiff.disc;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeLine;
 import org.textensor.stochdiff.numeric.morph.VolumeSlice;
 
 import java.util.ArrayList;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * Take a structure expressed as TreePoints each of which knows their
@@ -19,10 +21,9 @@ import java.util.ArrayList;
  * The output will be the elements (positions, volumes etc) and coupling
  * constants.
  */
-
-
-
 public class DiscSplitter {
+    static final Logger log = LogManager.getLogger(DiscSplitter.class);
+
     TreePoint[] srcPoints;
     ArrayList<CurvedVolumeSlice> gridAL;
     HashSet<TreePoint> wkpHS;
@@ -42,7 +43,7 @@ public class DiscSplitter {
 
         if (mar > 0.5) {
             maxAR = mar;
-            E.info("set max aspect ratio " + maxAR);
+            log.info("set max aspect ratio {}", maxAR);
         }
     }
 
@@ -102,7 +103,7 @@ public class DiscSplitter {
                 } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
                     // E.info("first pt after branch " + tpn);
                     TreePoint par = tp.parent;
-                    E.info("starting a sub-branch at " + tp + " - " + tpn + " " + pGrid);
+                    log.info("starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
 
                     vg = baseGrid(tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);

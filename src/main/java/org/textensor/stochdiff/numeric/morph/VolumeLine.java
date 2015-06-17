@@ -3,19 +3,19 @@
 //written by Robert Cannon
 package org.textensor.stochdiff.numeric.morph;
 
-/*
- * A line of cuboid volume elements across the diameter of dendrite.
- * Used for producing 2D models
- */
-
-
-
-import org.textensor.report.E;
 import org.textensor.stochdiff.geom.*;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
+/*
+ * A line of cuboid volume elements across the diameter of dendrite.
+ * Used for producing 2D models.
+ */
 public class VolumeLine {
+    static final Logger log = LogManager.getLogger(VolumeLine.class);
 
     int nsl;
     int nreg;
@@ -179,8 +179,8 @@ public class VolumeLine {
     public void subPlaneConnect(TreePoint tp, TreePoint tpl, VolumeLine tgt,
                                 double offset) {
 
-        E.info("segment junction: " + nl + " points across " + lSize +
-               " being connected to " + tgt.nl + " across " + tgt.lSize);
+        log.info("segment junction: {} points across {} being connected to {} across {}",
+                 nl, lSize, tgt.nl, tgt.lSize);
 
         double[][] rngme = makeRanges();
         double[][] rngtgt = tgt.makeRanges();
@@ -190,7 +190,7 @@ public class VolumeLine {
         // offset
         // -1 here because we measure from the "bottom" of the parent segment
         double offeff = -1 * (offset - 0.5 * (lSize - tgt.lSize));
-        E.info("shifting child branch " + offeff + " relative to parent center");
+        log.info("shifting child branch {} relative to parent center", offeff);
 
         // E.info("effoff " + offset + " " + lSize + " " + tgt.lSize + " " + offeff);
         for (int i = 0; i < rngtgt.length; i++) {
@@ -215,7 +215,8 @@ public class VolumeLine {
                 if (fol > 0.001) {
                     CuboidVolumeElement vme = (CuboidVolumeElement)getElement(jme);
                     vme.coupleTo(vtgt, fol * vme.getSideArea());
-                    E.info("coupled parent element " + jme + " to child element " + i + " overlap factor = " + fol);
+                    log.info("coupled parent element {} to child element {} overlap factor = {}",
+                             jme, i, fol);
                 }
             }
         }
@@ -348,16 +349,11 @@ public class VolumeLine {
         E.info("ranges: " + sr);
         */
 
-        if (Math.abs(wk - 0.5 * lSize) / lSize > 1.e-5) {
-            E.info("nl=" + nl + " nsl=" + nsl + " nr=" + nreg + " dreg=" + dreg + " dsl=" + dsl);
-            E.error("range miscount : " + wk + " " + lSize);
-        }
+        log.info("nl={} nsl={} nr={} dreg={} dsl={}",
+                 nl, nsl, nreg, dreg, dsl);
+        assert Math.abs(wk - 0.5 * lSize) / lSize < 1.e-5: "range miscount : " + wk + " " + lSize;
         return ret;
     }
-
-
-
-
 
     public ArrayList<VolumeElement> getElements() {
         ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();

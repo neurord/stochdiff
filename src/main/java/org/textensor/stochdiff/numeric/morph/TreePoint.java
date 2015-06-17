@@ -1,15 +1,9 @@
 package org.textensor.stochdiff.numeric.morph;
 
-import org.textensor.report.E;
-
 import org.textensor.stochdiff.geom.Position;
 
-
-
 import java.util.ArrayList;
-
 import java.util.HashMap;
-
 
 public class TreePoint implements Position {
 
@@ -141,28 +135,19 @@ public class TreePoint implements Position {
     // REFAC - these should all be private, so only the
     // static methods that presever symmetry are visible
     public void addNeighbor(TreePoint cpn) {
-        boolean has = false;
-        for (int i = 0; i < nnbr; i++) {
-            if (nbr[i] == cpn) {
-                E.error("adding a neighbor we already have ");
-                has = true;
-            }
-        }
-        if (has) {
-            // do nothing more - shouldn't have been called though;
+        for (int i = 0; i < nnbr; i++)
+            if (nbr[i] == cpn)
+                throw new RuntimeException("adding a neighbor we already have ");
 
-        } else {
-            if (nnbr >= nbr.length) {
-                TreePoint[] pn = new TreePoint[2 * nnbr];
-                for (int i = 0; i < nnbr; i++) {
-                    pn[i] = nbr[i];
-                }
-                nbr = pn;
+        if (nnbr >= nbr.length) {
+            TreePoint[] pn = new TreePoint[2 * nnbr];
+            for (int i = 0; i < nnbr; i++) {
+                pn[i] = nbr[i];
             }
-            nbr[nnbr++] = cpn;
+            nbr = pn;
         }
+        nbr[nnbr++] = cpn;
     }
-
 
     public void removeNeighbor(TreePoint cp) {
         int ii = -1;
@@ -190,9 +175,8 @@ public class TreePoint implements Position {
         }
         if (ii >= 0) {
             nbr[ii] = cr;
-        } else {
-            E.error(" (replaceNeighbor) couldnt find nbr " + cp + " in nbrs list of " + this);
-        }
+        } else
+            throw new RuntimeException("(replaceNeighbor) couldn't find nbr " + cp + " in nbrs list of " + this);
 
         if (segidHM != null && segidHM.containsKey(cp)) {
             segidHM.put(cr, segidHM.get(cp));

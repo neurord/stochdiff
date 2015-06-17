@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.numeric.stochastic;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
@@ -15,12 +14,7 @@ import org.apache.logging.log4j.LogManager;
  * very many different transition probabilities so that the
  * DiscretePStepGenerator would require an unfeasibly large array
  * of transition count tables.
- *
- *
  */
-
-
-
 public class InterpolatingStepGenerator extends StepGenerator {
     static final Logger log = LogManager.getLogger(InterpolatingStepGenerator.class);
 
@@ -136,7 +130,8 @@ public class InterpolatingStepGenerator extends StepGenerator {
             ia = 0;
             f = 0.;
         }
-        E.info("interpolationg between tables " + ia + " and " + (ia+1) + " factor " + f);
+
+        log.info("interpolationg between tables " + ia + " and " + (ia+1) + " factor " + f);
         pnTable[ia][n].print();
         pnTable[ia+1][n].print();
     }
