@@ -257,6 +257,7 @@ public class SDRun implements IOutputSet {
             final Discretization disc = this.getDiscretization();
 
             double d = disc.getDefaultMaxElementSide();
+            double deltaX = disc.spineDeltaX != null ? disc.spineDeltaX : d;
 
             // <--WK 6 22 2007
             // (1) iterate through all endpoints and their associated radii.
@@ -290,7 +291,7 @@ public class SDRun implements IOutputSet {
 
             SpineLocator.locate(this.spineSeed,
                                 morph.getSpineDistribution(),
-                                disc.getSpineDeltaX(),
+                                deltaX,
                                 volumeGrid);
             volumeGrid.fix();
         }

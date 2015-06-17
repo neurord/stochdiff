@@ -316,7 +316,7 @@ A required simulationSeed statement specifies the seed for the random number gen
     <spineSeed>123</spineSeed>
     <simulationSeed>123</simulationSeed>
 
-The discretization statement indicates how to subdivide the segments, i.e. the size of voxels or subvolumes used in running simulations. Smaller sizes require more calculations and result in a longer run time. Three different statements can be used within a discretization statement. The defaultMaxElementSide specifies the largest size (in microns) for each side of the subvolume in each segment. This is the default, and can be overriden by the "MaxElementSide region" statement, which specifies a region and the size of its voxels. The value supplied will be used only for that region. The spineDeltaX statement specifies the size of subvolumes in spines. Spines have a one dimensional discretization. An example follows:
+The discretization statement indicates how to subdivide the segments, i.e. the size of voxels or subvolumes used in running simulations. Smaller sizes require more calculations and result in a longer run time. Three different statements can be used within a discretization statement. The defaultMaxElementSide specifies the largest size (in microns) for each side of the subvolume in each segment. This is the default, and can be overriden by <maxElementSide> for specific regions, which specifies a region and the size of its voxels. The value supplied will be used only for that region. The <spineDeltaX> element specifies the size of subvolumes in spines. spineDeltaX defaults to defaultMaxElementSide. Spines have a one dimensional discretization. Example:
 
 .. code-block:: xml
 
@@ -326,17 +326,17 @@ The discretization statement indicates how to subdivide the segments, i.e. the s
 
         <!-- default largest size for elements in bulk volumes, microns -->
         <defaultMaxElementSide>0.2</defaultMaxElementSide>
-        <MaxElementSide region="dendrite">0.4</MaxElementSide>
+        <maxElementSide region="dendrite">0.4</maxElementSide>
      </discretization>
 
-The actual size of the elements depends on the total radius or length of the compartment, and also the constraint that there are an odd number of voxels across the radius of the structure. The maxelementsize is approximately the maximum that you will achieve.  I.e., with a MaxElemetSide of 0.4, you may generate subvolumes of size 0.33, depending on the size of the compartment. It calculates the length of compartment, divided by MaxElementSide.  Then, it determines the number of subvolumes along the length by rounding the results.  Then, it divides length by number of compartments to yield the actual element size.  Thus, you can end up with a value slightly larger than max element size.
+The actual size of the elements depends on the total radius or length of the compartment, and also the constraint that there are an odd number of voxels across the radius of the structure. The maxElementSize is approximately the maximum that you will achieve.  I.e., with a maxElemetSide of 0.4, you may generate subvolumes of size 0.33, depending on the size of the compartment. It calculates the length of compartment, divided by maxElementSide.  Then, it determines the number of subvolumes along the length by rounding the results.  Then, it divides length by number of compartments to yield the actual element size.  Thus, you can end up with a value slightly larger than max element size.
 
 .. warning::
 
-    If maxelementsize is large enough to create only a single voxel in the height dimension
+    If maxElementSize is large enough to create only a single voxel in the height dimension
     (single submembrane voxel and no cytosolic voxels) then the initial condition specification
     <SurfaceDensitySet> will give half the total number of molecules compared to smaller
-    maxelementsize producing two submembrane voxels with 1 or more cytosolic voxels.
+    maxElementSize producing two submembrane voxels with 1 or more cytosolic voxels.
 
 The timestep statement specifies the time step, in milliseconds, used in fixed step calculations:
 

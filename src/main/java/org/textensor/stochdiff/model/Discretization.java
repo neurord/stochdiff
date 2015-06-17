@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 public class Discretization {
     static final Logger log = LogManager.getLogger(Discretization.class);
 
-    private Double spineDeltaX;
+    Double spineDeltaX;
 
     private Double defaultMaxElementSide;
 
@@ -44,14 +44,6 @@ public class Discretization {
                 }
         }
         return this.maxSideHM;
-    }
-
-    public double getSpineDeltaX() {
-        if (this.spineDeltaX == null)
-            // FIXME: what should the default value be? 1.0 or inf?
-            return 1.0;
-        else
-            return this.spineDeltaX;
     }
 
     public boolean curvedElements() {
