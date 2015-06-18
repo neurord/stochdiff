@@ -31,6 +31,7 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,16 @@ public class ModelReader<T> {
             /* rename MaxElementSide to maxElementSide */
             if (this.sdrun_seen && uri.equals(STOCHDIFF_NS) && localName.equals("MaxElementSide"))
                 localName = "maxElementSide";
+
+            /* rename dt on OutputSet to outputInterval */
+            if (this.sdrun_seen && uri.equals(STOCHDIFF_NS) && localName.equals("OutputSet") &&
+                atts.getIndex("dt") >= 0) {
+
+                log.info("Renaming attribute dt to outputInterval");
+                AttributesImpl filtered = new AttributesImpl(atts);
+                filtered.setLocalName(atts.getIndex("dt"), "outputInterval");
+                atts = filtered;
+            }
 
             super.startElement(uri, localName, qName, atts);
         }

@@ -265,12 +265,12 @@ Every OutputSet block must have in its definition one (and only) instance of:
 Where filename is a string that specifies a sufix appended to the main output file name
 Additionally, every OutputSet block might have one (and only) instance of:
 *     region or;
-*     dt
+*     outputInterval
 A separate statement in each outputset block is used to indicate molecules to be included in the output file. For example:
 
 .. code-block:: xml
 
-     <OutputSet filename = "dt01sml"  region="dendrite" dt="1.0">
+     <OutputSet filename = "dt01sml"  region="dendrite" outputInterval="1.0">
          <OutputSpecie                 name="glu"  />
      </OutputSet>
 

@@ -17,7 +17,7 @@ public class OutputSet implements IOutputSet {
 
     @XmlAttribute public String filename;
     @XmlAttribute public String region;
-    @XmlAttribute public Double dt;
+    @XmlAttribute public Double outputInterval;
 
     @XmlElement(name="OutputSpecie")
     public ArrayList<OutputSpecie> outputSpecies;
@@ -81,8 +81,8 @@ public class OutputSet implements IOutputSet {
 
     @Override
     public double getOutputInterval(double fallback) {
-        if (this.dt != null)
-            return this.dt;
+        if (this.outputInterval != null)
+            return this.outputInterval;
         else
             return fallback;
     }
