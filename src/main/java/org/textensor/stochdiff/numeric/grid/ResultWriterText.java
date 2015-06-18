@@ -311,7 +311,7 @@ public class ResultWriterText implements ResultWriter {
 
         for (int specie: indices)
             for (int i = 0; i < nel; i++)
-                if (region.equals("default") || region.equals(regionLabels[eltRegions[i]]))
+                if (region == null || region.equals(regionLabels[eltRegions[i]]))
                     sb.append(this.formatNumber(i, specie, source));
 
         sb.append("\n");
@@ -332,7 +332,7 @@ public class ResultWriterText implements ResultWriter {
 
         for (int specie: indices)
             for (int i = 0; i < vgrid.getNElements(); i++)
-                if (region.equals("default") || region.equals(regionLabels[eltRegions[i]])) {
+                if (region == null || region.equals(regionLabels[eltRegions[i]])) {
                     sb.append(" Vol_" + i);
                     sb.append("_" + regionLabels[eltRegions[i]]);
 

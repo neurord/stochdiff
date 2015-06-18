@@ -68,10 +68,7 @@ public class OutputSet implements IOutputSet {
 
     @Override
     public String getRegion() {
-        if (this.region != null)
-            return this.region;
-        else
-            return "default";
+        return this.region;
     }
 
     @Override
