@@ -230,7 +230,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             t.writeStimulationData(source);
             t.writeReactionData(source);
             t.writeReactionDependencies(source);
-            t.writeOutputSpecies();
+            t.writeOutputInfo();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -482,7 +482,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     writeArray("neighbors", this.model(), vgrid.getPerElementNeighbors(), -1);
                 setAttribute(ds, "TITLE", "adjacency mapping between voxels");
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
             {
                 Dataset ds =
@@ -556,7 +556,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 Dataset ds = writeArray("targets", group, targets, -1);
                 setAttribute(ds, "TITLE", "stimulated voxels");
                 setAttribute(ds, "LAYOUT", "[??? × ???]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
         }
 
@@ -573,28 +573,28 @@ public class ResultWriterHDF5 implements ResultWriter {
                 Dataset ds = writeArray("reactants", group, indices, -1);
                 setAttribute(ds, "TITLE", "reactant indices");
                 setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
             {
                 int[][] indices = table.getProductIndices();
                 Dataset ds = writeArray("products", group, indices, -1);
                 setAttribute(ds, "TITLE", "product indices");
                 setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
             {
                 int[][] stoichio = table.getReactantStoichiometry();
                 Dataset ds = writeArray("reactant_stoichiometry", group, stoichio, -1);
                 setAttribute(ds, "TITLE", "reactant stoichiometry");
                 setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
             {
                 int[][] stoichio = table.getProductStoichiometry();
                 Dataset ds = writeArray("product_stoichiometry", group, stoichio, -1);
                 setAttribute(ds, "TITLE", "product stoichiometry");
                 setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
-                setAttribute(ds, "UNITS", "indexes");
+                setAttribute(ds, "UNITS", "indices");
             }
 
             {
@@ -662,12 +662,12 @@ public class ResultWriterHDF5 implements ResultWriter {
                     Dataset ds = writeArray("dependent", group, dependent, -1);
                     setAttribute(ds, "TITLE", "dependent reaction channels");
                     setAttribute(ds, "LAYOUT", "[nchannel x ndependent*]");
-                    setAttribute(ds, "UNITS", "indexes");
+                    setAttribute(ds, "UNITS", "indices");
                 }
             }
         }
 
-        protected void writeOutputSpecies()
+        protected void writeOutputInfo()
             throws Exception
         {
             /* We cannot use getNamesOfOutputSpecies() because it has various special
@@ -682,6 +682,11 @@ public class ResultWriterHDF5 implements ResultWriter {
                     Group group = output.createGroup(set.getIdentifier(), this.output_info());
                     writeSpecieVector("output_species", "names of output species", group,
                                       species, ispecout2[i]);
+
+                    Dataset ds = writeVector("output_elements", group, elementsout2[i]);
+                    setAttribute(ds, "TITLE", "indices of output elements");
+                    setAttribute(ds, "LAYOUT", "[nelements]");
+                    setAttribute(ds, "UNITS", "indices");
                 }
         }
 
