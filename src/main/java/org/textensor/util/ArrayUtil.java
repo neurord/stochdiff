@@ -343,12 +343,23 @@ public class ArrayUtil {
         return x;
     }
 
-    public static double[] toPrimitiveArray(Collection<Double> list) {
+    public static double[] toDoubleArray(Collection<Double> list) {
         int n = list == null ? 0 : list.size();
         double[] arr = new double[n];
         if (list != null) {
             int i = 0;
             for (double d: list)
+                arr[i++] = d;
+        }
+        return arr;
+    }
+
+    public static int[] toIntArray(Collection<Integer> list) {
+        int n = list == null ? 0 : list.size();
+        int[] arr = new int[n];
+        if (list != null) {
+            int i = 0;
+            for (int d: list)
                 arr[i++] = d;
         }
         return arr;

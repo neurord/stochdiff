@@ -58,7 +58,7 @@ public class Discretization {
     }
 
     public double[] getSurfaceLayers() {
-        return ArrayUtil.toPrimitiveArray(this.surfaceLayers);
+        return ArrayUtil.toDoubleArray(this.surfaceLayers);
     }
 
     public double getDefaultMaxElementSide() {

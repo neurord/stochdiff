@@ -67,6 +67,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     final int[] ispecout1;
     final int nel;
     final int[][] ispecout2;
+    final int[][] elementsout2;
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
 
@@ -86,10 +87,30 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.nel = grid.getNElements();
         if (this.outputSets != null) {
             this.ispecout2 = new int[outputSets.size()][];
-            for (int i = 0; i < this.ispecout2.length; i++)
+            this.elementsout2 = new int[outputSets.size()][];
+
+            final String[] regionLabels = grid.getRegionLabels();
+            final int[] elementRegions = grid.getRegionIndexes();
+
+            for (int i = 0; i < this.ispecout2.length; i++) {
                 this.ispecout2[i] = outputSets.get(i).getIndicesOfOutputSpecies(species);
-        } else
+
+                String region = outputSets.get(i).getRegion();
+                if (region != null) {
+                    /* Find elements which match specified regions */
+                    ArrayList<Integer> list = inst.newArrayList();
+                    for (int j = 0; j < elementRegions.length; j++)
+                        if (region.equals(regionLabels[elementRegions[j]]))
+                            list.add(j);
+
+                    this.elementsout2[i] = ArrayUtil.toIntArray(list);
+                } else
+                    this.elementsout2[i] = ArrayUtil.iota(this.nel);
+            }
+        } else {
             this.ispecout2 = null;
+            this.elementsout2 = null;
+        }
     }
 
     private int users = 0;
@@ -263,20 +284,20 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected int concs_times_count;
 
         final int[] ispecout;
-        final int nel;
+        final int[] elements;
 
-        public ConcentrationOutput(Group parent, String name, int nel, int[] ispecout)
+        public ConcentrationOutput(Group parent, String name, int[] elements, int[] ispecout)
             throws Exception
         {
             this.ispecout = ispecout;
-            this.nel = nel;
+            this.elements = elements;
 
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
             this.concs = createExtensibleArray("concentrations", parent, int_t,
                                                "concentrations of species in voxels over time",
                                                "[snapshot × nel × nspecout]",
                                                "count",
-                                               CACHE_SIZE1, nel, ispecout.length);
+                                               CACHE_SIZE1, elements.length, ispecout.length);
 
             this.times = createExtensibleArray("times", parent, double_t,
                                                "times when snapshots were written",
@@ -284,7 +305,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                "ms",
                                                CACHE_SIZE1);
 
-            this.concs_cache = new int[CACHE_SIZE1][nel][ispecout.length];
+            this.concs_cache = new int[CACHE_SIZE1][elements.length][ispecout.length];
             this.times_cache = new double[CACHE_SIZE1];
         }
 
@@ -292,7 +313,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             getGridNumbers(this.concs_cache[this.concs_times_count],
-                           this.nel, this.ispecout, source);
+                           this.elements, this.ispecout, source);
             this.times_cache[this.concs_times_count] = time;
             this.concs_times_count++;
 
@@ -697,7 +718,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this._initConcentrations1 = ispecout1.length > 0 ? 1 : 0;
 
             if (this._initConcentrations1 > 0) {
-                this.concs1 = new ConcentrationOutput(this.sim, "out", nel, ispecout1);
+                this.concs1 = new ConcentrationOutput(this.sim, "out", ArrayUtil.iota(nel), ispecout1);
                 return true;
             }
 
@@ -713,7 +734,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
                 String ident = set.getIdentifier();
                 Group group = output.createGroup(ident, this.sim);
-                ConcentrationOutput conc = new ConcentrationOutput(group, ident, nel, ispecout2[i]);
+                ConcentrationOutput conc = new ConcentrationOutput(group, ident, elementsout2[i], ispecout2[i]);
                 this.concs2.add(i, conc);
             }
 
@@ -1246,9 +1267,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     protected static void getGridNumbers(int[][] dst,
-                                         int nel, int ispecout[], IGridCalc source) {
-        for (int i = 0; i < nel; i++)
+                                         int elements[], int ispecout[], IGridCalc source) {
+        for (int i = 0; i < elements.length; i++)
             for (int j = 0; j < ispecout.length; j++)
-                dst[i][j] = source.getGridPartNumb(i, ispecout[j]);
+                dst[i][j] = source.getGridPartNumb(elements[i], ispecout[j]);
     }
 }
