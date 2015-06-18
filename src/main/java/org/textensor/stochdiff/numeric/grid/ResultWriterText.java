@@ -34,19 +34,23 @@ public class ResultWriterText implements ResultWriter {
 
     final String[] species;
     final int[] ispecout;
+    final int nel;
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
+    final VolumeGrid grid;
 
     public ResultWriterText(File output,
                             IOutputSet primary,
                             List<? extends IOutputSet> outputSets,
                             String[] species,
+                            VolumeGrid grid,
                             boolean writeConcentration) {
 
         this.writeConcentration = writeConcentration;
         this.outputFile = new File(output + ".out");
 
         this.species = species;
+        this.grid = grid;
         if (primary != null) {
             this.ispecout = primary.getIndicesOfOutputSpecies(species);
             this.outputSet = primary;
@@ -55,6 +59,7 @@ public class ResultWriterText implements ResultWriter {
             this.outputSet = null;
         }
         this.outputSets = outputSets;
+        this.nel = grid.getNElements();
     }
 
     public boolean isContinuation() {
@@ -127,7 +132,7 @@ public class ResultWriterText implements ResultWriter {
         if (ret == null) {
             String fnm = FileUtil.getRootName(this.outputFile) + extn;
             File f = new File(outputFile.getParentFile(), fnm);
-            ret = new ResultWriterText(f, null, null, this.species, this.writeConcentration);
+            ret = new ResultWriterText(f, null, null, this.species, this.grid, this.writeConcentration);
             ret.init(null);
             siblings.put(extn, ret);
         }
@@ -270,7 +275,7 @@ public class ResultWriterText implements ResultWriter {
         }
     }
 
-    private String getGridConcsText(double time, int nel, int[] ispecout, IGridCalc source) {
+    private String getGridConcsText(double time, int[] ispecout, IGridCalc source) {
         final String[] species = source.getSource().getSpecies();
         StringBuffer sb = new StringBuffer();
         // TODO tag specific to integer quantities;
@@ -278,12 +283,12 @@ public class ResultWriterText implements ResultWriter {
         if (nspecout == 0)
             return "";
 
-        sb.append("gridConcentrations " + nel + " " + nspecout + " " + time + " ");
+        sb.append("gridConcentrations " + this.nel + " " + nspecout + " " + time + " ");
         for (int i = 0; i < nspecout; i++)
             sb.append(species[ispecout[i]] + " ");
         sb.append("\n");
 
-        for (int i = 0; i < nel; i++) {
+        for (int i = 0; i < this.nel; i++) {
             for (int j = 0; j < nspecout; j++)
                 sb.append(this.formatNumber(i, ispecout[j], source));
             sb.append("\n");
@@ -292,12 +297,12 @@ public class ResultWriterText implements ResultWriter {
     }
 
     @Override
-    public void writeOutputInterval(double time, int nel, IGridCalc source) {
-        String concs = this.getGridConcsText(time, nel, this.ispecout, source);
+    public void writeOutputInterval(double time, IGridCalc source) {
+        String concs = this.getGridConcsText(time, this.ispecout, source);
         this.writeString(concs);
     }
 
-    private String getGridConcsPlainText_dumb(IOutputSet output, double time, int nel, IGridCalc source) {
+    private String getGridConcsPlainText_dumb(IOutputSet output, double time, IGridCalc source) {
         final String[] species = source.getSource().getSpecies();
 
         final String[] regionLabels = source.getSource().getVolumeGrid().getRegionLabels();
@@ -310,7 +315,7 @@ public class ResultWriterText implements ResultWriter {
         sb.append(stringd(time));
 
         for (int specie: indices)
-            for (int i = 0; i < nel; i++)
+            for (int i = 0; i < this.nel; i++)
                 if (region == null || region.equals(regionLabels[eltRegions[i]]))
                     sb.append(this.formatNumber(i, specie, source));
 
@@ -331,7 +336,7 @@ public class ResultWriterText implements ResultWriter {
         final String region = output.getRegion();
 
         for (int specie: indices)
-            for (int i = 0; i < vgrid.getNElements(); i++)
+            for (int i = 0; i < this.nel; i++)
                 if (region == null || region.equals(regionLabels[eltRegions[i]])) {
                     sb.append(" Vol_" + i);
                     sb.append("_" + regionLabels[eltRegions[i]]);
@@ -366,11 +371,11 @@ public class ResultWriterText implements ResultWriter {
 
 
     @Override
-    public void writeOutputScheme(int i, double time, int nel, IGridCalc source) {
+    public void writeOutputScheme(int i, double time, IGridCalc source) {
         IOutputSet output = this.outputSets.get(i);
         String fnamepart = output.getIdentifier();
-        log.debug("writeOutputScheme: i={} time={} nel={} fnamepart={}", i, time, nel, fnamepart);
-        String text = getGridConcsPlainText_dumb(output, time, nel, source);
+        log.debug("writeOutputScheme: i={} time={} nel={} fnamepart={}", i, time, this.nel, fnamepart);
+        String text = getGridConcsPlainText_dumb(output, time, source);
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
 

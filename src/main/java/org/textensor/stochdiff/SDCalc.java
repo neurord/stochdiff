@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.numeric.BaseCalc;
+import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
 import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.stochdiff.numeric.grid.ResultWriterHDF5;
@@ -39,11 +40,13 @@ public class SDCalc {
 
         for (String type: writers) {
             final ResultWriter writer;
+            final VolumeGrid grid = sdr.getVolumeGrid();
+            final String[] species = sdr.getSpecies();
             if (type.equals("text")) {
-                writer = new ResultWriterText(output, sdr, sdr.getOutputSets(), sdr.getSpecies(), false);
+                writer = new ResultWriterText(output, sdr, sdr.getOutputSets(), species, grid, false);
                 log.info("Using text writer for {}", writer.outputFile());
             } else if (type.equals("h5")) {
-                writer = new ResultWriterHDF5(output, sdr, sdr.getOutputSets(), sdr.getSpecies());
+                writer = new ResultWriterHDF5(output, sdr, sdr.getOutputSets(), species, grid);
                 log.info("Using HDF5 writer for {}", writer.outputFile());
             } else {
                 log.error("Unknown writer '{}'", type);

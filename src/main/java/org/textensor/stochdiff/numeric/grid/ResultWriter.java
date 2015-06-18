@@ -19,10 +19,10 @@ public interface ResultWriter {
     void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source);
 
     /* Write the output specified in the first way. */
-    void writeOutputInterval(double time, int nel, IGridCalc source);
+    void writeOutputInterval(double time, IGridCalc source);
 
     /* Write the output specified in the second way. */
-    void writeOutputScheme(int i, double time, int nel, IGridCalc source);
+    void writeOutputScheme(int i, double time, IGridCalc source);
 
     void saveState(double time, String prefix, IGridCalc source);
     Object loadState(String initialStateFile, IGridCalc source);

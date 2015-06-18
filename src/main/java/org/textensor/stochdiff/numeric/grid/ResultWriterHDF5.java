@@ -3,6 +3,7 @@ package org.textensor.stochdiff.numeric.grid;
 import java.io.File;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Collection;
 import java.util.Map;
@@ -64,6 +65,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     final String[] species;
     final int[] ispecout1;
+    final int nel;
     final int[][] ispecout2;
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
@@ -71,7 +73,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     public ResultWriterHDF5(File output,
                             IOutputSet primary,
                             List<? extends IOutputSet> outputSets,
-                            String[] species) {
+                            String[] species,
+                            VolumeGrid grid) {
 
         this.outputFile = new File(output + ".h5");
         log.debug("Writing HDF5 to {}", this.outputFile);
@@ -80,6 +83,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.outputSet = primary;
         this.outputSets = outputSets;
         this.ispecout1 = primary.getIndicesOfOutputSpecies(species);
+        this.nel = grid.getNElements();
         if (this.outputSets != null) {
             this.ispecout2 = new int[outputSets.size()][];
             for (int i = 0; i < this.ispecout2.length; i++)
@@ -212,20 +216,20 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    synchronized public void writeOutputInterval(double time, int nel, IGridCalc source) {
+    synchronized public void writeOutputInterval(double time, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeOutput1(time, nel, source);
+            t._writeOutput1(time, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    synchronized public void writeOutputScheme(int i, double time, int nel, IGridCalc source) {
+    synchronized public void writeOutputScheme(int i, double time, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeOutput2(i, time, nel, source);
+            t._writeOutput2(i, time, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -259,11 +263,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected int concs_times_count;
 
         final int[] ispecout;
+        final int nel;
 
         public ConcentrationOutput(Group parent, String name, int nel, int[] ispecout)
             throws Exception
         {
             this.ispecout = ispecout;
+            this.nel = nel;
 
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
             this.concs = createExtensibleArray("concentrations", parent, int_t,
@@ -282,11 +288,11 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.times_cache = new double[CACHE_SIZE1];
         }
 
-        public void writeConcentrations(double time, int nel, IGridCalc source)
+        public void writeConcentrations(double time, IGridCalc source)
             throws Exception
         {
             getGridNumbers(this.concs_cache[this.concs_times_count],
-                           nel, this.ispecout, source);
+                           this.nel, this.ispecout, source);
             this.times_cache[this.concs_times_count] = time;
             this.concs_times_count++;
 
@@ -384,10 +390,10 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             log.debug("Writing grid at time {} for trial {}", startTime, source.trial());
-            int n = vgrid.getNElements();
+            assert nel == vgrid.getNElements();
             long[]
-                dims = {n,},
-                chunks = {n,};
+                dims = {nel,},
+                chunks = {nel,};
             String[] memberNames = { "x0", "y0", "z0",
                                      "x1", "y1", "z1",
                                      "x2", "y2", "z2",
@@ -407,8 +413,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             Vector<Object> data = vgrid.gridData();
 
             {
-                String[] labels = new String[n];
-                for (int i = 0; i < n; i++) {
+                String[] labels = new String[nel];
+                for (int i = 0; i < nel; i++) {
                     labels[i] = vgrid.getLabel(i);
                     if (labels[i] == null)
                         labels[i] = "element" + i;
@@ -418,22 +424,22 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             {
                 int[] indexes = vgrid.getRegionIndexes();
-                assert indexes.length == n;
+                assert indexes.length == nel;
                 data.add(indexes);
             }
 
             {
                 boolean[] membranes = vgrid.getSubmembranes();
-                assert membranes.length == n;
-                String[] types = new String[n];
-                for (int i = 0; i < n; i++)
+                assert membranes.length == nel;
+                String[] types = new String[nel];
+                for (int i = 0; i < nel; i++)
                     types[i] = membranes[i] ? "submembrane" : "cytosol";
                 data.add(types);
             }
 
             {
-                String[] labels = new String[n];
-                for (int i = 0; i < n; i++) {
+                String[] labels = new String[nel];
+                for (int i = 0; i < nel; i++) {
                     labels[i] = vgrid.getGroupID(i);
                     if (labels[i] == null)
                         labels[i] = "";
@@ -658,24 +664,24 @@ public class ResultWriterHDF5 implements ResultWriter {
                 }
         }
 
-        public void _writeOutput1(double time, int nel, IGridCalc source)
+        public void _writeOutput1(double time, IGridCalc source)
             throws Exception
         {
-            this.writeConcentrations1(time, nel, source);
+            this.writeConcentrations1(time, source);
             this.writeStimulationEvents(time, source);
             this.writeDiffusionEvents(time, source);
             this.writeReactionEvents(time, source);
             this.writeEvents(time, source);
         }
 
-        public void _writeOutput2(int i, double time, int nel, IGridCalc source)
+        public void _writeOutput2(int i, double time, IGridCalc source)
             throws Exception
         {
-            this.writeConcentrations2(i, time, nel, source);
+            this.writeConcentrations2(i, time, source);
         }
 
         private int _initConcentrations1 = -1;
-        protected boolean initConcentrations1(int nel, IGridCalc source)
+        protected boolean initConcentrations1(IGridCalc source)
             throws Exception
         {
             if (this._initConcentrations1 >= 0)
@@ -698,7 +704,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             return false;
         }
 
-        protected boolean initConcentrations2(int i, int nel, IGridCalc source)
+        protected boolean initConcentrations2(int i, IGridCalc source)
             throws Exception
         {
             if (i >= this.concs2.size() || this.concs2.get(i) == null) {
@@ -714,22 +720,22 @@ public class ResultWriterHDF5 implements ResultWriter {
             return true;
         }
 
-        protected void writeConcentrations1(double time, int nel, IGridCalc source)
+        protected void writeConcentrations1(double time, IGridCalc source)
             throws Exception
         {
-            if (!this.initConcentrations1(nel, source))
+            if (!this.initConcentrations1(source))
                 return;
 
-            this.concs1.writeConcentrations(time, nel, source);
+            this.concs1.writeConcentrations(time, source);
         }
 
-        protected void writeConcentrations2(int i, double time, int nel, IGridCalc source)
+        protected void writeConcentrations2(int i, double time, IGridCalc source)
             throws Exception
         {
-            if (!this.initConcentrations2(i, nel, source))
+            if (!this.initConcentrations2(i, source))
                 return;
 
-            this.concs2.get(i).writeConcentrations(time, nel, source);
+            this.concs2.get(i).writeConcentrations(time, source);
         }
 
         protected void initStimulationEvents(int elements, int species)
@@ -986,7 +992,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.flushEvents(time, false);
         }
 
-        protected void writeSavedStateI(int nel, int nspecie, IGridCalc source)
+        protected void writeSavedStateI(int nspecie, IGridCalc source)
             throws Exception
         {
             int[][] state = {};
@@ -1005,7 +1011,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeSavedStateD(int nel, int nspecie, IGridCalc source)
+        protected void writeSavedStateD(int nspecie, IGridCalc source)
             throws Exception
         {
             double[][] state = {};
@@ -1028,12 +1034,12 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             log.debug("state saved at t={} ms for trial {}", time, source.trial());
-            int nel = source.getNumberElements();
+            assert nel == source.getNumberElements();
             int nspecie = source.getSource().getSpecies().length;
             if (source.preferConcs())
-                this.writeSavedStateD(nel, nspecie, source);
+                this.writeSavedStateD(nspecie, source);
             else
-                this.writeSavedStateI(nel, nspecie, source);
+                this.writeSavedStateI(nspecie, source);
         }
 
         public Object _loadState(String filename, IGridCalc source)
@@ -1042,7 +1048,6 @@ public class ResultWriterHDF5 implements ResultWriter {
             // FIXME: This is totally not going to work, because we delete
             // the file on creation...
             Dataset obj = (Dataset) output.get("/simulation/state");
-            int nel = source.getNumberElements();
             int nspecie = source.getSource().getSpecies().length;
             if (obj == null)
                 throw new RuntimeException("state hasn't been saved");
