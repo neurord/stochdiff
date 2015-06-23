@@ -358,7 +358,7 @@ public class NextEventQueue {
 
                     int count = this.leap_count(current, leap);
 
-                    log.debug("{}: leaping {} {}→{}, extent {}",
+                    log.debug("{}: leaping {} ({}→{}), extent {}",
                               this, leap, current, current + leap, count);
                     this.setEvent(count, true, current, current + leap);
                     return;
@@ -1100,7 +1100,7 @@ public class NextEventQueue {
             log.warn("{}: population would become negative for element {} sp {}: changing {} by {} {}",
                      event, element, specie,
                      this.particles[element][specie], count,
-                     "" + this.particles);
+                     this.particles);
             done = -this.particles[element][specie];
             this.particles[element][specie] = 0;
         } else {
