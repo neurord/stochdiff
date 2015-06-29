@@ -408,14 +408,17 @@ public class NextEventQueue {
             pick_time(current, timelimit, tolerance);
             queue.reposition("update", this);
 
-            for (NextEvent dep: this.dependent) {
-                double old = dep._update_propensity(changed);
-                if (update_times && !Double.isInfinite(dep.time))
-                    dep.time = (dep.time - current) * old / dep.propensity + current;
-                else
-                    dep.time = dep._new_time(current);
-                queue.reposition("upd.dep", dep);
-            }
+            for (NextEvent dep: this.dependent)
+                dep.update_and_reposition(current, changed);
+        }
+
+        void update_and_reposition(double current, boolean changed) {
+            double old = this._update_propensity(changed);
+            if (update_times && !Double.isInfinite(this.time))
+                this.time = (this.time - current) * old / this.propensity + current;
+            else
+                this.time = this._new_time(current);
+            queue.reposition("upd.dep", this);
         }
 
         List<NextEvent>
