@@ -1406,8 +1406,8 @@ public class NextEventQueue {
             log.debug("Next event is {} time {}, past stop at {}", ev, now, tstop);
             return tstop;
         } else
-            log.debug("Advanced {}→{} with event {} {} extent={}",
-                      time, now, ev, ev.leap ? "leap" : "", ev.extent);
+            log.debug("Advanced {}→{} with event {} {}extent={}",
+                      time, now, ev, ev.leap ? "leap " : "", ev.extent);
 
         ev.update(reactionEvents,
                   diffusionEvents,
