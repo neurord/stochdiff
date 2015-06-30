@@ -191,6 +191,19 @@ public class NextEventQueue {
          */
         protected boolean leap;
 
+        protected NextEvent reverse;
+
+        /*
+         * We calculated the leap size including both forward and reverse propensities.
+         * Reverse event is "taken care of".
+         */
+        protected boolean bidirectional_leap;
+
+        /*
+         * reverse_is_leaping: set when this Event is "taken care of" by the reverse Event.
+         */
+        protected boolean reverse_is_leaping;
+
         /**
          * propensity: speed with which this event occurs in unchanging conditions
          */
@@ -206,9 +219,12 @@ public class NextEventQueue {
             this.reactants = reactants;
         }
 
-        protected void setEvent(int extent, boolean leap, double wait_start, double time) {
+        protected void setEvent(int extent, boolean leap, boolean bidirectional,
+                                double wait_start, double time) {
+            assert !this.reverse_is_leaping;
             this.extent = extent;
             this.leap = leap;
+            this.bidirectional_leap = bidirectional;
             this.wait_start = wait_start;
             this.time = time;
         }
@@ -237,9 +253,6 @@ public class NextEventQueue {
             this.index = index;
         }
 
-        public abstract boolean isReversible();
-        public abstract boolean isReverseOf(NextEvent other);
-
         @Override
         public double time() {
             return this.time;
@@ -247,6 +260,14 @@ public class NextEventQueue {
 
         public abstract int[] substrates();
         public abstract int[] substrate_stoichiometry();
+
+        public void addReverse(NextEvent other) {
+            assert this.reverse == null;
+            assert other.reverse == null;
+
+            this.reverse = other;
+            other.reverse = this;
+        }
 
         /**
          * Add and remove particles as appropriate for this event type.
@@ -283,7 +304,7 @@ public class NextEventQueue {
         /**
          * Calculate the (randomized) extent of the reaction based in the time given.
          */
-        abstract int leap_count(double current, double time);
+        abstract int leap_count(double current, double time, boolean bidirectional);
 
         /**
          * Calculate the <b>putative</b> time of a single exact execution.
@@ -356,11 +377,36 @@ public class NextEventQueue {
                 if (leap > exact * leap_min_jump) {
                     assert update_times;
 
-                    int count = this.leap_count(current, leap);
+                    /**
+                     * We make the leap bidirectional iff the reverse is fast enough
+                     * to happen in the chosen period. If not, we keep events separate,
+                     * and still use our calculation of leap time, becuase the reverse
+                     * reaction is slow enough for this to be valid.
+                     */
+                    boolean bidirectional = this.reverse != null;
 
-                    log.debug("{}: leaping {} ({}→{}), extent {}",
-                              this, leap, current, current + leap, count);
-                    this.setEvent(count, true, current, current + leap);
+                    int count = this.leap_count(current, leap, bidirectional);
+
+                    /**
+                     * We had a reverse event scheduled. The probability that
+                     * the generated count includes "that" event is P_cumul(t+leap)-P_cumul(t).
+                     * So we add the reverse to event count with the complementary probability.
+                     */
+                    if (bidirectional &&
+                        this.reverse.time >= current && this.reverse.time < current + leap) {
+
+                        double prob = 1 -
+                            Math.exp(-this.reverse.propensity * (current - this.reverse.wait_start))
+                            * (1 - Math.exp(-this.reverse.propensity * leap));
+                        if (prob > random.random())
+                            count -= 1;
+                    }
+
+                    log.debug("{}: leaping {} {} ({}→{}), extent {}",
+                              this,
+                              bidirectional ? "bi" : "uni",
+                              leap, current, current + leap, count);
+                    this.setEvent(count, true, bidirectional, current, current + leap);
                     return;
                 }
             }
@@ -368,7 +414,7 @@ public class NextEventQueue {
             double normal =  this._new_time(current);
 
             log.debug("waiting {} {}→{}", normal - current, current, normal);
-            this.setEvent(1, false, current, normal);
+            this.setEvent(1, false, false, current, normal);
         }
 
         void update(int[][] reactionEvents,
@@ -387,38 +433,69 @@ public class NextEventQueue {
                                          this.leap ? IGridCalc.HappeningKind.LEAP : IGridCalc.HappeningKind.EXACT,
                                          this.extent, current, current - this.wait_start));
 
-            if (changed) {
+            if (changed)
                 this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                              diffusionEvents != null ? diffusionEvents[this.element()] : null,
                              stimulationEvents != null ? stimulationEvents[this.element()] : null,
                              this.extent);
-                if (this.leap) {
-                    leaps += 1;
-                    leap_extent += this.extent;
-                } else
-                    normal_waits += 1;
+            if (this.leap) {
+                leaps += 1; /* We count a bidirectional leap as one */
+                leap_extent += this.extent;
+            } else
+                normal_waits += 1;
+
+            if (this.bidirectional_leap) {
+                assert this.reverse.reverse_is_leaping;
+                this.reverse.reverse_is_leaping = false;
+                this.bidirectional_leap = false;
             }
 
             log.debug("Updating {}", this);
 
-            // In reactions of the type Da→Da+MaI the propensity does not change
-            // after execution, but there's nothing to warn about.
+            /* In reactions of the type Da→Da+MaI the propensity does not change
+             * after execution, but there's nothing to warn about. */
             this._update_propensity(false);
 
-            pick_time(current, timelimit, tolerance);
+            this.pick_time(current, timelimit, tolerance);
             queue.reposition("update", this);
+            if (this.bidirectional_leap) {
+                this.reverse.propensity = 0;
+                this.reverse.setEvent(1, false, false, current, Double.POSITIVE_INFINITY);
+                this.reverse.reverse_is_leaping = true;
+                queue.reposition("reverse", this.reverse);
+            }
 
+            /* dependent of this must be the same as dependent of reverse reaction
+             * so no need to go over both. */
             for (NextEvent dep: this.dependent)
-                dep.update_and_reposition(current, changed);
+                if (!(dep == this.reverse && this.bidirectional_leap))
+                    dep.update_and_reposition(current, changed);
         }
 
         void update_and_reposition(double current, boolean changed) {
-            double old = this._update_propensity(changed);
-            if (update_times && !Double.isInfinite(this.time))
-                this.time = (this.time - current) * old / this.propensity + current;
-            else
-                this.time = this._new_time(current);
-            queue.reposition("upd.dep", this);
+            /* When reverse is leaping, we do not update the time or other
+             * fields on this event. We push all updates of time and propensity
+             * to the reverse. */
+
+            log.debug("update_and_reposition: {}", this);
+            if (this.reverse_is_leaping) {
+                log.warn("reverse_is_leaping pushing: {} → {}", this, this.reverse);
+                assert this.reverse.bidirectional_leap: this.reverse;
+                assert !this.reverse.reverse_is_leaping: this.reverse;
+
+                /* update_and_reposition might have already been called on the
+                 * reverse reaction, if both directions are dependent on the
+                 * reaction which just fired. So be safe and do not assume
+                 * state changed. */
+                this.reverse.update_and_reposition(current, false);
+            } else {
+                double old = this._update_propensity(changed);
+                if (update_times && !Double.isInfinite(this.time))
+                    this.time = (this.time - current) * old / this.propensity + current;
+                else
+                    this.time = this._new_time(current);
+                queue.reposition("upd.dep", this);
+            }
         }
 
         List<NextEvent>
@@ -489,7 +566,7 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, 0.0,
+            this.setEvent(1, false, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {}: t={}", this, this.time);
@@ -588,21 +665,16 @@ public class NextEventQueue {
         }
 
         @Override
-        public int leap_count(double current, double time) {
+        public int leap_count(double current, double time, boolean bidirectional) {
             /* Diffusion is a first order reaction, governed by the
              * sum of binomial distributions. */
-            int n = particles[this.element()][this.sp];
-            return stepper.versatile_ngo("neq diffusion", n, this.propensity * time / n);
-        }
-
-        @Override
-        public boolean isReversible() {
-            return true;
-        }
-
-        @Override
-        public boolean isReverseOf(NextEvent other) {
-            return other.index() == this.index2;
+            int X1 = particles[this.element()][this.sp];
+            int n1 = stepper.versatile_ngo("neq diffusion", X1, this.fdiff * time);
+            if (!bidirectional)
+                return n1;
+            int X2 = particles[this.element2][this.sp];
+            int n2 = stepper.versatile_ngo("neq diffusion", X2, this.fdiff * time);
+            return n1 - n2;
         }
 
         public void addRelations(Collection<? extends NextEvent> coll) {
@@ -696,8 +768,6 @@ public class NextEventQueue {
         final int index;
         final double rate, volume;
 
-        private NextReaction reverse_reaction;
-
         /**
          * @param index the index of this reaction in reactions array
          * @param element voxel number
@@ -731,7 +801,7 @@ public class NextEventQueue {
             this.substrate_stoichiometry = tmp[1];
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, 0.0,
+            this.setEvent(1, false, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {} rate={} vol={} time={}", this,
@@ -770,7 +840,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public int leap_count(double current, double time) {
+        public int leap_count(double current, double time, boolean bidirectional) {
             int[] X = particles[this.element()];
 
             int n = Integer.MAX_VALUE;
@@ -779,25 +849,9 @@ public class NextEventQueue {
 
             return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
 
+            // FIXME: update to bidirectional reactions
+
             // FIXME: update for second order reactions
-        }
-
-        @Override
-        public boolean isReversible() {
-            return this.reverse_reaction != null;
-        }
-
-        @Override
-        public boolean isReverseOf(NextEvent other) {
-            return other == this.reverse_reaction;
-        }
-
-        public void addReverse(NextReaction other) {
-            assert this.reverse_reaction == null;
-            assert other.reverse_reaction == null;
-
-            this.reverse_reaction = other;
-            other.reverse_reaction = this;
         }
 
         private void maybeAddRelation(NextEvent e) {
@@ -812,8 +866,8 @@ public class NextEventQueue {
                          * reaction is added to the P numbers for the direction
                          * from lesser to bigger index only.
                          */
-                        boolean add = !this.isReversible() ||
-                            this.index < this.reverse_reaction.index;
+                        boolean add = this.reverse == null ||
+                            this.index < this.reverse.index;
                         this.addDependent(e, add && plus, add && minus);
 
                         return;
@@ -909,7 +963,7 @@ public class NextEventQueue {
             this.stim = stim;
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, 0.0, this._new_time(0));
+            this.setEvent(1, false, false, 0.0, this._new_time(0));
 
             log.info("Created {}: t={} [{}]", this, this.time, this.stim);
         }
@@ -1042,19 +1096,12 @@ public class NextEventQueue {
         }
 
         @Override
-        public int leap_count(double current, double time) {
+        public int leap_count(double current, double time, boolean bidirectional) {
+            /* There should be no reverse reaction, hence no bidirectional leaps */
+            assert !bidirectional;
             return stepper.poissonStep(this.propensity * time);
         }
 
-        @Override
-        public boolean isReversible() {
-            return false;
-        }
-
-        @Override
-        public boolean isReverseOf(NextEvent other) {
-            return false;
-        }
         public void addRelations(Collection<? extends NextEvent> coll) {
             for (NextEvent e: coll)
                 if (e != this &&
@@ -1145,7 +1192,10 @@ public class NextEventQueue {
         double[] fdiff = rtab.getDiffusionConstants();
         String[] species = rtab.getSpecies();
 
-        ArrayList<NextDiffusion> ans = inst.newArrayList(3 * neighbors.length);
+        ArrayList<NextDiffusion> ans = inst.newArrayList(5 * neighbors.length);
+
+        int nel = grid.getNElements();
+        NextDiffusion[][][] rev = new NextDiffusion[nel][nel][fdiff.length];
 
         for (int el = 0; el < neighbors.length; el++)
             for (int j = 0; j < neighbors[el].length; j++) {
@@ -1153,10 +1203,21 @@ public class NextEventQueue {
                 double cc = couplings[el][j];
                 if (cc > 0)
                     for (int sp = 0; sp < fdiff.length; sp++)
-                        if (fdiff[sp] > 0)
-                            ans.add(new NextDiffusion(numbering.get(),
-                                                      el, el2, j, sp, species[sp],
-                                                      fdiff[sp] * cc));
+                        if (fdiff[sp] > 0) {
+                            NextDiffusion diff = new NextDiffusion(numbering.get(),
+                                                                   el, el2, j, sp, species[sp],
+                                                                   fdiff[sp] * cc);
+
+                            ans.add(diff);
+
+                            /* Here we take advantage of the fact that either
+                             * the "forward" or "backward" diffusion must be added
+                             * earlier. */
+                            if (rev[el2][el][sp] != null)
+                                diff.addReverse(rev[el2][el][sp]);
+                            else
+                                rev[el][el2][sp] = diff;
+                        }
             }
 
         log.info("Created {} diffusion events", ans.size());
@@ -1268,7 +1329,7 @@ public class NextEventQueue {
                     NextEvent dep = ev.dependent.get(i);
                     int[] coeff = ev.scoeff_ki.get(i);
                     int sum = ArrayUtil.abssum(coeff);
-                    if (ev.isReverseOf(dep))
+                    if (ev.reverse == dep)
                         log.debug("      → {}reverse {}", sum==1?"boring ":"", coeff);
                     else if (sum == 1)
                         boring ++;
