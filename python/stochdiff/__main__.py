@@ -5,6 +5,7 @@ from __future__ import print_function, division, unicode_literals
 import sys
 import os
 import glob
+import collections
 import itertools
 import argparse
 import subprocess
@@ -68,6 +69,7 @@ parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
+parser.add_argument('--sum-regions', action='store_true')
 parser.add_argument('--num-elements', type=int,
                     help='take only the first so many elements')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
@@ -318,12 +320,27 @@ def specie_indices(items, species):
     species = list(species)
     return np.array([species.index(i) for i in items])
 
-def generate_histories(species, region_indices, region_labels,
-                       times, counts):
+def generate_element_histories(species, region_indices, region_labels,
+                               times, counts):
     for name in species:
         for rlabel, rindi in zip(region_labels, region_indices):
             y = counts.loc[rindi][name].values
             yield times, y, name, rlabel
+
+def generate_region_histories(species, region_indices, region_labels,
+                               times, counts):
+    for name in species:
+        ans = collections.defaultdict(lambda: 0)
+        for rlabel, rindi in zip(region_labels, region_indices):
+            y = counts.loc[rindi][name].values
+            ans[rlabel] += y
+        for rlabel, y in ans.items():
+            yield times, y, name, rlabel
+
+def generate_histories(species, region_indices, region_labels,
+                       times, counts, opts):
+    func = generate_region_histories if opts.sum_regions else generate_element_histories
+    return func(species, region_indices, region_labels, times, counts)
 
 def _history(simul, species, region_indices, region_labels,
              times, counts, title, opts):
@@ -343,10 +360,10 @@ def _history(simul, species, region_indices, region_labels,
     ax.set_ylabel('particle numbers')
     colors = itertools.cycle('rgbkcmy')
     for x, y, name, rlabel in generate_histories(species, region_indices, region_labels,
-                                                 times, counts):
+                                                 times, counts, opts):
         ax.plot(x, y, opts.style, color=next(colors),
                 label='{} in {}'.format(name, rlabel))
-    ax.legend(loc='best')
+    ax.legend(loc='best', fontsize=7)
     if opts.save:
         fname = opts.save + ', particle numbers of species {}.svg'.format(', '.join(species))
         f.savefig(fname)
@@ -357,7 +374,7 @@ def _history(simul, species, region_indices, region_labels,
 def _history_data(simul, species, region_indices, region_labels,
                   times, counts, title, opts):
     data = generate_histories(species, region_indices, region_labels,
-                              times, counts)
+                              times, counts, opts)
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
     df = pd.DataFrame(d, index=xx[0])
