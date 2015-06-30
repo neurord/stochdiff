@@ -479,7 +479,6 @@ public class NextEventQueue {
 
             log.debug("update_and_reposition: {}", this);
             if (this.reverse_is_leaping) {
-                log.warn("reverse_is_leaping pushing: {} → {}", this, this.reverse);
                 assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
