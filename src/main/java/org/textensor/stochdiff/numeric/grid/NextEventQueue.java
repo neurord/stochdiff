@@ -272,10 +272,10 @@ public class NextEventQueue {
         /**
          * Add and remove particles as appropriate for this event type.
          */
-        abstract void execute(int[] reactionEvents,
-                              int[][] diffusionEvents,
-                              int[] stimulationEvents,
-                              int count);
+        abstract int execute(int[] reactionEvents,
+                             int[][] diffusionEvents,
+                             int[] stimulationEvents,
+                             int count);
 
         /**
          * Calculate propensity of this event.
@@ -351,7 +351,7 @@ public class NextEventQueue {
             return old;
         }
 
-        private int[] reactantPopulation() {
+        protected int[] reactantPopulation() {
             int[] react = this.reactants();
             int[] pop = new int[react.length];
             for (int i = 0; i < react.length; i++)
@@ -425,7 +425,8 @@ public class NextEventQueue {
 
             assert this.bidirectional_leap || this.extent >= 0: this.extent;
 
-            final boolean changed = this.extent > 0;
+            boolean changed = this.extent > 0;
+            int done;
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
@@ -433,14 +434,19 @@ public class NextEventQueue {
                                          this.leap ? IGridCalc.HappeningKind.LEAP : IGridCalc.HappeningKind.EXACT,
                                          this.extent, current, current - this.wait_start));
 
-            if (changed)
-                this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
-                             diffusionEvents != null ? diffusionEvents[this.element()] : null,
-                             stimulationEvents != null ? stimulationEvents[this.element()] : null,
-                             this.extent);
+            if (changed) {
+                done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
+                                    diffusionEvents != null ? diffusionEvents[this.element()] : null,
+                                    stimulationEvents != null ? stimulationEvents[this.element()] : null,
+                                    this.extent);
+                if (done == 0)
+                    changed = false;
+            } else
+                done = 0;
+
             if (this.leap) {
                 leaps += 1; /* We count a bidirectional leap as one */
-                leap_extent += this.extent;
+                leap_extent += Math.abs(done);
             } else
                 normal_waits += 1;
 
@@ -580,15 +586,17 @@ public class NextEventQueue {
         }
 
         @Override
-        void execute(int[] reactionEvents,
-                     int[][] diffusionEvents,
-                     int[] stimulationEvents,
-                     int count) {
+        int execute(int[] reactionEvents,
+                    int[][] diffusionEvents,
+                    int[] stimulationEvents,
+                    int count) {
             int done = updatePopulation(this.element(), this.sp, -count, this);
             updatePopulation(this.element2, this.sp, -done, this);
 
             if (diffusionEvents != null)
                 diffusionEvents[this.sp][this.index2] += -done;
+
+            return done;
         }
 
         @Override
@@ -883,17 +891,19 @@ public class NextEventQueue {
         }
 
         @Override
-        void execute(int[] reactionEvents,
-                     int[][] diffusionEvents,
-                     int[] stimulationEvents,
-                     int count) {
+        int execute(int[] reactionEvents,
+                    int[][] diffusionEvents,
+                    int[] stimulationEvents,
+                    int count) {
             for (int i = 0; i < this.reactants().length; i++)
-                if (particles[this.element()][this.reactants()[i]]
-                    < this.reactant_stoichiometry[i] * count) {
-                    log.error("{} prop={} {}→{} pow={} extent={}: {}", this, this.propensity,
-                              this.reactants(), this.products, this.reactant_powers,
-                              count, particles[this.element()]);
-                    log.info("reaculated prop={}", this.calcPropensity());
+                if (particles[this.element()][this.reactants()[i]] < this.reactant_stoichiometry[i] * count) {
+
+                    int oldcount = count;
+                    count = particles[this.element()][this.reactants()[i]] / this.reactant_stoichiometry[i];
+                    log.warn("{}: population would go below zero with prop={} reactants {}×{} extent={} (using {})",
+                             this, this.propensity,
+                             this.reactantPopulation(), this.reactant_powers,
+                             oldcount, count);
                 }
 
             for (int i = 0; i < this.reactants().length; i++)
@@ -905,6 +915,7 @@ public class NextEventQueue {
 
             if (reactionEvents != null)
                 reactionEvents[this.index] += count;
+            return count;
         }
 
         @Override
@@ -975,14 +986,15 @@ public class NextEventQueue {
             return IGridCalc.EventType.STIMULATION;
         }
 
-        void execute(int[] reactionEvents,
-                     int[][] diffusionEvents,
-                     int[] stimulationEvents,
-                     int count) {
+        int execute(int[] reactionEvents,
+                    int[][] diffusionEvents,
+                    int[] stimulationEvents,
+                    int count) {
             updatePopulation(this.element(), this.sp, count, this);
 
             if (stimulationEvents != null)
                 stimulationEvents[this.sp] += count;
+            return count;
         }
 
         /**
