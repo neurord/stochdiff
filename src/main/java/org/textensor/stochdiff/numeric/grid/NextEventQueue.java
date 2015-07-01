@@ -478,17 +478,20 @@ public class NextEventQueue {
              * to the reverse. */
 
             log.debug("update_and_reposition: {}", this);
+            /* For reactions which have a reverse, update_and_reposition might have
+             * already been called on the reverse reaction, if both directions are
+             * dependent on the reaction which just fired. Usually the "forward"
+             * reaction will be called first, but not always ("forward" is the one
+             * which has higher propensity when the leap is queued). So be safe and
+             * do not assume propensity changed for those reactions.. */
             if (this.reverse_is_leaping) {
                 assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
-                /* update_and_reposition might have already been called on the
-                 * reverse reaction, if both directions are dependent on the
-                 * reaction which just fired. So be safe and do not assume
-                 * state changed. */
                 this.reverse.update_and_reposition(current, false);
             } else {
-                double old = this._update_propensity(changed);
+                boolean expect_changed = changed && !this.bidirectional_leap;
+                double old = this._update_propensity(expect_changed);
                 if (update_times && !Double.isInfinite(this.time))
                     this.time = (this.time - current) * old / this.propensity + current;
                 else
