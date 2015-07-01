@@ -135,9 +135,9 @@ public class NextEventQueue {
         }
     }
 
-    int leaps = 0;
-    int leap_extent = 0;
-    int normal_waits = 0;
+    long leaps = 0;
+    long leap_extent = 0;
+    long normal_waits = 0;
 
     public abstract class NextEvent implements Node, IGridCalc.Event {
         int index;

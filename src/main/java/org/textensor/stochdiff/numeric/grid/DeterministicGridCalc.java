@@ -43,7 +43,7 @@ public class DeterministicGridCalc extends GridCalc {
     double[][] wktm1;
     double[][] wkC;
 
-    int event_count = 0;
+    long event_count = 0;
 
     public DeterministicGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);

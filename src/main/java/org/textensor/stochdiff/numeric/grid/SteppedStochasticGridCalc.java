@@ -90,7 +90,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     double[][] pSharedOut;
     double[][][] fSharedExit;
 
-    int event_count = 0;
+    long event_count = 0;
 
     public SteppedStochasticGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
