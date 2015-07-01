@@ -423,7 +423,7 @@ public class NextEventQueue {
                     double current, double tstop, double timelimit,
                     List<IGridCalc.Happening> events) {
 
-            assert this.extent >= 0: this.extent;
+            assert this.bidirectional_leap || this.extent >= 0: this.extent;
 
             final boolean changed = this.extent > 0;
 
