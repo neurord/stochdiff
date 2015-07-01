@@ -194,7 +194,11 @@ public class MersenneTwister implements RandomGenerator {
 
     @Override
     public final double exponential(double tau) {
-        return - Math.log1p(-random()) / tau;
+        assert tau >= 0;
+        if (tau == 0)
+            return Double.POSITIVE_INFINITY;
+        else
+            return - Math.log1p(-random()) / tau;
     }
 
     public static void main(String[] argv) {

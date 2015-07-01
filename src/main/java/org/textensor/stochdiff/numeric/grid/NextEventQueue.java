@@ -227,6 +227,7 @@ public class NextEventQueue {
             this.bidirectional_leap = bidirectional;
             this.wait_start = wait_start;
             this.time = time;
+            assert time >= 0: this;
         }
 
         @Override
@@ -502,6 +503,8 @@ public class NextEventQueue {
                     this.time = (this.time - current) * old / this.propensity + current;
                 else
                     this.time = this._new_time(current);
+                assert this.time >= 0: this.time;
+
                 queue.reposition("upd.dep", this);
             }
         }
@@ -1410,6 +1413,7 @@ public class NextEventQueue {
         NextEvent ev = this.queue.first();
         assert ev != null;
         double now = ev.time;
+        assert now >= time: ev;
 
         if (now > tstop) {
             log.debug("Next event is {} time {}, past stop at {}", ev, now, tstop);
