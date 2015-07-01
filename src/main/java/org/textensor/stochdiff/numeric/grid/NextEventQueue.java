@@ -1330,14 +1330,9 @@ public class NextEventQueue {
                     int sum = ArrayUtil.abssum(coeff);
                     if (ev.reverse == dep)
                         log.debug("      → {}reverse {}", sum==1?"boring ":"", coeff);
-                    else if (sum == 1)
-                        boring ++;
                     else
                         log.debug("      → {} {}", dep, coeff);
                 }
-
-                if (boring > 0)
-                    log.debug("      → + {} boring single-specie first-order deps", boring);
             }
         }
 
