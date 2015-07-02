@@ -90,7 +90,9 @@ The stochiometry of reactions is specified through two attributes: `power="p"` a
 Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
 determines how the number of molecules influences reaction rate. The rate is proportional
 to
+
     N·(N-1)·…·(N-p+1)
+
 where *N* is the number of molecules of given species.
 
 Power *p* defaults to 1. Stochiometry *n* defaults to *p*. If *p* is not specified but *n* is, the reaction is a “psuedo” higher order reaction in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
@@ -229,6 +231,9 @@ Multiple trains are possible with two more parameters — intertrain interval an
      </InjectionStim>
 
 Note that the intertrain interval specifies the interval between repetition of the entire train (excluding the onset time).
+
+.. image:: stim-params.svg
+   :align: center
 
 Since particles can only be injected, and not withdrawn, to produce transient elevations in concentration it may be necessary to inject a "binding partner" and add a reaction between the injected particle and the binding partner to lower the concentration of the unbound injected molecule.
 
