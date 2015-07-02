@@ -232,7 +232,7 @@ Multiple trains are possible with two more parameters — intertrain interval an
 
 Note that the intertrain interval specifies the interval between repetition of the entire train (excluding the onset time).
 
-.. image:: stim-params.svg
+.. image:: stim-params.png
    :align: center
 
 Since particles can only be injected, and not withdrawn, to produce transient elevations in concentration it may be necessary to inject a "binding partner" and add a reaction between the injected particle and the binding partner to lower the concentration of the unbound injected molecule.
