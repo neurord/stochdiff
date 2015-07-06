@@ -75,7 +75,7 @@ public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
 
 
     private final Matrix numderivs(Column vc, Column vdc,  double deltat) {
-        int n = rtab.nspecie;
+        int n = rtab.getNSpecies();
         Matrix m = new Matrix(n);
 
         double[] r0 = rtab.stepResiduals(vc, vdc, deltat).getData();

@@ -74,13 +74,10 @@ public class ReactionScheme {
 
         log.info("Running with {} reactions (forward and reverse)", n);
 
-        ReactionTable rtab = new ReactionTable(n, species.size());
-
-        rtab.setSpecies(getSpecies());
-        rtab.setDiffusionConstants(getDiffusionConstants());
+        ReactionTable rtab = new ReactionTable(n, this.getSpecies(), this.getDiffusionConstants());
 
         int i = 0;
-        for (Reaction r :  reactions) {
+        for (Reaction r: reactions) {
             int[][] reactants = r.getReactantIndices();
             int[][] products = r.getProductIndices();
 

@@ -13,10 +13,9 @@ public class ReactionTable {
     static final Logger log = LogManager.getLogger(ReactionTable.class);
 
     public final int nreaction;
-    public final int nspecie;
 
-    private String[] species;
-    private double[] diffusionConstants;
+    private final String[] species;
+    private final double[] diffusionConstants;
 
     private final int[][] reactantIndices;
     private final int[][] productIndices;
@@ -33,9 +32,12 @@ public class ReactionTable {
     private Matrix productionMatrix;
 
 
-    public ReactionTable(int nreaction, int nspecie) {
+    public ReactionTable(int nreaction, String[] species, double[] diffusionConstants) {
         this.nreaction = nreaction;
-        this.nspecie = nspecie;
+
+        this.species = species;
+
+        this.diffusionConstants = diffusionConstants;
 
         this.reactantIndices = new int[nreaction][];
         this.productIndices = new int[nreaction][];
@@ -53,7 +55,7 @@ public class ReactionTable {
 
     public void print() {
         StringBuffer sb = new StringBuffer();
-        sb.append("nspecie = " + nspecie + "  nreaction = " + nreaction + "\n");
+        sb.append("nspecie = " + this.species.length + "  nreaction = " + nreaction + "\n");
         for (int r = 0; r < nreaction; r++) {
             sb.append("reaction " + r + ":      ");
             for (int i = 0; i < reactantIndices[r].length; i++)
@@ -117,15 +119,9 @@ public class ReactionTable {
             this.reversiblePairs[ireact] = -1;
     }
 
-
-    public void setSpecies(String[] sa) {
-        species = sa;
-    }
-
-
     public String[] getSpecies() {
-        assert species != null;
-        return species;
+        assert this.species != null;
+        return this.species;
     }
 
     public static String getReactionSignature(int[] rr, int[] rs, int[] pp, int[] ps, String[] ids) {
@@ -156,19 +152,12 @@ public class ReactionTable {
     }
 
     public int getNSpecies() {
-        return nspecie;
+        return this.species.length;
     }
-
-
-    public void setDiffusionConstants(double[] d) {
-        diffusionConstants = d;
-    }
-
 
     public double[] getDiffusionConstants() {
-        return diffusionConstants;
+        return this.diffusionConstants;
     }
-
 
     public Column getRateColumn(Column mconc) {
         double[] c = mconc.getData();
@@ -186,7 +175,7 @@ public class ReactionTable {
 
     public Matrix getProductionMatrix() {
         if (productionMatrix == null) {
-            double[][] a = new double[nspecie][nreaction];
+            double[][] a = new double[this.species.length][nreaction];
             for (int ireac = 0; ireac < nreaction; ireac++) {
                 for (int index: reactantIndices[ireac])
                     a[index][ireac] -= 1;
@@ -205,7 +194,7 @@ public class ReactionTable {
     // this is the same as the production matrix times teh rate column;
     public Column getProductionColumn(Column mconc) {
         double[] c = mconc.getData();
-        double[] vr = new double[nspecie];
+        double[] vr = new double[this.species.length];
 
         for (int ireac = 0; ireac < nreaction; ireac++) {
             int[] si = reactantIndices[ireac];
@@ -233,7 +222,7 @@ public class ReactionTable {
 
     public Matrix getIncrementRateMatrix(Column mconc) {
         double[] c = mconc.getData();
-        double[][] d = new double[nspecie][nspecie];
+        double[][] d = new double[this.species.length][this.species.length];
 
         for (int ireac = 0; ireac < nreaction; ireac++)
             for (int index: reactantIndices[ireac]) {
@@ -333,7 +322,7 @@ public class ReactionTable {
     public int getSpecieIndex(String specieID) {
         String[] sa = getSpecies();
 
-        for (int i = 0; i < nspecie; i++)
+        for (int i = 0; i < this.species.length; i++)
             if (sa[i].equals(specieID))
                 return i;
         log.error("Cannot find specie {}", specieID);
