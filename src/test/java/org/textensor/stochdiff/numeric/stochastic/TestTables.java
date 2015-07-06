@@ -3,7 +3,6 @@ package org.textensor.stochdiff.numeric.stochastic;
 import java.util.Random;
 import java.util.ArrayList;
 
-import org.textensor.report.E;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.util.inst;
