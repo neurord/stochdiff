@@ -16,7 +16,10 @@
    width="564.79407"
    height="200.70605"
    viewBox="0 0 564.79406 200.70606"
-   sodipodi:docname="NeuroRDstimParams-1.svg"><metadata
+   sodipodi:docname="NeuroRDstimParams-1.svg"
+   inkscape:export-filename="/mnt/meshugaas/home/zbyszek/neuro/neurord/stochdiff/stim-params.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90"><metadata
      id="metadata8"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
@@ -49,7 +52,7 @@
      fit-margin-right="0.1"
      fit-margin-bottom="0.1"
      inkscape:zoom="0.92161796"
-     inkscape:cx="403.17513"
+     inkscape:cx="382.55921"
      inkscape:cy="147.92378"
      inkscape:window-x="2379"
      inkscape:window-y="13"
