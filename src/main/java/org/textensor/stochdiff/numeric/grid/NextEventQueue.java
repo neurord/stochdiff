@@ -181,6 +181,11 @@ public class NextEventQueue {
          */
         protected double time;
         /**
+         * time: original wait time. This is only used when logging
+         * individual events.
+         */
+        protected double original_wait;
+        /**
          * extent: how many "instances" of this event are scheduled to occur. Must
          * be greater than 0.
          */
@@ -227,6 +232,7 @@ public class NextEventQueue {
             this.bidirectional_leap = bidirectional;
             this.wait_start = wait_start;
             this.time = time;
+            this.original_wait = time - wait_start;
             assert time >= 0: this;
         }
 
@@ -433,7 +439,7 @@ public class NextEventQueue {
             if (events != null)
                 events.add(new Happening(this.event_number,
                                          this.leap ? IGridCalc.HappeningKind.LEAP : IGridCalc.HappeningKind.EXACT,
-                                         this.extent, current, current - this.wait_start));
+                                         this.extent, current, current - this.wait_start, this.original_wait));
 
             if (changed) {
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
@@ -1439,18 +1445,20 @@ public class NextEventQueue {
         final int event_number;
         final IGridCalc.HappeningKind kind;
         final int extent;
-        final double time, waited;
+        final double time, waited, original_wait;
 
         public Happening(int event_number,
                          IGridCalc.HappeningKind kind,
                          int extent,
                          double time,
-                         double waited) {
+                         double waited,
+                         double original_wait) {
             this.event_number = event_number;
             this.kind = kind;
             this.extent = extent;
             this.time = time;
             this.waited = waited;
+            this.original_wait = original_wait;
         }
 
         @Override
@@ -1476,6 +1484,11 @@ public class NextEventQueue {
         @Override
         public double waited() {
             return this.waited;
+        }
+
+        @Override
+        public double original_wait() {
+            return this.original_wait;
         }
     }
 }

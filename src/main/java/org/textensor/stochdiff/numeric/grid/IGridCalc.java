@@ -52,6 +52,7 @@ public interface IGridCalc {
         int extent();
         double time();
         double waited();
+        double original_wait();
     }
 
     Collection<Event> getEvents();

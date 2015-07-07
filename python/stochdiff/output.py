@@ -261,16 +261,18 @@ class Simulation(object):
         "A full history of events"
         times = self._sim.events.times[:]
         waited = self._sim.events.waited[:]
+        original = self._sim.events.original_wait[:]
         events = self._sim.events.events[:]
         extents = self._sim.events.extents[:]
         kinds = self._sim.events.kinds[:]
         df = pd.DataFrame(dict(time=times,
                                waited=waited,
+                               original=original,
                                event=events,
                                extent=extents,
                                kind=kinds))
         df.set_index('time', inplace=True)
-        return df.reindex_axis('waited event kind extent'.split(), axis=1)
+        return df.reindex_axis('waited original event kind extent'.split(), axis=1)
 
 class Output(object):
     """The output for a single model, 0 or more experiments

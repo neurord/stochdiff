@@ -367,7 +367,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected List<IGridCalc.Happening> events_cache;
         protected H5ScalarDS
             events_event, events_kind,
-            events_extent, events_time, events_waited;
+            events_extent, events_time, events_waited, events_original;
         protected Dataset saved_state = null;
 
         public Trial(Group group)
@@ -930,6 +930,11 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                        "[waited]",
                                                        "ms",
                                                        CACHE_SIZE2);
+            this.events_original = createExtensibleArray("original_wait", this.events, double_t,
+                                                       "time originally schedule to wait",
+                                                       "[original_wait]",
+                                                       "ms",
+                                                       CACHE_SIZE2);
             this.events_event = createExtensibleArray("events", this.events, int_t,
                                                       "index of the event that happened",
                                                       "[event#]",
@@ -978,6 +983,14 @@ public class ResultWriterHDF5 implements ResultWriter {
                     for (int i = 0; i < howmuch; i++)
                         data[i] = this.events_cache.get(m + i).waited();
                     this.events_waited.write(data);
+                }
+
+                {
+                    extendExtensibleArray(this.events_original, howmuch);
+                    double[] data = (double[]) this.events_original.getData();
+                    for (int i = 0; i < howmuch; i++)
+                        data[i] = this.events_cache.get(m + i).original_wait();
+                    this.events_original.write(data);
                 }
 
                 {
