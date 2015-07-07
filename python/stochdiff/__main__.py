@@ -507,19 +507,19 @@ def describe_leaps(output):
             continue
         print(label, waited.size, waited.min(), waited.max(), np.median(waited))
 
-def plot_leaps(output):
+def plot_leaps(output, leaps):
     title = output.file.filename
     model = output.model
     simul = output.simulation(opts.trial)
     descriptions = list(model.dependencies.descriptions())
-    species = model.species()
 
     import matplotlib
     if opts.save:
         matplotlib.use('Agg')
     from matplotlib import pyplot
 
-    full_title = '{}, event timings {}'.format(title, ', '.join(species))
+    joined = ','.join(str(leap) for leap in leaps)
+    full_title = '{}, event timings {}'.format(title, joined)
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
     ax = f.gca(yscale=opts.yscale)
@@ -528,8 +528,10 @@ def plot_leaps(output):
 #    ax2.yaxis.tick_right()
 
     events = simul.events()
-    if opts.leaps:
-        events = events.loc[events['event'].isin(opts.leaps)]
+    if leaps:
+        events = events.loc[events['event'].isin(leaps)]
+    if events.size == 0:
+        return
     events['extent'] = np.abs(events['extent'])
     hist = grouped_histogram(events, 'event kind'.split(), 'waited',
                              'extent' if opts.weighted else None)
@@ -551,7 +553,7 @@ def plot_leaps(output):
     pyplot.setp(ax.yaxis.get_majorticklabels(), fontsize=8)
     pyplot.setp(ax2.yaxis.get_majorticklabels(), fontsize=8)
     if opts.save:
-        fname = opts.save + ', event timings of species {}.svg'.format(', '.join(species))
+        fname = opts.save + ', event timings of events {}.svg'.format(joined)
         f.savefig(fname)
         print('saved {}'.format(fname))
     else:
@@ -588,7 +590,7 @@ if __name__ == '__main__':
     elif opts.history is not None:
         plot_history(opts.file, opts.history)
     elif opts.leaps is not None:
-        plot_leaps(opts.file)
+        plot_leaps(opts.file, opts.leaps)
     elif opts.describe_leaps is not None:
         describe_leaps(opts.file)
     elif opts.config is not None:
