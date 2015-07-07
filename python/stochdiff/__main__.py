@@ -4,6 +4,7 @@ from __future__ import print_function, division, unicode_literals
 
 import sys
 import os
+import math
 import glob
 import collections
 import itertools
@@ -71,10 +72,11 @@ parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
+parser.add_argument('--multiplot', nargs='?', const=1, type=int)
 parser.add_argument('--num-elements', type=int,
                     help='take only the first so many elements')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
-parser.add_argument('--style', default='-')
+parser.add_argument('--style', default='r-')
 parser.add_argument('--time', type=time_range, default=(None, None))
 parser.add_argument('--trial', type=int, default=0)
 parser.add_argument('--config', type=str, nargs='?', const='')
@@ -379,15 +381,29 @@ def _history(simul, species, region_indices, region_labels,
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
-    ax = f.gca(yscale=opts.yscale)
+    data = list(generate_histories(species, region_indices, region_labels,
+                                   times, counts, opts))
+    fmt = '{name} in {rlabel}' if len(set(region_labels)) > 1 else '{name}'
+    if opts.multiplot:
+        i = 1
+        cols = opts.multiplot
+        rows = math.ceil(len(data) / cols)
+        for x, y, name, rlabel in data:
+            ax = f.add_subplot(rows, cols, i, yscale=opts.yscale)
+            ax.plot(x, y, opts.style,
+                    label=fmt.format(name=name, rlabel=rlabel))
+            ax.legend(loc='best', fontsize=8)
+            ax.locator_params(nbins=3)
+            i += 1
+    else:
+        ax = f.gca(yscale=opts.yscale)
+        ax.set_ylabel('particle numbers')
+        colors = itertools.cycle('rgbkcmy')
+        for x, y, name, rlabel in data:
+            ax.plot(x, y, opts.style, color=next(colors),
+                    label=fmt.format(name=name, rlabel=rlabel))
+        ax.legend(loc='best', fontsize=7)
     ax.set_xlabel('t / ms')
-    ax.set_ylabel('particle numbers')
-    colors = itertools.cycle('rgbkcmy')
-    for x, y, name, rlabel in generate_histories(species, region_indices, region_labels,
-                                                 times, counts, opts):
-        ax.plot(x, y, opts.style, color=next(colors),
-                label='{} in {}'.format(name, rlabel))
-    ax.legend(loc='best', fontsize=7)
     if opts.save:
         fname = opts.save + ', particle numbers of species {}.svg'.format(', '.join(species))
         f.savefig(fname)
