@@ -37,6 +37,10 @@ def str_list(arg):
     parts = arg.split(',')
     return parts
 
+def int_list(arg):
+    parts = arg.split(',')
+    return list(int(part) for part in parts)
+
 def time_range(arg):
     a, b, c = arg.partition('-')
     if not b:
@@ -73,7 +77,8 @@ parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
-parser.add_argument('--leaps', type=str_list, nargs='?', const=())
+parser.add_argument('--describe-leaps', type=int_list, nargs='?', const=())
+parser.add_argument('--leaps', type=int_list, nargs='?', const=())
 parser.add_argument('--weighted', action='store_true')
 parser.add_argument('--multiplot', nargs='?', const=1, type=int)
 parser.add_argument('--num-elements', type=int,
@@ -474,17 +479,40 @@ def grouped_histogram(events, group_keys, what_key, weight_key=None):
     df = pd.DataFrame(hists)
     return df
 
-def reverse_legend(ax, **kwargs):
+def reverse_legend(ax, *, ax2=None, **kwargs):
     handles, labels = ax.get_legend_handles_labels()
+    if ax2 is not None:
+        handles2, labels2 = ax2.get_legend_handles_labels()
+        handles += handles2
+        labels += labels2
     ax.legend(handles[::-1], labels[::-1], **kwargs)
 
-def plot_leaps(output, species):
-    title=output.file.filename
+def describe_leaps(output):
     model = output.model
     simul = output.simulation(opts.trial)
     descriptions = list(model.dependencies.descriptions())
-    if not species:
-        species = model.species()
+    species = model.species()
+
+    events = simul.events()
+    if opts.describe_leaps:
+        events = events.loc[events['event'].isin(opts.describe_leaps)]
+    events['extent'] = np.abs(events['extent'])
+
+    gb = events.groupby(['event', 'kind'])
+    for key, group in gb:
+        event, kind = key
+        label = '{}, {}'.format(descriptions[event], EventKind(kind).name.lower())
+        waited = group['waited']
+        if waited.max() < 10:
+            continue
+        print(label, waited.size, waited.min(), waited.max(), np.median(waited))
+
+def plot_leaps(output):
+    title = output.file.filename
+    model = output.model
+    simul = output.simulation(opts.trial)
+    descriptions = list(model.dependencies.descriptions())
+    species = model.species()
 
     import matplotlib
     if opts.save:
@@ -494,10 +522,15 @@ def plot_leaps(output, species):
     full_title = '{}, event timings {}'.format(title, ', '.join(species))
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
-    ax = f.gca()
+    ax = f.gca(yscale=opts.yscale)
+    ax2 = ax.twinx()
+#    ax2.set_yscale(opts.yscale)
+#    ax2.yaxis.tick_right()
 
     events = simul.events()
-    print(events)
+    if opts.leaps:
+        events = events.loc[events['event'].isin(opts.leaps)]
+    events['extent'] = np.abs(events['extent'])
     hist = grouped_histogram(events, 'event kind'.split(), 'waited',
                              'extent' if opts.weighted else None)
     base = 0
@@ -505,15 +538,18 @@ def plot_leaps(output, species):
         event, kind = event_kind
         label = '{}, {}'.format(descriptions[event], EventKind(kind).name.lower())
         values = hist[event_kind].values
-        ax.step(hist.index, base + values,
-                fillstyle='none',
-                linestyle='-' if kind==1 else '--',
-                label=label)
-        ax.legend(loc='upper right')
-        reverse_legend(ax, fontsize=8)
-        pyplot.setp(ax.xaxis.get_majorticklabels(), fontsize=8)
-        pyplot.setp(ax.yaxis.get_majorticklabels(), fontsize=8)
+        _ax = ax2 if kind == EventKind.LEAP else ax
+        _ax.step(hist.index, base + values,
+                 fillstyle='none',
+                 linestyle='-' if kind==1 else '--',
+                 label=label)
+        values[np.isnan(values)] = 0
         base += values
+    ax.legend(loc='upper right')
+    reverse_legend(ax, ax2=ax2, fontsize=8)
+    pyplot.setp(ax.xaxis.get_majorticklabels(), fontsize=8)
+    pyplot.setp(ax.yaxis.get_majorticklabels(), fontsize=8)
+    pyplot.setp(ax2.yaxis.get_majorticklabels(), fontsize=8)
     if opts.save:
         fname = opts.save + ', event timings of species {}.svg'.format(', '.join(species))
         f.savefig(fname)
@@ -552,7 +588,9 @@ if __name__ == '__main__':
     elif opts.history is not None:
         plot_history(opts.file, opts.history)
     elif opts.leaps is not None:
-        plot_leaps(opts.file, opts.leaps)
+        plot_leaps(opts.file)
+    elif opts.describe_leaps is not None:
+        describe_leaps(opts.file)
     elif opts.config is not None:
         print_config(opts.file)
     else:

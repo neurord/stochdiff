@@ -15,8 +15,11 @@ def bincount_axis1(data, max, weights=None):
         ans = [np.bincount(col, wei, minlength=max+1)[:, None]
                for col, wei in zip(data.T, weights.T)]
     ans = np.hstack(ans)
-    ans[-2] += ans[-1]
-    return ans[:-1]
+    if ans.size >= 2:
+        ans[-2] += ans[-1]
+        return ans[:-1]
+    else:
+        return ans
 
 def histogram(items, weights=None, normed=False, cumulative=False, min_max=None, bins=None):
     """Compute normed cdf of distribution of counts"""
@@ -25,7 +28,7 @@ def histogram(items, weights=None, normed=False, cumulative=False, min_max=None,
         right = items.max()
     else:
         left, right = min_max
-    binsize = (right - left) / bins if bins is not None else 1
+    binsize = (max(right - left, 1)) / bins if bins is not None else 1
     where = np.empty_like(items, dtype=int)
     np.floor_divide(items - left, binsize, out=where)
     hist = bincount_axis1(where, (right-left)/binsize, weights)
