@@ -604,6 +604,20 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "LAYOUT", "[nreact]");
                 setAttribute(ds, "UNITS", "transitions/ms");
             }
+            {
+                int[] pairs = table.getReversiblePairs();
+                /* pairs has only one index set per pair. Make it symmetrical. */
+                for (int i = 0; i < pairs.length; i++)
+                    if (pairs[i] >= 0) {
+                        assert pairs[pairs[i]] == -1;
+                        pairs[pairs[i]] = i;
+                    }
+
+                Dataset ds = writeVector("reversible_pairs", group, pairs);
+                setAttribute(ds, "TITLE", "indices of reverse reaction");
+                setAttribute(ds, "LAYOUT", "[nreact]");
+                setAttribute(ds, "UNITS", "indices");
+            }
         }
 
         protected void writeReactionDependencies(IGridCalc source)

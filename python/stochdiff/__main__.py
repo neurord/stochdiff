@@ -218,8 +218,8 @@ def dot_opts(**opts):
             for k, v in opts.items() if v is not None]
     return ' [{}]'.format(','.join(opts)) if opts else ''
 
-def _conn(dst, a, b, penwidth=None, label=None):
-    opts = dot_opts(penwidth=penwidth, label=label)
+def _conn(dst, a, b, penwidth=None, label=None, **kwargs):
+    opts = dot_opts(penwidth=penwidth, label=label, **kwargs)
     print('\t"{}" -> "{}"{};'.format(a, b, opts), file=dst)
 
 REGION_COLORDICT = {'dendrite':'lightblue', 'soma':'cyan'}
@@ -290,19 +290,30 @@ def reaction_name(num, model):
          for num in ([num] if single else num)]
     return l[0] if single else np.array(l)
 
-def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rates):
+def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
     print('digraph Reactions {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
     print('\tnode [color=green,style=filled];', file=dst)
-    for rr, rr_s, pp, pp_s, rate in zip(reactants, r_stoichio,
-                                        products, p_stoichio, rates):
+    for i, rr, rr_s, pp, pp_s, rate in zip(range(len(rates)),
+                                           reactants, r_stoichio,
+                                           products, p_stoichio, rates):
         name = _reaction_name(rr, rr_s, pp, pp_s, species)
-        print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
-        for j, s in zip(rr, rr_s):
-            _conn(dst, species[j], name, _logclip(rate, 10))
+        label = True
+        if i in reversibles and i > reversibles[i]:
+            label = False
+            name = _reaction_name(pp, pp_s, rr, rr_s, species)
+        if label:
+            print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
+        # For each reversible pair, let one part do one direction,
+        # other part the other direction.
+        if i not in reversibles:
+            for j, s in zip(rr, rr_s):
+                _conn(dst, species[j], name, _logclip(rate, 10), style='dashed')
         for j, s in zip(pp, pp_s):
-            _conn(dst, name, species[j], _logclip(rate, 10))
+            _conn(dst, name, species[j], _logclip(rate, 10),
+                  style=('dashed' if not label else None),
+                  arrowhead=('none' if not label else None))
         if not len(rr) and not len(pp):
             print('\t"{}";'.format(name), file=dst)
         print()
@@ -314,7 +325,7 @@ def dot_productions(output):
     _productions(sys.stdout, model.species(),
                  reactions.reactants(), reactions.reactant_stoichiometry(),
                  reactions.products(), reactions.product_stoichiometry(),
-                 reactions.rates())
+                 reactions.rates(), reactions.reversible_pairs())
 
 def specie_indices(items, species):
     species = list(species)

@@ -131,6 +131,18 @@ class Reactions(object):
         "Rates of the reactions"
         return self._element.rates
 
+    def reversible_pairs(self):
+        """Mapping to reverse reactions
+
+        For reaction i which has a reverse reaction, reversible_pairs()[i]
+        gives the index of the reverse reaction. Reactions which do not have
+        a reverse are not included.
+        """
+        indices = self._element.reversible_pairs
+        mapping = {i:indices[i] for i in range(len(indices))
+                   if indices[i] >= 0}
+        return mapping
+
 class Model(object):
     """Information about the model, same for all trials
     """
