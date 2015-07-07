@@ -8,6 +8,7 @@ import glob
 import collections
 import itertools
 import argparse
+import tempfile
 import subprocess
 import numpy as np
 import tables
@@ -207,7 +208,7 @@ def make_movie(save):
     command = '''mencoder -mf type=png:w=800:h=600:fps=25
                  -ovc lavc -lavcopts vcodec=mpeg4 -oac copy -o'''.split()
     command += [save, 'mf://*.png'.format(save)]
-    print("running {}", command)
+    print('running', ' '.join(command))
     subprocess.check_call(command)
 
 def _logclip(x, offset):
@@ -304,7 +305,7 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
             label = False
             name = _reaction_name(pp, pp_s, rr, rr_s, species)
         if label:
-            print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name))
+            print('\t"{}" [color=black,shape=point,fillcolor=magenta];'.format(name), file=dst)
         # For each reversible pair, let one part do one direction,
         # other part the other direction.
         if i not in reversibles:
@@ -322,10 +323,22 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
-    _productions(sys.stdout, model.species(),
+    if opts.save:
+        file = open(opts.save + '-reactions.svg', 'w')
+    else:
+        tmp = tempfile.NamedTemporaryFile(prefix='reactions-', suffix='.svg')
+        file = open(tmp.name, 'w')
+    _productions(file, model.species(),
                  reactions.reactants(), reactions.reactant_stoichiometry(),
                  reactions.products(), reactions.product_stoichiometry(),
                  reactions.rates(), reactions.reversible_pairs())
+    file.flush()
+    if opts.save:
+        print('Written', file.name)
+    else:
+        command = ['neato', '-Tx11', file.name]
+        print('running', ' '.join(command))
+        subprocess.check_call(command)
 
 def specie_indices(items, species):
     species = list(species)
