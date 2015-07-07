@@ -19,7 +19,8 @@ from pygments.lexers import XmlLexer
 from pygments.formatters import Terminal256Formatter as Formatter
 import pandas as pd
 
-from . import output
+from . import output, ks
+from .output import EventKind
 
 # TODO: support --time in animations
 
@@ -72,6 +73,8 @@ parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
+parser.add_argument('--leaps', type=str_list, nargs='?', const=())
+parser.add_argument('--weighted', action='store_true')
 parser.add_argument('--multiplot', nargs='?', const=1, type=int)
 parser.add_argument('--num-elements', type=int,
                     help='take only the first so many elements')
@@ -459,6 +462,65 @@ def plot_history(output, species):
                  simul.times()[when], simul.counts()[when],
                  title=output.file.filename, opts=opts)
 
+def grouped_histogram(events, group_keys, what_key, weight_key=None):
+    min_max = (events[what_key].min(), events[what_key].max())
+    gb = events.groupby(group_keys)
+    hists = dict(
+        (key, ks.apply_histogram(group[[what_key]],
+                                 group[[weight_key]] if weight_key else None,
+                                 min_max=min_max,
+                                 bins=50)[what_key])
+        for key, group in gb)
+    df = pd.DataFrame(hists)
+    return df
+
+def reverse_legend(ax, **kwargs):
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[::-1], labels[::-1], **kwargs)
+
+def plot_leaps(output, species):
+    title=output.file.filename
+    model = output.model
+    simul = output.simulation(opts.trial)
+    descriptions = list(model.dependencies.descriptions())
+    if not species:
+        species = model.species()
+
+    import matplotlib
+    if opts.save:
+        matplotlib.use('Agg')
+    from matplotlib import pyplot
+
+    full_title = '{}, event timings {}'.format(title, ', '.join(species))
+    f = pyplot.figure(figsize=opts.geometry)
+    f.canvas.set_window_title(full_title)
+    ax = f.gca()
+
+    events = simul.events()
+    print(events)
+    hist = grouped_histogram(events, 'event kind'.split(), 'waited',
+                             'extent' if opts.weighted else None)
+    base = 0
+    for event_kind in hist:
+        event, kind = event_kind
+        label = '{}, {}'.format(descriptions[event], EventKind(kind).name.lower())
+        values = hist[event_kind].values
+        ax.step(hist.index, base + values,
+                fillstyle='none',
+                linestyle='-' if kind==1 else '--',
+                label=label)
+        ax.legend(loc='upper right')
+        reverse_legend(ax, fontsize=8)
+        pyplot.setp(ax.xaxis.get_majorticklabels(), fontsize=8)
+        pyplot.setp(ax.yaxis.get_majorticklabels(), fontsize=8)
+        base += values
+    if opts.save:
+        fname = opts.save + ', event timings of species {}.svg'.format(', '.join(species))
+        f.savefig(fname)
+        print('saved {}'.format(fname))
+    else:
+        pyplot.show(block=True)
+
 def print_config(output):
     tree = output.simulation(0).config()
     if opts.config:
@@ -489,6 +551,8 @@ if __name__ == '__main__':
         dot_productions(opts.file)
     elif opts.history is not None:
         plot_history(opts.file, opts.history)
+    elif opts.leaps is not None:
+        plot_leaps(opts.file, opts.leaps)
     elif opts.config is not None:
         print_config(opts.file)
     else:
