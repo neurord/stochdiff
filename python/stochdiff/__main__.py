@@ -392,17 +392,20 @@ def _history(simul, species, region_indices, region_labels,
     data = list(generate_histories(species, region_indices, region_labels,
                                    times, counts, opts))
     fmt = '{name} in {rlabel}' if len(set(region_labels)) > 1 else '{name}'
+    sharex = None
     if opts.multiplot:
         i = 1
         cols = opts.multiplot
         rows = math.ceil(len(data) / cols)
         for x, y, name, rlabel in data:
-            ax = f.add_subplot(rows, cols, i, yscale=opts.yscale)
+            ax = f.add_subplot(rows, cols, i, yscale=opts.yscale, sharex=sharex)
             ax.plot(x, y, opts.style,
                     label=fmt.format(name=name, rlabel=rlabel))
             ax.legend(loc='best', fontsize=8)
             ax.locator_params(nbins=3)
             i += 1
+            if sharex is None:
+                sharex = ax
     else:
         ax = f.gca(yscale=opts.yscale)
         ax.set_ylabel('particle numbers')
