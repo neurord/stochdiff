@@ -431,9 +431,11 @@ public class NextEventQueue {
                     List<IGridCalc.Happening> events) {
 
             assert this.bidirectional_leap || this.extent >= 0: this.extent;
+            assert !(this.bidirectional_leap && !this.leap);
 
             boolean changed = this.extent > 0;
-            int done;
+            final boolean was_leap = this.leap;
+            final int done;
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
@@ -442,6 +444,9 @@ public class NextEventQueue {
                                          this.extent, current, current - this.wait_start, this.original_wait));
 
             if (changed) {
+                /* Sometimes we attempt to execute something but the necessary
+                 * reactants are already gone. The extent of executed reaction
+                 * might be smaller, or even 0. */
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
                                     stimulationEvents != null ? stimulationEvents[this.element()] : null,
@@ -451,7 +456,7 @@ public class NextEventQueue {
             } else
                 done = 0;
 
-            if (this.leap) {
+            if (was_leap) {
                 leaps += 1; /* We count a bidirectional leap as one */
                 leap_extent += Math.abs(done);
             } else
@@ -478,14 +483,27 @@ public class NextEventQueue {
                 queue.reposition("reverse", this.reverse);
             }
 
+            double fraction = 0;
+
             /* dependent of this must be the same as dependent of reverse reaction
              * so no need to go over both. */
             for (NextEvent dep: this.dependent)
                 if (!(dep == this.reverse && this.bidirectional_leap))
-                    dep.update_and_reposition(current, changed);
+                    fraction = Math.max(dep.update_and_reposition(current, changed), fraction);
+            log.log(was_leap && fraction >= 5 * tolerance ? Level.WARN : Level.DEBUG,
+                    "{}: max {} change fraction {}",
+                      this, was_leap ? "leap" : "exact", fraction);
         }
 
-        void update_and_reposition(double current, boolean changed) {
+        /**
+         * Returns the fraction of modification of propensity:
+         *      (new - old) / old
+         * iff the time was updated based on ratio propensities.
+         * Returns 0 if a new time was generated.
+         * For a reaction subjugate to the reverse, it returns the ratio
+         * for the reverse reaction.
+         */
+        double update_and_reposition(double current, boolean changed) {
             /* When reverse is leaping, we do not update the time or other
              * fields on this event. We push all updates of time and propensity
              * to the reverse. */
@@ -501,21 +519,25 @@ public class NextEventQueue {
                 assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
-                this.reverse.update_and_reposition(current, false);
+                return this.reverse.update_and_reposition(current, false);
             } else {
                 boolean expect_changed = changed && !this.bidirectional_leap;
                 double old = this._update_propensity(expect_changed);
                 boolean inf = Double.isInfinite(this.time);
-                if (update_times && !inf)
+                final double ans;
+                if (update_times && !inf) {
                     this.time = (this.time - current) * old / this.propensity + current;
-                else {
+                    ans = (this.propensity - old) / old;
+                } else {
                     this.time = this._new_time(current);
                     if (inf)
                         this.original_wait = this.time - current;
+                    ans = 0;
                 }
                 assert this.time >= 0: this.time;
 
                 queue.reposition("upd.dep", this);
+                return ans;
             }
         }
 
