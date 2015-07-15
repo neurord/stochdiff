@@ -161,17 +161,6 @@ public class NextEventQueue {
         protected List<int[]> scoeff_ki = inst.newArrayList();
 
         /**
-         * P_+ and P_- variables - the count of predependent reactions which sometimes increase
-         * propensity, and the count of predependent reactions which sometimes decrease propensity
-         * of this reaction.
-         *
-         * count_both is the number of reactions which are both + and -.
-         */
-        private int plus_count;
-        private int minus_count;
-        private int count_both;
-
-        /**
          * wait_start: when the event was schedules. This is only used when logging
          * individual events.
          */
@@ -554,18 +543,11 @@ public class NextEventQueue {
             return this.reactants;
         }
 
-        protected void addDependent(NextEvent ev, boolean plus, boolean minus) {
+        protected void addDependent(NextEvent ev) {
             assert !this.dependent.contains(ev): this;
 
             this.dependent.add(ev);
             ev.dependon.add(this);
-
-            if (plus)
-                ev.plus_count ++;
-            if (minus)
-                ev.minus_count ++;
-            if (plus && minus)
-                ev.count_both ++;
 
             this.scoeff_ki.add(scoeff_ki(this.substrates(), this.substrate_stoichiometry(),
                                          ev.substrates(), ev.substrate_stoichiometry()));
@@ -727,14 +709,9 @@ public class NextEventQueue {
                 if (e != this &&
                     (e.element() == this.element() ||
                      e.element() == this.element2) &&
-                    ArrayUtil.intersect(e.reactants(), this.sp)) {
+                    ArrayUtil.intersect(e.reactants(), this.sp))
 
-                    /* To avoid duplication, diffusion is added to the P numbers
-                     * for the direction from lesser to bigger element only.
-                     */
-                    boolean add = this.element() < this.element2;
-                    this.addDependent(e, add, add);
-                }
+                    this.addDependent(e);
         }
 
         @Override
@@ -903,17 +880,7 @@ public class NextEventQueue {
             for (int r1: e.reactants())
                 for (int i = 0; i < this.substrates.length; i++)
                     if (this.substrates[i] == r1) {
-                        boolean minus = ArrayUtil.intersect(e.reactants(), this.reactants());
-                        boolean plus = ArrayUtil.intersect(e.reactants(), this.products);
-                        assert minus || plus : this;
-
-                        /* To avoid duplication, for reversible reactions,
-                         * reaction is added to the P numbers for the direction
-                         * from lesser to bigger index only.
-                         */
-                        boolean add = this.reverse == null ||
-                            this.index < this.reverse.index;
-                        this.addDependent(e, add && plus, add && minus);
+                        this.addDependent(e);
 
                         return;
                     }
@@ -1157,9 +1124,7 @@ public class NextEventQueue {
                     e.element() == this.element() &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
 
-                    /* We know that this only ever adds molecules, so is always in plus group.
-                     */
-                    this.addDependent(e, true, false);
+                    this.addDependent(e);
         }
 
         @Override
@@ -1389,28 +1354,16 @@ public class NextEventQueue {
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
 
-            int total_plus = 0, total_minus = 0, total_both = 0;
-            boolean in_infinity = false;
-
             for (NextEvent ev: obj.queue.nodes) {
-                total_plus += ev.plus_count;
-                total_minus += ev.minus_count;
-                total_both += ev.count_both;
+                log.info("{} → {} prop={} t={})", ev.index(),
+                         ev, ev.propensity, ev.time());
 
-                if (!in_infinity) {
-                    log.info("{} → {} prop={} t={} P₊={} P₋={} (P±={})", ev.index(),
-                             ev, ev.propensity, ev.time(),
-                             ev.plus_count, ev.minus_count, ev.count_both);
-
-                    if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
-                        log.info("{} — {} will happen at infinity",
-                                 ev.index() + 1, obj.queue.nodes.length-1);
-                        in_infinity = true;
-                    }
+                if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
+                    log.info("{} — {} will happen at infinity",
+                             ev.index() + 1, obj.queue.nodes.length-1);
+                    break;
                 }
             }
-
-            log.info("ΣP₊={} ΣP₋={} (ΣP±={})", total_plus, total_minus, total_both);
         }
 
         log_dependency_edges(e);
