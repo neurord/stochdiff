@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
@@ -146,9 +148,11 @@ public class NextEventQueue {
         final private int element;
         final String signature;
         final private int[] reactants;
+        final private int[] reactant_stoichiometry;
 
         /**
-         * Utility table of coefficients in s_jk definition.
+         * Utility table of coefficients to calculate propensity change
+         * of dependent reaction k when reaction j executes.
          *
          * s_jk = | sum_i (v_ij n_ik / X_i) |
          *                 ^^^^^^^^^
@@ -206,11 +210,15 @@ public class NextEventQueue {
         public abstract IGridCalc.EventType event_type();
         Happening happening;
 
-        NextEvent(int event_number, int element, String signature, int... reactants) {
+        NextEvent(int event_number, int element, String signature, int[] reactants, int[] reactant_stoichiometry) {
+            for (int i: reactant_stoichiometry)
+                assert i > 0;
+
             this.event_number = event_number;
             this.element = element;
             this.signature = signature;
             this.reactants = reactants;
+            this.reactant_stoichiometry = reactant_stoichiometry;
         }
 
         protected void setEvent(int extent, boolean leap, boolean bidirectional,
@@ -256,6 +264,8 @@ public class NextEventQueue {
 
         public abstract int[] substrates();
         public abstract int[] substrate_stoichiometry();
+
+        public abstract Map<Integer, int[]> substrates_by_voxel();
 
         public void addReverse(NextEvent other) {
             assert this.reverse == null;
@@ -543,14 +553,22 @@ public class NextEventQueue {
             return this.reactants;
         }
 
+        public int[] reactant_stoichiometry() {
+            return this.reactant_stoichiometry;
+        }
+
         protected void addDependent(NextEvent ev) {
             assert !this.dependent.contains(ev): this;
 
             this.dependent.add(ev);
             ev.dependon.add(this);
 
-            this.scoeff_ki.add(scoeff_ki(this.substrates(), this.substrate_stoichiometry(),
-                                         ev.substrates(), ev.substrate_stoichiometry()));
+            final int[] subs = this.substrates();
+
+            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet())
+                if (entry.getKey() == ev.element())
+                    this.scoeff_ki.add(scoeff_ki(subs, entry.getValue(),
+                                                 ev.reactants(), ev.reactant_stoichiometry()));
             assert this.scoeff_ki.size() == this.dependent.size();
         }
 
@@ -584,7 +602,8 @@ public class NextEventQueue {
         NextDiffusion(int event_number,
                       int element, int element2, int index2,
                       int sp, String signature, double fdiff) {
-            super(event_number, element, signature, sp);
+            super(event_number, element, signature,
+                  new int[]{ sp }, new int[] { 1 });
             this.element2 = element2;
             this.index2 = index2;
             this.sp = sp;
@@ -633,6 +652,13 @@ public class NextEventQueue {
             return new int[]{ -1 };
         }
 
+        @Override
+        public Map<Integer, int[]> substrates_by_voxel() {
+            HashMap<Integer, int[]> map = new HashMap<>();
+            map.put(this.element(), this.substrate_stoichiometry());
+            map.put(this.element2, new int[]{ +1 });
+            return map;
+        }
 
         /**
          * Calculate leap_time based on the limit on variance and expected extents.
@@ -760,21 +786,21 @@ public class NextEventQueue {
 
     /**
      * Calculate a row of scoeff_ki table, for dependent reaction k described
-     * by substrates2 and substrate_stoichiometry2.
+     * by reactants and reactant_stoichiometry.
      */
     public static int[] scoeff_ki(int[] substrates, int[] substrate_stoichiometry,
-                                  int[] substrates2, int[] substrate_stoichiometry2)
+                                  int[] reactants, int[] reactant_stoichiometry)
     {
         assert substrates.length == substrate_stoichiometry.length;
-        assert substrates2.length == substrate_stoichiometry2.length;
+        assert reactants.length == reactant_stoichiometry.length;
 
         int[] ans = new int[substrates.length];
 
         for (int i = 0; i < substrates.length; i++)
             /* if we find no match, we leave 0 in the array */
-            for (int ii = 0; ii < substrates2.length; ii++)
-                if (substrates2[ii] == substrates[i]) {
-                    ans[i] = substrate_stoichiometry[i] * substrate_stoichiometry2[ii];
+            for (int ii = 0; ii < reactants.length; ii++)
+                if (reactants[ii] == substrates[i]) {
+                    ans[i] = substrate_stoichiometry[i] * reactant_stoichiometry[ii];
                     break;
                 }
 
@@ -784,7 +810,7 @@ public class NextEventQueue {
     public class NextReaction extends NextEvent {
         final int[]
             products,
-            reactant_stoichiometry, product_stoichiometry,
+            product_stoichiometry,
             reactant_powers,
             substrates, substrate_stoichiometry;
         final int index;
@@ -807,10 +833,10 @@ public class NextEventQueue {
                      int[] reactant_stoichiometry, int[] product_stoichiometry,
                      int[] reactant_powers, String signature,
                      double rate, double volume) {
-            super(event_number, element, signature, reactants);
+            super(event_number, element, signature,
+                  reactants, reactant_stoichiometry);
             this.index = index;
             this.products = products;
-            this.reactant_stoichiometry = reactant_stoichiometry;
             this.product_stoichiometry = product_stoichiometry;
             this.reactant_powers = reactant_powers;
 
@@ -818,7 +844,7 @@ public class NextEventQueue {
             this.volume = volume;
 
             int[][] tmp = stoichiometry(reactants, reactant_stoichiometry,
-                                       products, product_stoichiometry);
+                                        products, product_stoichiometry);
             this.substrates = tmp[0];
             this.substrate_stoichiometry = tmp[1];
 
@@ -844,7 +870,7 @@ public class NextEventQueue {
             for (int i = 0; i < this.reactants().length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.reactants()[i]] /
-                                    this.propensity / this.reactant_stoichiometry[i]);
+                                     this.propensity / this.reactant_stoichiometry()[i]);
             for (int i = 0; i < this.products.length; i++)
                 time = Math.min(time,
                                 tolerance * X[this.products[i]] /
@@ -867,7 +893,7 @@ public class NextEventQueue {
 
             int n = Integer.MAX_VALUE;
             for (int i = 0; i < this.reactants().length; i++)
-                n = Math.min(n, X[this.reactants()[i]] / this.reactant_stoichiometry[i]);
+                n = Math.min(n, X[this.reactants()[i]] / this.reactant_stoichiometry()[i]);
 
             return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
 
@@ -898,10 +924,10 @@ public class NextEventQueue {
                     int[] stimulationEvents,
                     int count) {
             for (int i = 0; i < this.reactants().length; i++)
-                if (particles[this.element()][this.reactants()[i]] < this.reactant_stoichiometry[i] * count) {
+                if (particles[this.element()][this.reactants()[i]] < this.reactant_stoichiometry()[i] * count) {
 
                     int oldcount = count;
-                    count = particles[this.element()][this.reactants()[i]] / this.reactant_stoichiometry[i];
+                    count = particles[this.element()][this.reactants()[i]] / this.reactant_stoichiometry()[i];
                     log.warn("{}: population would go below zero with prop={} reactants {}×{} extent={} (using {})",
                              this, this.propensity,
                              this.reactantPopulation(), this.reactant_powers,
@@ -910,7 +936,7 @@ public class NextEventQueue {
 
             for (int i = 0; i < this.reactants().length; i++)
                 updatePopulation(this.element(), this.reactants()[i],
-                                 this.reactant_stoichiometry[i] * -count, this);
+                                 this.reactant_stoichiometry()[i] * -count, this);
             for (int i = 0; i < this.products.length; i++)
                 updatePopulation(this.element(), this.products[i],
                                  this.product_stoichiometry[i] * count, this);
@@ -923,7 +949,7 @@ public class NextEventQueue {
         @Override
         public double calcPropensity() {
             double ans = AdaptiveGridCalc.calculatePropensity(this.reactants(), this.products,
-                                                              this.reactant_stoichiometry,
+                                                              this.reactant_stoichiometry(),
                                                               this.product_stoichiometry,
                                                               this.reactant_powers,
                                                               this.rate,
@@ -945,6 +971,13 @@ public class NextEventQueue {
         public int[] substrate_stoichiometry() {
             assert this.substrate_stoichiometry != null;
             return this.substrate_stoichiometry;
+        }
+
+        @Override
+        public Map<Integer, int[]> substrates_by_voxel() {
+            HashMap<Integer, int[]> map = new HashMap<>();
+            map.put(this.element(), this.substrate_stoichiometry());
+            return map;
         }
 
         @Override
@@ -972,7 +1005,8 @@ public class NextEventQueue {
         NextStimulation(int event_number,
                         int element, int neighbors, int sp, String signature,
                         Stimulation stim) {
-            super(event_number, element, signature);
+            super(event_number, element, signature,
+                  new int[]{}, new int[]{});
             this.sp = sp;
             this.neighbors = neighbors;
             this.stim = stim;
@@ -1084,6 +1118,13 @@ public class NextEventQueue {
         @Override
         public int[] substrate_stoichiometry() {
             return new int[]{ 1 };
+        }
+
+        @Override
+        public Map<Integer, int[]> substrates_by_voxel() {
+            HashMap<Integer, int[]> map = new HashMap<>();
+            map.put(this.element(), this.substrate_stoichiometry());
+            return map;
         }
 
         @Override
@@ -1310,6 +1351,19 @@ public class NextEventQueue {
         return ans;
     }
 
+    static String scoeff_over_specie(int[] subs, String[] species, int[] scoeff) {
+        assert subs.length == scoeff.length;
+
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < subs.length; i++)
+            if (scoeff[i] != 0) {
+                if (b.length() > 0)
+                    b.append(" + ");
+                b.append("" + scoeff[i] + "/" + species[subs[i]]);
+            }
+        return b.toString();
+    }
+
     public static NextEventQueue create(int[][] particles,
                                         RandomGenerator random,
                                         StepGenerator stepper,
@@ -1330,23 +1384,22 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
-        log.info("Creating dependency graphs");
+        log.info("Creating dependency graph");
         for (NextEvent ev: e) {
             ev.addRelations(e);
 
-            /* skip diffusion by default, since it's mostly boring */
-            if (verbose && !(ev instanceof NextDiffusion)) {
-                int boring = 0;
-
-                log.debug("dependent {}:{}", ev.index(), ev);
+            if (verbose) {
+                log.debug("{}:{}", ev.index(), ev);
                 for (int i = 0; i < ev.dependent.size(); i++) {
                     NextEvent dep = ev.dependent.get(i);
                     int[] coeff = ev.scoeff_ki.get(i);
                     int sum = ArrayUtil.abssum(coeff);
-                    if (ev.reverse == dep)
-                        log.debug("      → {}reverse {}", sum==1?"boring ":"", coeff);
-                    else
-                        log.debug("      → {} {}", dep, coeff);
+                    String formula = scoeff_over_specie(ev.substrates(), rtab.getSpecies(), coeff);
+
+                    log.debug("      → {}:{} [{} el.{}]",
+                              dep.index(),
+                              ev.reverse == dep ? sum==1?"boring reverse":"reverse" : dep,
+                              formula, dep.element());
                 }
             }
         }
