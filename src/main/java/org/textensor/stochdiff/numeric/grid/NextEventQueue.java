@@ -295,7 +295,7 @@ public class NextEventQueue {
          *
          * @answer is time relative to @current.
          */
-        abstract double leap_time(double current, double tolerance);
+        abstract double leap_time(double current);
 
         /**
          * Calculate the <b>expected</b> time of a single exact execution.
@@ -365,12 +365,12 @@ public class NextEventQueue {
             return pop;
         }
 
-        void pick_time(double current, double timelimit, double tolerance) {
+        void pick_time(double current, double timelimit) {
 
             final double exact = this.exact_time(current);
 
             if (adaptive) {
-                double leap = this.leap_time(current, tolerance);
+                double leap = this.leap_time(current);
 
                 log.debug("deps: {}", this.dependent);
                 log.debug("options: wait {}, leap {}", exact, leap);
@@ -473,7 +473,7 @@ public class NextEventQueue {
              * after execution, but there's nothing to warn about. */
             this._update_propensity(false);
 
-            this.pick_time(current, timelimit, tolerance);
+            this.pick_time(current, timelimit);
             queue.reposition("update", this);
             if (this.bidirectional_leap) {
                 this.reverse.propensity = 0;
@@ -686,7 +686,7 @@ public class NextEventQueue {
          * @returns time step relative to @current.
          */
         @Override
-        public double leap_time(double current, double tolerance) {
+        public double leap_time(double current) {
             final int
                 X1 = particles[this.element()][this.sp],
                 X2 = particles[this.element2][this.sp],
@@ -863,7 +863,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public double leap_time(double current, double tolerance) {
+        public double leap_time(double current) {
             int[] X = particles[this.element()];
             double time = Double.POSITIVE_INFINITY;
 
@@ -1134,7 +1134,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public double leap_time(double current, double tolerance) {
+        public double leap_time(double current) {
             double cont_leap_time =
                 tolerance * particles[this.element()][this.sp] / this.propensity;
             assert cont_leap_time >= 0;
