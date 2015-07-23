@@ -141,6 +141,64 @@ public class NextEventQueue {
     long leap_extent = 0;
     long normal_waits = 0;
 
+    /**
+     * Utility table of coefficients to calculate propensity change
+     * of dependent reaction k when reaction j executes.
+     *
+     * s_jk = | sum_i (v_ij n_ik / X_i) |
+     *                 ^^^^^^^^^
+     * The first index goes over reactions, the second over species.
+     * This means that
+     *
+     * s_jk for dependent[k] is
+     *      = | sum_i ( scoeff_ki[k, i] / X_substrate[i] ) |
+     *
+     * This class contains the row scoeff_ki[k].
+     */
+    static class ScoeffElem {
+        final int element;
+        final int[] coeff;
+        final boolean reverse;
+        ScoeffElem(int element, int[] coeff, boolean reverse) {
+            this.element = element;
+            this.coeff = coeff;
+            this.reverse = reverse;
+        }
+
+        /**
+         * Calculate a row of scoeff_ki table, for dependent reaction k described
+         * by reactants and reactant_stoichiometry.
+         */
+        public static int[] scoeff_ki(int[] substrates, int[] substrate_stoichiometry,
+                                      int[] reactants, int[] reactant_stoichiometry)
+        {
+            assert substrates.length == substrate_stoichiometry.length;
+            assert reactants.length == reactant_stoichiometry.length;
+
+            int[] ans = new int[substrates.length];
+
+            for (int i = 0; i < substrates.length; i++)
+                /* if we find no match, we leave 0 in the array */
+                for (int ii = 0; ii < reactants.length; ii++)
+                    if (reactants[ii] == substrates[i]) {
+                        ans[i] = substrate_stoichiometry[i] * reactant_stoichiometry[ii];
+                        break;
+                    }
+
+            return ans;
+        }
+
+        public static ScoeffElem create(int element,
+                                        int[] substrates, int[] substrate_stoichiometry,
+                                        int[] reactants, int[] reactant_stoichiometry,
+                                        boolean reverse) {
+            return new ScoeffElem(element,
+                                  scoeff_ki(substrates, substrate_stoichiometry,
+                                            reactants, reactant_stoichiometry),
+                                  reverse);
+        }
+    }
+
     public abstract class NextEvent implements Node, IGridCalc.Event {
         int index;
 
@@ -150,19 +208,7 @@ public class NextEventQueue {
         final private int[] reactants;
         final private int[] reactant_stoichiometry;
 
-        /**
-         * Utility table of coefficients to calculate propensity change
-         * of dependent reaction k when reaction j executes.
-         *
-         * s_jk = | sum_i (v_ij n_ik / X_i) |
-         *                 ^^^^^^^^^
-         * The first index goes over reactions, the second over species.
-         * This means that
-         *
-         * s_jk for dependent[k] is
-         *      = | sum_i ( scoeff_ki[k, i] / X_substrate[i] ) |
-         */
-        protected List<int[]> scoeff_ki = inst.newArrayList();
+        protected List<ScoeffElem> scoeff_ki = inst.newArrayList();
 
         /**
          * wait_start: when the event was schedules. This is only used when logging
@@ -297,6 +343,57 @@ public class NextEventQueue {
          */
         abstract double leap_time(double current);
 
+
+        /**
+         * Any reaction j must modify all dependent propensities k only at most
+         * by ɛa_k, including both mean change and standard deviation of the
+         * change.
+         *
+         * This function calculates the extent that is allowed by this (in the
+         * linear approximation).
+         */
+        double allowed_leap_extent() {
+            int[] subs = this.substrates();
+            double min_change = Double.POSITIVE_INFINITY;
+
+            /* First we calculate how propensity k depends on the extent
+             * of reaction j:
+             *     α = da_k/d_y / a_k
+             *     Δa_k / a_k < ɛ
+             *     α y < ɛ
+             *     y < ɛ / α
+             *
+             * First we calculate α...
+             */
+
+            for (ScoeffElem scoeff: this.scoeff_ki)
+                if (!scoeff.reverse) {
+                    /* If we leap, we take the reverse with us, so no need to
+                     * include the reverse in this calculation. */
+
+                    double change = 0;
+                    int[] X = new int[subs.length];
+                    for (int n = 0; n < subs.length; n++) {
+                        change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
+                        X[n] = particles[scoeff.element][subs[n]];
+                    }
+
+                    // this should be reversed
+
+                    change = Math.abs(change);
+                    log.info("{} el.{} coeff {}/{}: {} → {}",
+                             subs, scoeff.element, scoeff.coeff, X, min_change, change);
+                    if (Double.isNaN(change))
+                        return Double.NaN;
+
+                    min_change = Math.min(change, min_change);
+                }
+
+            /* ... then the answer is ɛ / α */
+
+            return tolerance / min_change;
+        }
+
         /**
          * Calculate the <b>expected</b> time of a single exact execution.
          * Propensity is not recalculated, so must be brought up-to-date externally.
@@ -361,11 +458,7 @@ public class NextEventQueue {
         }
 
         protected int[] reactantPopulation() {
-            int[] react = this.reactants();
-            int[] pop = new int[react.length];
-            for (int i = 0; i < react.length; i++)
-                pop[i] = particles[this.element()][react[i]];
-            return pop;
+            return ArrayUtil.pick(particles[this.element()], this.reactants());
         }
 
         void pick_time(double current, double timelimit) {
@@ -497,9 +590,11 @@ public class NextEventQueue {
                         worst = dep;
                     }
                 }
-            if (was_leap && max_fraction >= 5 * tolerance)
-                log.warn("{}: max {} change fraction {} for {}",
-                         this, was_leap ? "leap" : "exact", max_fraction, worst);
+            if (was_leap && max_fraction >= 5 * tolerance) {
+                log.warn("{}, extent {}: max {} change fraction {} for {}",
+                         this, done, was_leap ? "leap" : "exact", max_fraction, worst);
+                System.exit(1);
+            }
         }
 
         /**
@@ -573,10 +668,14 @@ public class NextEventQueue {
 
             final int[] subs = this.substrates();
 
-            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet())
-                if (entry.getKey() == ev.element())
-                    this.scoeff_ki.add(scoeff_ki(subs, entry.getValue(),
-                                                 ev.reactants(), ev.reactant_stoichiometry()));
+            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet()) {
+                int elem = entry.getKey();
+                if (elem == ev.element())
+                    this.scoeff_ki.add(ScoeffElem.create(elem,
+                                                         subs, entry.getValue(),
+                                                         ev.reactants(), ev.reactant_stoichiometry(),
+                                                         ev == this.reverse));
+            }
             assert this.scoeff_ki.size() == this.dependent.size();
         }
 
@@ -695,23 +794,37 @@ public class NextEventQueue {
          */
         @Override
         public double leap_time(double current) {
+            /* This is based on all dependent reactions, except for the reverse one.
+             * Both mean extent of the reaction and sdev should be smaller than this
+             * limit. */
+            final double limit1 = this.allowed_leap_extent();
+            if (limit1 < 1) {
+                /* Do not bother with leaping in that case */
+                log.debug("leap time: maximum allowed extent {}, not leaping", limit1);
+                return 0;
+            }
+
             final int
                 X1 = particles[this.element()][this.sp],
                 X2 = particles[this.element2][this.sp],
                 Xm = Math.min(X1, X2),
                 Xtotal = X1 + X2;
 
-            final double t1 = tolerance * Xm / this.fdiff / 2 / (Xtotal/2 - Xm);
+            final double limit = Math.min(limit1, tolerance * Xm);
 
-            final double arg = 1 - tolerance*tolerance * Xm*Xm * 2 / Xtotal;
+            final double t1 = limit / this.fdiff / 2 / (Xtotal/2 - Xm);
+
+            final double arg = 1 - limit * limit * 2 / Xtotal;
             final double ans;
             if (arg > 0) {
                 final double t2 = Math.log(arg) / -this.fdiff;
                 ans = Math.min(t1, t2);
-                log.debug("leap time: min({}, {}, E→{}, V→{}) → {}", X1, X2, t1, t2, ans);
+                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→{}) → {}",
+                          X1, X2, limit1, tolerance * Xm, t1, t2, ans);
             } else {
                 ans = t1;
-                log.debug("leap time: min({}, {}, E→{}, V→inf) → {}", X1, X2, t1, ans);
+                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→inf) → {}",
+                          X1, X2, limit1, tolerance * Xm, t1, ans);
             }
             return ans;
             /*
@@ -793,29 +906,6 @@ public class NextEventQueue {
         return new int[][] {ArrayUtil.toArray(si), ArrayUtil.toArray(ss)};
     }
 
-    /**
-     * Calculate a row of scoeff_ki table, for dependent reaction k described
-     * by reactants and reactant_stoichiometry.
-     */
-    public static int[] scoeff_ki(int[] substrates, int[] substrate_stoichiometry,
-                                  int[] reactants, int[] reactant_stoichiometry)
-    {
-        assert substrates.length == substrate_stoichiometry.length;
-        assert reactants.length == reactant_stoichiometry.length;
-
-        int[] ans = new int[substrates.length];
-
-        for (int i = 0; i < substrates.length; i++)
-            /* if we find no match, we leave 0 in the array */
-            for (int ii = 0; ii < reactants.length; ii++)
-                if (reactants[ii] == substrates[i]) {
-                    ans[i] = substrate_stoichiometry[i] * reactant_stoichiometry[ii];
-                    break;
-                }
-
-        return ans;
-    }
-
     public class NextReaction extends NextEvent {
         final int[]
             products,
@@ -871,24 +961,39 @@ public class NextEventQueue {
             return IGridCalc.EventType.REACTION;
         }
 
+        protected int[] productPopulation() {
+            return ArrayUtil.pick(particles[this.element()], this.products);
+        }
+
         @Override
         public double leap_time(double current) {
+            /* This is based on all dependent reactions, except for the reverse one.
+             * Both mean extent of the reaction and sdev should be smaller than this
+             * limit. */
+            final double limit1 = this.allowed_leap_extent();
+            if (limit1 < 1) {
+                /* Do not bother with leaping in that case */
+                log.debug("leap time: maximum allowed extent {}, not leaping", limit1);
+                return 0;
+            }
+
             int[] X = particles[this.element()];
-            double time = Double.POSITIVE_INFINITY;
 
+            final int[] reactants = this.reactants();
+            final int[] stoichiometry = this.reactant_stoichiometry();
+            int extent2 = Integer.MAX_VALUE;
             for (int i = 0; i < this.reactants().length; i++)
-                time = Math.min(time,
-                                tolerance * X[this.reactants()[i]] /
-                                     this.propensity / this.reactant_stoichiometry()[i]);
-            for (int i = 0; i < this.products.length; i++)
-                time = Math.min(time,
-                                tolerance * X[this.products[i]] /
-                                    this.propensity / this.product_stoichiometry[i]);
+                extent2 = Math.min(extent2, X[reactants[i]] / stoichiometry[i] / this.reactant_powers[i]);
 
-            log.debug("{}: leap time: subs {}×{}, ɛ={}, pop={} → leap={}",
+            double limit2 = extent2 * tolerance;
+            double time = Math.min(limit1, limit2) / this.propensity; // XXX: substract backward propensity
+
+            log.debug("{}: leap time: subs {}×{}, ɛ={}, pop.{}→{} → limit {},{} → leap={}",
                       this,
                       this.substrates, this.substrate_stoichiometry,
-                      tolerance, X, time);
+                      tolerance, this.reactantPopulation(), this.productPopulation(),
+                      limit1, limit2,
+                      time);
 
             /* Make sure time is NaN or >= 0. */
             assert !(time < 0): time;
@@ -1398,14 +1503,14 @@ public class NextEventQueue {
                 log.debug("{}:{}", ev.index(), ev);
                 for (int i = 0; i < ev.dependent.size(); i++) {
                     NextEvent dep = ev.dependent.get(i);
-                    int[] coeff = ev.scoeff_ki.get(i);
-                    int sum = ArrayUtil.abssum(coeff);
-                    String formula = scoeff_over_specie(ev.substrates(), rtab.getSpecies(), coeff);
+                    ScoeffElem scoeff = ev.scoeff_ki.get(i);
+                    int sum = ArrayUtil.abssum(scoeff.coeff);
+                    String formula = scoeff_over_specie(ev.substrates(), rtab.getSpecies(), scoeff.coeff);
 
                     log.debug("      → {}:{} [{} el.{}]",
                               dep.index(),
                               ev.reverse == dep ? sum==1?"boring reverse":"reverse" : dep,
-                              formula, dep.element());
+                              formula, scoeff.element);
                 }
             }
         }

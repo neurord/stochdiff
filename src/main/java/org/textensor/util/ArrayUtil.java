@@ -364,4 +364,11 @@ public class ArrayUtil {
         }
         return arr;
     }
+
+    public static int[] pick(int[] big_array, int[] indices) {
+        int[] ans = new int[indices.length];
+        for (int i = 0; i < indices.length; i++)
+            ans[i] = big_array[indices[i]];
+        return ans;
+    }
 }
