@@ -669,15 +669,15 @@ public class NextEventQueue {
          *
          *   y = (N/2 - Xm) p
          *   V = N p/2 (1 - p/2)
-         *   p = 1 - e^{-rt}
+         *   p = 1 - e^{-2rt}
          *
          * But assume linearity in y:
          *
-         *  y' = (N/2 - Xm) rt
+         *  y' = (N/2 - Xm) 2rt
          *
          * This gives:
          *  y' ≤ ε Xm
-         *  t  ≤ ε/r Xm/(N/2 - Xm)
+         *  t  ≤ ε/2r Xm/(N/2 - Xm)
          *
          *  V ≤ ε^2 Xm^2
          *  p ≤ ε^2 Xm^2 2/N (approx)
@@ -693,7 +693,7 @@ public class NextEventQueue {
                 Xm = Math.min(X1, X2),
                 Xtotal = X1 + X2;
 
-            final double t1 = tolerance * Xm / this.fdiff / (Xtotal/2 - Xm);
+            final double t1 = tolerance * Xm / this.fdiff / 2 / (Xtotal/2 - Xm);
 
             final double arg = 1 - tolerance*tolerance * Xm*Xm * 2 / Xtotal;
             final double ans;
