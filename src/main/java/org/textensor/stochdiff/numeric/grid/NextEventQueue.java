@@ -481,16 +481,22 @@ public class NextEventQueue {
                 queue.reposition("reverse", this.reverse);
             }
 
-            double fraction = 0;
+            double max_fraction = 0;
+            NextEvent worst = null;
 
             /* dependent of this must be the same as dependent of reverse reaction
              * so no need to go over both. */
             for (NextEvent dep: this.dependent)
-                if (!(dep == this.reverse && this.bidirectional_leap))
-                    fraction = Math.max(dep.update_and_reposition(current, changed), fraction);
-            log.log(was_leap && fraction >= 5 * tolerance ? Level.WARN : Level.DEBUG,
-                    "{}: max {} change fraction {}",
-                    this, was_leap ? "leap" : "exact", fraction);
+                if (!(dep == this.reverse && this.bidirectional_leap)) {
+                    double fraction = dep.update_and_reposition(current, changed);
+                    if (fraction > max_fraction) {
+                        max_fraction = fraction;
+                        worst = dep;
+                    }
+                }
+            if (was_leap && max_fraction >= 5 * tolerance)
+                log.debug("{}: max {} change fraction {} for {}",
+                          this, was_leap ? "leap" : "exact", max_fraction, worst);
         }
 
         /**
