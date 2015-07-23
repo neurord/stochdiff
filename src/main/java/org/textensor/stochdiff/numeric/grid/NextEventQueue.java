@@ -372,7 +372,6 @@ public class NextEventQueue {
             if (adaptive) {
                 double leap = this.leap_time(current);
 
-                log.debug("deps: {}", this.dependent);
                 log.debug("options: wait {}, leap {}", exact, leap);
 
                 if (current + leap > timelimit) {
@@ -491,7 +490,7 @@ public class NextEventQueue {
                     fraction = Math.max(dep.update_and_reposition(current, changed), fraction);
             log.log(was_leap && fraction >= 5 * tolerance ? Level.WARN : Level.DEBUG,
                     "{}: max {} change fraction {}",
-                      this, was_leap ? "leap" : "exact", fraction);
+                    this, was_leap ? "leap" : "exact", fraction);
         }
 
         /**
@@ -728,8 +727,6 @@ public class NextEventQueue {
                 return n1;
             int X2 = particles[this.element2][this.sp];
             int n2 = stepper.versatile_ngo("neq diffusion", X2, mul);
-            log.debug("leap_count for diffusion {},{} a={}*{}={} → {}-{}={}",
-                      X1, X2, this.fdiff, time-current, mul, n1, n2, n1-n2);
             return n1 - n2;
         }
 
@@ -958,8 +955,6 @@ public class NextEventQueue {
                                                               this.rate,
                                                               this.volume,
                                                               particles[this.element()]);
-            //  log.debug("{}: rate={} vol={} propensity={}",
-            //        this, this.rate, this.volume, ans);
             assert ans >= 0: ans;
             return ans;
         }
@@ -1097,7 +1092,6 @@ public class NextEventQueue {
         double exact_time(double current) {
             double cont = super.exact_time(current);
             double real = _continous_delta_to_real_time(current, cont, false);
-            // log.debug("exact_time: current={} + {} → {} ({} advance)", current, cont, real, real - current);
             return real - current;
         }
 
