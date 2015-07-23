@@ -309,6 +309,9 @@ public class NextEventQueue {
 
         /**
          * Calculate the (randomized) extent of the reaction based in the time given.
+         * @current is "now" (only relevant for stimulations), and @time
+         * a time delta. Iff @bidirectional is true, the leap should encompass
+         * the reverse reaction.
          */
         abstract int leap_count(double current, double time, boolean bidirectional);
 
@@ -726,7 +729,7 @@ public class NextEventQueue {
         public int leap_count(double current, double time, boolean bidirectional) {
             /* Diffusion is a first order reaction, governed by the
              * sum of binomial distributions. */
-            double mul = (time - current) * this.fdiff;
+            double mul = time * this.fdiff;
             int X1 = particles[this.element()][this.sp];
             int n1 = stepper.versatile_ngo("neq diffusion", X1, mul);
             if (!bidirectional)
