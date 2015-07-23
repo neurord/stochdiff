@@ -498,8 +498,8 @@ public class NextEventQueue {
                     }
                 }
             if (was_leap && max_fraction >= 5 * tolerance)
-                log.debug("{}: max {} change fraction {} for {}",
-                          this, was_leap ? "leap" : "exact", max_fraction, worst);
+                log.warn("{}: max {} change fraction {} for {}",
+                         this, was_leap ? "leap" : "exact", max_fraction, worst);
         }
 
         /**
