@@ -323,6 +323,10 @@ public class NextEventQueue {
 
         /**
          * Add and remove particles as appropriate for this event type.
+         *
+         * @return the extent of performed reaction. (Always positive for
+         * forward reactions. May be negative for combined forward and
+         * backward reactions.)
          */
         abstract int execute(int[] reactionEvents,
                              int[][] diffusionEvents,
@@ -739,7 +743,7 @@ public class NextEventQueue {
             if (diffusionEvents != null)
                 diffusionEvents[this.sp][this.index2] += -done;
 
-            return done;
+            return -done;
         }
 
         @Override
