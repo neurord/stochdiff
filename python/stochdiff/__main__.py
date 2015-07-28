@@ -13,6 +13,7 @@ import tempfile
 import subprocess
 import numpy as np
 import tables
+import contextlib
 from lxml import etree
 from pygments import highlight
 from pygments.lexers import XmlLexer
@@ -224,6 +225,22 @@ def make_movie(save):
 def _logclip(x, offset):
     return np.clip(np.log(x + 1e-10) + offset, 0.3, 5)
 
+@contextlib.contextmanager
+def save_or_dot(ident):
+    if opts.save:
+        file = open(opts.save + '-{}.svg'.format(ident), 'w')
+    else:
+        tmp = tempfile.NamedTemporaryFile(prefix='{}-'.format(ident), suffix='.svg')
+        file = open(tmp.name, 'w')
+    yield file
+    file.flush()
+    if opts.save:
+        print('Written', file.name)
+    else:
+        command = ['neato', '-Tx11', file.name]
+        print('running', ' '.join(command))
+        subprocess.check_call(command)
+
 def dot_opts(**opts):
     opts = ['{}={}'.format(k, v)
             for k, v in opts.items() if v is not None]
@@ -251,7 +268,8 @@ def _connections(dst, model):
     print('}', file=dst)
 
 def dot_connections(output):
-    _connections(sys.stdout, output.model)
+    with save_or_dot('connections') as file:
+        _connections(file, output.model)
 
 TYPE_COLORDICT = {output.EventType.REACTION:'lightblue',
                   output.EventType.DIFFUSION:'grey',
@@ -333,22 +351,11 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
-    if opts.save:
-        file = open(opts.save + '-reactions.svg', 'w')
-    else:
-        tmp = tempfile.NamedTemporaryFile(prefix='reactions-', suffix='.svg')
-        file = open(tmp.name, 'w')
-    _productions(file, model.species(),
-                 reactions.reactants(), reactions.reactant_stoichiometry(),
-                 reactions.products(), reactions.product_stoichiometry(),
-                 reactions.rates(), reactions.reversible_pairs())
-    file.flush()
-    if opts.save:
-        print('Written', file.name)
-    else:
-        command = ['neato', '-Tx11', file.name]
-        print('running', ' '.join(command))
-        subprocess.check_call(command)
+    with save_or_dot('reactions') as file:
+        _productions(file, model.species(),
+                     reactions.reactants(), reactions.reactant_stoichiometry(),
+                     reactions.products(), reactions.product_stoichiometry(),
+                     reactions.rates(), reactions.reversible_pairs())
 
 def specie_indices(items, species):
     species = list(species)
