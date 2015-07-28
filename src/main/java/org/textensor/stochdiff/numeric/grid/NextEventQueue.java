@@ -1015,17 +1015,24 @@ public class NextEventQueue {
             return time;
         }
 
-        @Override
-        public int leap_count(double current, double time, boolean bidirectional) {
-            int[] X = particles[this.element()];
-
+        private int leap_count_uni(int[] X, double time) {
             int n = Integer.MAX_VALUE;
             for (int i = 0; i < this.reactants().length; i++)
                 n = Math.min(n, X[this.reactants()[i]] / this.reactant_stoichiometry()[i]);
 
             return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
+        }
 
-            // FIXME: update to bidirectional reactions
+        @Override
+        public int leap_count(double current, double time, boolean bidirectional) {
+            int[] X = particles[this.element()];
+            int n1 = this.leap_count_uni(X, time);
+            if (!bidirectional)
+                return n1;
+            assert this.reverse != null;
+            assert this.element() == this.reverse.element();
+            int n2 = ((NextReaction) this.reverse).leap_count_uni(X, time);
+            return n1 - n2;
 
             // FIXME: update for second order reactions
         }
