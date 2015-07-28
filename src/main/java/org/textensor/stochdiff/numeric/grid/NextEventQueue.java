@@ -27,6 +27,9 @@ import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger(NextEventQueue.class);
@@ -358,7 +361,7 @@ public class NextEventQueue {
          */
         double allowed_leap_extent() {
             int[] subs = this.substrates();
-            double min_change = Double.POSITIVE_INFINITY;
+            double max_change = 0;
 
             /* First we calculate how propensity k depends on the extent
              * of reaction j:
@@ -370,11 +373,13 @@ public class NextEventQueue {
              * First we calculate α...
              */
 
-            for (ScoeffElem scoeff: this.scoeff_ki)
-                if (!scoeff.reverse) {
+            for (ScoeffElem scoeff: this.scoeff_ki) {
+                if (scoeff.reverse)
                     /* If we leap, we take the reverse with us, so no need to
                      * include the reverse in this calculation. */
+                    continue;
 
+                if (true) {
                     double change = 0;
                     int[] X = new int[subs.length];
                     for (int n = 0; n < subs.length; n++) {
@@ -382,20 +387,19 @@ public class NextEventQueue {
                         X[n] = particles[scoeff.element][subs[n]];
                     }
 
-                    // this should be reversed
-
                     change = Math.abs(change);
-                    log.info("{} el.{} coeff {}/{}: {} → {}",
-                             subs, scoeff.element, scoeff.coeff, X, min_change, change);
+                    //                    log.info("{} el.{} coeff {}/{}: {}/{}→{}",
+                    //                             subs, scoeff.element, scoeff.coeff, X, tolerance, change, tolerance/change);
                     if (Double.isNaN(change))
                         return Double.NaN;
 
-                    min_change = Math.min(change, min_change);
+                    max_change = Math.max(change, max_change);
                 }
+            }
 
             /* ... then the answer is ɛ / α */
 
-            return tolerance / min_change;
+            return tolerance / max_change;
         }
 
         /**
@@ -597,8 +601,14 @@ public class NextEventQueue {
             if (was_leap && max_fraction >= 5 * tolerance) {
                 log.warn("{}, extent {}: max {} change fraction {} for {}",
                          this, done, was_leap ? "leap" : "exact", max_fraction, worst);
-                System.exit(1);
+                // try {
+                //     Thread.sleep(1000);
+                // } catch(InterruptedException exc) {
+                // }
             }
+
+            if (bad_specie >= 0 && particles[0][bad_specie] > 20000)
+                System.exit(1);
         }
 
         /**
@@ -1479,6 +1489,8 @@ public class NextEventQueue {
         return b.toString();
     }
 
+    static int bad_specie = -1;
+    
     public static NextEventQueue create(int[][] particles,
                                         RandomGenerator random,
                                         StepGenerator stepper,
@@ -1498,6 +1510,8 @@ public class NextEventQueue {
         e.addAll(obj.createReactions(numbering, grid, rtab));
         e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
+
+        bad_specie = rtab.getSpecieIndex("cAMP");
 
         log.info("Creating dependency graph");
         for (NextEvent ev: e) {
@@ -1546,6 +1560,8 @@ public class NextEventQueue {
         return obj;
     }
 
+    static boolean once = false; //true;
+    
     /**
      * Execute an event if the next event is before tstop.
      * @param timelimit is the maximum time that leap events are allowed to extend to.
@@ -1580,6 +1596,18 @@ public class NextEventQueue {
                   stimulationEvents,
                   now, tstop, timelimit,
                   events);
+
+        if (once && now >= 38000) {
+            once = false;
+
+            LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+            Configuration config = ctx.getConfiguration();
+
+            log.info("Set log level of {} {}", log.getName(), config.getLoggerConfig(log.getName()).getName());
+            config.getLoggerConfig(log.getName()).setLevel(Level.DEBUG);
+
+            ctx.updateLoggers();
+        }
 
         return now;
     }

@@ -356,20 +356,29 @@ def specie_indices(items, species):
 
 def generate_element_histories(species, region_indices, region_labels,
                                times, counts):
+    fmt = '{name} el.{element}'
+    if len(set(region_labels)) > 1:
+        fmt += ' {region}'
+
     for name in species:
         for rlabel, rindi in zip(region_labels, region_indices):
             y = counts.loc[rindi][name].values
-            yield times, y, name, rlabel
+            label = fmt.format(name=name, element=rindi, region=rlabel)
+            yield times, y, name, label
 
 def generate_region_histories(species, region_indices, region_labels,
                                times, counts):
+    fmt = '{name}'
+    if len(set(region_labels)) > 1:
+        fmt += ' {region}'
     for name in species:
         ans = collections.defaultdict(lambda: 0)
         for rlabel, rindi in zip(region_labels, region_indices):
             y = counts.loc[rindi][name].values
             ans[rlabel] += y
         for rlabel, y in ans.items():
-            yield times, y, name, rlabel
+            label = fmt.format(name=name, region=rlabel)
+            yield times, y, name, label
 
 def generate_histories(species, region_indices, region_labels,
                        times, counts, opts):
@@ -391,16 +400,14 @@ def _history(simul, species, region_indices, region_labels,
 
     data = list(generate_histories(species, region_indices, region_labels,
                                    times, counts, opts))
-    fmt = '{name} in {rlabel}' if len(set(region_labels)) > 1 else '{name}'
     sharex = None
     if opts.multiplot:
         i = 1
         cols = opts.multiplot
         rows = math.ceil(len(data) / cols)
-        for x, y, name, rlabel in data:
+        for x, y, name, label in data:
             ax = f.add_subplot(rows, cols, i, yscale=opts.yscale, sharex=sharex)
-            ax.plot(x, y, opts.style,
-                    label=fmt.format(name=name, rlabel=rlabel))
+            ax.plot(x, y, opts.style, label=label)
             ax.legend(loc='best', fontsize=8)
             ax.locator_params(nbins=3)
             i += 1
@@ -410,9 +417,8 @@ def _history(simul, species, region_indices, region_labels,
         ax = f.gca(yscale=opts.yscale)
         ax.set_ylabel('particle numbers')
         colors = itertools.cycle('rgbkcmy')
-        for x, y, name, rlabel in data:
-            ax.plot(x, y, opts.style, color=next(colors),
-                    label=fmt.format(name=name, rlabel=rlabel))
+        for x, y, name, label in data:
+            ax.plot(x, y, opts.style, color=next(colors), label=label)
         ax.legend(loc='best', fontsize=7)
     ax.set_xlabel('t / ms')
     if opts.save:
