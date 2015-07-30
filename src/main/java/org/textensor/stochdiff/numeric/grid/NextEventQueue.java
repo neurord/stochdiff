@@ -1306,7 +1306,7 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el.%d stim[%s]",
+            return String.format("%s el.%d %s",
                                  getClass().getSimpleName(),
                                  element(), signature);
         }
