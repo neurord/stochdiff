@@ -23,6 +23,7 @@ from __future__ import print_function, division, unicode_literals
 
 import operator
 import enum
+import math
 import tables
 import functools
 import numpy as np
@@ -221,7 +222,8 @@ class Simulation(object):
 
     def times(self):
         times = self._sim.times[:]
-        return np.round(times, decimals=max(3-int(np.log10(times.max())), 0))
+        diff = times[1] - times[0]
+        return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
     def counts(self):
         data = self._sim.concentrations
