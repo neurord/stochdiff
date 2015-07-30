@@ -535,7 +535,7 @@ public class NextEventQueue {
             assert this.bidirectional_leap || this.extent >= 0: this.extent;
             assert !(this.bidirectional_leap && !this.leap);
 
-            boolean changed = this.extent > 0;
+            boolean changed = this.extent != 0;
             final boolean was_leap = this.leap;
             final int done;
 
