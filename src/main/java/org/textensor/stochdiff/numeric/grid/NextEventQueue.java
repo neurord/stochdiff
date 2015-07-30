@@ -610,9 +610,6 @@ public class NextEventQueue {
                 // } catch(InterruptedException exc) {
                 // }
             }
-
-            if (bad_specie >= 0 && particles[0][bad_specie] > 20000)
-                System.exit(1);
         }
 
         /**
@@ -1500,8 +1497,6 @@ public class NextEventQueue {
         return b.toString();
     }
 
-    static int bad_specie = -1;
-    
     public static NextEventQueue create(int[][] particles,
                                         RandomGenerator random,
                                         StepGenerator stepper,
@@ -1521,8 +1516,6 @@ public class NextEventQueue {
         e.addAll(obj.createReactions(numbering, grid, rtab));
         e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
-
-        bad_specie = rtab.getSpecieIndex("cAMP");
 
         log.info("Creating dependency graph");
         for (NextEvent ev: e) {
