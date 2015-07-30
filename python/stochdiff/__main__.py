@@ -42,26 +42,13 @@ def int_list(arg):
     parts = arg.split(',')
     return list(int(part) for part in parts)
 
-def time_range(arg):
+def time_slice(arg):
     a, b, c = arg.partition('-')
     if not b:
         raise ValueError("either t₁-t₂, t₁-, or -t₂ must be used")
     a = float(a) if a else None
     c = float(c) if c else None
-    return (a, c)
-
-def filter_times(limits, times):
-    a = 0
-    if limits[0] is not None:
-        while times[a] < limits[0]:
-            a += 1
-    if limits[1] is not None:
-        b = a
-        while times[b] < limits[1]:
-            b += 1
-    else:
-        b = None
-    return slice(a, b)
+    return slice(a, c)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file', type=output.Output)
@@ -86,7 +73,7 @@ parser.add_argument('--num-elements', type=int,
                     help='take only the first so many elements')
 parser.add_argument('--yscale', choices=('linear', 'log', 'symlog'))
 parser.add_argument('--style', default='r-')
-parser.add_argument('--time', type=time_range, default=(None, None))
+parser.add_argument('--time', type=time_slice)
 parser.add_argument('--trial', type=int, default=0)
 parser.add_argument('--config', type=str, nargs='?', const='')
 
@@ -361,39 +348,40 @@ def specie_indices(items, species):
     species = list(species)
     return np.array([species.index(i) for i in items])
 
-def generate_element_histories(species, region_indices, region_labels,
-                               times, counts):
+def generate_element_histories(species, region_indices, region_labels, counts):
     fmt = '{name} el.{element}'
     if len(set(region_labels)) > 1:
         fmt += ' {region}'
 
     for name in species:
         for rlabel, rindi in zip(region_labels, region_indices):
-            y = counts.loc[rindi][name].values
+            series = counts.loc[rindi][name]
+            times = series.index.values
+            y = series.values
             label = fmt.format(name=name, element=rindi, region=rlabel)
             yield times, y, name, label
 
-def generate_region_histories(species, region_indices, region_labels,
-                               times, counts):
+def generate_region_histories(species, region_indices, region_labels, counts):
     fmt = '{name}'
     if len(set(region_labels)) > 1:
         fmt += ' {region}'
     for name in species:
         ans = collections.defaultdict(lambda: 0)
         for rlabel, rindi in zip(region_labels, region_indices):
-            y = counts.loc[rindi][name].values
-            ans[rlabel] += y
+            series = counts.loc[rindi][name].values
+            times = series.index.values
+            ans[rlabel] += series.values
         for rlabel, y in ans.items():
             label = fmt.format(name=name, region=rlabel)
             yield times, y, name, label
 
 def generate_histories(species, region_indices, region_labels,
-                       times, counts, opts):
+                       counts, opts):
     func = generate_region_histories if opts.sum_regions else generate_element_histories
-    return func(species, region_indices, region_labels, times, counts)
+    return func(species, region_indices, region_labels, counts)
 
 def _history(simul, species, region_indices, region_labels,
-             times, counts, title, opts):
+             counts, title, opts):
 
     import matplotlib
     if opts.save:
@@ -406,7 +394,7 @@ def _history(simul, species, region_indices, region_labels,
     f.canvas.set_window_title(full_title)
 
     data = list(generate_histories(species, region_indices, region_labels,
-                                   times, counts, opts))
+                                   counts, opts))
     sharex = None
     if opts.multiplot:
         i = 1
@@ -436,9 +424,9 @@ def _history(simul, species, region_indices, region_labels,
         pyplot.show(block=True)
 
 def _history_data(simul, species, region_indices, region_labels,
-                  times, counts, title, opts):
+                  counts, title, opts):
     data = generate_histories(species, region_indices, region_labels,
-                              times, counts, opts)
+                              counts, opts)
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
     df = pd.DataFrame(d, index=xx[0])
@@ -465,7 +453,10 @@ def plot_history(output, species):
     simul = output.simulation(opts.trial)
     if not species:
         species = model.species()
-    when = filter_times(opts.time, simul.times())
+    # filter time. level 0 is voxel, level 1 is time
+    counts = simul.counts()
+    if opts.time:
+        counts = counts.loc[(slice(None), opts.time), :]
 
     regions = model.grid().region
     region_numbers = list(find_regions(regions, opts.regions))
@@ -475,12 +466,12 @@ def plot_history(output, species):
     if opts.save_data:
         _history_data(simul, species,
                       region_indices, region_labels,
-                      simul.times()[when], simul.counts()[when],
+                      counts,
                       title=output.file.filename, opts=opts)
     else:
         _history(simul, species,
                  region_indices, region_labels,
-                 simul.times()[when], simul.counts()[when],
+                 counts,
                  title=output.file.filename, opts=opts)
 
 def grouped_histogram(events, group_keys, what_key, weight_key=None):
