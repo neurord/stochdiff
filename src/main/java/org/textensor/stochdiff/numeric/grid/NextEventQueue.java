@@ -570,7 +570,11 @@ public class NextEventQueue {
                 this.bidirectional_leap = false;
             }
 
-            log.debug("Updating {}", this);
+            log.debug("Advanced to {} with {} {}extent={}{}",
+                      time, this,
+                      was_leap ? "leap " : "",
+                      done,
+                      done == this.extent ? "" : " (planned " + this.extent + ")");
 
             /* In reactions of the type Da→Da+MaI the propensity does not change
              * after execution, but there's nothing to warn about. */
@@ -1034,7 +1038,7 @@ public class NextEventQueue {
             int n2 = ((NextReaction) this.reverse).leap_count_uni(X, time);
             return n1 - n2;
 
-            // FIXME: update for second order reactions
+            // FIXME: update variance for second order reactions
         }
 
         private void maybeAddRelation(NextEvent e) {
@@ -1594,9 +1598,7 @@ public class NextEventQueue {
         if (now > tstop) {
             log.debug("Next event is {} time {}, past stop at {}", ev, now, tstop);
             return tstop;
-        } else
-            log.debug("Advanced {}→{} with event {} {}extent={}",
-                      time, now, ev, ev.leap ? "leap " : "", ev.extent);
+        }
 
         ev.update(reactionEvents,
                   diffusionEvents,
