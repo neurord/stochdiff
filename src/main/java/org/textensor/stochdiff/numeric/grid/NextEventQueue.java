@@ -372,10 +372,12 @@ public class NextEventQueue {
          * by ɛa_k, including both mean change and standard deviation of the
          * change.
          *
-         * This function calculates the extent that is allowed by this (in the
-         * linear approximation).
+         * This function calculates the extent that would change the propensity of
+         * all dependent reactions by 100% (in the linear approximation).
+         * This will have to be multiplied by the tolerance to get the allowed
+         * leap extent.
          */
-        double allowed_leap_extent() {
+        double size1_leap_extent() {
             int[] subs = this.substrates();
             double max_change = 0;
 
@@ -401,9 +403,9 @@ public class NextEventQueue {
                 max_change = Math.max(change, max_change);
             }
 
-            /* ... then the answer is ɛ / α */
+            /* ... then the answer is 1 / α */
 
-            return tolerance / max_change;
+            return 1 / max_change;
         }
 
         /**
@@ -848,10 +850,10 @@ public class NextEventQueue {
             /* This is based on all dependent reactions, except for the reverse one.
              * Both mean extent of the reaction and sdev should be smaller than this
              * limit. */
-            final double limit1 = this.allowed_leap_extent();
-            if (limit1 < 1) {
+            final double limit1 = this.size1_leap_extent();
+            if (limit1*tolerance < 1) {
                 /* Do not bother with leaping in that case */
-                log.debug("leap time: maximum allowed extent {}, not leaping", limit1);
+                log.debug("leap time: maximum size1 extent {}, not leaping", limit1);
                 return 0;
             }
 
@@ -861,7 +863,7 @@ public class NextEventQueue {
                 Xm = Math.min(X1, X2),
                 Xtotal = X1 + X2;
 
-            final double limit = Math.min(limit1, tolerance * Xm);
+            final double limit = tolerance * Math.min(limit1, Xm);
 
             final double t1 = limit / this.fdiff / 2 / (Xtotal/2 - Xm);
 
@@ -1021,10 +1023,10 @@ public class NextEventQueue {
             /* This is based on all dependent reactions, except for the reverse one.
              * Both mean extent of the reaction and sdev should be smaller than this
              * limit. */
-            final double limit1 = this.allowed_leap_extent();
-            if (limit1 < 1) {
+            final double limit1 = this.size1_leap_extent();
+            if (limit1*tolerance < 1) {
                 /* Do not bother with leaping in that case */
-                log.debug("leap time: maximum allowed extent {}, not leaping", limit1);
+                log.debug("leap time: maximum size1 extent {}, not leaping", limit1);
                 return 0;
             }
 
@@ -1032,12 +1034,11 @@ public class NextEventQueue {
 
             final int[] reactants = this.reactants();
             final int[] stoichiometry = this.reactant_stoichiometry();
-            int extent2 = Integer.MAX_VALUE;
+            int limit2 = Integer.MAX_VALUE;
             for (int i = 0; i < this.reactants().length; i++)
-                extent2 = Math.min(extent2, X[reactants[i]] / stoichiometry[i] / this.reactant_powers[i]);
+                limit2 = Math.min(limit2, X[reactants[i]] / stoichiometry[i] / this.reactant_powers[i]);
 
-            double limit2 = extent2 * tolerance;
-            double time = Math.min(limit1, limit2) / this.propensity; // XXX: substract backward propensity
+            double time = tolerance * Math.min(limit1, limit2) / this.propensity; // XXX: substract backward propensity
 
             log.debug("{}: leap time: subs {}×{}, ɛ={}, pop.{}→{} → limit {},{} → leap={}",
                       this,
