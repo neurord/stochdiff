@@ -371,4 +371,11 @@ public class ArrayUtil {
             ans[i] = big_array[indices[i]];
         return ans;
     }
+
+    public static int[] negate(int[] ar) {
+        int[] negated = new int[ar.length];
+        for (int i = 0; i < ar.length; i++)
+            negated[i] = -ar[i];
+        return negated;
+    }
 }

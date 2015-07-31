@@ -166,6 +166,12 @@ public class NextEventQueue {
             this.coeff = coeff;
         }
 
+        public boolean sameAs(ScoeffElem other) {
+            return this.element == other.element &&
+                (Arrays.equals(this.coeff, other.coeff) ||
+                 Arrays.equals(this.coeff, ArrayUtil.negate(other.coeff)));
+        }
+
         public String toString(int[] subs, String[] species) {
             assert subs.length == this.coeff.length;
 
@@ -703,13 +709,22 @@ public class NextEventQueue {
                     ScoeffElem scoeff = ScoeffElem.create(elem,
                                                           subs, entry.getValue(),
                                                           ev.reactants(), ev.reactant_stoichiometry());
+                    boolean same = false;
+                    for (ScoeffElem other: this.scoeff_ki)
+                        if (other.sameAs(scoeff)) {
+                            same = true;
+                            break;
+                        }
+                    if (!same)
+                        this.scoeff_ki.add(scoeff);
+
                     if (verbose) {
                         int sum = ArrayUtil.abssum(scoeff.coeff);
                         String formula = scoeff.toString(subs, species);
-                        log.debug("      → {}:{} [{}]",
-                                  ev.index(), ev, formula);
+                        log.debug("      → {}:{} [{}{}]",
+                                  ev.index(), ev, formula,
+                                  same ? " duplicate" : "");
                     }
-                    this.scoeff_ki.add(scoeff);
                     return;
                 }
             }
@@ -901,9 +916,6 @@ public class NextEventQueue {
                     ArrayUtil.intersect(e.reactants(), this.sp))
 
                     this.addDependent(e, species, verbose);
-
-            assert this.scoeff_ki.size() == this.dependent.size() - (this.reverse != null ? 1 : 0):
-                "" + this.scoeff_ki.size() + " != " + this.dependent.size();
         }
 
         @Override
