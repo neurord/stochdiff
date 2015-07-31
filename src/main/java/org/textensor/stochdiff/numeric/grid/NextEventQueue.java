@@ -374,27 +374,20 @@ public class NextEventQueue {
              */
 
             for (ScoeffElem scoeff: this.scoeff_ki) {
-                if (scoeff.reverse)
-                    /* If we leap, we take the reverse with us, so no need to
-                     * include the reverse in this calculation. */
-                    continue;
-
-                if (true) {
-                    double change = 0;
-                    int[] X = new int[subs.length];
-                    for (int n = 0; n < subs.length; n++) {
-                        change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
-                        X[n] = particles[scoeff.element][subs[n]];
-                    }
-
-                    change = Math.abs(change);
-                    //                    log.info("{} el.{} coeff {}/{}: {}/{}→{}",
-                    //                             subs, scoeff.element, scoeff.coeff, X, tolerance, change, tolerance/change);
-                    if (Double.isNaN(change))
-                        return Double.NaN;
-
-                    max_change = Math.max(change, max_change);
+                double change = 0;
+                int[] X = new int[subs.length];
+                for (int n = 0; n < subs.length; n++) {
+                    change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
+                    X[n] = particles[scoeff.element][subs[n]];
                 }
+
+                change = Math.abs(change);
+                //                    log.info("{} el.{} coeff {}/{}: {}/{}→{}",
+                //                             subs, scoeff.element, scoeff.coeff, X, tolerance, change, tolerance/change);
+                if (Double.isNaN(change))
+                    return Double.NaN;
+
+                max_change = Math.max(change, max_change);
             }
 
             /* ... then the answer is ɛ / α */
@@ -686,10 +679,12 @@ public class NextEventQueue {
             for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet()) {
                 int elem = entry.getKey();
                 if (elem == ev.element())
-                    this.scoeff_ki.add(ScoeffElem.create(elem,
-                                                         subs, entry.getValue(),
-                                                         ev.reactants(), ev.reactant_stoichiometry(),
-                                                         ev == this.reverse));
+                    if (ev != this.reverse)
+                        /* If we leap, we take the reverse with us, so no need to
+                         * include the reverse in this calculation. */
+                        this.scoeff_ki.add(ScoeffElem.create(elem,
+                                                             subs, entry.getValue(),
+                                                             ev.reactants(), ev.reactant_stoichiometry());
             }
             assert this.scoeff_ki.size() == this.dependent.size();
         }
