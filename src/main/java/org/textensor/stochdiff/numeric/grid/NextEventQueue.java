@@ -160,10 +160,33 @@ public class NextEventQueue {
      */
     static class ScoeffElem {
         final int element;
+        final int single_coeff;
+        final int single_sub;
         final int[] coeff;
-        ScoeffElem(int element, int[] coeff) {
+        ScoeffElem(int element, int[] coeff, int[] substrates) {
             this.element = element;
             this.coeff = coeff;
+
+            /* If there's just one coefficient, we can save time,
+             * and instead of calculating c = 1/Σ(1/x + 1/y + ...),
+             * just do c = x. We also take the absolute, to avoid
+             * having to do it later in size1_leap_extent().
+             */
+            int single_coeff = 0;
+            int single_sub = -1;
+            for (int i = 0; i < coeff.length; i++)
+                if (coeff[i] != 0)
+                    if (single_coeff == 0) {
+                        single_coeff = Math.abs(coeff[i]);
+                        single_sub = substrates[i];
+                    } else {
+                        /* more than one, we cannot use this optimization */
+                        single_coeff = 0;
+                        single_sub = -1;
+                        break;
+                    }
+            this.single_coeff = single_coeff;
+            this.single_sub = single_sub;
         }
 
         public boolean sameAs(ScoeffElem other) {
@@ -182,6 +205,8 @@ public class NextEventQueue {
                         b.append(" + ");
                     b.append("" + this.coeff[i] + "/" + species[subs[i]]);
                 }
+            if (this.single_coeff > 0)
+                b.append(" 😊");
             b.append(" el." + this.element);
             return b.toString();
         }
@@ -214,7 +239,8 @@ public class NextEventQueue {
                                         int[] reactants, int[] reactant_stoichiometry) {
             return new ScoeffElem(element,
                                   scoeff_ki(substrates, substrate_stoichiometry,
-                                            reactants, reactant_stoichiometry));
+                                            reactants, reactant_stoichiometry),
+                                  substrates);
         }
     }
 
