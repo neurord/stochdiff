@@ -391,15 +391,10 @@ public class NextEventQueue {
 
             for (ScoeffElem scoeff: this.scoeff_ki) {
                 double change = 0;
-                int[] X = new int[subs.length];
-                for (int n = 0; n < subs.length; n++) {
+                for (int n = 0; n < subs.length; n++)
                     change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
-                    X[n] = particles[scoeff.element][subs[n]];
-                }
 
                 change = Math.abs(change);
-                //                    log.info("{} el.{} coeff {}/{}: {}/{}→{}",
-                //                             subs, scoeff.element, scoeff.coeff, X, tolerance, change, tolerance/change);
                 if (Double.isNaN(change))
                     return Double.NaN;
 
