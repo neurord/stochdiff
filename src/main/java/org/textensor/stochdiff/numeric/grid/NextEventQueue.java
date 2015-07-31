@@ -161,11 +161,23 @@ public class NextEventQueue {
     static class ScoeffElem {
         final int element;
         final int[] coeff;
-        final boolean reverse;
-        ScoeffElem(int element, int[] coeff, boolean reverse) {
+        ScoeffElem(int element, int[] coeff) {
             this.element = element;
             this.coeff = coeff;
-            this.reverse = reverse;
+        }
+
+        public String toString(int[] subs, String[] species) {
+            assert subs.length == this.coeff.length;
+
+            StringBuilder b = new StringBuilder();
+            for (int i = 0; i < subs.length; i++)
+                if (this.coeff[i] != 0) {
+                    if (b.length() > 0)
+                        b.append(" + ");
+                    b.append("" + this.coeff[i] + "/" + species[subs[i]]);
+                }
+            b.append(" el." + this.element);
+            return b.toString();
         }
 
         /**
@@ -193,12 +205,10 @@ public class NextEventQueue {
 
         public static ScoeffElem create(int element,
                                         int[] substrates, int[] substrate_stoichiometry,
-                                        int[] reactants, int[] reactant_stoichiometry,
-                                        boolean reverse) {
+                                        int[] reactants, int[] reactant_stoichiometry) {
             return new ScoeffElem(element,
                                   scoeff_ki(substrates, substrate_stoichiometry,
-                                            reactants, reactant_stoichiometry),
-                                  reverse);
+                                            reactants, reactant_stoichiometry));
         }
     }
 
@@ -668,28 +678,49 @@ public class NextEventQueue {
             return this.reactant_stoichiometry;
         }
 
-        protected void addDependent(NextEvent ev) {
+        protected void addDependent(NextEvent ev, String[] species, boolean verbose) {
             assert !this.dependent.contains(ev): this;
 
             this.dependent.add(ev);
             ev.dependon.add(this);
 
+            if (ev == this.reverse) {
+                /* If we leap, we take the reverse with us, so no need to
+                 * include the reverse in this calculation. */
+                if (verbose)
+                    log.debug("      → {}:{} [reverse el.{}]",
+                              ev.index(),
+                              ev,
+                              ev.element());
+                return;
+            }
+
             final int[] subs = this.substrates();
 
             for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet()) {
                 int elem = entry.getKey();
-                if (elem == ev.element())
-                    if (ev != this.reverse)
-                        /* If we leap, we take the reverse with us, so no need to
-                         * include the reverse in this calculation. */
-                        this.scoeff_ki.add(ScoeffElem.create(elem,
-                                                             subs, entry.getValue(),
-                                                             ev.reactants(), ev.reactant_stoichiometry());
+                if (elem == ev.element()) {
+                    ScoeffElem scoeff = ScoeffElem.create(elem,
+                                                          subs, entry.getValue(),
+                                                          ev.reactants(), ev.reactant_stoichiometry());
+                    if (verbose) {
+                        int sum = ArrayUtil.abssum(scoeff.coeff);
+                        String formula = scoeff.toString(subs, species);
+                        log.debug("      → {}:{} [{}]",
+                                  ev.index(), ev, formula);
+                    }
+                    this.scoeff_ki.add(scoeff);
+                    return;
+                }
             }
-            assert this.scoeff_ki.size() == this.dependent.size();
+
+            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet())
+                log.info("subs_by_voxel: {} → {}", entry.getKey(), entry.getValue());
+            log.error("Dependency not found: {} dep. {}", this, ev);
+            throw new RuntimeException("wtf?");
         }
 
-        public abstract void addRelations(Collection<? extends NextEvent> coll);
+        public abstract void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose);
     }
 
     static void log_dependency_edges(ArrayList<NextEvent> events) {
@@ -862,14 +893,17 @@ public class NextEventQueue {
             return n1 - n2;
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
             for (NextEvent e: coll)
                 if (e != this &&
                     (e.element() == this.element() ||
                      e.element() == this.element2) &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
 
-                    this.addDependent(e);
+                    this.addDependent(e, species, verbose);
+
+            assert this.scoeff_ki.size() == this.dependent.size() - (this.reverse != null ? 1 : 0):
+                "" + this.scoeff_ki.size() + " != " + this.dependent.size();
         }
 
         @Override
@@ -1033,20 +1067,20 @@ public class NextEventQueue {
             // FIXME: update variance for second order reactions
         }
 
-        private void maybeAddRelation(NextEvent e) {
+        private void maybeAddRelation(NextEvent e, String[] species, boolean verbose) {
             for (int r1: e.reactants())
                 for (int i = 0; i < this.substrates.length; i++)
                     if (this.substrates[i] == r1) {
-                        this.addDependent(e);
+                        this.addDependent(e, species, verbose);
 
                         return;
                     }
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
             for (NextEvent e: coll)
                 if (e != this && e.element() == this.element())
-                    this.maybeAddRelation(e);
+                    this.maybeAddRelation(e, species, verbose);
         }
 
         @Override
@@ -1287,13 +1321,13 @@ public class NextEventQueue {
             return stepper.poissonStep(this.propensity * time);
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll) {
+        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
             for (NextEvent e: coll)
                 if (e != this &&
                     e.element() == this.element() &&
                     ArrayUtil.intersect(e.reactants(), this.sp))
 
-                    this.addDependent(e);
+                    this.addDependent(e, species, verbose);
         }
 
         @Override
@@ -1479,19 +1513,6 @@ public class NextEventQueue {
         return ans;
     }
 
-    static String scoeff_over_specie(int[] subs, String[] species, int[] scoeff) {
-        assert subs.length == scoeff.length;
-
-        StringBuilder b = new StringBuilder();
-        for (int i = 0; i < subs.length; i++)
-            if (scoeff[i] != 0) {
-                if (b.length() > 0)
-                    b.append(" + ");
-                b.append("" + scoeff[i] + "/" + species[subs[i]]);
-            }
-        return b.toString();
-    }
-
     public static NextEventQueue create(int[][] particles,
                                         RandomGenerator random,
                                         StepGenerator stepper,
@@ -1514,22 +1535,9 @@ public class NextEventQueue {
 
         log.info("Creating dependency graph");
         for (NextEvent ev: e) {
-            ev.addRelations(e);
-
-            if (verbose) {
+            if (verbose)
                 log.debug("{}:{}", ev.index(), ev);
-                for (int i = 0; i < ev.dependent.size(); i++) {
-                    NextEvent dep = ev.dependent.get(i);
-                    ScoeffElem scoeff = ev.scoeff_ki.get(i);
-                    int sum = ArrayUtil.abssum(scoeff.coeff);
-                    String formula = scoeff_over_specie(ev.substrates(), rtab.getSpecies(), scoeff.coeff);
-
-                    log.debug("      → {}:{} [{} el.{}]",
-                              dep.index(),
-                              ev.reverse == dep ? sum==1?"boring reverse":"reverse" : dep,
-                              formula, scoeff.element);
-                }
-            }
+            ev.addRelations(e, rtab.getSpecies(), verbose);
         }
 
         if (verbose) {
