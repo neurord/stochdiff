@@ -1567,8 +1567,6 @@ public class NextEventQueue {
         return obj;
     }
 
-    static boolean once = false; //true;
-    
     /**
      * Execute an event if the next event is before tstop.
      * @param timelimit is the maximum time that leap events are allowed to extend to.
@@ -1601,18 +1599,6 @@ public class NextEventQueue {
                   stimulationEvents,
                   now, tstop, timelimit,
                   events);
-
-        if (once && now >= 38000) {
-            once = false;
-
-            LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-            Configuration config = ctx.getConfiguration();
-
-            log.info("Set log level of {} {}", log.getName(), config.getLoggerConfig(log.getName()).getName());
-            config.getLoggerConfig(log.getName()).setLevel(Level.DEBUG);
-
-            ctx.updateLoggers();
-        }
 
         return now;
     }
