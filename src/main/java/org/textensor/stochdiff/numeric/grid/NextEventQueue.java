@@ -851,7 +851,7 @@ public class NextEventQueue {
              * Both mean extent of the reaction and sdev should be smaller than this
              * limit. */
             final double limit1 = this.size1_leap_extent();
-            if (limit1*tolerance < 1) {
+            if (limit1 < 1 / tolerance) {
                 /* Do not bother with leaping in that case */
                 log.debug("leap time: maximum size1 extent {}, not leaping", limit1);
                 return 0;
@@ -1024,7 +1024,7 @@ public class NextEventQueue {
              * Both mean extent of the reaction and sdev should be smaller than this
              * limit. */
             final double limit1 = this.size1_leap_extent();
-            if (limit1*tolerance < 1) {
+            if (limit1 < 1 / tolerance) {
                 /* Do not bother with leaping in that case */
                 log.debug("leap time: maximum size1 extent {}, not leaping", limit1);
                 return 0;
