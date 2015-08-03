@@ -405,7 +405,8 @@ public class NextEventQueue {
          */
         double size1_leap_extent() {
             int[] subs = this.substrates();
-            double max_change = 0;
+            double min_value = 0;
+            boolean first = true;
 
             /* First we calculate how propensity k depends on the extent
              * of reaction j:
@@ -417,21 +418,32 @@ public class NextEventQueue {
              * First we calculate α...
              */
 
-            for (ScoeffElem scoeff: this.scoeff_ki) {
-                double change = 0;
-                for (int n = 0; n < subs.length; n++)
-                    change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
+            for (ScoeffElem scoeff: this.scoeff_ki)
+                if (scoeff.single_coeff > 0) {
+                    double val = (double) particles[scoeff.element][scoeff.single_sub] / scoeff.single_coeff;
+                    if (first)
+                        min_value = val;
+                    else {
+                        min_value = Math.min(min_value, val);
+                        first = false;
+                    }
+                } else {
+                    double change = 0;
+                    for (int n = 0; n < subs.length; n++)
+                        change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
 
-                change = Math.abs(change);
-                if (Double.isNaN(change))
-                    return Double.NaN;
-
-                max_change = Math.max(change, max_change);
-            }
+                    change = Math.abs(change);
+                    if (first)
+                        min_value = 1 / change;
+                    else {
+                        min_value = Math.min(min_value, 1 / change);
+                        first = false;
+                    }
+                }
 
             /* ... then the answer is 1 / α */
 
-            return 1 / max_change;
+            return min_value;
         }
 
         /**
