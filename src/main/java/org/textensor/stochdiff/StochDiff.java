@@ -58,6 +58,9 @@ public class StochDiff {
                     continue;
                 }
 
+                // Force the logger to exist
+                LogManager.getLogger(logger);
+
                 LoggerConfig loggerConfig = config.getLoggerConfig(logger);
                 if (!loggerConfig.getName().equals(logger)) {
                     log.warn("Failed to find logger \"{}\"", logger);
