@@ -633,14 +633,9 @@ public class NextEventQueue {
                         worst = dep;
                     }
                 }
-            if (was_leap && max_fraction >= 5 * tolerance) {
+            if (was_leap && max_fraction >= 5 * tolerance)
                 log.warn("{}, extent {}: max {} change fraction {} for {}",
                          this, done, was_leap ? "leap" : "exact", max_fraction, worst);
-                // try {
-                //     Thread.sleep(1000);
-                // } catch(InterruptedException exc) {
-                // }
-            }
         }
 
         /**
@@ -1344,7 +1339,7 @@ public class NextEventQueue {
             assert !(cont_leap_time < 0);
 
             double until = _continous_delta_to_real_time(current, cont_leap_time, true);
-            log.info("{}: leap time: {}×min({}, {})/{} → {} cont, {} real until {}",
+            log.debug("{}: leap time: {}×min({}, {})/{} → {} cont, {} real until {}",
                       this,
                       tolerance, limit1, limit2, this.propensity,
                       cont_leap_time, until - current, until);
@@ -1601,10 +1596,6 @@ public class NextEventQueue {
 
         if (only_init)
             System.exit(0);
-        try {
-            Thread.sleep(1000);
-        } catch(InterruptedException exc) {
-        }
 
         return obj;
     }
