@@ -2,12 +2,12 @@ package org.textensor.stochdiff.numeric.morph;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.HashMap;
 
 import org.textensor.stochdiff.disc.CurvedVolumeSlice;
 import org.textensor.stochdiff.geom.Geom;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -317,8 +317,8 @@ public class VolumeGrid {
             i++;
         }
 
-        return inst.newVector(new Object[]
-            {x0, y0, z0, x1, y1, x1, x2, y2, z2, x3, y3, z3, volume, deltaZ});
+        return new Vector<>(Arrays.asList(new Object[]
+            {x0, y0, z0, x1, y1, x1, x2, y2, z2, x3, y3, z3, volume, deltaZ}));
     }
 
     public String getLabel(int i) {
