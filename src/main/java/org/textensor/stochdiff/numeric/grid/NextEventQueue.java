@@ -36,6 +36,7 @@ public class NextEventQueue {
 
     final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
     final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);
+    final static boolean check_updates = Settings.getProperty("stochdiff.neq.check_updates", false);
 
     final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
     final static boolean log_propensity = Settings.getProperty("stochdiff.neq.log_propensity", false);
@@ -471,29 +472,34 @@ public class NextEventQueue {
         int[] old_pop;
         double _update_propensity(boolean warn) {
             double old = this.propensity;
-            int[] pop = this.reactantPopulation();
             this.propensity = this.calcPropensity();
-            if (warn && this.propensity != 0 && this.propensity == old) {
-                boolean higher = false;
-                boolean lower = false;
-                for (int i = 0; i < pop.length; i++) {
-                    if (pop[i] < old_pop[i])
-                        lower = true;
-                    if (pop[i] > old_pop[i])
-                        higher = true;
+
+            if (check_updates) {
+                int[] pop = this.reactantPopulation();
+
+                if (warn && this.propensity != 0 && this.propensity == old) {
+                    boolean higher = false;
+                    boolean lower = false;
+                    for (int i = 0; i < pop.length; i++) {
+                        if (pop[i] < old_pop[i])
+                            lower = true;
+                        if (pop[i] > old_pop[i])
+                            higher = true;
+                    }
+                    log.log(higher && lower ? Level.DEBUG : Level.ERROR,
+                            "{}: propensity changed {} → {} (n={} → {}), extent={}",
+                            this, old, this.propensity, old_pop, pop, this.extent);
+                    if (!(higher && lower))
+                        throw new RuntimeException();
+                } else if (log_propensity) {
+                    log.debug("particles el.{}: {}", this.element(), particles[this.element()]);
+                    log.debug("{}: propensity changed {} → {} (n={} → {}), extent={}",
+                              this, old, this.propensity, old_pop, pop, this.extent);
                 }
-                log.log(higher && lower ? Level.DEBUG : Level.ERROR,
-                        "{}: propensity changed {} → {} (n={} → {}), extent={}",
-                        this, old, this.propensity, old_pop, pop, this.extent);
-                if (!(higher && lower))
-                    throw new RuntimeException();
-            } else if (log_propensity) {
-                log.debug("particles el.{}: {}", this.element(), particles[this.element()]);
-                log.debug("{}: propensity changed {} → {} (n={} → {}), extent={}",
-                          this, old, this.propensity, old_pop, pop, this.extent);
+
+                this.old_pop = pop;
             }
 
-            this.old_pop = pop;
             return old;
         }
 
