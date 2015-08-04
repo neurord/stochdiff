@@ -15,7 +15,6 @@ import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.grid.ResultWriter;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +45,7 @@ public abstract class BaseCalc implements Runnable {
     // the nanoMolar concentration this much
     public static final double NM_PER_PARTICLE_PUV = 1. / PARTICLES_PUVC;
 
-    protected final ArrayList<ResultWriter> resultWriters = inst.newArrayList();
+    protected final ArrayList<ResultWriter> resultWriters = new ArrayList<>();
 
     public enum distribution_t {
         BINOMIAL,

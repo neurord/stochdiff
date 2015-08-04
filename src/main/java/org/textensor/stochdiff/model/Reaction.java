@@ -8,7 +8,6 @@ import java.util.StringTokenizer;
 import javax.xml.bind.annotation.*;
 
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
-import org.textensor.util.inst;
 import static org.textensor.stochdiff.model.Specie.generateID;
 
 import org.apache.logging.log4j.Logger;
@@ -24,10 +23,10 @@ public class Reaction {
     public String id;
 
     @XmlElement(name="Reactant")
-    private final ArrayList<Reactant> p_reactants = inst.newArrayList();
+    private final ArrayList<Reactant> p_reactants = new ArrayList<>();
 
     @XmlElement(name="Product")
-    private final ArrayList<Product> p_products = inst.newArrayList();
+    private final ArrayList<Product> p_products = new ArrayList<>();
 
     private Double forwardRate;
     private Double reverseRate;
@@ -92,7 +91,7 @@ public class Reaction {
     private ArrayList<Specie> parseRefs(ArrayList<? extends SpecieRef> asr,
                                         HashMap<String, Specie> sphm) {
 
-        ArrayList<Specie> ret = inst.newArrayList();
+        ArrayList<Specie> ret = new ArrayList<>();
         for (SpecieRef sr : asr) {
             Specie sr2 = sphm.get(sr.getSpecieID());
             if (sr2 == null)

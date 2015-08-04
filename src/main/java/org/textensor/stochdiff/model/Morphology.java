@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.*;
 import org.textensor.stochdiff.numeric.morph.SpineDistribution;
 import org.textensor.stochdiff.numeric.morph.SpinePopulation;
 import org.textensor.stochdiff.numeric.morph.TreePoint;
-import org.textensor.util.inst;
 
 public class Morphology {
 
@@ -27,7 +26,7 @@ public class Morphology {
     transient private boolean resolved = false;
 
     public void resolve() {
-        HashMap<String, SpineType> spineHM = inst.newHashMap();
+        HashMap<String, SpineType> spineHM = new HashMap<>();
         if (spineTypes != null)
             for (SpineType st : spineTypes)
                 spineHM.put(st.id, st);
@@ -37,20 +36,20 @@ public class Morphology {
                 ss.resolve(spineHM);
 
         if (segments != null) {
-            HashMap<String, Segment> segmentHM = inst.newHashMap();
+            HashMap<String, Segment> segmentHM = new HashMap<>();
             for (Segment seg : segments)
                 segmentHM.put(seg.getID(), seg);
 
             for (Segment seg : segments)
                 seg.resolve(segmentHM);
 
-            ArrayList<MorphPoint> wk = inst.newArrayList();
+            ArrayList<MorphPoint> wk = new ArrayList<>();
             for (Segment seg : segments) {
                 wk.add(seg.getStart());
                 wk.add(seg.getEnd());
             }
 
-            p_points = inst.newArrayList();
+            p_points = new ArrayList<>();
             for (MorphPoint mp : wk)
                 if (mp.redundant())
                     mp.transferConnections();

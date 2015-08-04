@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.textensor.util.inst;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -12,7 +11,7 @@ public class StringListAdapter extends XmlAdapter<String, List<String>> {
     @Override
     public List<String> unmarshal(final String string) {
         StringTokenizer st = new StringTokenizer(string, " ,");
-        List<String> values = inst.newArrayList();
+        List<String> values = new ArrayList<>();
 
         int ntok = st.countTokens();
         for (int i = 0; i < ntok; i++)

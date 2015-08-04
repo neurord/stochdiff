@@ -2,6 +2,7 @@ package org.textensor.stochdiff;
 
 import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,6 @@ import org.textensor.stochdiff.numeric.grid.ResultWriterText;
 import org.textensor.stochdiff.numeric.grid.ResultWriterHDF5;
 
 import org.textensor.util.Settings;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +28,7 @@ public class SDCalc {
     final int trials = Settings.getProperty("stochdiff.trials", 1);
     final int threads = Settings.getProperty("stochdiff.threads", 0);
 
-    protected final List<ResultWriter> resultWriters = inst.newArrayList();
+    protected final List<ResultWriter> resultWriters = new ArrayList<>();
 
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;

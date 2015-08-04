@@ -12,7 +12,6 @@ import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.math.RandomMath;
 import org.textensor.stochdiff.numeric.morph.*;
 import org.textensor.util.ArrayUtil;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -26,8 +25,8 @@ public abstract class SpineLocator {
         final MersenneTwister rngen = new MersenneTwister();
         rngen.setSeed(seed > 0 ? seed : Math.abs(new Random().nextLong()));
 
-        final HashMap<SpineProfile, DiscretizedSpine> spines = inst.newHashMap();
-        final HashSet<VolumeElement> volumes = inst.newHashSet();
+        final HashMap<SpineProfile, DiscretizedSpine> spines = new HashMap<>();
+        final HashSet<VolumeElement> volumes = new HashSet<>();
 
         int nblocked = 0;
 
@@ -42,8 +41,8 @@ public abstract class SpineLocator {
             double density = sp.getDensity();
             String reg = sp.getTargetRegion();
 
-            ArrayList<VolumeElement> surfVE = inst.newArrayList();
-            ArrayList<Double> surfA = inst.newArrayList();
+            ArrayList<VolumeElement> surfVE = new ArrayList<>();
+            ArrayList<Double> surfA = new ArrayList<>();
 
             for (VolumeElement ve : grid.getElementsInRegion(reg)) {
                 Position[] sbdry = ve.getSurfaceBoundary();

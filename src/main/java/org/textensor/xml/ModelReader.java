@@ -41,7 +41,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import org.textensor.stochdiff.model.SDRun;
-import org.textensor.util.inst;
 
 public class ModelReader<T> {
     static final Logger log = LogManager.getLogger(ModelReader.class);
@@ -55,9 +54,9 @@ public class ModelReader<T> {
 
         SAXParseException exception = null;
 
-        ArrayDeque<String> names = inst.newArrayDeque();
+        ArrayDeque<String> names = new ArrayDeque<>();
 
-        HashMap<String, String> overrides = inst.newHashMap();
+        HashMap<String, String> overrides = new HashMap<>();
         {
             Properties props = System.getProperties();
             for (String key : props .stringPropertyNames())

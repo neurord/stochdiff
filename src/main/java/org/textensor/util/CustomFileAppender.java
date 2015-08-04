@@ -15,11 +15,12 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Plugin(name="CustomFile", category="core", elementType="appender", printObject=true)
 public final class CustomFileAppender extends AbstractAppender {
 
-    final private List<Appender> appenders = inst.newArrayList();
+    final private List<Appender> appenders = new ArrayList<>();
 
     static private CustomFileAppender instance = null;
     static public CustomFileAppender getInstance() {

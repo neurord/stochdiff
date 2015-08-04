@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
-import org.textensor.util.inst;
 
 import static org.testng.Assert.assertEquals;
 import static org.textensor.util.TestUtil.assertArrayEquals;
@@ -20,7 +19,7 @@ public class TestTables {
 
     @DataProvider
     public Object[][] tables() {
-        ArrayList<Object[]> t = inst.newArrayList();
+        ArrayList<Object[]> t = new ArrayList<>();
         for (int i = 10; i <= 90; i += 10)
             for (int ip = -6; ip < -1; ip++)
                 for (distribution_t mode: distribution_t.values())
@@ -48,7 +47,7 @@ public class TestTables {
 
     @DataProvider
     public static Object[][] modes() {
-        ArrayList<Object[]> t = inst.newArrayList();
+        ArrayList<Object[]> t = new ArrayList<>();
         for (distribution_t mode: distribution_t.values())
             t.add(new Object[] {mode});
         return t.toArray(new Object[0][]);

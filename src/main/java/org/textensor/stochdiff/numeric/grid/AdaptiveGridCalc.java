@@ -7,7 +7,6 @@ import org.textensor.stochdiff.model.SDRun;
 import org.textensor.stochdiff.SDCalcType;
 import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
-import org.textensor.util.inst;
 
 import java.util.ArrayList;
 
@@ -124,7 +123,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         Collection<IGridCalc.Happening> recent = this.events;
         /* If it was null, it should stay null. Otherwise, reinitalize. */
         if (recent != null)
-            this.events = inst.newArrayList();
+            this.events = new ArrayList<>();
         return recent;
     }
 }

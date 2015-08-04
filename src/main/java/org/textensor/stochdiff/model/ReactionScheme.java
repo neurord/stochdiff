@@ -7,7 +7,6 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.*;
 
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -16,10 +15,10 @@ public class ReactionScheme {
     static final Logger log = LogManager.getLogger();
 
     @XmlElement(name="Specie")
-    private final ArrayList<Specie> species = inst.newArrayList();
+    private final ArrayList<Specie> species = new ArrayList<>();
 
     @XmlElement(name="Reaction")
-    private final ArrayList<Reaction> reactions = inst.newArrayList();
+    private final ArrayList<Reaction> reactions = new ArrayList<>();
 
     static <T,V> void hmPut(HashMap<T, V> hm, T key, V value) {
         V old = hm.put(key, value);
@@ -28,7 +27,7 @@ public class ReactionScheme {
     }
 
     public void resolve() {
-        HashMap<String, Specie> hm = inst.newHashMap();
+        HashMap<String, Specie> hm = new HashMap<>();
         int index = 0;
 
         for (Specie sp: this.species) {

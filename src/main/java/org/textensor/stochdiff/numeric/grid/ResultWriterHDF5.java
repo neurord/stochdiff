@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Collection;
 import java.util.Map;
+import java.util.HashMap;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
@@ -28,7 +29,6 @@ import org.textensor.util.ArrayUtil;
 import org.textensor.util.Settings;
 import static org.textensor.util.ArrayUtil.xJoined;
 import org.textensor.util.LibUtil;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -49,7 +49,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     final protected File outputFile;
     protected H5File output;
     protected Group root;
-    final protected Map<Integer, Trial> trials = inst.newHashMap();
+    final protected Map<Integer, Trial> trials = new HashMap<>();
 
     public static final H5Datatype double_t =
         new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
@@ -98,7 +98,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 String region = outputSets.get(i).getRegion();
                 if (region != null) {
                     /* Find elements which match specified regions */
-                    ArrayList<Integer> list = inst.newArrayList();
+                    ArrayList<Integer> list = new ArrayList<>();
                     for (int j = 0; j < elementRegions.length; j++)
                         if (region.equals(regionLabels[elementRegions[j]]))
                             list.add(j);
@@ -359,7 +359,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected Group output_info;
         protected final Group sim;
         protected ConcentrationOutput concs1;
-        protected List<ConcentrationOutput> concs2 = inst.newArrayList();
+        protected List<ConcentrationOutput> concs2 = new ArrayList<>();
         protected H5ScalarDS stimulation_events;
         protected H5ScalarDS diffusion_events;
         protected H5ScalarDS reaction_events;
@@ -952,7 +952,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                                        CACHE_SIZE2);
 
             long chunk_size = this.events_event.getChunkSize()[0];
-            this.events_cache = inst.newArrayList((int)chunk_size);
+            this.events_cache = new ArrayList<>((int)chunk_size);
         }
 
         private boolean initEvents_warning = false;

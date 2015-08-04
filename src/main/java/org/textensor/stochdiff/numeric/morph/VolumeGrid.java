@@ -28,9 +28,9 @@ public class VolumeGrid {
         }
     }
 
-    ArrayList<VolumeElement> elements = inst.newArrayList();
+    ArrayList<VolumeElement> elements = new ArrayList<>();
 
-    HashMap<String, ArrayList<VolumeElement>> regionHM = inst.newHashMap();
+    HashMap<String, ArrayList<VolumeElement>> regionHM = new HashMap<>();
 
     int nelement;
     String[] eltLabels;

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.*;
 
-import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 import org.textensor.xml.DoubleListAdapter;
 
@@ -33,7 +32,7 @@ public class Discretization {
 
     public synchronized HashMap<String, Double> getResolutionHM() {
         if (this.maxSideHM == null) {
-            this.maxSideHM = inst.newHashMap();
+            this.maxSideHM = new HashMap<>();
             if (this.maxElementSide != null)
                 for (MaxElementSide side: this.maxElementSide) {
                     Double old = this.maxSideHM.put(side.region, side.value);

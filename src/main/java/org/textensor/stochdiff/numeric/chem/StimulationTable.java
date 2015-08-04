@@ -2,7 +2,6 @@ package org.textensor.stochdiff.numeric.chem;
 
 import java.util.ArrayList;
 
-import org.textensor.util.inst;
 
 public class StimulationTable {
 
@@ -59,7 +58,7 @@ public class StimulationTable {
         }
     }
 
-    private final ArrayList<Stimulation> stims = inst.newArrayList();
+    private final ArrayList<Stimulation> stims = new ArrayList<>();
 
     public void addSquarePulse(String site, double[] rate, double onset, double duration) {
         this.addPeriodicSquarePulse(site, rate, onset, duration,

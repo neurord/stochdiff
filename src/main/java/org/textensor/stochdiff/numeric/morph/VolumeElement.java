@@ -5,7 +5,6 @@ package org.textensor.stochdiff.numeric.morph;
 import java.util.ArrayList;
 
 import org.textensor.stochdiff.geom.Position;
-import org.textensor.util.inst;
 
 public abstract class VolumeElement {
     double cx;

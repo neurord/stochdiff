@@ -6,7 +6,6 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.*;
 
 import org.textensor.stochdiff.numeric.morph.TreePoint;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -30,8 +29,8 @@ public class MorphPoint {
     transient private ArrayList<MorphPoint> offsetNeighbors;
 
 
-    transient HashMap<MorphPoint, String> segidHM = inst.newHashMap();
-    transient HashMap<MorphPoint, String> regionHM = inst.newHashMap();
+    transient HashMap<MorphPoint, String> segidHM = new HashMap<>();
+    transient HashMap<MorphPoint, String> regionHM = new HashMap<>();
 
     public MorphPoint() {
         x = y = z = r = Double.NaN;

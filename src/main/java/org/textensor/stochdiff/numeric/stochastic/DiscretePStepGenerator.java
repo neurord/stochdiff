@@ -26,11 +26,10 @@ import java.util.HashMap;
 
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
-import org.textensor.util.inst;
 
 public class DiscretePStepGenerator extends StepGenerator {
 
-    final HashMap<Integer, FixedPStepGenerator> generators = inst.newHashMap();
+    final HashMap<Integer, FixedPStepGenerator> generators = new HashMap<>();
     public final static double lnpmin = -20;
 
     public DiscretePStepGenerator(distribution_t mode, RandomGenerator random) {

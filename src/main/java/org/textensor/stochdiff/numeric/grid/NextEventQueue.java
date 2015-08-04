@@ -17,7 +17,6 @@ import org.textensor.stochdiff.numeric.chem.StimulationTable.Stimulation;
 import static org.textensor.stochdiff.numeric.chem.ReactionTable.getReactionSignature;
 import org.textensor.util.Settings;
 import org.textensor.util.ArrayUtil;
-import org.textensor.util.inst;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import static org.textensor.stochdiff.numeric.grid.GridCalc.intlog;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
@@ -254,7 +253,7 @@ public class NextEventQueue {
         final private int[] reactants;
         final private int[] reactant_stoichiometry;
 
-        protected List<ScoeffElem> scoeff_ki = inst.newArrayList();
+        protected List<ScoeffElem> scoeff_ki = new ArrayList<>();
 
         /**
          * wait_start: when the event was schedules. This is only used when logging
@@ -697,8 +696,8 @@ public class NextEventQueue {
         }
 
         List<NextEvent>
-            dependent = inst.newArrayList(),
-            dependon = inst.newArrayList();
+            dependent = new ArrayList<>(),
+            dependon = new ArrayList<>();
 
         @Override
         public Collection<IGridCalc.Event> dependent() {
@@ -961,8 +960,8 @@ public class NextEventQueue {
      */
     public static int[][] stoichiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
         ArrayList<Integer>
-            si = inst.newArrayList(),
-            ss = inst.newArrayList();
+            si = new ArrayList<>(),
+            ss = new ArrayList<>();
         boolean[] pconsidered = new boolean[pi.length];
 
         for (int i = 0; i < ri.length; i++) {
@@ -1458,7 +1457,7 @@ public class NextEventQueue {
         double[] fdiff = rtab.getDiffusionConstants();
         String[] species = rtab.getSpecies();
 
-        ArrayList<NextDiffusion> ans = inst.newArrayList(5 * neighbors.length);
+        ArrayList<NextDiffusion> ans = new ArrayList<>(5 * neighbors.length);
 
         int nel = grid.getNElements();
         NextDiffusion[][][] rev = new NextDiffusion[nel][nel][fdiff.length];
@@ -1506,7 +1505,7 @@ public class NextEventQueue {
 
         String[] species = rtab.getSpecies();
 
-        ArrayList<NextReaction> ans = inst.newArrayList(RI.length * volumes.length);
+        ArrayList<NextReaction> ans = new ArrayList<>(RI.length * volumes.length);
 
         for (int r = 0; r < rtab.getNReaction(); r++) {
             int[] ri = RI[r], pi = PI[r], rs = RS[r], ps = PS[r], rp = RP[r];
@@ -1540,7 +1539,7 @@ public class NextEventQueue {
                                                   StimulationTable stimtab,
                                                   int[][] stimtargets) {
         String[] species = rtab.getSpecies();
-        ArrayList<NextStimulation> ans = inst.newArrayList(stimtargets.length * 3);
+        ArrayList<NextStimulation> ans = new ArrayList<>(stimtargets.length * 3);
 
         for (int i = 0; i < stimtab.getStimulations().size(); i++) {
             Stimulation stim = stimtab.getStimulations().get(i);
@@ -1575,7 +1574,7 @@ public class NextEventQueue {
                                         boolean verbose) {
         NextEventQueue obj = new NextEventQueue(random, stepper, particles, adaptive, tolerance, leap_min_jump);
 
-        ArrayList<NextEvent> e = inst.newArrayList();
+        ArrayList<NextEvent> e = new ArrayList<>();
         Numbering numbering = new Numbering();
         e.addAll(obj.createDiffusions(numbering, grid, rtab));
         e.addAll(obj.createReactions(numbering, grid, rtab));

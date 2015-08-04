@@ -16,7 +16,6 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
 import org.textensor.util.ArrayUtil;
-import org.textensor.util.inst;
 import org.textensor.xml.StringListAdapter;
 import org.textensor.xml.ModelReader;
 

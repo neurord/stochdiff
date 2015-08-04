@@ -12,7 +12,6 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.inter.SDState;
 import org.textensor.stochdiff.inter.StateReader;
 import org.textensor.stochdiff.model.IOutputSet;
-import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 import org.textensor.util.FileUtil;
 
@@ -30,7 +29,7 @@ public class ResultWriterText implements ResultWriter {
 
     final boolean writeConcentration;
 
-    final protected HashMap<String, ResultWriterText> siblings = inst.newHashMap();
+    final protected HashMap<String, ResultWriterText> siblings = new HashMap<>();
 
     final String[] species;
     final int[] ispecout;

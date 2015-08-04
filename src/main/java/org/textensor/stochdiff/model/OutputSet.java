@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 
-import org.textensor.util.inst;
 import org.textensor.util.ArrayUtil;
 
 import org.apache.logging.log4j.Logger;
@@ -27,7 +26,7 @@ public class OutputSet implements IOutputSet {
         if (this.outputSpecies == null)
             return null;
 
-        List<String> names = inst.newArrayList();
+        List<String> names = new ArrayList<>();
         for (OutputSpecie out: this.outputSpecies)
             names.add(out.name);
         return names;
@@ -37,7 +36,7 @@ public class OutputSet implements IOutputSet {
         if (specout == null)
             return ArrayUtil.iota(species.length);
 
-        HashMap<String, Integer> map = inst.newHashMap();
+        HashMap<String, Integer> map = new HashMap<>();
         for (int i = 0; i < species.length; i++) {
             if (species[i].equals("all"))
                 return ArrayUtil.iota(species.length);

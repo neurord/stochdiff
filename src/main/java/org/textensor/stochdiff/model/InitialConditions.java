@@ -9,7 +9,6 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.*;
 
 import org.textensor.stochdiff.inter.FloatValued;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -118,7 +117,7 @@ public class InitialConditions {
     }
 
     public static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
-        HashMap<String, T> hm = inst.newHashMap();
+        HashMap<String, T> hm = new HashMap<>();
 
         if (list != null)
             for(T item: list)

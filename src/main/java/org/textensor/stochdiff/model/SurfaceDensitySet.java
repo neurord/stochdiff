@@ -6,7 +6,6 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.*;
 
 import org.textensor.stochdiff.inter.FloatValued;
-import org.textensor.util.inst;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +22,7 @@ public class SurfaceDensitySet implements Regional {
 
     public HashMap<String, PicoSD> getSurfaceDensityHM() {
         if (sdHM == null) {
-            sdHM = inst.newHashMap();
+            sdHM = new HashMap<>();
             if (sds != null)
                 for (PicoSD sd : sds)
                     sdHM.put(sd.specieID, sd);

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.textensor.stochdiff.numeric.math.MersenneTwister;
 import org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
-import org.textensor.util.inst;
 
 import static org.testng.Assert.assertEquals;
 import org.textensor.util.TestUtil;
