@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
  * given.
  */
 public final class NGoTable {
-    static final Logger log = LogManager.getLogger(NGoTable.class);
+    static final Logger log = LogManager.getLogger();
 
     public final double lnp;
     public final int n;

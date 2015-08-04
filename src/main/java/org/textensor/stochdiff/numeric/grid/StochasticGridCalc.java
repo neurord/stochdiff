@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class StochasticGridCalc extends GridCalc {
-    static final Logger log = LogManager.getLogger(StochasticGridCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     final static boolean log_events = Settings.getProperty("stochdiff.log_events", false);
 

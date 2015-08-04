@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class MorphPoint {
-    static final Logger log = LogManager.getLogger(MorphPoint.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public double x;
     @XmlAttribute public double y;

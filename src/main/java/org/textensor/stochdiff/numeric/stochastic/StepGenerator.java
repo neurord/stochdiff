@@ -18,7 +18,7 @@ import org.apache.logging.log4j.LogManager;
  */
 
 public abstract class StepGenerator {
-    static final Logger log = LogManager.getLogger(StepGenerator.class);
+    static final Logger log = LogManager.getLogger();
 
     protected final distribution_t mode;
     protected final RandomGenerator random;

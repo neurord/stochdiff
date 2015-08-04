@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class GridCalc extends BaseCalc implements IGridCalc {
-    static final Logger log = LogManager.getLogger(GridCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     final static boolean count_events = Settings.getProperty("stochdiff.count_events", false);
 

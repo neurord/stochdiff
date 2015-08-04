@@ -32,7 +32,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 public class NextEventQueue {
-    static final Logger log = LogManager.getLogger(NextEventQueue.class);
+    static final Logger log = LogManager.getLogger();
 
     final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
     final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);

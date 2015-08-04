@@ -35,7 +35,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
 
 public class ResultWriterHDF5 implements ResultWriter {
-    static final Logger log = LogManager.getLogger(ResultWriterHDF5.class);
+    static final Logger log = LogManager.getLogger();
 
     static {
         LibUtil.addLibraryPaths("/usr/lib64/jhdf",

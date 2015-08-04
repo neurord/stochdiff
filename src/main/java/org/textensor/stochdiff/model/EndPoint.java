@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class EndPoint extends MorphPoint {
-    static final Logger log = LogManager.getLogger(EndPoint.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String on;
     @XmlAttribute public String at;

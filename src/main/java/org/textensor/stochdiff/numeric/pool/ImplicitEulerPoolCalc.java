@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 
 
 public class ImplicitEulerPoolCalc extends DeterministicPoolCalc {
-    static final Logger log = LogManager.getLogger(ImplicitEulerPoolCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     int maxIterationsSoFar;
 

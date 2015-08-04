@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class Discretization {
-    static final Logger log = LogManager.getLogger(Discretization.class);
+    static final Logger log = LogManager.getLogger();
 
     Double spineDeltaX;
 

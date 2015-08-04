@@ -36,7 +36,7 @@ public enum SDCalcType {
     GRID_EXACT(AdaptiveGridCalc.class),
     GRID_ADAPTIVE(AdaptiveGridCalc.class);
 
-    static final Logger log = LogManager.getLogger(SDCalcType.class);
+    static final Logger log = LogManager.getLogger();
 
     private final Class cls;
 

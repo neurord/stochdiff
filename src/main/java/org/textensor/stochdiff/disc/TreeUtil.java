@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class TreeUtil {
-    static final Logger log = LogManager.getLogger(TreeUtil.class);
+    static final Logger log = LogManager.getLogger();
 
     public static void parentizeFrom(TreePoint base, TreePoint[] srcPoints) {
         for (TreePoint tp : srcPoints) {

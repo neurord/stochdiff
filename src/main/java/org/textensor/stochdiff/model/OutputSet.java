@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.xml.bind.annotation.*;
 
 public class OutputSet implements IOutputSet {
-    static final Logger log = LogManager.getLogger(OutputSet.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String filename;
     @XmlAttribute public String region;

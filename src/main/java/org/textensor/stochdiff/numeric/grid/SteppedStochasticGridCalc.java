@@ -50,7 +50,7 @@ import org.apache.logging.log4j.LogManager;
  */
 
 public class SteppedStochasticGridCalc extends StochasticGridCalc {
-    static final Logger log = LogManager.getLogger(SteppedStochasticGridCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     // WK 8 28 2007
     // in parallelAndSharedDiffusionStep(),

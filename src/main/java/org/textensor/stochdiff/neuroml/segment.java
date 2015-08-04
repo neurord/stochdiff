@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class segment {
-    static final Logger log = LogManager.getLogger(segment.class);
+    static final Logger log = LogManager.getLogger();
 
     public String name;
     public String id;

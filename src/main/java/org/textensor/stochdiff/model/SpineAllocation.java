@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.textensor.stochdiff.numeric.morph.SpinePopulation;
 
 public class SpineAllocation {
-    static final Logger log = LogManager.getLogger(SpineAllocation.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String id;
 

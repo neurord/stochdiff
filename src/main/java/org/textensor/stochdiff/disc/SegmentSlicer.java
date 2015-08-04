@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
  * structure to which stimuli or recorders may be attached.
  */
 public class SegmentSlicer {
-    static final Logger log = LogManager.getLogger(SegmentSlicer.class);
+    static final Logger log = LogManager.getLogger();
 
     TreePoint[] srcPoints;
 

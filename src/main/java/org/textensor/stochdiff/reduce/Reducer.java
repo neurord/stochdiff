@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class Reducer {
-    static final Logger log = LogManager.getLogger(Reducer.class);
+    static final Logger log = LogManager.getLogger();
 
     // the base model specification
     SDRun sdr;

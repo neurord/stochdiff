@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class ForwardEulerPoolCalc extends DeterministicPoolCalc {
-    static final Logger log = LogManager.getLogger(ForwardEulerPoolCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     public ForwardEulerPoolCalc(int trial, SDRun sdm) {
         super(trial, sdm);

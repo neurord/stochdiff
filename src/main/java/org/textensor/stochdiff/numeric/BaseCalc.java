@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
  */
 
 public abstract class BaseCalc implements Runnable {
-    static final Logger log = LogManager.getLogger(BaseCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     // particles Per Unit Volume and Concentration
     public static final double PARTICLES_PUVC = 0.602214179;

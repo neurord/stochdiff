@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
  * of transition count tables.
  */
 public class InterpolatingStepGenerator extends StepGenerator {
-    static final Logger log = LogManager.getLogger(InterpolatingStepGenerator.class);
+    static final Logger log = LogManager.getLogger();
 
     public final int NRANGES = 600;
 

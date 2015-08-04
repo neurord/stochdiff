@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class AdaptiveGridCalc extends StochasticGridCalc {
-    static final Logger log = LogManager.getLogger(AdaptiveGridCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     final static boolean curtail_leaps = Settings.getProperty("stochdiff.curtail_leaps", false);
 

@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class Reaction {
-    static final Logger log = LogManager.getLogger(Reaction.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute
     public String name;

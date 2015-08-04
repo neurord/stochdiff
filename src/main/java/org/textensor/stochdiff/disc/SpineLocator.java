@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class SpineLocator {
-    static final Logger log = LogManager.getLogger(SpineLocator.class);
+    static final Logger log = LogManager.getLogger();
 
     public static void locate(int seed, SpineDistribution dist, double delta, VolumeGrid grid) {
 

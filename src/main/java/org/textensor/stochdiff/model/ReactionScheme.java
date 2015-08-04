@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class ReactionScheme {
-    static final Logger log = LogManager.getLogger(ReactionScheme.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlElement(name="Specie")
     private final ArrayList<Specie> species = inst.newArrayList();

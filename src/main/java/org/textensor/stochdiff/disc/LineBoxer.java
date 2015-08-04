@@ -30,7 +30,7 @@ import org.apache.logging.log4j.LogManager;
 // TODO - make a subclass of Boxer, share with VolumeBoxer, pull
 // various things up
 public class LineBoxer {
-    static final Logger log = LogManager.getLogger(LineBoxer.class);
+    static final Logger log = LogManager.getLogger();
 
     TreePoint[] srcPoints;
 

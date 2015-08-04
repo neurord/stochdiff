@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class StateReader {
-    static final Logger log = LogManager.getLogger(StateReader.class);
+    static final Logger log = LogManager.getLogger();
 
     public static SDState readState(String fnm) {
         String s = FileUtil.readStringFromFile(new File(fnm));

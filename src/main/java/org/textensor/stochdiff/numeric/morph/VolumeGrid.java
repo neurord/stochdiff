@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class VolumeGrid {
-    static final Logger log = LogManager.getLogger(VolumeGrid.class);
+    static final Logger log = LogManager.getLogger();
 
     public enum geometry_t {
         GEOM_2D,

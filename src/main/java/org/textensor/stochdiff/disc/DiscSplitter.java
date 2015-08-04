@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
  * constants.
  */
 public class DiscSplitter {
-    static final Logger log = LogManager.getLogger(DiscSplitter.class);
+    static final Logger log = LogManager.getLogger();
 
     TreePoint[] srcPoints;
     ArrayList<CurvedVolumeSlice> gridAL;

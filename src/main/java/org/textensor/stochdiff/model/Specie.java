@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.xml.bind.annotation.*;
 
 public class Specie {
-    static final Logger log = LogManager.getLogger(Specie.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute private String name;
     @XmlAttribute private String id;

@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
  * Used for producing 2D models.
  */
 public class VolumeLine {
-    static final Logger log = LogManager.getLogger(VolumeLine.class);
+    static final Logger log = LogManager.getLogger();
 
     int nsl;
     int nreg;

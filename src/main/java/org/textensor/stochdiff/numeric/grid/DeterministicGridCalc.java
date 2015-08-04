@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
  * This is a continuous (deterministic) calculation to generate reference data.
  */
 public class DeterministicGridCalc extends GridCalc {
-    static final Logger log = LogManager.getLogger(DeterministicGridCalc.class);
+    static final Logger log = LogManager.getLogger();
 
     @Override
     public boolean preferConcs(){ return true; }

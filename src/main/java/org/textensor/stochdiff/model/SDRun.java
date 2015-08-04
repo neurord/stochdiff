@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.adapters.*;
 
 @XmlRootElement(name="SDRun")
 public class SDRun implements IOutputSet {
-    static final Logger log = LogManager.getLogger(SDRun.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlElement(name="ReactionScheme")
     private ReactionScheme reactionScheme;

@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class SurfaceDensitySet implements Regional {
-    static final Logger log = LogManager.getLogger(SurfaceDensitySet.class);
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String region;
 
