@@ -1337,14 +1337,23 @@ public class NextEventQueue {
 
         @Override
         public double leap_time(double current) {
-            double cont_leap_time =
-                tolerance * particles[this.element()][this.sp] / this.propensity;
-            assert cont_leap_time >= 0;
+            /* This is based on the dependent reactions. Both mean extent of
+             * the stimulation and sdev should be smaller than this limit. */
+            final double limit1 = this.size1_leap_extent();
+            if (limit1 < 1 / tolerance) {
+                /* Do not bother with leaping in that case */
+                log.debug("leap time: maximum size1 extent {}, not leaping", limit1);
+                return 0;
+            }
+
+            final int limit2 = particles[this.element()][this.sp];
+            double cont_leap_time = tolerance * Math.min(limit1, limit2) / this.propensity;
+            assert !(cont_leap_time < 0);
 
             double until = _continous_delta_to_real_time(current, cont_leap_time, true);
-            log.debug("{}: leap time: {}×{}/{} → {} cont, {} real until {}",
+            log.info("{}: leap time: {}×min({}, {})/{} → {} cont, {} real until {}",
                       this,
-                      tolerance, particles[this.element()][this.sp], this.propensity,
+                      tolerance, limit1, limit2, this.propensity,
                       cont_leap_time, until - current, until);
 
             /* When we are after the end of the stimulation duration,
