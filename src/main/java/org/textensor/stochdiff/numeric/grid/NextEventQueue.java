@@ -425,7 +425,7 @@ public class NextEventQueue {
                             change += (double) scoeff.coeff[n] / particles[scoeff.element][subs[n]];
                         return 1 / Math.abs(change);
                     }
-                }).min().orElseThrow(null);
+                }).min().orElse(Double.POSITIVE_INFINITY);
         }
 
         /**
