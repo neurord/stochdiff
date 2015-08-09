@@ -43,7 +43,7 @@ public class StaticCalc extends BaseCalc {
         rtab = this.sdRun.getReactionTable();
         vgrid = this.sdRun.getVolumeGrid();
 
-        nel = vgrid.getNElements();
+        nel = vgrid.size();
 
         nspec = rtab.getNSpecies();
         species = rtab.getSpecies();

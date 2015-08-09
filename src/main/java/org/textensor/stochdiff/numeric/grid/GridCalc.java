@@ -80,7 +80,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         VolumeGrid grid = this.sdRun.getVolumeGrid();
 
-        nel = grid.getNElements();
+        nel = grid.size();
         volumes = grid.getElementVolumes();
 
         rtab = this.sdRun.getReactionTable();

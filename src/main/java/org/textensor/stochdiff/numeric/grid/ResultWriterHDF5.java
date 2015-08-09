@@ -84,7 +84,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         this.outputSet = primary;
         this.outputSets = outputSets;
         this.ispecout1 = primary.getIndicesOfOutputSpecies(species);
-        this.nel = grid.getNElements();
+        this.nel = grid.size();
         if (this.outputSets != null) {
             this.ispecout2 = new int[outputSets.size()][];
             this.elementsout2 = new int[outputSets.size()][];
@@ -411,7 +411,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             log.debug("Writing grid at time {} for trial {}", startTime, source.trial());
-            assert nel == vgrid.getNElements();
+            assert nel == vgrid.size();
             long[]
                 dims = {nel,},
                 chunks = {nel,};

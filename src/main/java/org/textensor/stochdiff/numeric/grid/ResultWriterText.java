@@ -58,7 +58,7 @@ public class ResultWriterText implements ResultWriter {
             this.outputSet = null;
         }
         this.outputSets = outputSets;
-        this.nel = grid.getNElements();
+        this.nel = grid.size();
     }
 
     public boolean isContinuation() {

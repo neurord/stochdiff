@@ -1448,7 +1448,7 @@ public class NextEventQueue {
 
         ArrayList<NextDiffusion> ans = new ArrayList<>(5 * neighbors.length);
 
-        int nel = grid.getNElements();
+        int nel = grid.size();
         NextDiffusion[][][] rev = new NextDiffusion[nel][nel][fdiff.length];
 
         for (int el = 0; el < neighbors.length; el++)

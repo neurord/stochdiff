@@ -229,10 +229,8 @@ public class VolumeGrid {
         return eltRegions;
     }
 
-    public int getNElements() {
-        if (volumes == null)
-            throw new RuntimeException("volumes not fixed");
-
+    public int size() {
+        assert volumes != null: "volumes not fixed";
         return nelement;
     }
 
@@ -257,10 +255,6 @@ public class VolumeGrid {
         return eltNbrG;
     }
 
-
-    public int size() {
-        return getNElements();
-    }
 
     public String[] getRegionLabels() {
         return regionLabels;
