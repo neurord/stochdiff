@@ -6,6 +6,7 @@ import sys
 import os
 import math
 import glob
+import re
 import collections
 import itertools
 import argparse
@@ -61,6 +62,7 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
+parser.add_argument('--format', default='dot', choices=('dot', 'tex'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
@@ -306,7 +308,7 @@ def reaction_name(num, model):
          for num in ([num] if single else num)]
     return l[0] if single else np.array(l)
 
-def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+def _productions_dot(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
     print('digraph Reactions {', file=dst)
     print('\trankdir=LR;', file=dst)
     print('\tsplines=true;', file=dst)
@@ -335,14 +337,50 @@ def _productions(dst, species, reactants, r_stoichio, products, p_stoichio, rate
         print()
     print('}', file=dst)
 
+def format_num(num):
+    return re.sub(r'e[+-]0*(\d+)', r'\cdot 10^{\1}', str(num))
+
+def _reaction_name_tex(rr, rr_s, pp, pp_s, species, forward, backward, align=True):
+    forward = format_num(forward)
+    if backward:
+        backward = format_num(backward)
+        arrow = r'\xleftrightarrow'
+    else:
+        backward = ''
+        arrow = r'\xrightarrow'
+    aligner = '&' if align else ''
+    joiner = r'%s%s[%s]{%s}' % (aligner, arrow, backward, forward) # /\mathrm{ms}
+    return joiner.join(
+        ('+'.join('%s\specie{%s}' % (s if s > 1 else '', species[r])
+                  for r, s in zip(rr_, ss_)
+                  if r >= 0)
+         for rr_, ss_ in ((rr, rr_s), (pp, pp_s))))
+
+def _tex_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    for i, rr, rr_s, pp, pp_s, rate in zip(range(len(rates)),
+                                           reactants, r_stoichio,
+                                           products, p_stoichio, rates):
+        if i in reversibles and i < reversibles[i]:
+            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, rates[reversibles[i]])
+        else:
+            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, None)
+
+def _productions_tex(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    print(r'\begin{align*}')
+    elements = list(_tex_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles))
+    for left, right in itertools.zip_longest(elements[::2], elements[1::2]):
+        print('  ' + left + ('\n    & ' + right if right else '') + r'\\')
+    print(r'\end{align*}')
+
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
+    func = {'dot':_productions_dot, 'tex':_productions_tex}[opts.format]
     with save_or_dot('reactions') as file:
-        _productions(file, model.species(),
-                     reactions.reactants(), reactions.reactant_stoichiometry(),
-                     reactions.products(), reactions.product_stoichiometry(),
-                     reactions.rates(), reactions.reversible_pairs())
+        func(file, model.species(),
+             reactions.reactants(), reactions.reactant_stoichiometry(),
+             reactions.products(), reactions.product_stoichiometry(),
+             reactions.rates(), reactions.reversible_pairs())
 
 def specie_indices(items, species):
     species = list(species)
