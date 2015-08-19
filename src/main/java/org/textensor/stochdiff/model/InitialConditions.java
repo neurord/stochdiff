@@ -54,7 +54,9 @@ public class InitialConditions {
         ConcentrationSet defaults = this.getDefaultConcentrations();
         double[][] ret = new double[regions.length][species.length];
         for (int i = 0; i < regions.length; i++) {
-            ConcentrationSet set = this.getConcentrationSets().getOrDefault(regions[i], defaults);
+            ConcentrationSet set = this.getConcentrationSets().get(regions[i]);
+            if (set == null)
+                set = defaults;
 
             for (int j = 0; j < species.length; j++) {
                 Double val = set.getNanoMolarConcentration(species[j]);
