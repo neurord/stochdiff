@@ -1587,7 +1587,7 @@ public class NextEventQueue {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
 
             for (NextEvent ev: obj.queue.nodes) {
-                log.info("{} → {} prop={} t={})", ev.index(),
+                log.info("{} → {} prop={} t={}", ev.index(),
                          ev, ev.propensity, ev.time());
 
                 if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {

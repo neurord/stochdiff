@@ -46,6 +46,7 @@ public class StochDiff {
     public static void setLogLevels() {
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
+        boolean any = false;
 
         Properties props = System.getProperties();
         for (String key : props .stringPropertyNames())
@@ -69,7 +70,12 @@ public class StochDiff {
 
                 log.debug("Logging level {}={}", logger, level);
                 loggerConfig.setLevel(level);
+                any = true;
             }
+
+        if (any)
+            /* This causes all Loggers to refetch information from their LoggerConfig. */
+            ctx.updateLoggers();
     }
 
     public static void main(String[] argv) throws Exception {
