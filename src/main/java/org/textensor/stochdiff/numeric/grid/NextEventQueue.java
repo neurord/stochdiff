@@ -1044,11 +1044,32 @@ public class NextEventQueue {
             return ArrayUtil.pick(particles[this.element()], this.products);
         }
 
+        /**
+         * Make sure that the propensity of *this* reaction does not change
+         * too much. Based on the equation:
+         *   da/dX_i / a = n_i / X_i
+         * @returns the leap limit that would change propensity by 1
+         *          in the linear approximation
+         */
+        protected int self_leap_limit(int[] X) {
+            final int[] reactants = this.reactants();
+            final int[] stoichiometry = this.reactant_stoichiometry();
+            int limit = Integer.MAX_VALUE;
+            for (int i = 0; i < reactants.length; i++)
+                limit = Math.min(limit, X[reactants[i]] / this.reactant_powers[i]);
+            return limit;
+        }
+
         @Override
         public double leap_time(double current) {
             /* This is based on all dependent reactions, except for the reverse one.
              * Both mean extent of the reaction and sdev should be smaller than this
-             * limit. */
+             * limit.
+             *
+             * The result is the same for the forward and reverse reactions
+             * (stoichiometry is the same except for the sign), so this needs to be
+             * calculated only once.
+             */
             final double limit1 = this.size1_leap_extent();
             if (limit1 < 1 / tolerance) {
                 /* Do not bother with leaping in that case */
@@ -1057,20 +1078,29 @@ public class NextEventQueue {
             }
 
             int[] X = particles[this.element()];
+            int limit2 = this.self_leap_limit(X);
+            double propensity = this.propensity;
+            double time = limit2 / propensity;
+            int limit3 = -1;
 
-            final int[] reactants = this.reactants();
-            final int[] stoichiometry = this.reactant_stoichiometry();
-            int limit2 = Integer.MAX_VALUE;
-            for (int i = 0; i < this.reactants().length; i++)
-                limit2 = Math.min(limit2, X[reactants[i]] / stoichiometry[i] / this.reactant_powers[i]);
+            if (this.reverse != null) {
+                limit3 = ((NextReaction) this.reverse).self_leap_limit(X);
+                time = Math.min(time, limit3 / this.reverse.propensity);
+                propensity = Math.abs(propensity - this.reverse.propensity);
+            }
 
-            double time = tolerance * Math.min(limit1, limit2) / this.propensity; // XXX: substract backward propensity
+            /* The result is the minimum of the three limits:
+               - the dependent reactions, which only care about the effective rate
+               - the forward reaction, which cares about the forward rate
+               - the reverse reaction, which cares about the reverse rate
+            */
+            time = tolerance * Math.min(limit1 / propensity, time);
 
-            log.debug("{}: leap time: subs {}×{}, ɛ={}, pop.{}→{} → limit {},{} → leap={}",
+            log.debug("{}: leap time: subs {}×{}, ɛ={}, pop.{}→{} → limit {},{},{} → leap={}",
                       this,
                       this.substrates, this.substrate_stoichiometry,
                       tolerance, this.reactantPopulation(), this.productPopulation(),
-                      limit1, limit2,
+                      limit1, limit2, limit3 < 0 ? "-" : limit3,
                       time);
 
             /* Make sure time is NaN or >= 0. */
