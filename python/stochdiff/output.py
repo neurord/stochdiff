@@ -193,7 +193,7 @@ class Model(object):
 
     def indices(self):
         "Numbers of the elements"
-        return range(self._element.species.shape[0])
+        return range(self._element.grid.shape[0])
 
     def neighbors(self):
         "A generator of lists of neighboring nodes (by index)"
