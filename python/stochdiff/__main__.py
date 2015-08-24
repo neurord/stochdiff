@@ -406,7 +406,7 @@ def generate_region_histories(species, region_indices, region_labels, counts):
     for name in species:
         ans = collections.defaultdict(lambda: 0)
         for rlabel, rindi in zip(region_labels, region_indices):
-            series = counts.loc[rindi][name].values
+            series = counts.loc[rindi][name]
             times = series.index.values
             ans[rlabel] += series.values
         for rlabel, y in ans.items():
