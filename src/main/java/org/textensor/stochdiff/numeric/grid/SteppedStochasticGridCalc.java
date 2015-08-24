@@ -289,6 +289,12 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     }
 
     @Override
+    public void footer() {
+        super.footer();
+        log.info("Leapt {} times", this.eventCount());
+    }
+
+    @Override
     protected long eventCount() {
         return this.event_count;
     }
