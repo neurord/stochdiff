@@ -6,23 +6,13 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.morph.VolumeGrid.geometry_t;
 
 import java.io.File;
-
 import java.util.HashMap;
-
 
 public class TreeBoxDiscretizer {
 
-    TreePoint[] srcPoints;
-
-
-    public TreeBoxDiscretizer(TreePoint[] points) {
-        srcPoints = points;
-    }
-
-
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM,
-                                double[] surfaceLayers, geometry_t geom, double d2d) {
-
+    public static VolumeGrid buildGrid(TreePoint[] srcPoints,
+                                       double d, HashMap<String, Double> resHM,
+                                       double[] surfaceLayers, geometry_t geom, double d2d) {
 
         TreePoint base = srcPoints[0];
         // TODO - could be better to check if we need to start from a different point,
@@ -37,7 +27,7 @@ public class TreeBoxDiscretizer {
         TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
 
         TreeWriter tw = new TreeWriter(slicedPoints);
-        tw.writeSWC(new File("discretized-tree.swc"));
+        tw.writeSWC(new File("discretized-tree.swc")); // FIXME
 
         VolumeGrid vgrid = null;
 

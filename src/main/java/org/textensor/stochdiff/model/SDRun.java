@@ -285,11 +285,10 @@ public class SDRun implements IOutputSet {
                 volumeGrid = tced.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),
                                             disc.getMaxAspectRatio());
 
-            } else {
-                TreeBoxDiscretizer tbd = new TreeBoxDiscretizer(tpa);
-                volumeGrid = tbd.buildGrid(d, disc.getResolutionHM(), disc.getSurfaceLayers(),
-                                           this.getGeometry(), this.depth2D);
-            }
+            } else
+                 volumeGrid = TreeBoxDiscretizer.buildGrid(tpa,
+                                                           d, disc.getResolutionHM(), disc.getSurfaceLayers(),
+                                                           this.getGeometry(), this.depth2D);
 
             SpineLocator.locate(this.spineSeed,
                                 morph.getSpineDistribution(),
