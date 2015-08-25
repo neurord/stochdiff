@@ -88,7 +88,7 @@ public class VolumeGrid {
         final String region = ve.getRegion();
         assert region != null;
 
-        log.debug("Processing VolumeElement {} from region {}", ve.getAsText(), region, new Throwable());
+        log.debug("Processing VolumeElement {} from region {}", ve.getAsText(), region);
 
         if (regionHM.containsKey(region)) {
             regionHM.get(region).add(ve);

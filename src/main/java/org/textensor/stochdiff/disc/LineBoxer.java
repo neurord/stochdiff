@@ -67,13 +67,13 @@ public class LineBoxer {
 
         tp.partBranchOffset = 0.;
 
-        log.debug("Processing {}", tp);
+        log.debug("Processing {} with {} neighbours", tp, tp.getNeighbors().size());
 
         for (TreePoint tpn : tp.getNeighbors())
             if (working_set.contains(tpn)) {
                 working_set.remove(tpn);
 
-                log.debug("looking at neighbour {}", tpn);
+                log.debug("Looking at neighbour {}", tpn);
 
                 // if the current point doesn't have a label, try to use one from the terminal
                 if (lbl == null && tpn.nnbr == 1)
@@ -88,7 +88,7 @@ public class LineBoxer {
                 } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
                     log.debug("{}: first pt after branch", tpn);
                     TreePoint par = tp.parent;
-                    log.info("starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
+                    log.info("Starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
 
                     vg = baseGrid(surfaceLayers, depth, resolution, tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
@@ -116,7 +116,7 @@ public class LineBoxer {
                     recAdd(surfaceLayers, depth, resolution, working_set, volume_lines, pGrid, tpn);
                 }
             } else
-                log.debug("neighbour {} already removed from the working set", tpn);
+                log.debug("Neighbour {} already removed from the working set", tpn);
     }
 
     private static VolumeLine baseGrid(double[] surfaceLayers, double depth, Resolution resolution,
@@ -140,9 +140,6 @@ public class LineBoxer {
         double dleft = 2 * (r - dsl);
 
         // number of regular boxes across the inner part once nsl put on each end
-        // RCC - old form was lacking a factor of 2 to divide dleft to get the radius:
-        // int nreg = 1 + 2 * ((int)((dleft) / delta));
-
         int nreg = 1 + 2 * ((int)((dleft/2) / delta));
         double dtot = 2 * dsl + nreg * delta;
         VolumeLine ret = new VolumeLine(nsl, nreg, surfaceLayers, dtot, depth);
