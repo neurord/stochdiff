@@ -129,17 +129,10 @@ public class LineBoxer {
                 log.debug("neighbour {} already removed from the working set", tpn);
     }
 
-    public VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
-        VolumeLine ret = null;
-
+    private VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
         double delta = resolution.getLocalDelta(tpa, tpb);
         String rgn = tpa.regionClassWith(tpb);
 
-        return baseHardGrid(tpa, tpb, lbl, rgn, delta);
-    }
-
-    public VolumeLine baseHardGrid(TreePoint tpa, TreePoint tpb, String lbl,
-                                   String rgn, double delta) {
         // odd number of cells, fixed size
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius()) - 1.e-7;
         // subtract 1.e-7 in case user provides exact multiples.
