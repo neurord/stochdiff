@@ -13,9 +13,9 @@ import org.apache.logging.log4j.LogManager;
 public class MorphPoint {
     static final Logger log = LogManager.getLogger();
 
-    @XmlAttribute public double x;
-    @XmlAttribute public double y;
-    @XmlAttribute public double z;
+    @XmlAttribute public Double x;
+    @XmlAttribute public Double y;
+    @XmlAttribute public Double z;
     @XmlAttribute public double r;
     @XmlAttribute public String label;
 
@@ -32,9 +32,7 @@ public class MorphPoint {
     transient HashMap<MorphPoint, String> segidHM = new HashMap<>();
     transient HashMap<MorphPoint, String> regionHM = new HashMap<>();
 
-    public MorphPoint() {
-        x = y = z = r = Double.NaN;
-    }
+    public MorphPoint() { }
 
     public MorphPoint(String label, double x, double y, double z, double r) {
         this.label = label;
@@ -128,11 +126,7 @@ public class MorphPoint {
     }
 
     public boolean hasPosition() {
-        boolean ret = true;
-        if (Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z)) {
-            ret = false;
-        }
-        return ret;
+        return x != null && y != null && z != null;
     }
 
     public double distanceTo(MorphPoint mp) {

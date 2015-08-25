@@ -318,10 +318,21 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="attachment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="start" />
+      <xs:enumeration value="end" />
+      <xs:whiteSpace value="collapse" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:complexType name="point">
-    <xs:attribute name="x" type="xs:decimal" use="required" />
-    <xs:attribute name="y" type="xs:decimal" use="required" />
-    <xs:attribute name="z" type="xs:decimal" use="required" />
+    <xs:attribute name="x" type="xs:decimal" />
+    <xs:attribute name="y" type="xs:decimal" />
+    <xs:attribute name="z" type="xs:decimal" />
+    <xs:attribute name="on" type="xs:string" />
+    <xs:attribute name="at" type="attachment" />
+    <xs:attribute name="atFraction" type="non-negative-real" />
     <xs:attribute name="r" type="non-negative-real" use="required" />
     <xs:attribute name="label" type="xs:string" />
   </xs:complexType>
