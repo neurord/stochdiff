@@ -137,15 +137,8 @@ public class LineBoxer {
         double delta = resolution.getLocalDelta(tpa, tpb);
         String rgn = tpa.regionClassWith(tpb);
 
-        if (false) {
-            ret = baseSoftGrid(tpa, tpb, lbl, rgn, delta);
-        } else {
-            ret = baseHardGrid(tpa, tpb, lbl, rgn, delta);
-        }
-        return ret;
+        return baseHardGrid(tpa, tpb, lbl, rgn, delta);
     }
-
-
 
     public VolumeLine baseHardGrid(TreePoint tpa, TreePoint tpb, String lbl,
                                    String rgn, double delta) {
@@ -175,27 +168,6 @@ public class LineBoxer {
 
         double dtot = 2 * dsl + nreg * delta;
         VolumeLine ret = new VolumeLine(nsl, nreg, surfaceLayers, dtot, depth);
-        ret.lineFill(tpa, tpb, lbl, rgn);
-
-        return ret;
-    }
-
-
-    public VolumeLine baseSoftGrid(TreePoint tpa, TreePoint tpb, String lbl,
-                                   String rgn, double delta) {
-        if (surfaceLayers != null && surfaceLayers.length > 0)
-            log.warn("Surface layers are incompatible with soft grid - ignoring");
-
-        // allows the cells to grow or shrink a little to fill the line;
-        double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
-
-        // number of boxes across the diameter;
-        int nd = (int)(2 * r / delta + 0.5);
-        if (nd < 1) {
-            nd = 1;
-        }
-
-        VolumeLine ret = new VolumeLine(0, nd, null, 2. * r, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
 
         return ret;
