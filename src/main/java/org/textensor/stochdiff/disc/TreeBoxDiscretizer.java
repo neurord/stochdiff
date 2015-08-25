@@ -43,8 +43,7 @@ public class TreeBoxDiscretizer {
 
         switch(geom) {
         case GEOM_2D:
-            LineBoxer lb = new LineBoxer(slicedPoints, surfaceLayers, d2d);
-            vgrid = lb.buildGrid(d, resHM);
+            vgrid = LineBoxer.buildGrid(slicedPoints, surfaceLayers, d2d, d, resHM);
             break;
         case GEOM_3D:
             DiscBoxer db = new DiscBoxer(slicedPoints, surfaceLayers);

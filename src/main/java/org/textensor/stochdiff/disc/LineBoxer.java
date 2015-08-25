@@ -32,20 +32,9 @@ import org.apache.logging.log4j.LogManager;
 public class LineBoxer {
     static final Logger log = LogManager.getLogger();
 
-    final TreePoint[] srcPoints;
-    final double[] surfaceLayers;
-    final double depth;
-
-    Resolution resolution;
-
-    public LineBoxer(TreePoint[] srcPoints, double[] surfaceLayers, double depth) {
-        this.srcPoints = srcPoints;
-        this.surfaceLayers = surfaceLayers;
-        this.depth = depth;
-    }
-
-    public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM) {
-        this.resolution = new Resolution(d, resHM);
+    public static VolumeGrid buildGrid(TreePoint[] srcPoints, double[] surfaceLayers, double depth,
+                                       double d, HashMap<String, Double> resHM) {
+        final Resolution resolution = new Resolution(d, resHM);
 
         TreePoint firstpt = null;
         // put them all in a set - take them out when they've been done;
@@ -64,15 +53,16 @@ public class LineBoxer {
         TreeUtil.parentizeFrom(firstpt, srcPoints);
 
         final ArrayList<VolumeLine> volume_lines = new ArrayList<VolumeLine>();
-        recAdd(working_set, volume_lines, null, firstpt);
+        recAdd(surfaceLayers, depth, resolution, working_set, volume_lines, null, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();
         vgr.importLines(volume_lines);
         return vgr;
     }
 
-    private void recAdd(HashSet<TreePoint> working_set, ArrayList<VolumeLine> volume_lines,
-                        VolumeLine pGrid, TreePoint tp) {
+    private static void recAdd(double[] surfaceLayers, double depth, Resolution resolution,
+                               HashSet<TreePoint> working_set, ArrayList<VolumeLine> volume_lines,
+                               VolumeLine pGrid, TreePoint tp) {
         String lbl = tp.getLabel();
 
         tp.partBranchOffset = 0.;
@@ -100,13 +90,13 @@ public class LineBoxer {
                     TreePoint par = tp.parent;
                     log.info("starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
 
-                    vg = baseGrid(tp, tpn, lbl);
+                    vg = baseGrid(surfaceLayers, depth, resolution, tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
                     par.partBranchOffset += 2 * tpn.r;
 
                 } else {
                     log.debug("Creating new grid between neighbouring points");
-                    vg = baseGrid(tp, tpn, lbl);
+                    vg = baseGrid(surfaceLayers, depth, resolution, tp, tpn, lbl);
                     if (pGrid != null) {
                         // TODO - probably not what we want
                         // too much numerical diffusion if boxes can have gradually changing
@@ -119,17 +109,18 @@ public class LineBoxer {
                 lbl = null; // only use it once
                 if (vg != null) {
                     volume_lines.add(vg);
-                    recAdd(working_set, volume_lines, vg, tpn);
+                    recAdd(surfaceLayers, depth, resolution, working_set, volume_lines, vg, tpn);
                 } else {
                     // skipped the point that is the start of a new segment
                     // of different radius
-                    recAdd(working_set, volume_lines, pGrid, tpn);
+                    recAdd(surfaceLayers, depth, resolution, working_set, volume_lines, pGrid, tpn);
                 }
             } else
                 log.debug("neighbour {} already removed from the working set", tpn);
     }
 
-    private VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
+    private static VolumeLine baseGrid(double[] surfaceLayers, double depth, Resolution resolution,
+                                       TreePoint tpa, TreePoint tpb, String lbl) {
         double delta = resolution.getLocalDelta(tpa, tpb);
         String rgn = tpa.regionClassWith(tpb);
 
@@ -140,23 +131,19 @@ public class LineBoxer {
         double dsl = 0;
         int nsl = 0;
 
-        if (surfaceLayers != null && surfaceLayers.length > 0) {
+        if (surfaceLayers != null && surfaceLayers.length > 0)
             while (nsl < surfaceLayers.length && dsl + surfaceLayers[nsl] < r) {
                 dsl += surfaceLayers[nsl];
                 nsl += 1;
             }
-        }
-        double dleft = 2 * (r - dsl);
 
+        double dleft = 2 * (r - dsl);
 
         // number of regular boxes across the inner part once nsl put on each end
         // RCC - old form was lacking a factor of 2 to divide dleft to get the radius:
         // int nreg = 1 + 2 * ((int)((dleft) / delta));
 
         int nreg = 1 + 2 * ((int)((dleft/2) / delta));
-
-
-
         double dtot = 2 * dsl + nreg * delta;
         VolumeLine ret = new VolumeLine(nsl, nreg, surfaceLayers, dtot, depth);
         ret.lineFill(tpa, tpb, lbl, rgn);
