@@ -59,65 +59,53 @@ public class VolumeGrid {
     boolean hasCuboids = false;
     boolean hasCurveds = false;
 
-    public void importSlices(ArrayList<VolumeSlice> gridAL) {
-        hasCuboids = true;
-        for (VolumeSlice vs : gridAL) {
-            for (VolumeElement ve : vs.getElements()) {
-                addVolumeElement(ve);
-            }
-        }
+    public void importSlices(ArrayList<VolumeSlice> slices) {
+        this.hasCuboids = true;
+        for (VolumeSlice slice : slices)
+            this.addElements(slice.getElements());
     }
 
-    public void importSmoothSlices(ArrayList<CurvedVolumeSlice> gridAL) {
-        hasCurveds = true;
-        for (CurvedVolumeSlice vs : gridAL) {
-            for (VolumeElement ve : vs.getElements()) {
-                addVolumeElement(ve);
-            }
-        }
+    public void importSmoothSlices(ArrayList<CurvedVolumeSlice> slices) {
+        this.hasCurveds = true;
+        for (CurvedVolumeSlice slice : slices)
+            this.addElements(slice.getElements());
     }
 
-    public void importLines(ArrayList<VolumeLine> gridAL) {
-        hasCuboids = true;
-        for (VolumeLine vs : gridAL) {
-            for (VolumeElement ve : vs.getElements()) {
-                addVolumeElement(ve);
-
-            }
-        }
+    public void importLines(ArrayList<VolumeLine> lines) {
+        this.hasCuboids = true;
+        for (VolumeLine line : lines)
+            this.addElements(line.getElements());
     }
 
-    public void addElements(List<VolumeElement> veal) {
-        for (VolumeElement ve : veal)
+    public void addElements(List<? extends VolumeElement> elements) {
+        for (VolumeElement ve : elements)
             addVolumeElement(ve);
     }
 
     private void addVolumeElement(VolumeElement ve) {
-        elements.add(ve);
+        this.elements.add(ve);
 
-        String sr = ve.getRegion();
-        if (sr != null) {
-            if (regionHM.containsKey(sr)) {
-                regionHM.get(sr).add(ve);
+        final String region = ve.getRegion();
+        assert region != null;
 
-                //  Position[] sbdry = ve.getSurfaceBoundary();
+        log.debug("Processing VolumeElement {} from region {}", ve.getAsText(), region, new Throwable());
 
-            } else {
-                ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
-                ave.add(ve);
-                regionHM.put(sr, ave);
-            }
+        if (regionHM.containsKey(region)) {
+            regionHM.get(region).add(ve);
+        } else {
+            ArrayList<VolumeElement> ave = new ArrayList<>();
+            ave.add(ve);
+            regionHM.put(region, ave);
         }
     }
 
     public ArrayList<VolumeElement> getElementsInRegion(String reg) {
-        ArrayList<VolumeElement> ret = null;
-        if (regionHM.containsKey(reg)) {
+        final ArrayList<VolumeElement> ret;
+        if (regionHM.containsKey(reg))
             ret = regionHM.get(reg);
-        } else {
+        else
             // POSERR - any use in impty array - error?
             ret = new ArrayList<VolumeElement>();
-        }
         return ret;
     }
 

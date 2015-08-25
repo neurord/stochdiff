@@ -75,11 +75,7 @@ public class EndPoint extends MorphPoint {
 
 
     public boolean radiiDiffer(MorphPoint mp) {
-        boolean ret = true;
-        if (Math.abs((r - mp.r) / (r + mp.r)) < 1.e-4) {
-            ret = false;
-        }
-        return ret;
+        return Math.abs((r - mp.r) / (r + mp.r)) > 1.e-4;
     }
 
 

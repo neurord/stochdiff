@@ -32,82 +32,73 @@ import org.apache.logging.log4j.LogManager;
 public class LineBoxer {
     static final Logger log = LogManager.getLogger();
 
-    TreePoint[] srcPoints;
-
-
-    ArrayList<VolumeLine> gridAL;
-    HashSet<TreePoint> wkpHS;
-
-    double[] surfaceLayers;
-
-    double depth;
+    final TreePoint[] srcPoints;
+    final double[] surfaceLayers;
+    final double depth;
 
     Resolution resolution;
 
-
-    public LineBoxer(TreePoint[] pts, double[] sl, double d2d) {
-        srcPoints = pts;
-        surfaceLayers = sl;
-        depth = d2d;
+    public LineBoxer(TreePoint[] srcPoints, double[] surfaceLayers, double depth) {
+        this.srcPoints = srcPoints;
+        this.surfaceLayers = surfaceLayers;
+        this.depth = depth;
     }
 
-
     public VolumeGrid buildGrid(double d, HashMap<String, Double> resHM) {
-        resolution = new Resolution(d, resHM);
+        this.resolution = new Resolution(d, resHM);
 
         TreePoint firstpt = null;
         // put them all in a set - take them out when they've been done;
-        wkpHS = new HashSet<TreePoint>();
-        for (TreePoint tp : srcPoints) {
-            wkpHS.add(tp);
+        final HashSet<TreePoint> working_set = new HashSet<>();
+
+        for (TreePoint tp : srcPoints)
             // need one that has only one neighbor as the start point;
             if (firstpt == null && tp.isEndPoint()) {
                 firstpt = tp;
+                log.debug("Using {} as the starting point", firstpt);
+            } else {
+                working_set.add(tp);
+                log.debug("Will process {} later", tp);
             }
-        }
 
         TreeUtil.parentizeFrom(firstpt, srcPoints);
 
+        final ArrayList<VolumeLine> volume_lines = new ArrayList<VolumeLine>();
+        VolumeLine vg0 = null; // WTF???
 
-        gridAL = new ArrayList<VolumeLine>();
-        VolumeLine vg0 = null;
-        wkpHS.remove(firstpt);
-
-        recAdd(vg0, firstpt);
+        recAdd(working_set, volume_lines, vg0, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();
-        vgr.importLines(gridAL);
+        vgr.importLines(volume_lines);
         return vgr;
-
     }
 
-
-
-
-    private void recAdd(VolumeLine pGrid, TreePoint tp) {
+    private void recAdd(HashSet<TreePoint> working_set, ArrayList<VolumeLine> volume_lines,
+                        VolumeLine pGrid, TreePoint tp) {
         String lbl = tp.getLabel();
 
         tp.partBranchOffset = 0.;
 
-        //  E.info("processing " + tp);
+        log.debug("Processing {}", tp);
 
-        for (TreePoint tpn : tp.getNeighbors()) {
-            if (wkpHS.contains(tpn)) {
-                wkpHS.remove(tpn);
+        for (TreePoint tpn : tp.getNeighbors())
+            if (working_set.contains(tpn)) {
+                working_set.remove(tpn);
 
-                // if a terminal has a label, and the current point doesn't, then use it
-                if (lbl == null && tpn.nnbr == 1 && tpn.getLabel() != null) {
+                log.debug("looking at neighbour {}", tpn);
+
+                // if the current point doesn't have a label, try to use one from the terminal
+                if (lbl == null && tpn.nnbr == 1)
                     lbl = tpn.getLabel();
-                }
 
                 VolumeLine vg = null;
                 if (tpn.subAreaPeer == tp) {
                     // nothing to do for now - put line in when we
                     // do the first child of tpn
-                    // E.info("skipping pt with peer " + tpn);
+                    log.debug("{}: skipping pt with peer", tpn);
 
                 } else if (tp.subAreaPeer != null && tp.subAreaPeer == tp.parent) {
-                    // E.info("first pt after branch " + tpn);
+                    log.debug("{}: first pt after branch", tpn);
                     TreePoint par = tp.parent;
                     log.info("starting a sub-branch at {} - {} {}", tp, tpn, pGrid);
 
@@ -116,35 +107,29 @@ public class LineBoxer {
                     par.partBranchOffset += 2 * tpn.r;
 
                 } else {
-                    if (pGrid == null) {
-                        vg = baseGrid(tp, tpn, lbl);
-
-                    } else {
+                    log.debug("Creating new grid between neighbouring points");
+                    vg = baseGrid(tp, tpn, lbl);
+                    if (pGrid != null) {
                         // TODO - probably not what we want
                         // too much numerical diffusion if boxes can have gradually changing
                         // sizes? restrict to a few discrete multiples?
-                        vg = baseGrid(tp, tpn, lbl);
+                        log.debug("Attaching with planeConnect()");
                         pGrid.planeConnect(vg);
                     }
-
                 }
 
                 lbl = null; // only use it once
                 if (vg != null) {
-                    gridAL.add(vg);
-                    recAdd(vg, tpn);
+                    volume_lines.add(vg);
+                    recAdd(working_set, volume_lines, vg, tpn);
                 } else {
                     // skipped the point that is the start of a new segment
                     // of different radius
-                    recAdd(pGrid, tpn);
+                    recAdd(working_set, volume_lines, pGrid, tpn);
                 }
-            }
-        }
+            } else
+                log.debug("neighbour {} already removed from the working set", tpn);
     }
-
-
-
-
 
     public VolumeLine baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
         VolumeLine ret = null;

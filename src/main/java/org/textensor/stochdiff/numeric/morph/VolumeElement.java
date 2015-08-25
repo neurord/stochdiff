@@ -181,10 +181,13 @@ public abstract class VolumeElement {
         // export boundary if have it, ow just the center point;
         if (boundary != null)
             for (Position p : boundary)
-                sb.append(String.format(" (%.5g %.5g %.5g) ", p.getX(), p.getY(), p.getZ()));
+                sb.append(String.format("%s(%.5g %.5g %.5g)",
+                                        sb.length() > 0 ? " " : "",
+                                        p.getX(), p.getY(), p.getZ()));
         else
-            sb.append(String.format(" (%.5g %.5g %.5g) ", cx, cy, cz));
-
+            sb.append(String.format("%s(%.5g %.5g %.5g)",
+                                    sb.length() > 0 ? " " : "",
+                                    cx, cy, cz));
         return sb.toString();
     }
 
@@ -203,9 +206,8 @@ public abstract class VolumeElement {
 
     public String getAsPlainText() {
         StringBuffer sb = new StringBuffer();
-        double pp[] = this.getAsNumbers();
-        for(double p: pp)
-            sb.append(String.format(" %.5g", p));
+        for(double p: this.getAsNumbers())
+            sb.append(String.format("%s%.5g", sb.length() > 0 ? " " : "", p));
         return sb.toString();
     }
 
