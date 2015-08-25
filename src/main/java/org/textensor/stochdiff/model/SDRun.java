@@ -52,7 +52,7 @@ public class SDRun implements IOutputSet {
 
     public String action;
 
-    private String geometry = "2D";
+    private String geometry;
     public double depth2D = 0.5;
 
     private Double runtime;
@@ -92,23 +92,26 @@ public class SDRun implements IOutputSet {
     public String distribution;
     public String algorithm;
 
-    private distribution_t distributionID;
-    private algorithm_t algorithmID;
-
     private transient VolumeGrid volumeGrid;
     private transient int[][] stimulationTargets;
 
     // just getters from here on;
 
     public distribution_t getDistribution() {
+        if (this.distribution == null)
+            return distribution_t.BINOMIAL;
         return distribution_t.valueOf(this.distribution);
     }
 
     public algorithm_t getAlgorithm() {
+        if (this.algorithm == null)
+            return algorithm_t.INDEPENDENT;
         return algorithm_t.valueOf(this.algorithm);
     }
 
     public geometry_t getGeometry() {
+        if (this.geometry == null)
+            return geometry_t.GEOM_2D;
         return geometry_t.fromString(this.geometry);
     }
 
