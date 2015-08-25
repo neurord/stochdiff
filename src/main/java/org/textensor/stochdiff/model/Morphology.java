@@ -69,8 +69,8 @@ public class Morphology {
         if (!resolved)
             resolve();
 
-        ArrayList<TreePoint> tpts = new ArrayList<TreePoint>();
-        HashMap<MorphPoint, TreePoint> mtHM = new HashMap<MorphPoint, TreePoint>();
+        ArrayList<TreePoint> tpts = new ArrayList<>();
+        HashMap<MorphPoint, TreePoint> mtHM = new HashMap<>();
         int ic = 0;
         for (MorphPoint mp : p_points) {
             TreePoint tp = mp.toTreePoint();

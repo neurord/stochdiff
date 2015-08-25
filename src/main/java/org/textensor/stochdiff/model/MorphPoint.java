@@ -44,7 +44,6 @@ public class MorphPoint {
 
     public void setSegment(Segment seg) {
         r_segment = seg;
-
     }
 
     protected void addNeighbor(MorphPoint p) {
