@@ -24,25 +24,25 @@ public class Segment {
     }
 
     public void resolve(HashMap<String, Segment> segmentHM) {
-        start.setSegment(this);
-        end.setSegment(this);
+        this.start.setSegment(this);
+        this.end.setSegment(this);
 
-        start.resolve(segmentHM, end);
-        end.resolve(segmentHM, start);
+        this.start.resolve(segmentHM, this.end);
+        this.end.resolve(segmentHM, this.start);
 
+        this.start.addNeighbor(this.end);
+        this.end.addNeighbor(this.start);
 
-        start.addNeighbor(end);
-        end.addNeighbor(start);
-
-        if (region != null) {
-            start.setRegionWith(end, region);
-            end.setRegionWith(start, region);
+        if (this.region != null) {
+            this.start.setRegionWith(this.end, this.region);
+            this.end.setRegionWith(this.start, this.region);
         }
 
-        if (id != null) {
-            start.setIDWith(end, id);
-            end.setIDWith(start, id);
+        if (this.id != null) {
+            this.start.setIDWith(this.end, this.id);
+            this.end.setIDWith(this.start, this.id);
         }
+
         resolved = true;
     }
 
@@ -53,7 +53,6 @@ public class Segment {
     public EndPoint getEnd() {
         return end;
     }
-
 
     public void checkHasPositions() {
         if (!start.hasPosition())
