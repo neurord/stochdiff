@@ -45,8 +45,13 @@ public class DeterministicGridCalc extends GridCalc {
 
     long event_count = 0;
 
+    final double[][] couplingConstants;
+
     public DeterministicGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
+
+        VolumeGrid grid = this.sdRun.getVolumeGrid();
+        this.couplingConstants = grid.getPerElementCouplingConstants();
     }
 
     // the only task here is to allocate and initialize the workspace for

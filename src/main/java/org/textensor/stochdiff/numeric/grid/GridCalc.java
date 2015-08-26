@@ -32,7 +32,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     double[] fdiff;
 
     int[][] neighbors;
-    double[][] couplingConstants;
 
     public int[] eltregions;
 
@@ -88,7 +87,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         nspec = rtab.getNSpecies();
 
         neighbors = grid.getPerElementNeighbors();
-        couplingConstants = grid.getPerElementCouplingConstants();
 
         eltregions = grid.getRegionIndexes();
 

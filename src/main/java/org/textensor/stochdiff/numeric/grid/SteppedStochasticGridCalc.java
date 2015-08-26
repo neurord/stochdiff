@@ -112,7 +112,9 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         log.debug("lnvolumes: {}", lnvolumes);
 
         lnfdiff = ArrayUtil.log(fdiff);
-        lnCC = ArrayUtil.log(couplingConstants);
+
+        VolumeGrid grid = this.sdRun.getVolumeGrid();
+        lnCC = ArrayUtil.log(grid.getPerElementCouplingConstants());
 
         // workspace for the calculation
         wkB = new int[nel][nspec];
