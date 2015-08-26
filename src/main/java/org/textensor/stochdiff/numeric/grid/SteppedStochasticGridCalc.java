@@ -66,8 +66,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
     int[][] wkB;
 
-    double[] diffusionConstants;
-
     int[][] reactantIndices;
     int[][] productIndices;
 
