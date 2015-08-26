@@ -216,17 +216,17 @@ class Simulation(object):
     """Information about the results of a trial
     """
     def __init__(self, element, model):
-        self._sim = element
+        self._element = element
         self.number = int(element._v_parent._v_name[5:])
         self.model = model
 
     def times(self):
-        times = self._sim.times[:]
+        times = self._element.times[:]
         diff = times[1] - times[0]
         return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
     def counts(self):
-        data = self._sim.concentrations
+        data = self._element.concentrations
         panel= pd.Panel(data.read(),
                         items=self.times(),
                         major_axis=range(data.shape[1]),
@@ -256,17 +256,17 @@ class Simulation(object):
         2D
         """
 
-        xml = self._sim.serialized_config
+        xml = self._element.serialized_config
         return etree.fromstring(xml.read()[0])
 
     def events(self):
         "A full history of events"
-        times = self._sim.events.times[:]
-        waited = self._sim.events.waited[:]
-        original = self._sim.events.original_wait[:]
-        events = self._sim.events.events[:]
-        extents = self._sim.events.extents[:]
-        kinds = self._sim.events.kinds[:]
+        times = self._element.events.times[:]
+        waited = self._element.events.waited[:]
+        original = self._element.events.original_wait[:]
+        events = self._element.events.events[:]
+        extents = self._element.events.extents[:]
+        kinds = self._element.events.kinds[:]
         df = pd.DataFrame(dict(time=times,
                                waited=waited,
                                original=original,
