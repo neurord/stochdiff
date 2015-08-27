@@ -472,17 +472,13 @@ def _history_data(simul, species, region_indices, region_labels,
     df.to_pickle(fname)
     print('saved', fname)
 
-def find_regions(regions, spec):
+def find_regions(regions, region_names, spec):
     if spec:
-        for item in spec_:
+        for item in spec:
             try:
-                region = int(item)
+                yield int(item)
             except ValueError:
-                w = regions[:] == item
-                if w.sum() != 1:
-                    raise ValueError("bad region: {}".format(item))
-                region = w.argmax() # find True
-            yield region
+                yield region_names.index(item)
     else:
         yield from sorted(regions)
 
@@ -497,7 +493,7 @@ def plot_history(output, species):
         counts = counts.loc[(slice(None), opts.time), :]
 
     regions = model.grid().region
-    region_numbers = list(find_regions(regions, opts.regions))
+    region_numbers = list(find_regions(regions, model.region_names(), opts.regions))
     region_indices = np.arange(len(regions))[(regions[:, None] == region_numbers).any(axis=1)]
     region_labels = model.region_names(region_numbers)
 
