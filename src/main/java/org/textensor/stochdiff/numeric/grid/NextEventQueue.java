@@ -1477,6 +1477,7 @@ public class NextEventQueue {
     }
 
     ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {
+        double[] volumes = grid.getElementVolumes();
         int[][] neighbors = grid.getPerElementNeighbors();
         double[][] couplings = grid.getPerElementCouplingConstants();
         double[] fdiff = rtab.getDiffusionConstants();
@@ -1494,9 +1495,11 @@ public class NextEventQueue {
                 if (cc > 0)
                     for (int sp = 0; sp < fdiff.length; sp++)
                         if (fdiff[sp] > 0) {
+                            // probability is dt * K_diff * contact_area /
+                            // (center_to_center_distance * source_volume)
                             NextDiffusion diff = new NextDiffusion(numbering.get(),
                                                                    el, el2, j, sp, species[sp],
-                                                                   fdiff[sp] * cc);
+                                                                   fdiff[sp] * cc / volumes[el]);
 
                             ans.add(diff);
 

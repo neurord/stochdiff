@@ -164,7 +164,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     double lnpgo = lnfdiff[k] + lnCC[iel][j] + lndt - lnvolumes[iel];
                     // probability is dt * K_diff * contact_area /
                     // (center_to_center_distance * source_volume)
-                    // gnbr contains the gometry: contact_area / distance
+                    // gnbr contains the geometry: contact_area / distance
 
                     double p = Math.exp(lnpgo);
                     ptot += p;
