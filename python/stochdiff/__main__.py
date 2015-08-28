@@ -67,6 +67,7 @@ parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
+parser.add_argument('--sum-all', action='store_true')
 parser.add_argument('--describe-leaps', type=int_list, nargs='?', const=())
 parser.add_argument('--leaps', type=int_list, nargs='?', const=())
 parser.add_argument('--weighted', action='store_true')
@@ -413,9 +414,23 @@ def generate_region_histories(species, region_indices, region_labels, counts):
             label = fmt.format(name=name, region=rlabel)
             yield times, y, name, label
 
+def generate_total_histories(species, region_indices, region_labels, counts):
+    for name in species:
+        ans = 0
+        for rlabel, rindi in zip(region_labels, region_indices):
+            series = counts.loc[rindi][name]
+            times = series.index.values
+            ans += series.values
+        yield times, ans, name, name
+
 def generate_histories(species, region_indices, region_labels,
                        counts, opts):
-    func = generate_region_histories if opts.sum_regions else generate_element_histories
+    if opts.sum_regions:
+        func = generate_region_histories
+    elif opts.sum_all:
+        func = generate_total_histories
+    else:
+        func = generate_element_histories
     return func(species, region_indices, region_labels, counts)
 
 def _history(simul, species, region_indices, region_labels,
