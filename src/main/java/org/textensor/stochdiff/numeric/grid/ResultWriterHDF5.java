@@ -541,7 +541,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             {
                 String[] targets = table.getTargetIDs();
                 if (targets.length == 0) {
-                    log.info("Not writing stimulation data (empty targets)");
+                    log.debug("Not writing stimulation data (empty targets)");
                     return;
                 }
 
@@ -625,7 +625,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             Collection<IGridCalc.Event> events = source.getEvents();
             if (events == null) {
-                    log.warn("No dependency data, not writing dependency scheme");
+                    log.debug("No dependency data, not writing dependency scheme");
                     return;
             }
 
@@ -822,7 +822,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             if (elements == 0 || species == 0 || neighbors == 0) {
                 if (!initDiffusionEvents_warning) {
                     log.info("Diffusion events are {}×{}×{}", elements, species, neighbors);
-                    log.warn("No diffusion events, not writing anything");
+                    log.log(elements > 1 ? Level.WARN : Level.DEBUG,
+                            "No diffusion events, not writing anything");
                     initDiffusionEvents_warning = true;
                 }
                 return false;
@@ -873,7 +874,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             if (elements == 0 || reactions == 0) {
                 if (!initReactionEvents_warning) {
-                    log.warn("No reaction events, not writing anything");
+                    log.info("No reaction events, not writing anything");
                     initReactionEvents_warning = true;
                 }
                 return false;
@@ -967,7 +968,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             int howmuch, m;
             for (m = 0; m < n; m += howmuch) {
                 howmuch = Math.min(n - m, CACHE_SIZE2);
-                log.log(Level.DEBUG, "Writing {} events at time {}", howmuch, time);
+                log.debug("Writing {} events at time {}", howmuch, time);
 
                 {
                     extendExtensibleArray(this.events_time, howmuch);
@@ -1030,7 +1031,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             final Collection<IGridCalc.Happening> events = source.getHappenings();
             if (events == null) {
                 if (!initEvents_warning) {
-                    log.warn("No events, not writing anything");
+                    log.debug("No events, not writing anything");
                     initEvents_warning = true;
                 }
                 return;
