@@ -206,14 +206,21 @@ public class SDRun implements IOutputSet {
     }
 
     public Discretization getDiscretization() {
-        if (discretization != null)
-            return discretization;
+        if (this.discretization != null)
+            return this.discretization;
         else
             return Discretization.SINGLE_VOXEL;
     }
 
+    private InitialConditions _empty_initalConditions;
     public InitialConditions getInitialConditions() {
-        return initialConditions;
+        if (this.initialConditions != null)
+            return this.initialConditions;
+        else {
+            if (this._empty_initalConditions == null)
+                this._empty_initalConditions = new InitialConditions();
+            return this._empty_initalConditions;
+        }
     }
 
     public double getStartTime() {
