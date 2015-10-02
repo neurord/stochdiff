@@ -1,6 +1,7 @@
 from __future__ import division
 import functools
 import numpy as np
+import math
 
 def arrayize(type):
     def decorator(func):
@@ -122,3 +123,8 @@ def detect_upstates(y, min_high_ratio=0.50, P_high=0.25, P_low=0.60, upstates=No
 def state_lifetime(states):
     times = np.fromiter((end - start for (start, end) in states), dtype=float)
     return (times.mean(), times.std(ddof=1) / times.size**0.5)
+
+def state_population(states, population):
+    all = np.hstack((population[math.ceil(beg):math.ceil(end)]
+                     for beg,end in states))
+    return (all.mean(), all.std(ddof=1) / all.size**0.5)
