@@ -152,7 +152,6 @@ class Model(object):
         try:
             self.dependencies = Dependencies(self._element.dependencies)
         except tables.exceptions.NoSuchNodeError as e:
-            print(e)
             self.dependencies = None
         self.reactions = Reactions(self._element.reactions)
 
@@ -284,6 +283,12 @@ class Output(object):
     def __init__(self, filename):
         self.file = tables.openFile(filename)
         self.model = Model(self.file.root.trial0.model)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.file.close()
 
     def simulation(self, num):
         """Get simulation by number

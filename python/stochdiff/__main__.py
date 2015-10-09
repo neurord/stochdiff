@@ -659,3 +659,4 @@ if __name__ == '__main__':
             make_movie(opts.save)
             for fname in glob.glob('{}-*.png'.format(opts.save)):
                 os.unlink(fname)
+    opts.file.file.close()
