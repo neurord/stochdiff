@@ -15,6 +15,14 @@ def listize(func):
         return list(func(*args, **kwargs))
     return functools.update_wrapper(wrapper, func)
 
+def nanize(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except IndexError:
+            return (np.nan, np.nan)
+    return functools.update_wrapper(wrapper, func)
+
 @arrayize(int)
 def detect_peaks(y, min_high_ratio=0.25, P_low=0.5, P_high=0.5, both=False):
     low_i, low = 0, y[0]
@@ -124,6 +132,7 @@ def state_lifetime(states):
     times = np.fromiter((end - start for (start, end) in states), dtype=float)
     return (times.mean(), times.std(ddof=1) / times.size**0.5)
 
+@nanize
 def state_population(states, population):
     all = np.hstack((population[math.ceil(beg):math.ceil(end)]
                      for beg,end in states))
