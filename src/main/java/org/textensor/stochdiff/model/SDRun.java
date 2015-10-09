@@ -212,7 +212,7 @@ public class SDRun implements IOutputSet {
             return Discretization.SINGLE_VOXEL;
     }
 
-    private InitialConditions _empty_initalConditions;
+    private transient InitialConditions _empty_initalConditions;
     public InitialConditions getInitialConditions() {
         if (this.initialConditions != null)
             return this.initialConditions;
