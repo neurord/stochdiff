@@ -1302,7 +1302,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected static void getGridNumbers(int[][] dst,
                                          int elements[], int ispecout[], IGridCalc source) {
         for (int i = 0; i < elements.length; i++)
-            for (int j = 0; j < ispecout.length; j++)
+            for (int j = 0; j < ispecout.length; j++) {
                 dst[i][j] = source.getGridPartNumb(elements[i], ispecout[j]);
+                assert dst[i][j] >= 0: "" + i + " " + j + " " + dst[i][j];
+            }
     }
 }

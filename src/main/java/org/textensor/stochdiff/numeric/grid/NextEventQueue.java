@@ -601,11 +601,6 @@ public class NextEventQueue {
             } else
                 normal_waits += 1;
 
-            if (this.bidirectional_leap) {
-                assert this.reverse.reverse_is_leaping;
-                this.reverse.reverse_is_leaping = false;
-                this.bidirectional_leap = false;
-            }
 
             log.debug("Advanced to {} with {} {}extent={}{}",
                       time, this,
@@ -617,14 +612,22 @@ public class NextEventQueue {
              * after execution, but there's nothing to warn about. */
             this._update_propensity(false);
 
+            if (this.bidirectional_leap) {
+                assert this.reverse.reverse_is_leaping;
+                this.reverse.reverse_is_leaping = false;
+                this.bidirectional_leap = false;
+
+                this.reverse._update_propensity(false);
+            }
+
             this.pick_time(current, timelimit);
             queue.reposition("update", this);
             if (this.bidirectional_leap) {
-                this.reverse.propensity = 0;
                 this.reverse.setEvent(1, false, false, current, Double.POSITIVE_INFINITY);
                 this.reverse.reverse_is_leaping = true;
                 queue.reposition("reverse", this.reverse);
-            }
+            } else
+                this.reverse.update_and_reposition(current, false);
 
             double max_fraction = 0;
             NextEvent worst = null;
@@ -632,7 +635,7 @@ public class NextEventQueue {
             /* dependent of this must be the same as dependent of reverse reaction
              * so no need to go over both. */
             for (NextEvent dep: this.dependent)
-                if (!(dep == this.reverse && this.bidirectional_leap)) {
+                if (dep != this.reverse) {
                     double fraction = dep.update_and_reposition(current, changed);
                     if (fraction > max_fraction) {
                         max_fraction = fraction;
@@ -657,7 +660,6 @@ public class NextEventQueue {
              * fields on this event. We push all updates of time and propensity
              * to the reverse. */
 
-            log.debug("update_and_reposition: {}", this);
             /* For reactions which have a reverse, update_and_reposition might have
              * already been called on the reverse reaction, if both directions are
              * dependent on the reaction which just fired. Usually the "forward"
@@ -665,11 +667,13 @@ public class NextEventQueue {
              * which has higher propensity when the leap is queued). So be safe and
              * do not assume propensity changed for those reactions.. */
             if (this.reverse_is_leaping) {
+                log.debug("update_and_reposition: {}, doing reverse", this);
                 assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
                 return this.reverse.update_and_reposition(current, false);
             } else {
+                log.debug("update_and_reposition: {}", this);
                 boolean expect_changed = changed && !this.bidirectional_leap;
                 double old = this._update_propensity(expect_changed);
                 boolean inf = Double.isInfinite(this.time);
