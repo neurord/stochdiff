@@ -11,15 +11,29 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.jdk_version>1.7</project.jdk_version>
+
+    <git.git>git</git.git>
   </properties>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <filters>
+      <filter>${basedir}/target/filter.properties</filter>
+    </filters>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.4</version>
         <configuration>
+          <useDefaultManifestFile>true</useDefaultManifestFile>
           <archive>
             <manifest>
               <mainClass>org.textensor.stochdiff.StochDiff</mainClass>
@@ -93,6 +107,40 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.6</version>
             <executions>
+              <execution>
+                <id>git-describe</id>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <target>
+                    <exec executable="${git.git}"
+                          failifexecutionfails="false"
+                          outputproperty="git-describe.output"
+                          resultproperty="git-describe.result">
+                      <arg value="describe" />
+                      <arg value="--always" />
+                      <arg value="--tags" />
+                      <arg value="--dirty=+" />
+                    </exec>
+                    <condition property="git.version"
+                               value="${git-describe.output}"
+                               else="${project.version}">
+                      <equals arg1="${git-describe.result}" arg2="0" />
+                    </condition>
+
+                    <tstamp>
+                      <format property="last.updated" pattern="yyyy-MM-dd hh:mm:ss"/>
+                    </tstamp>
+
+                    <echo message="git.version=${git.version}" />
+                    <echo message="git.version=${git.version}&#10;build.time=${last.updated}&#10;"
+                          output="${basedir}/target/filter.properties" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+
               <execution>
                 <id>print-classpath</id>
                 <phase>compile</phase>

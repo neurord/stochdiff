@@ -1,0 +1,2 @@
+build-time: ${build.time}
+git-version: ${git.version}
