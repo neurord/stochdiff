@@ -8,6 +8,8 @@ import java.util.Vector;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.jar.Manifest;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
@@ -150,6 +152,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         this.root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
+        this.writeManifest();
     }
 
     @Override
@@ -172,6 +175,13 @@ public class ResultWriterHDF5 implements ResultWriter {
     @Override
     public File outputFile() {
         return this.outputFile;
+    }
+
+    protected void writeManifest()
+        throws Exception
+    {
+        Manifest manifest = Settings.getManifest();
+        writeMap("manifest", this.root, manifest.getMainAttributes().entrySet(), "information about the program");
     }
 
     protected Trial getTrial(int trial)
@@ -1175,6 +1185,24 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
+    }
+
+    protected Group writeMap(String name, Group parent, Set<Map.Entry<Object,Object>> set, String title)
+        throws Exception
+    {
+        Group group = this.output.createGroup(name, parent);
+        setAttribute(group, "TITLE", title);
+
+        for (Map.Entry<Object,Object> entry: set) {
+            /* Manifest keys allow ascii characters, numbers, dashes and underscores.
+             * Convert dashes to underscores so keys are valid python attributes. */
+            String key = entry.getKey().toString().toLowerCase().replace("-", "_");
+            String value = (String) entry.getValue();
+
+            writeVector(key, group, value);
+        }
+
+        return group;
     }
 
     protected Dataset writeVector(String name, Group parent, double... items)

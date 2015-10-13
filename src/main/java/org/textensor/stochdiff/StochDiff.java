@@ -1,12 +1,9 @@
 package org.textensor.stochdiff;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.jar.Manifest;
 
 import org.textensor.xml.ModelReader;
 import org.textensor.stochdiff.model.SDRun;
@@ -19,6 +16,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 import org.textensor.util.CustomFileAppender;
+import org.textensor.util.Settings;
 
 public class StochDiff {
     static final Logger log = LogManager.getLogger("stochdiff");
@@ -81,18 +79,6 @@ public class StochDiff {
             ctx.updateLoggers();
     }
 
-    public static String getGitVersion() {
-        InputStream stream =
-            Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
-        Manifest manifest;
-        try {
-            manifest = new Manifest(stream);
-        } catch(IOException e) {
-            return "(unknown version)";
-        }
-        return manifest.getMainAttributes().getValue("git.version");
-    }
-
     public static void main(String[] argv) throws Exception {
         File modelFile = null;
         final File outputFile;
@@ -122,7 +108,7 @@ public class StochDiff {
         final String logfile = outputFile + ".log";
         CustomFileAppender.addFileAppender(logfile);
 
-        log.info("NeuroRD {}", getGitVersion());
+        log.info("{}", Settings.getProgramVersion());
 
         SDRun sdModel = loader.unmarshall(modelFile);
 

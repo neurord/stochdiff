@@ -1,5 +1,9 @@
 package org.textensor.util;
 
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.jar.Manifest;
+
 public abstract class Settings {
     static public int getProperty(String name, int fallback) {
         String val = System.getProperty(name);
@@ -35,5 +39,23 @@ public abstract class Settings {
             return new String[0];
         else
             return spl;
+    }
+
+    public static Manifest getManifest() throws IOException {
+        InputStream stream =
+            Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
+        return new Manifest(stream);
+    }
+
+    public static String getProgramVersion() {
+        Manifest manifest;
+        String value = null;
+        try {
+            manifest = getManifest();
+            value = manifest.getMainAttributes().getValue("git-version");
+        } catch(IOException e) {
+        }
+
+        return "NeuroRD " + (value != null ? value : "(unknown version)");
     }
 }
