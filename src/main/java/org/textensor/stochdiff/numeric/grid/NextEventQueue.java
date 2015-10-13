@@ -626,7 +626,7 @@ public class NextEventQueue {
                 this.reverse.setEvent(1, false, false, current, Double.POSITIVE_INFINITY);
                 this.reverse.reverse_is_leaping = true;
                 queue.reposition("reverse", this.reverse);
-            } else
+            } else if (this.reverse != null)
                 this.reverse.update_and_reposition(current, false);
 
             double max_fraction = 0;
