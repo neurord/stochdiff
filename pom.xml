@@ -117,8 +117,7 @@
                           outputproperty="git-describe.output"
                           resultproperty="git-describe.result">
                       <arg value="describe" />
-                      <arg value="--always" />
-                      <arg value="--tags" />
+                      <arg value="--match=v*" />
                       <arg value="--dirty=+" />
                     </exec>
                     <condition property="git.version"
