@@ -925,13 +925,13 @@ public class NextEventQueue {
         public int leap_count(double current, double time, boolean bidirectional) {
             /* Diffusion is a first order reaction, governed by the
              * sum of binomial distributions. */
-            double mul = time * this.fdiff;
             int X1 = particles[this.element()][this.sp];
-            int n1 = stepper.versatile_ngo("neq diffusion", X1, mul);
+            int n1 = stepper.versatile_ngo("neq diffusion", X1, time * this.fdiff);
             if (!bidirectional)
                 return n1;
             int X2 = particles[this.element2][this.sp];
-            int n2 = stepper.versatile_ngo("neq diffusion", X2, mul);
+            double reverse_fdiff = ((NextDiffusion) this.reverse).fdiff;
+            int n2 = stepper.versatile_ngo("neq diffusion", X2, time * reverse_fdiff);
             return n1 - n2;
         }
 
