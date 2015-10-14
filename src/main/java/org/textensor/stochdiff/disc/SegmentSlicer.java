@@ -176,7 +176,7 @@ public class SegmentSlicer {
 
         if (np + nnp > maxnp) {
             log.error("not discretizing: need too many points ({})", np + nnp);
-            throw new RuntimeException("need to many points");
+            throw new RuntimeException("need too many points");
         }
 
         TreePoint[] pr = new TreePoint[np + nnp];
