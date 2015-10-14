@@ -57,6 +57,7 @@ parser.add_argument('--save', nargs='?', const=True)
 parser.add_argument('--save-data', nargs='?', const=True)
 parser.add_argument('--connections', action='store_true')
 parser.add_argument('--reactions', action='store_true')
+parser.add_argument('--units', choices={'ms', 'ns'}, default='ms')
 parser.add_argument('--dependencies', action='store_true')
 parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
@@ -338,13 +339,17 @@ def _productions_dot(dst, species, reactants, r_stoichio, products, p_stoichio, 
         print()
     print('}', file=dst)
 
-def format_num(num):
-    return re.sub(r'e[+-]0*(\d+)', r'\cdot 10^{\1}', str(num))
+def format_num(num, unit):
+    assert unit in {'ms', 'ns'}
+    if unit == 'ns':
+        num *= 1e3
+    s = re.sub(r'e[+-]0*(\d+)', r'\cdot 10^{\1}', str(num))
+    return s + r'/\mathrm{%s}' % (unit,)
 
-def _reaction_name_tex(rr, rr_s, pp, pp_s, species, forward, backward, align=True):
-    forward = format_num(forward)
+def _reaction_name_tex(rr, rr_s, pp, pp_s, species, forward, backward, unit, align=True):
+    forward = format_num(forward, unit)
     if backward:
-        backward = format_num(backward)
+        backward = format_num(backward, unit)
         arrow = r'\xleftrightarrow'
     else:
         backward = ''
@@ -352,7 +357,7 @@ def _reaction_name_tex(rr, rr_s, pp, pp_s, species, forward, backward, align=Tru
     aligner = '&' if align else ''
     joiner = r'%s%s[%s]{%s}' % (aligner, arrow, backward, forward) # /\mathrm{ms}
     return joiner.join(
-        ('+'.join('%s\specie{%s}' % (s if s > 1 else '', species[r])
+        ('+'.join('%s\species{%s}' % (s if s > 1 else '', species[r])
                   for r, s in zip(rr_, ss_)
                   if r >= 0)
          for rr_, ss_ in ((rr, rr_s), (pp, pp_s))))
@@ -362,9 +367,9 @@ def _tex_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates,
                                            reactants, r_stoichio,
                                            products, p_stoichio, rates):
         if i in reversibles and i < reversibles[i]:
-            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, rates[reversibles[i]])
+            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, rates[reversibles[i]], opts.units)
         else:
-            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, None)
+            yield _reaction_name_tex(rr, rr_s, pp, pp_s, species, rate, None, opts.units)
 
 def _productions_tex(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
     print(r'\begin{align*}')
