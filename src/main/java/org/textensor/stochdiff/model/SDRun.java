@@ -85,7 +85,7 @@ public class SDRun implements IOutputSet {
      * How many times our calculated allowed leap must be longer than
      * normal event waiting time, for us to choose leaping.
      */
-    public double leap_min_jump = 10;
+    public double leap_min_jump = 2;
 
     public String calculation;
 
