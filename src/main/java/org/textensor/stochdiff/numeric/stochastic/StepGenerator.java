@@ -51,45 +51,6 @@ public abstract class StepGenerator {
                             this.random.gaussian(), this.random.random());
     }
 
-    //<--WK
-    // based on RC's email on 5-17-2007
-    //<--RO & WK
-    // changed gaussianStep to accept another argument ",
-    // int np)"; before it was hardcoded as 10 (on 7 11 2008)
-    //RO & WK-->
-    private static int gaussianStep(int n, double p, double grv, double urv, double prv, int np)
-    {
-        double rngo = 0.0;
-
-        if (n*p < np)
-        {
-            rngo = prv;
-        }
-        else
-        {
-            rngo = (p * n + grv * Math.sqrt(n * p * (1. - p)));
-        }
-
-        int ngo = (int)rngo;
-        if (rngo - ngo > urv) {
-            ngo += 1;
-        }
-        return ngo;
-    }
-    //WK-->
-
-    public int gaussianStep(int n, double p, int np) {
-        double
-            g = this.random.gaussian(),
-            r = this.random.random(),
-            u = this.random.poisson(n * p);
-
-        return gaussianStep(n, p,
-                            g, r, u,
-                            np);
-    }
-
-
     /**
      * This just uses the poisson variance in combination with a gaussian random.
      * The alternative is to use a real poisson variable with the desired mean, but the
@@ -145,7 +106,7 @@ public abstract class StepGenerator {
         switch(mode) {
         case BINOMIAL:
             if (n * p < NP) {
-                ngo = this.gaussianStep(n, p, NP);
+                ngo = this.random.poisson(n * p);
                 msg = "n*p < " + NP;
             } else {
                 ngo = this.gaussianStep(n, p);
