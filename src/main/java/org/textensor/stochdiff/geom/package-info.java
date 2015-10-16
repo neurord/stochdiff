@@ -10,3 +10,5 @@
  * The class Geom contains utility methods that creates the G* classes from instances of
  * the interfaces.
  */
+
+package org.textensor.stochdiff.geom;

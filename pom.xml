@@ -59,6 +59,9 @@
           <source>${project.jdk_version}</source>
           <target>${project.jdk_version}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
+          <compilerArgs>
+            <arg>-Xpkginfo:always</arg>
+          </compilerArgs>
         </configuration>
 
         <executions>
