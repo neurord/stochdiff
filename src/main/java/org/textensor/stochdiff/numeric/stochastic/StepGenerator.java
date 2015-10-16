@@ -6,17 +6,6 @@ import static org.textensor.stochdiff.numeric.BaseCalc.distribution_t;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/*
- * Return the integer number of particles that going to move (or
- * reactions to occur) as a function of:
- * the probability, p, that one will move/occur
- * the number, n,  of particles of the given type in the volume element
- * a uniform random number r
- *
- * This is an abstract class - it just defines the method. Particular
- * instances evaluate the function in different ways.
- */
-
 public abstract class StepGenerator {
     static final Logger log = LogManager.getLogger();
 
@@ -33,19 +22,30 @@ public abstract class StepGenerator {
 
     protected abstract int nGo(int n, double p, double r);
 
+    /*
+     * Return the number of successes in n trials, with probability of success
+     * in a single trial p.
+     *
+     * @param n: number of trials
+     * @param p: probabilify of a success in one trial
+     * @returns: number of successes
+     */
     public int nGo(int n, double p) {
         return this.nGo(n, p, this.random.random());
     }
 
     private static int gaussianStep(int n, double p, double grv, double urv) {
-        double rngo = (p * n + grv * Math.sqrt(n * p * (1. - p)));
+        final double rngo = p * n + grv * Math.sqrt(n * p * (1 - p));
         int ngo = (int)rngo;
-        if (rngo - ngo > urv) {
+        if (rngo - ngo > urv)
             ngo += 1;
-        }
+
         return ngo;
     }
 
+    /**
+     * Generate a random number from the normal distribution np±√(np(1-p)).
+     */
     public int gaussianStep(int n, double p) {
         return gaussianStep(n, p,
                             this.random.gaussian(), this.random.random());
@@ -96,7 +96,7 @@ public abstract class StepGenerator {
      * cost is substantially greater (ten times or so).
      */
     private static int poissonStep(double np, double grv, double urv) {
-        double rngo = np + grv * Math.sqrt(np); //WK: removed Math.round per RC's email on 5-17-2007
+        double rngo = np + grv * Math.sqrt(np);
         int ngo = (int)rngo;
         ngo += (rngo - ngo > urv ? 1 : 0);
         if (ngo >= 0)
@@ -106,6 +106,11 @@ public abstract class StepGenerator {
         return 0;
     }
 
+
+    /**
+     * Generate a number form the approximate Poisson distribution with
+     * average np.
+     */
     public int poissonStep(double np) {
         return poissonStep(np, this.random.gaussian(), this.random.random());
     }
