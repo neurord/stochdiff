@@ -20,7 +20,7 @@ public abstract class StepGenerator {
     public final static int NMAX_STOCHASTIC = 120;
     public final static int NP = 30;         // AB Changed from 20 to 30. 2011.09.23
 
-    protected abstract int nGo(int n, double p, double r);
+    protected abstract int nGo(int n, double lnp, double r);
 
     /*
      * Return the number of successes in n trials, with probability of success
@@ -30,8 +30,8 @@ public abstract class StepGenerator {
      * @param p: probabilify of a success in one trial
      * @returns: number of successes
      */
-    public int nGo(int n, double p) {
-        return this.nGo(n, p, this.random.random());
+    public int nGo(int n, double lnp) {
+        return this.nGo(n, lnp, this.random.random());
     }
 
     private static int gaussianStep(int n, double p, double grv, double urv) {
