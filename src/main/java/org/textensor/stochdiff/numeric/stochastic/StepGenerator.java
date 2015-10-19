@@ -86,7 +86,11 @@ public abstract class StepGenerator {
     public int versatile_ngo(String descr, int n, double p) {
         final int ngo;
 
-        if (n == 1)
+        assert n >= 0;
+
+        if (n == 0)
+            return 0;
+        else if (n == 1)
             ngo = this.random.random() < p ? 1 : 0;
         else if (n < NMAX_STOCHASTIC) {
             ngo  = this.nGo(n, Math.log(p));
