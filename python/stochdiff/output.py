@@ -305,8 +305,9 @@ class Output(object):
 
     @functools.lru_cache()
     def simulations(self):
-        trials = self.file.list_nodes('/')
-        sims = [Simulation(trial.simulation, self.model) for trial in trials]
+        nodes = self.file.list_nodes('/')
+        sims = [Simulation(node.simulation, self.model) for node in nodes
+                if node._v_name.startswith('trial')]
         sims.sort(key=operator.attrgetter('number'))
         return sims
 
