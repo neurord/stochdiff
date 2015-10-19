@@ -104,7 +104,7 @@ def detect_upstates(y, min_high_ratio=0.50, P_high=0.25, P_low=0.60, upstates=No
         # and the part until the last halfway point as high.
         thresh = (high - low) / 2
         above = np.flatnonzero( y[start_i : i] >= thresh ) + start_i
-        print(low_i, i, above)
+        #print(low_i, i, above)
         if downstates:
             yield (last_high_end + 0.5, above[0] - 0.5)
         if upstates:
@@ -112,7 +112,7 @@ def detect_upstates(y, min_high_ratio=0.50, P_high=0.25, P_low=0.60, upstates=No
         last_high_end = above[-1]
 
         low_i, low = i, y[i]
-        print('low:', low_i, low)
+        #print('low:', low_i, low)
 
         for i in range(low_i, len(y)):
             if y[i] < low:
@@ -126,7 +126,7 @@ def detect_upstates(y, min_high_ratio=0.50, P_high=0.25, P_low=0.60, upstates=No
             break
 
         high_i, high = i, y[i]
-        print('high:', high_i, high)
+        #print('high:', high_i, high)
 
 def state_lifetime(states):
     times = np.fromiter((end - start for (start, end) in states), dtype=float)
