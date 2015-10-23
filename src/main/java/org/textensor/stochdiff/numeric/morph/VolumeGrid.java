@@ -300,7 +300,7 @@ public class VolumeGrid {
         }
 
         return new Vector<>(Arrays.asList(new Object[]
-            {x0, y0, z0, x1, y1, x1, x2, y2, z2, x3, y3, z3, volume, deltaZ}));
+            {x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, volume, deltaZ}));
     }
 
     public String getLabel(int i) {
