@@ -7,37 +7,33 @@ import java.util.ArrayList;
 import org.textensor.stochdiff.geom.Position;
 
 public abstract class VolumeElement {
-    double cx;
-    double cy;
-    double cz;
+    protected double cx;
+    protected double cy;
+    protected double cz;
 
     String label;
     String region;
 
-    double volume;
-    double deltaZ;
-    double exposedArea;
+    protected double volume;
+    protected double deltaZ;
+    protected double exposedArea;
 
-    private int icache;
+    protected int icache;
 
-    double alongArea;
-    double sideArea;
-    double topArea;
+    protected double alongArea;
+    protected double sideArea;
+    protected double topArea;
 
-    ArrayList<ElementConnection> connections;
+    protected ArrayList<ElementConnection> connections;
 
-    Position[] boundary;
-
-    Position[] surfaceBoundary = null;
+    protected Position[] boundary;
+    protected  Position[] surfaceBoundary;
 
     boolean fixcon = false;
 
+    boolean submembrane = false; //true if this volume element lies on submembrane
 
-    boolean submembrane = false; //true ifn this volume element lies on submembrane
-
-
-    String groupID = null;
-
+    protected String groupID;
 
     public void setAlongArea(double d) {
         alongArea = d;
@@ -125,8 +121,16 @@ public abstract class VolumeElement {
         volume = v;
     }
 
+    public double getVolume() {
+        return this.volume;
+    }
+
     public void setDeltaZ(double d) {
         deltaZ = d;
+    }
+
+    public double getDeltaZ() {
+        return this.deltaZ;
     }
 
     public void setExposedArea(double ea) {
@@ -141,20 +145,13 @@ public abstract class VolumeElement {
         connections.add(new ElementConnection(this, vx, ca));
     }
 
-    public double getVolume() {
-        return volume;
-    }
-
     public double getExposedArea() {
         return exposedArea;
     }
 
-
-    //<--WK
     public boolean getSubmembrane() {
         return submembrane;
     }
-    //WK-->
 
     public void cache(int ind) {
         icache = ind;
@@ -164,16 +161,20 @@ public abstract class VolumeElement {
         return icache;
     }
 
-    public void setBoundary(Position[] pbdry) {
-        boundary = pbdry;
+    public void setBoundary(Position[] boundary) {
+        this.boundary = boundary;
     }
 
-    public void setSurfaceBoundary(Position[] psb) {
-        surfaceBoundary = psb;
+    public Position[] getBoundary() {
+        return this.boundary;
+    }
+
+    public void setSurfaceBoundary(Position[] boundary) {
+        this.surfaceBoundary = boundary;
     }
 
     public Position[] getSurfaceBoundary() {
-        return surfaceBoundary;
+        return this.surfaceBoundary;
     }
 
     public String getAsText() {
@@ -207,16 +208,16 @@ public abstract class VolumeElement {
     public String getAsPlainText() {
         StringBuffer sb = new StringBuffer();
         for(double p: this.getAsNumbers())
-            sb.append(String.format("%s%.5g", sb.length() > 0 ? " " : "", p));
+            sb.append(String.format("_%s%.5g_", sb.length() > 0 ? " " : "", p));
         return sb.toString();
     }
 
-    public double[] getAsNumbers() {
+    private double[] getAsNumbers() {
         // export boundary if have it, or just the center point;
         if (boundary != null) {
             double ans[] = new double[3 * boundary.length + 2];
             int i = 0;
-            for (Position p: boundary) {
+            for (Position p: this.getBoundary()) {
                 ans[i++] = p.getX();
                 ans[i++] = p.getY();
                 ans[i++] = p.getZ();

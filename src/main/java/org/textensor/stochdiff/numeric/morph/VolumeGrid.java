@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import org.textensor.stochdiff.disc.CurvedVolumeSlice;
 import org.textensor.stochdiff.geom.Geom;
+import org.textensor.stochdiff.geom.Position;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -279,22 +280,23 @@ public class VolumeGrid {
             volume = new double[nelement], deltaZ = new double[nelement];
         int i = 0;
         for (VolumeElement el: elements) {
-            double pp[] = el.getAsNumbers();
-            x0[i] = pp[0];
-            y0[i] = pp[1];
-            z0[i] = pp[2];
-            x1[i] = pp[3];
-            y1[i] = pp[4];
-            z1[i] = pp[5];
-            x2[i] = pp[6];
-            y2[i] = pp[7];
-            z2[i] = pp[8];
-            x3[i] = pp[9];
-            y3[i] = pp[10];
-            z3[i] = pp[11];
-            volume[i] = pp[12];
-            deltaZ[i] = pp[13];
-            assert 14 == pp.length;
+            Position[] boundary = el.getBoundary();
+            assert boundary.length == 4; /* we do not support anything else atm */
+
+            x0[i] = boundary[0].getX();
+            y0[i] = boundary[0].getY();
+            z0[i] = boundary[0].getZ();
+            x1[i] = boundary[1].getX();
+            y1[i] = boundary[1].getY();
+            z1[i] = boundary[1].getZ();
+            x2[i] = boundary[2].getX();
+            y2[i] = boundary[2].getY();
+            z2[i] = boundary[2].getZ();
+            x3[i] = boundary[3].getX();
+            y3[i] = boundary[3].getY();
+            z3[i] = boundary[3].getZ() + el.getDeltaZ();
+            volume[i] = el.getVolume();
+            deltaZ[i] = el.getDeltaZ();
 
             i++;
         }
