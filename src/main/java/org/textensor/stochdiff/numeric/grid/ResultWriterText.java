@@ -248,20 +248,21 @@ public class ResultWriterText implements ResultWriter {
 
         log.info("Written elements mesh file");
 
-        for (IOutputSet out: this.outputSets) {
-            String sibsuf = "-" + out.getIdentifier() + "-conc.txt";
-            String shead = getGridConcsHeadings_dumb(out, vgrid, source);
-            StringTokenizer st = new StringTokenizer(shead);
-            int nt = st.countTokens();
+        if (this.outputSets != null)
+            for (IOutputSet out: this.outputSets) {
+                String sibsuf = "-" + out.getIdentifier() + "-conc.txt";
+                String shead = getGridConcsHeadings_dumb(out, vgrid, source);
+                StringTokenizer st = new StringTokenizer(shead);
+                int nt = st.countTokens();
 
-            if (this.isContinuation()) {
-                ResultWriterText sibrw = this.getRawSibling(sibsuf);
-                sibrw.pruneFrom("", 0, startTime);
-                sibrw.init(null);
-            } else {
-                this.writeToSiblingFile(shead, sibsuf);
+                if (this.isContinuation()) {
+                    ResultWriterText sibrw = this.getRawSibling(sibsuf);
+                    sibrw.pruneFrom("", 0, startTime);
+                    sibrw.init(null);
+                } else {
+                    this.writeToSiblingFile(shead, sibsuf);
+                }
             }
-        }
     }
 
     private String formatNumber(int i, int outj, IGridCalc source) {
