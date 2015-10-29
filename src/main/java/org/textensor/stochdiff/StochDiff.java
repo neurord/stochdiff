@@ -21,6 +21,8 @@ import org.textensor.util.Settings;
 public class StochDiff {
     static final Logger log = LogManager.getLogger("stochdiff");
 
+    final static boolean log_to_file = Settings.getProperty("stochdiff.log", true);
+
     static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     // The main method - a bit of basic checking and if all is well, create the
@@ -103,12 +105,18 @@ public class StochDiff {
             outputFile = new File(s);
         }
 
+        final String logfile = outputFile + ".log";
+
         setLogLevels();
 
-        final String logfile = outputFile + ".log";
-        CustomFileAppender.addFileAppender(logfile);
+        if (log_to_file)
+            CustomFileAppender.addFileAppender(logfile);
 
+        /* Write out the version, after opening the log file. */
         log.info("{}", Settings.getProgramVersion());
+
+        if (log_to_file)
+            log.info("Writing logs to {}", logfile);
 
         SDRun sdModel = loader.unmarshall(modelFile);
 
