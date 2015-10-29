@@ -162,6 +162,21 @@
                   <goal>run</goal>
                 </goals>
               </execution>
+              <execution>
+                <id>fuck-me</id>
+                <phase>compile</phase>
+                <configuration>
+                  <target>
+                    <exec executable="rm"
+                          failifexecutionfails="false">
+                      <arg value="target/classes/META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat" />
+                    </exec>
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
             </executions>
       </plugin>
 
