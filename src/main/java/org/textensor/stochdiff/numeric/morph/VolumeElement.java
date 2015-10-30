@@ -208,7 +208,7 @@ public abstract class VolumeElement {
     public String getAsPlainText() {
         StringBuffer sb = new StringBuffer();
         for(double p: this.getAsNumbers())
-            sb.append(String.format("_%s%.5g_", sb.length() > 0 ? " " : "", p));
+            sb.append(String.format("%s%.5g", sb.length() > 0 ? " " : "", p));
         return sb.toString();
     }
 
