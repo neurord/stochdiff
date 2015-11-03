@@ -1478,6 +1478,9 @@ public class NextEventQueue {
                      tolerance, leap_min_jump);
         else
             log.info("Leaping disabled");
+
+        if (log_propensity && !check_updates)
+            log.warn("stochdiff.neq.log_propensity has no effect without stochdiff.neq.check_updates");
     }
 
     ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {
