@@ -486,14 +486,18 @@ public class NextEventQueue {
                             higher = true;
                     }
                     log.log(higher && lower ? Level.DEBUG : Level.ERROR,
-                            "{}: propensity changed {} → {} (n={} → {}), extent={}",
-                            this, old, this.propensity, old_pop, pop, this.extent);
+                            "{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
+                            this, old, this.propensity,
+                            (this.propensity - old) / old,
+                            old_pop, pop, this.extent);
                     if (!(higher && lower))
                         throw new RuntimeException();
                 } else if (log_propensity) {
                     log.debug("particles el.{}: {}", this.element(), particles[this.element()]);
-                    log.debug("{}: propensity changed {} → {} (n={} → {}), extent={}",
-                              this, old, this.propensity, old_pop, pop, this.extent);
+                    log.debug("{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
+                              this, old, this.propensity,
+                              (this.propensity - old) / old,
+                              old_pop, pop, this.extent);
                 }
 
                 this.old_pop = pop;
