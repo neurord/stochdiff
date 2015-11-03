@@ -170,6 +170,7 @@
                   <target>
                     <exec executable="rm"
                           failifexecutionfails="false">
+                      <arg value="-f" />
                       <arg value="target/classes/META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat" />
                     </exec>
                   </target>
