@@ -1056,12 +1056,11 @@ public class NextEventQueue {
          * Make sure that the propensity of *this* reaction does not change
          * too much. Based on the equation:
          *   da/dX_i / a = n_i / X_i
-         * @returns the leap limit that would change propensity by 1
+         * @returns the leap length that would change propensity by 1
          *          in the linear approximation
          */
         protected int self_leap_limit(int[] X) {
             final int[] reactants = this.reactants();
-            final int[] stoichiometry = this.reactant_stoichiometry();
             int limit = Integer.MAX_VALUE;
             for (int i = 0; i < reactants.length; i++)
                 limit = Math.min(limit, X[reactants[i]] / this.reactant_powers[i]);
@@ -1087,14 +1086,16 @@ public class NextEventQueue {
 
             int[] X = particles[this.element()];
             int limit2 = this.self_leap_limit(X);
-            double propensity = this.propensity;
-            double time = limit2 / propensity;
+            double time = limit2 / this.propensity;
             int limit3 = -1;
+            final double effective_propensity;
 
-            if (this.reverse != null) {
+            if (this.reverse == null)
+                effective_propensity = this.propensity;
+            else {
                 limit3 = ((NextReaction) this.reverse).self_leap_limit(X);
                 time = Math.min(time, limit3 / this.reverse.propensity);
-                propensity = Math.abs(propensity - this.reverse.propensity);
+                effective_propensity = Math.abs(this.propensity - this.reverse.propensity);
             }
 
             /* The result is the minimum of the three limits:
@@ -1102,13 +1103,13 @@ public class NextEventQueue {
                - the forward reaction, which cares about the forward rate
                - the reverse reaction, which cares about the reverse rate
             */
-            time = tolerance * Math.min(limit1 / propensity, time);
+            time = tolerance * Math.min(limit1 / effective_propensity, time);
 
             log.debug("{}: leap time: subs {}×{}, ɛ={}, pop.{}→{} → limit {},{},{} → leap={}",
                       this,
                       this.substrates, this.substrate_stoichiometry,
                       tolerance, this.reactantPopulation(), this.productPopulation(),
-                      limit1, limit2, limit3 < 0 ? "-" : limit3,
+                      limit1, limit2, limit3 == -1 ? "-" : limit3,
                       time);
 
             /* Make sure time is NaN or >= 0. */
