@@ -492,13 +492,11 @@ public class NextEventQueue {
                             old_pop, pop, this.extent);
                     if (!(higher && lower))
                         throw new RuntimeException();
-                } else if (log_propensity) {
-                    log.debug("particles el.{}: {}", this.element(), particles[this.element()]);
+                } else if (log_propensity)
                     log.debug("{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
                               this, old, this.propensity,
                               (this.propensity - old) / old,
                               old_pop, pop, this.extent);
-                }
 
                 this.old_pop = pop;
             }
@@ -1058,13 +1056,24 @@ public class NextEventQueue {
          *   da/dX_i / a = n_i / X_i
          * @returns the leap length that would change propensity by 1
          *          in the linear approximation
+         *
+         * a = r A^nA B B^nB ...
+         * Δa = a y nA / A + a y nB / B + ...
+         * Δa/a = (nA/A + nB/B + ...) y = 1
+         * y = 1 / (nA/A + nB/B + ...)
          */
-        protected int self_leap_limit(int[] X) {
+        protected double self_leap_limit(int[] X) {
             final int[] reactants = this.reactants();
-            int limit = Integer.MAX_VALUE;
-            for (int i = 0; i < reactants.length; i++)
-                limit = Math.min(limit, X[reactants[i]] / this.reactant_powers[i]);
-            return limit;
+            if (reactants.length == 0)
+                return Double.POSITIVE_INFINITY;
+            else if (reactants.length == 1)
+                return (double) X[reactants[0]] / (this.reactant_powers[0] * this.reactant_stoichiometry()[0]);
+            else {
+                double mult = 0;
+                for (int i = 0; i < reactants.length; i++)
+                    mult += (double) this.reactant_powers[i] * this.reactant_stoichiometry()[0] / X[reactants[i]];
+                return 1 / mult;
+            }
         }
 
         @Override
@@ -1085,9 +1094,9 @@ public class NextEventQueue {
             }
 
             int[] X = particles[this.element()];
-            int limit2 = this.self_leap_limit(X);
+            final double limit2 = this.self_leap_limit(X);
             double time = limit2 / this.propensity;
-            int limit3 = -1;
+            double limit3 = -1;
             final double effective_propensity;
 
             if (this.reverse == null)
@@ -1099,9 +1108,12 @@ public class NextEventQueue {
             }
 
             /* The result is the minimum of the three limits:
-               - the dependent reactions, which only care about the effective rate
-               - the forward reaction, which cares about the forward rate
-               - the reverse reaction, which cares about the reverse rate
+               - tolerance * limit1 / effective_propensity:
+                     the dependent reactions, which only care about the effective rate
+               - tolerance * limit2 / this.propensity:
+                     the forward reaction, which cares about the forward rate
+               - tolerance * limit3 / this.reverse.propensity:
+                     the reverse reaction, which cares about the reverse rate
             */
             time = tolerance * Math.min(limit1 / effective_propensity, time);
 
