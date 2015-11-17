@@ -286,7 +286,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    protected class ConcentrationOutput {
+    protected class PopulationOutput {
         final H5ScalarDS concs;
         final int[][][] concs_cache;
         final H5ScalarDS times;
@@ -296,15 +296,15 @@ public class ResultWriterHDF5 implements ResultWriter {
         final int[] ispecout;
         final int[] elements;
 
-        public ConcentrationOutput(Group parent, String name, int[] elements, int[] ispecout)
+        public PopulationOutput(Group parent, String name, int[] elements, int[] ispecout)
             throws Exception
         {
             this.ispecout = ispecout;
             this.elements = elements;
 
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
-            this.concs = createExtensibleArray("concentrations", parent, int_t,
-                                               "concentrations of species in voxels over time",
+            this.concs = createExtensibleArray("population", parent, int_t,
+                                               "population of species in voxels over time",
                                                "[snapshot × nel × nspecout]",
                                                "count",
                                                CACHE_SIZE1, elements.length, ispecout.length);
@@ -319,7 +319,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.times_cache = new double[CACHE_SIZE1];
         }
 
-        public void writeConcentrations(double time, IGridCalc source)
+        public void writePopulation(double time, IGridCalc source)
             throws Exception
         {
             getGridNumbers(this.concs_cache[this.concs_times_count],
@@ -328,10 +328,10 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.concs_times_count++;
 
             if (this.concs_times_count == this.times_cache.length)
-                this.flushConcentrations(time);
+                this.flushPopulation(time);
         }
 
-        public void flushConcentrations(double time)
+        public void flushPopulation(double time)
             throws Exception
         {
             if (this.concs_times_count == 0)
@@ -368,8 +368,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected Group model;
         protected Group output_info;
         protected final Group sim;
-        protected ConcentrationOutput concs1;
-        protected List<ConcentrationOutput> concs2 = new ArrayList<>();
+        protected PopulationOutput concs1;
+        protected List<PopulationOutput> concs2 = new ArrayList<>();
         protected H5ScalarDS stimulation_events;
         protected H5ScalarDS diffusion_events;
         protected H5ScalarDS reaction_events;
@@ -392,11 +392,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void close()
             throws Exception
         {
-            this.concs1.flushConcentrations(Double.POSITIVE_INFINITY);
+            this.concs1.flushPopulation(Double.POSITIVE_INFINITY);
             if (this.events_cache != null)
                 this.flushEvents(Double.POSITIVE_INFINITY, true);
-            for (ConcentrationOutput output: this.concs2)
-                output.flushConcentrations(Double.POSITIVE_INFINITY);
+            for (PopulationOutput output: this.concs2)
+                output.flushPopulation(Double.POSITIVE_INFINITY);
         }
 
         protected Group model() throws Exception {
@@ -717,7 +717,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         public void _writeOutput1(double time, IGridCalc source)
             throws Exception
         {
-            this.writeConcentrations1(time, source);
+            this.writePopulation1(time, source);
             this.writeStimulationEvents(time, source);
             this.writeDiffusionEvents(time, source);
             this.writeReactionEvents(time, source);
@@ -727,15 +727,15 @@ public class ResultWriterHDF5 implements ResultWriter {
         public void _writeOutput2(int i, double time, IGridCalc source)
             throws Exception
         {
-            this.writeConcentrations2(i, time, source);
+            this.writePopulation2(i, time, source);
         }
 
-        private int _initConcentrations1 = -1;
-        protected boolean initConcentrations1(IGridCalc source)
+        private int _initPopulation1 = -1;
+        protected boolean initPopulation1(IGridCalc source)
             throws Exception
         {
-            if (this._initConcentrations1 >= 0)
-                return this._initConcentrations1 > 0;
+            if (this._initPopulation1 >= 0)
+                return this._initPopulation1 > 0;
 
             assert this.concs1 == null;
 
@@ -744,17 +744,17 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.writeRegionLabels(source);
             }
 
-            this._initConcentrations1 = ispecout1.length > 0 ? 1 : 0;
+            this._initPopulation1 = ispecout1.length > 0 ? 1 : 0;
 
-            if (this._initConcentrations1 > 0) {
-                this.concs1 = new ConcentrationOutput(this.sim, "out", ArrayUtil.iota(nel), ispecout1);
+            if (this._initPopulation1 > 0) {
+                this.concs1 = new PopulationOutput(this.sim, "out", ArrayUtil.iota(nel), ispecout1);
                 return true;
             }
 
             return false;
         }
 
-        protected boolean initConcentrations2(int i, IGridCalc source)
+        protected boolean initPopulation2(int i, IGridCalc source)
             throws Exception
         {
             if (i >= this.concs2.size() || this.concs2.get(i) == null) {
@@ -763,29 +763,29 @@ public class ResultWriterHDF5 implements ResultWriter {
 
                 String ident = set.getIdentifier();
                 Group group = output.createGroup(ident, this.sim);
-                ConcentrationOutput conc = new ConcentrationOutput(group, ident, elementsout2[i], ispecout2[i]);
+                PopulationOutput conc = new PopulationOutput(group, ident, elementsout2[i], ispecout2[i]);
                 this.concs2.add(i, conc);
             }
 
             return true;
         }
 
-        protected void writeConcentrations1(double time, IGridCalc source)
+        protected void writePopulation1(double time, IGridCalc source)
             throws Exception
         {
-            if (!this.initConcentrations1(source))
+            if (!this.initPopulation1(source))
                 return;
 
-            this.concs1.writeConcentrations(time, source);
+            this.concs1.writePopulation(time, source);
         }
 
-        protected void writeConcentrations2(int i, double time, IGridCalc source)
+        protected void writePopulation2(int i, double time, IGridCalc source)
             throws Exception
         {
-            if (!this.initConcentrations2(i, source))
+            if (!this.initPopulation2(i, source))
                 return;
 
-            this.concs2.get(i).writeConcentrations(time, source);
+            this.concs2.get(i).writePopulation(time, source);
         }
 
         protected void initStimulationEvents(int elements, int species)

@@ -225,7 +225,7 @@ class Simulation(object):
         return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
     def counts(self):
-        data = self._element.concentrations
+        data = self._element.population
         panel= pd.Panel(data.read(),
                         items=self.times(),
                         major_axis=range(data.shape[1]),
