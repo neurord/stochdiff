@@ -254,7 +254,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             return;
 
         try {
-            Trial t = this.getTrial(source.trial());
+            Trial t = this.getTrial(0);
             t._writeGrid(vgrid, startTime, source);
 
             t.writeSimulationData(source);
@@ -262,6 +262,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             t.writeReactionData(source);
             t.writeReactionDependencies(source);
             t.writeOutputInfo();
+            t.writeSpecies();
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
