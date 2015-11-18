@@ -4,6 +4,7 @@
 r"""
 Wrapper which makes reading stochdiff HDF5 output easier to use
 
+>>> from stochdiff.output import Output
 >>> out = Output('model.h5')
 
 Units: concentrations are expressed in nM and volumes in cubic microns.
@@ -56,7 +57,10 @@ class Dependencies(object):
     ...                         deps.descriptions(),
     ...                         deps.dependent()):
     ...     print('type {} in voxel {} "{}" dependent: {}'.format(t, e, d, dep))
-    type 0 in voxel 0 "NextReaction el.0 A→n" dependent: []
+    type 0 in voxel 0 "NextReaction el.0 A+B→C" dependent: [1]
+    type 0 in voxel 0 "NextReaction el.0 2×C→D" dependent: [2]
+    type 0 in voxel 0 "NextReaction el.0 D→2×C" dependent: [1]
+    type 2 in voxel 0 "NextStimulation el.0 B" dependent: [0]
     """
     def __init__(self, element):
         self._element = element
@@ -95,15 +99,15 @@ class Reactions(object):
     >>> out = Output('model.h5')
     >>> reactions = out.model.reactions
     >>> list(reactions.reactants())
-    [[0]]
+    [[0, 1], [2], [3]]
     >>> list(reactions.reactant_stoichiometry())
-    [[1]]
+    [[1, 1], [2], [1]]
     >>> list(reactions.products())
-    [[]]
+    [[2], [3], [2]]
     >>> list(reactions.product_stoichiometry())
-    [[]]
+    [[1], [1], [2]]
     >>> list(reactions.rates())
-    [0.002]
+    [1.0000000000000001e-05, 9.9999999999999995e-07, 1.0000000000000001e-05]
     """
     def __init__(self, element):
         self._element = element
@@ -162,8 +166,8 @@ class Model(object):
         indices to actual names.
 
         >>> model = Output('model.h5').model
-        >>> model.species
-        ['A']
+        >>> model.species()
+        ['A', 'B', 'C', 'D']
         """
         what = self._element.species[indices] if indices is not None else self._element.species
         return list(sp.decode('utf-8') for sp in what)
@@ -175,10 +179,13 @@ class Model(object):
 
         >>> model = Output('model.h5').model
         >>> grid = model.grid()
+
+        >>> import textwrap
         >>> names = grid.dtype.names
         >>> print(textwrap.fill(' '.join(names), width=40))
         x0 y0 z0 x1 y1 z1 x2 y2 z2 x3 y3 z3
         volume deltaZ label region type group
+
         >>> grid.volume
         array([ 2.])
 
@@ -252,7 +259,7 @@ class Simulation(object):
         >>> xml
         <Element {http://stochdiff.textensor.org}SDRun at 0x...>
         >>> xml.find('./ns:geometry', {'ns':'http://stochdiff.textensor.org'}).text
-        2D
+        '2D'
         """
 
         xml = self.model._element.serialized_config
@@ -307,7 +314,7 @@ class Output(object):
     @functools.lru_cache()
     def simulations(self):
         nodes = self.file.list_nodes('/')
-        sims = [Simulation(node.simulation, self.model) for node in nodes
+        sims = [Simulation(node, self.model) for node in nodes
                 if node._v_name.startswith('trial')]
         sims.sort(key=operator.attrgetter('number'))
         return sims
@@ -319,27 +326,28 @@ class Output(object):
         >>> out = Output('model.h5')
         >>> counts = out.counts()
         >>> counts.head(1)
-                                   count
-        voxel time specie trial
-        0     0    A      0      1204428
+                                 count
+        voxel time specie trial       
+        0     0    A      0       1265
 
         Calculate average over trials
 
         >>> gb = counts.groupby(level='voxel time  specie'.split())
         >>> gb.mean().head(1)
-                                    count
-        voxel time specie
-        0     0    A       1204428.433333
+                             count
+        voxel time specie         
+        0     0    A       1264.67
 
         Calculate mean and standard deviation
 
+        >>> import numpy as np
         >>> gb.aggregate([np.mean, np.std]).head(3)
-                                    count
-                                     mean         std
-        voxel time specie
-        0     0    A       1204428.433333    0.504007
-              5    A       1192430.800000  123.919440
-              10   A       1180586.466667  179.969870
+                             count          
+                              mean       std
+        voxel time specie                   
+        0     0    A       1264.67  0.472582
+                   B       1204.47  0.501614
+                   C          0.00  0.000000
         """
         sims = self.simulations()
         data = dict((i, sim.counts())
@@ -356,13 +364,13 @@ class Output(object):
 
         >>> out = Output('model.h5')
         >>> out.counts().head(1)
-                                   count
-        voxel time specie trial
-        0     0    A      0      1204428
+                                 count
+        voxel time specie trial       
+        0     0    A      0       1265
         >>> out.concentrations().head(1)
                                  concentration
-        voxel time specie trial
-        0     0    A      0      999999.702764
+        voxel time specie trial               
+        0     0    A      0         1050.29078
         """
         counts = self.counts()
         volumes = self.model.grid().volume
