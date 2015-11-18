@@ -74,7 +74,6 @@ public class ResultWriterHDF5 implements ResultWriter {
     final List<? extends IOutputSet> outputSets;
 
     protected Group model;
-    protected Group output_info;
 
     public ResultWriterHDF5(File output,
                             IOutputSet primary,
@@ -196,15 +195,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         return this.model;
     }
 
-    protected Group output_info() throws Exception {
-        if (this.output_info == null) {
-            this.output_info = this.output.createGroup("output", this.model());
-            setAttribute(this.output_info, "TITLE", "output species");
-        }
-
-        return this.output_info;
-    }
-
     protected Trial getTrial(int trial)
         throws Exception
     {
@@ -247,24 +237,45 @@ public class ResultWriterHDF5 implements ResultWriter {
     };
 
     @Override
-    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
+    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source) {
+        try {
+            this._writeGrid(vgrid, startTime, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
+        throws Exception
     {
+        Trial t = this.getTrial(source.trial());
+        t.writeSimulationData(source);
+
         /* Only write stuff for the first trial to save time and space */
         if (source.trial() > 0)
             return;
 
-        try {
-            Trial t = this.getTrial(0);
-            t._writeGrid(vgrid, startTime, source);
+        Group model = this.model();
 
-            t.writeSimulationData(source);
-            t.writeStimulationData(source);
-            t.writeReactionData(source);
-            t.writeReactionDependencies(source);
-            t.writeOutputInfo();
-            t.writeSpecies();
-        } catch(Exception e) {
-            throw new RuntimeException(e);
+        t._writeGrid(vgrid, startTime, source);
+
+        writeSpeciesVector("species", "names of all species", model, species, null);
+
+        t.writeStimulationData(model, source);
+        t.writeReactionData(model, source);
+        t.writeReactionDependencies(model, source);
+
+        {
+            Group output_info = this.output.createGroup("output", model);
+            setAttribute(output_info, "TITLE", "output species");
+            t.writeOutputInfo(output_info);
+        }
+
+        {
+            String s = source.getSource().serialize();
+            Dataset ds = writeVector("serialized_config", model, s);
+            setAttribute(ds, "TITLE", "serialized config");
+            setAttribute(ds, "LAYOUT", "XML");
         }
     }
 
@@ -510,19 +521,6 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "LAYOUT", "seed");
                 setAttribute(ds, "UNITS", "number");
             }
-
-            {
-                String s = source.getSource().serialize();
-                Dataset ds = writeVector("serialized_config", this.sim, s);
-                setAttribute(ds, "TITLE", "serialized config");
-                setAttribute(ds, "LAYOUT", "XML");
-            }
-        }
-
-        protected void writeSpecies()
-            throws Exception
-        {
-            writeSpeciesVector("species", "names of all species", model(), species, null);
         }
 
         protected void writeRegionLabels(IGridCalc source)
@@ -535,12 +533,12 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "UNITS", "text");
         }
 
-        protected void writeStimulationData(IGridCalc source)
+        protected void writeStimulationData(Group parent, IGridCalc source)
             throws Exception
         {
             StimulationTable table = source.getSource().getStimulationTable();
 
-            Group group = output.createGroup("stimulation", model());
+            Group group = output.createGroup("stimulation", parent);
             setAttribute(group, "TITLE", "stimulation parameters");
 
             {
@@ -565,12 +563,12 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeReactionData(IGridCalc source)
+        protected void writeReactionData(Group parent, IGridCalc source)
             throws Exception
         {
             ReactionTable table = source.getSource().getReactionTable();
 
-            Group group = output.createGroup("reactions", model());
+            Group group = output.createGroup("reactions", parent);
             setAttribute(group, "TITLE", "reaction scheme");
 
             {
@@ -625,7 +623,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeReactionDependencies(IGridCalc source)
+        protected void writeReactionDependencies(Group parent, IGridCalc source)
             throws Exception
         {
             Collection<IGridCalc.Event> events = source.getEvents();
@@ -634,7 +632,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     return;
             }
 
-            Group group = output.createGroup("dependencies", model());
+            Group group = output.createGroup("dependencies", parent);
             setAttribute(group, "TITLE", "dependency scheme");
 
             {
@@ -700,19 +698,19 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(ds, "UNITS", "indices");
         }
 
-        protected void writeOutputInfo()
+        protected void writeOutputInfo(Group parent)
             throws Exception
         {
             /* We cannot use getNamesOfOutputSpecies() because it has various special
              * rules like support for "all". Instead we use precalulcated lists of species
              * indices. */
             if (ispecout1 != null)
-                writeOutputInfo(output_info(), "__main__", ispecout1, ArrayUtil.iota(nel));
+                writeOutputInfo(parent, "__main__", ispecout1, ArrayUtil.iota(nel));
 
             if (outputSets != null)
                 for (int i = 0; i < outputSets.size(); i++) {
                     IOutputSet set = outputSets.get(i);
-                    writeOutputInfo(output_info(),
+                    writeOutputInfo(parent,
                                     set.getIdentifier(), ispecout2[i], elementsout2[i]);
                 }
         }
@@ -741,7 +739,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     if (ispecout1.length == 0)
                         return false;
 
-                    ident = "general";
+                    ident = "__main__";
                     elements = ArrayUtil.iota(nel);
                     ispecout = ispecout1;
                 } else {
