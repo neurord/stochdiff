@@ -522,7 +522,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSpecies()
             throws Exception
         {
-            writeSpecieVector("species", "names of all species", model(), species, null);
+            writeSpeciesVector("species", "names of all species", model(), species, null);
         }
 
         protected void writeRegionLabels(IGridCalc source)
@@ -692,7 +692,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             Group group = output.createGroup(identifier, parent);
 
-            writeSpecieVector("species", "names of output species", group, species, which);
+            writeSpeciesVector("species", "names of output species", group, species, which);
 
             Dataset ds = writeVector("elements", group, elements);
             setAttribute(ds, "TITLE", "indices of output elements");
@@ -704,7 +704,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             /* We cannot use getNamesOfOutputSpecies() because it has various special
-             * rules like support for "all". Instead we use precalulcated lists of specie
+             * rules like support for "all". Instead we use precalulcated lists of species
              * indices. */
             if (ispecout1 != null)
                 writeOutputInfo(output_info(), "__main__", ispecout1, ArrayUtil.iota(nel));
@@ -1042,7 +1042,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.flushEvents(time, false);
         }
 
-        protected void writeSavedStateI(int nspecie, IGridCalc source)
+        protected void writeSavedStateI(int nspecies, IGridCalc source)
             throws Exception
         {
             int[][] state = {};
@@ -1061,7 +1061,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeSavedStateD(int nspecie, IGridCalc source)
+        protected void writeSavedStateD(int nspecies, IGridCalc source)
             throws Exception
         {
             double[][] state = {};
@@ -1085,11 +1085,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             log.debug("state saved at t={} ms for trial {}", time, source.trial());
             assert nel == source.getNumberElements();
-            int nspecie = source.getSource().getSpecies().length;
+            int nspecies = source.getSource().getSpecies().length;
             if (source.preferConcs())
-                this.writeSavedStateD(nspecie, source);
+                this.writeSavedStateD(nspecies, source);
             else
-                this.writeSavedStateI(nspecie, source);
+                this.writeSavedStateI(nspecies, source);
         }
 
         public Object _loadState(String filename, IGridCalc source)
@@ -1098,15 +1098,15 @@ public class ResultWriterHDF5 implements ResultWriter {
             // FIXME: This is totally not going to work, because we delete
             // the file on creation...
             Dataset obj = (Dataset) output.get("/simulation/state");
-            int nspecie = source.getSource().getSpecies().length;
+            int nspecies = source.getSource().getSpecies().length;
             if (obj == null)
                 throw new RuntimeException("state hasn't been saved");
             if (source.preferConcs()) {
                 double[] data = (double[]) obj.getData();
-                return ArrayUtil.shape(data, nel, nspecie);
+                return ArrayUtil.shape(data, nel, nspecies);
             } else {
                 int[] data = (int[]) obj.getData();
-                return ArrayUtil.shape(data, nel, nspecie);
+                return ArrayUtil.shape(data, nel, nspecies);
             }
         }
     }
@@ -1230,8 +1230,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    protected void writeSpecieVector(String name, String title,
-                                     Group parent, String[] species, int[] which)
+    protected void writeSpeciesVector(String name, String title,
+                                      Group parent, String[] species, int[] which)
         throws Exception
     {
         final String[] specout;
