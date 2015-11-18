@@ -216,16 +216,16 @@ class Simulation(object):
     """
     def __init__(self, element, model):
         self._element = element
-        self.number = int(element._v_parent._v_name[5:])
+        self.number = int(element._v_name[5:])
         self.model = model
 
     def times(self):
-        times = self._element.times[:]
+        times = self._element.output.__main__.times[:]
         diff = times[1] - times[0]
         return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
     def counts(self):
-        data = self._element.population
+        data = self._element.output.__main__.population
         panel= pd.Panel(data.read(),
                         items=self.times(),
                         major_axis=range(data.shape[1]),
@@ -255,7 +255,8 @@ class Simulation(object):
         2D
         """
 
-        xml = self._element.serialized_config
+        xml = self.model._element.serialized_config
+        # FIXME: overwrite seed?
         return etree.fromstring(xml.read()[0])
 
     def events(self):
@@ -282,7 +283,7 @@ class Output(object):
     """
     def __init__(self, filename):
         self.file = tables.openFile(filename)
-        self.model = Model(self.file.root.trial0.model)
+        self.model = Model(self.file.root.model)
 
     def __enter__(self):
         return self
@@ -301,7 +302,7 @@ class Output(object):
         <Element {http://stochdiff.textensor.org}SDRun at 0x...>
         """
         trial = self.file.get_node('/trial{}'.format(num))
-        return Simulation(trial.simulation, self.model)
+        return Simulation(trial, self.model)
 
     @functools.lru_cache()
     def simulations(self):
