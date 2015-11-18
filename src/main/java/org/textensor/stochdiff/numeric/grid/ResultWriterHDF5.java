@@ -410,7 +410,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             this.group = group;
 
-            this.sim = output.createGroup("simulation", group);
+            this.sim = output.createGroup("output", group);
             setAttribute(this.sim, "TITLE", "results of the simulation");
         }
 
@@ -1095,7 +1095,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             // FIXME: This is totally not going to work, because we delete
             // the file on creation...
-            Dataset obj = (Dataset) output.get("/simulation/state");
+            Dataset obj = (Dataset) output.get("/output/state");
             int nspecies = source.getSource().getSpecies().length;
             if (obj == null)
                 throw new RuntimeException("state hasn't been saved");
