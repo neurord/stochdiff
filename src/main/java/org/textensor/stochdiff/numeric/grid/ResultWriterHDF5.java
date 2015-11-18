@@ -261,6 +261,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         writeSpeciesVector("species", "names of all species", model, species, null);
 
+        t.writeRegionLabels(model, source);
         t.writeStimulationData(model, source);
         t.writeReactionData(model, source);
         t.writeReactionDependencies(model, source);
@@ -523,11 +524,11 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeRegionLabels(IGridCalc source)
+        protected void writeRegionLabels(Group parent, IGridCalc source)
             throws Exception
         {
             String[] regions = source.getSource().getVolumeGrid().getRegionLabels();
-            Dataset ds = writeVector("regions", model(), regions);
+            Dataset ds = writeVector("regions", parent, regions);
             setAttribute(ds, "TITLE", "names of regions");
             setAttribute(ds, "LAYOUT", "[nregions]");
             setAttribute(ds, "UNITS", "text");

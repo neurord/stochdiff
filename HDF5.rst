@@ -37,6 +37,11 @@ A simple table with the names of all species.
 
 A pair of tables listing neighbours of each voxel (indices, -1 is used fill empty positions), and the coupling coefficient for each neighbour.
 
+/model/regions
+--------------
+
+Names of regions.
+
 /model/grid
 -----------
 
@@ -66,6 +71,8 @@ This table describes the voxels.
       "group": StringCol(itemsize=100, shape=(), dflt='', pos=17)}
 
 (x0, y0, z0), (x1, y1, z1), (x2, y2, z2) are in one plane, and (x3, y3, z3) is the opposite corner in the other plane.
+
+``region`` is an index into the ``regions`` table described above.
 
 /model/serialized_config
 ------------------------
