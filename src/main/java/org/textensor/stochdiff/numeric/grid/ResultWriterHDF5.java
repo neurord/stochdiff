@@ -73,6 +73,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
 
+    protected Group model;
+    protected Group output_info;
+
     public ResultWriterHDF5(File output,
                             IOutputSet primary,
                             List<? extends IOutputSet> outputSets,
@@ -184,6 +187,24 @@ public class ResultWriterHDF5 implements ResultWriter {
         writeMap("manifest", this.root, manifest.getMainAttributes().entrySet(), "information about the program");
     }
 
+    protected Group model() throws Exception {
+        if (this.model == null) {
+            this.model = output.createGroup("model", this.root);
+            setAttribute(this.model, "TITLE", "model parameters");
+        }
+
+        return this.model;
+    }
+
+    protected Group output_info() throws Exception {
+        if (this.output_info == null) {
+            this.output_info = this.output.createGroup("output", this.model());
+            setAttribute(this.output_info, "TITLE", "output species");
+        }
+
+        return this.output_info;
+    }
+
     protected Trial getTrial(int trial)
         throws Exception
     {
@@ -248,19 +269,14 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     @Override
     synchronized public void writeOutputInterval(double time, IGridCalc source) {
-        try {
-            Trial t = this.getTrial(source.trial());
-            t._writeOutput1(time, source);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+        writeOutputScheme(-1, time, source);
     }
 
     @Override
     synchronized public void writeOutputScheme(int i, double time, IGridCalc source) {
         try {
             Trial t = this.getTrial(source.trial());
-            t._writeOutput2(i, time, source);
+            t._writeOutput(i + 1, time, source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -365,11 +381,8 @@ public class ResultWriterHDF5 implements ResultWriter {
 
     protected class Trial {
         protected final Group group;
-        protected Group model;
-        protected Group output_info;
         protected final Group sim;
-        protected PopulationOutput concs1;
-        protected List<PopulationOutput> concs2 = new ArrayList<>();
+        protected List<PopulationOutput> populations = new ArrayList<>();
         protected H5ScalarDS stimulation_events;
         protected H5ScalarDS diffusion_events;
         protected H5ScalarDS reaction_events;
@@ -392,29 +405,10 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void close()
             throws Exception
         {
-            this.concs1.flushPopulation(Double.POSITIVE_INFINITY);
             if (this.events_cache != null)
                 this.flushEvents(Double.POSITIVE_INFINITY, true);
-            for (PopulationOutput output: this.concs2)
+            for (PopulationOutput output: this.populations)
                 output.flushPopulation(Double.POSITIVE_INFINITY);
-        }
-
-        protected Group model() throws Exception {
-            if (this.model == null) {
-                this.model = output.createGroup("model", this.group);
-                setAttribute(this.model, "TITLE", "model parameters");
-            }
-
-            return this.model;
-        }
-
-        protected Group output_info() throws Exception {
-            if (this.output_info == null) {
-                this.output_info = output.createGroup("output", this.group);
-                setAttribute(this.output_info, "TITLE", "output species");
-            }
-
-            return this.output_info;
         }
 
         protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
@@ -479,7 +473,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             Dataset grid =
-                output.createCompoundDS("grid", this.model(), dims, null, chunks, compression_level,
+                output.createCompoundDS("grid", model(), dims, null, chunks, compression_level,
                                         memberNames, memberTypes, null, data);
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "grid", xJoined(dims), "", xJoined(chunks));
@@ -489,14 +483,14 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             {
                 Dataset ds =
-                    writeArray("neighbors", this.model(), vgrid.getPerElementNeighbors(), -1);
+                    writeArray("neighbors", model(), vgrid.getPerElementNeighbors(), -1);
                 setAttribute(ds, "TITLE", "adjacency mapping between voxels");
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
                 setAttribute(ds, "UNITS", "indices");
             }
             {
                 Dataset ds =
-                    writeArray("couplings", this.model(), vgrid.getPerElementCouplingConstants());
+                    writeArray("couplings", model(), vgrid.getPerElementCouplingConstants());
                 setAttribute(ds, "TITLE", "coupling rate between voxels");
                 setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
                 setAttribute(ds, "UNITS", "nm^2 / nm ?");
@@ -527,14 +521,14 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSpecies()
             throws Exception
         {
-            writeSpecieVector("species", "names of all species", this.model(), species, null);
+            writeSpecieVector("species", "names of all species", model(), species, null);
         }
 
         protected void writeRegionLabels(IGridCalc source)
             throws Exception
         {
             String[] regions = source.getSource().getVolumeGrid().getRegionLabels();
-            Dataset ds = writeVector("regions", this.model(), regions);
+            Dataset ds = writeVector("regions", model(), regions);
             setAttribute(ds, "TITLE", "names of regions");
             setAttribute(ds, "LAYOUT", "[nregions]");
             setAttribute(ds, "UNITS", "text");
@@ -545,7 +539,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             StimulationTable table = source.getSource().getStimulationTable();
 
-            Group group = output.createGroup("stimulation", this.model());
+            Group group = output.createGroup("stimulation", model());
             setAttribute(group, "TITLE", "stimulation parameters");
 
             {
@@ -575,7 +569,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             ReactionTable table = source.getSource().getReactionTable();
 
-            Group group = output.createGroup("reactions", this.model());
+            Group group = output.createGroup("reactions", model());
             setAttribute(group, "TITLE", "reaction scheme");
 
             {
@@ -639,7 +633,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     return;
             }
 
-            Group group = output.createGroup("dependencies", this.model());
+            Group group = output.createGroup("dependencies", model());
             setAttribute(group, "TITLE", "dependency scheme");
 
             {
@@ -691,6 +685,20 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
+        protected void writeOutputInfo(Group parent, String identifier,
+                                        int[] which, int[] elements)
+            throws Exception
+        {
+            Group group = output.createGroup(identifier, parent);
+
+            writeSpecieVector("species", "names of output species", group, species, which);
+
+            Dataset ds = writeVector("elements", group, elements);
+            setAttribute(ds, "TITLE", "indices of output elements");
+            setAttribute(ds, "LAYOUT", "[nelements]");
+            setAttribute(ds, "UNITS", "indices");
+        }
+
         protected void writeOutputInfo()
             throws Exception
         {
@@ -698,94 +706,71 @@ public class ResultWriterHDF5 implements ResultWriter {
              * rules like support for "all". Instead we use precalulcated lists of specie
              * indices. */
             if (ispecout1 != null)
-                writeSpecieVector("output_species", "names of output species", this.output_info(),
-                                  species, ispecout1);
+                writeOutputInfo(output_info(), "__main__", ispecout1, ArrayUtil.iota(nel));
+
             if (outputSets != null)
                 for (int i = 0; i < outputSets.size(); i++) {
                     IOutputSet set = outputSets.get(i);
-                    Group group = output.createGroup(set.getIdentifier(), this.output_info());
-                    writeSpecieVector("output_species", "names of output species", group,
-                                      species, ispecout2[i]);
-
-                    Dataset ds = writeVector("output_elements", group, elementsout2[i]);
-                    setAttribute(ds, "TITLE", "indices of output elements");
-                    setAttribute(ds, "LAYOUT", "[nelements]");
-                    setAttribute(ds, "UNITS", "indices");
+                    writeOutputInfo(output_info(),
+                                    set.getIdentifier(), ispecout2[i], elementsout2[i]);
                 }
         }
 
-        public void _writeOutput1(double time, IGridCalc source)
+        public void _writeOutput(int i, double time, IGridCalc source)
             throws Exception
         {
-            this.writePopulation1(time, source);
-            this.writeStimulationEvents(time, source);
-            this.writeDiffusionEvents(time, source);
-            this.writeReactionEvents(time, source);
-            this.writeEvents(time, source);
-        }
-
-        public void _writeOutput2(int i, double time, IGridCalc source)
-            throws Exception
-        {
-            this.writePopulation2(i, time, source);
-        }
-
-        private int _initPopulation1 = -1;
-        protected boolean initPopulation1(IGridCalc source)
-            throws Exception
-        {
-            if (this._initPopulation1 >= 0)
-                return this._initPopulation1 > 0;
-
-            assert this.concs1 == null;
-
-            if (source.trial() == 0) {
-                this.writeSpecies();
-                this.writeRegionLabels(source);
+            this.writePopulation(i, time, source);
+            if (i == 0) {
+                this.writeStimulationEvents(time, source);
+                this.writeDiffusionEvents(time, source);
+                this.writeReactionEvents(time, source);
+                this.writeEvents(time, source);
             }
-
-            this._initPopulation1 = ispecout1.length > 0 ? 1 : 0;
-
-            if (this._initPopulation1 > 0) {
-                this.concs1 = new PopulationOutput(this.sim, "out", ArrayUtil.iota(nel), ispecout1);
-                return true;
-            }
-
-            return false;
         }
 
-        protected boolean initPopulation2(int i, IGridCalc source)
+        protected boolean initPopulation(int i, IGridCalc source)
             throws Exception
         {
-            if (i >= this.concs2.size() || this.concs2.get(i) == null) {
-                IOutputSet set = outputSets.get(i);
-                assert set != null;
+            if (i >= this.populations.size() || this.populations.get(i) == null) {
+                int elements[], ispecout[];
+                String ident;
 
-                String ident = set.getIdentifier();
+                if (i == 0) {
+                    /* special case */
+                    if (ispecout1.length == 0)
+                        return false;
+
+                    ident = "general";
+                    elements = ArrayUtil.iota(nel);
+                    ispecout = ispecout1;
+                } else {
+                    final IOutputSet set = outputSets.get(i - 1);
+                    assert set != null;
+
+                    log.info("elementsout2: {} {}", elementsout2, "");
+                    log.info("i:{} {}", i, elementsout2[i - 1]);
+
+                    elements = elementsout2[i - 1];
+                    ispecout = ispecout2[i - 1];
+
+                    ident = set.getIdentifier();
+                }
+
                 Group group = output.createGroup(ident, this.sim);
-                PopulationOutput conc = new PopulationOutput(group, ident, elementsout2[i], ispecout2[i]);
-                this.concs2.add(i, conc);
+                PopulationOutput conc = new PopulationOutput(group, ident, elements, ispecout);
+                this.populations.add(i, conc);
             }
 
             return true;
         }
 
-        protected void writePopulation1(double time, IGridCalc source)
+        protected void writePopulation(int i, double time, IGridCalc source)
             throws Exception
         {
-            if (!this.initPopulation1(source))
+            if (!this.initPopulation(i, source))
                 return;
 
-            this.concs1.writePopulation(time, source);
-        }
-
-        protected void writePopulation2(int i, double time, IGridCalc source)
-            throws Exception
-        {
-            if (!this.initPopulation2(i, source))
-                return;
-
-            this.concs2.get(i).writePopulation(time, source);
+            this.populations.get(i).writePopulation(time, source);
         }
 
         protected void initStimulationEvents(int elements, int species)
