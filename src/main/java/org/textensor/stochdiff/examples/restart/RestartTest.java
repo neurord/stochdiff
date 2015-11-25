@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.examples.restart;
 
-import org.catacomb.dataview.CCViz;
 import org.textensor.stochdiff.StochDiff;
 
 public class RestartTest {
@@ -12,12 +11,6 @@ public class RestartTest {
 
         String[] args = {srt + "model2.xml"};
 
-
         StochDiff.main(args);
-
-        String[] sa = {srt + "model2.out"};
-        CCViz.main(sa);
     }
-
-
 }

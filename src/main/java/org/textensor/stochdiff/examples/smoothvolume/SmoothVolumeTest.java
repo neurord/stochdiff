@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.examples.smoothvolume;
 
-import org.catacomb.dataview.CCViz;
 import org.textensor.stochdiff.StochDiff;
 
 public class SmoothVolumeTest {
@@ -11,12 +10,6 @@ public class SmoothVolumeTest {
 
         String[] args = {srt + "model.xml"};
 
-
         StochDiff.main(args);
-
-        String[] sa = {srt + "model.out"};
-        CCViz.main(sa);
     }
-
-
 }

@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.examples.morphtest;
 
-import org.catacomb.dataview.CCViz;
 import org.textensor.stochdiff.StochDiff;
 
 public class MorphTest {
@@ -14,12 +13,6 @@ public class MorphTest {
 
         String[] args = {srt + mfnm + ".xml"};
 
-
         StochDiff.main(args);
-
-        String[] sa = {srt + mfnm + ".out"};
-        CCViz.main(sa);
     }
-
-
 }

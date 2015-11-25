@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.examples.restart;
 
-import org.catacomb.dataview.CCViz;
 import org.textensor.stochdiff.StochDiff;
 import org.textensor.stochdiff.reduce.Reduce;
 
@@ -13,8 +12,5 @@ public class ReduceTest {
         String[] args = {srt + "model2.xml", srt + "model2-state-40.nrds"};
 
         Reduce.main(args);
-
     }
-
-
 }

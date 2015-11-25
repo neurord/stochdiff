@@ -1,6 +1,5 @@
 package org.textensor.stochdiff.examples.morphsurf;
 
-import org.catacomb.dataview.CCViz;
 import org.textensor.stochdiff.StochDiff;
 
 public class MSTest {
@@ -12,12 +11,6 @@ public class MSTest {
 
         String[] args = {srt + "Model_nosurfaceLayers.xml"};
 
-
         StochDiff.main(args);
-
-        String[] sa = {srt + "Model_nosurfaceLayers.out"};
-        CCViz.main(sa);
     }
-
-
 }

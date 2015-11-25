@@ -1,6 +1,0 @@
-
-<DeclarationReading>
-  
-  <Factory class="NumDataSetFactory" makes="NumDataSet"/>
-
-</DeclarationReading>

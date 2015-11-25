@@ -1,6 +1,0 @@
-<DeclarationReading>
-  
-  <Instantiable class="org.catacomb.util.StandardColors" 
-		        provides="StandardColors"/>
-
-</DeclarationReading>
