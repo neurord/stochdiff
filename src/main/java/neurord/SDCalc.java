@@ -24,9 +24,9 @@ public class SDCalc {
 
     final SDRun sdRun;
 
-    final String[] writers = Settings.getPropertyList("stochdiff.writers", "text");
-    final int trials = Settings.getProperty("stochdiff.trials", 1);
-    final int threads = Settings.getProperty("stochdiff.threads", 0);
+    final String[] writers = Settings.getPropertyList("neurord.writers", "text");
+    final int trials = Settings.getProperty("neurord.trials", 1);
+    final int threads = Settings.getProperty("neurord.threads", 0);
 
     protected final List<ResultWriter> resultWriters = new ArrayList<>();
 

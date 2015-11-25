@@ -19,9 +19,9 @@ import neurord.util.CustomFileAppender;
 import neurord.util.Settings;
 
 public class StochDiff {
-    static final Logger log = LogManager.getLogger("stochdiff");
+    static final Logger log = LogManager.getLogger("neurord");
 
-    final static boolean log_to_file = Settings.getProperty("stochdiff.log", true);
+    final static boolean log_to_file = Settings.getProperty("neurord.log", true);
 
     static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 

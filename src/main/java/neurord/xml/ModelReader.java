@@ -45,7 +45,7 @@ import neurord.model.SDRun;
 public class ModelReader<T> {
     static final Logger log = LogManager.getLogger(ModelReader.class);
 
-    public static final String STOCHDIFF_NS = "http://stochdiff.textensor.org";
+    public static final String NEURORD_NS = "http://neurord.textensor.org";
 
     public static class NamespaceFiller extends XMLFilterImpl {
         boolean sdrun_seen = false;
@@ -60,7 +60,7 @@ public class ModelReader<T> {
         {
             Properties props = System.getProperties();
             for (String key : props .stringPropertyNames())
-                if (key.startsWith("stochdiff.sdrun") || key.startsWith("stochdiff.SDRun"))
+                if (key.startsWith("neurord.sdrun") || key.startsWith("neurord.SDRun"))
                     overrides.put("SDRun" + key.substring(15), props.getProperty(key));
         }
 
@@ -77,20 +77,20 @@ public class ModelReader<T> {
                 if (!this.ns_warning) {
                     this.ns_warning = true;
                     log.info("{}: namespace not specified, assuming {}",
-                             this.location(false), STOCHDIFF_NS);
+                             this.location(false), NEURORD_NS);
                 }
-                uri = STOCHDIFF_NS;
+                uri = NEURORD_NS;
             }
             if (this.exception != null && this.exception.getMessage().contains("cvc-complex-type.2.4.a"))
                 /* clear the exception if it seems to be the appropriate type */
                 this.exception = null;
 
             /* rename MaxElementSide to maxElementSide */
-            if (this.sdrun_seen && uri.equals(STOCHDIFF_NS) && localName.equals("MaxElementSide"))
+            if (this.sdrun_seen && uri.equals(NEURORD_NS) && localName.equals("MaxElementSide"))
                 localName = "maxElementSide";
 
             /* rename dt on OutputSet to outputInterval */
-            if (this.sdrun_seen && uri.equals(STOCHDIFF_NS) && localName.equals("OutputSet") &&
+            if (this.sdrun_seen && uri.equals(NEURORD_NS) && localName.equals("OutputSet") &&
                 atts.getIndex("dt") >= 0) {
 
                 log.info("Renaming attribute dt to outputInterval");
@@ -108,7 +108,7 @@ public class ModelReader<T> {
         {
             this.names.pop();
             if (this.sdrun_seen && uri.equals(""))
-                uri = STOCHDIFF_NS;
+                uri = NEURORD_NS;
             super.endElement(uri, localName, qName);
         }
 

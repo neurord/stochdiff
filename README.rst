@@ -385,7 +385,7 @@ If the last argument is ommitted, the output name is the input file name without
 
 With the default options, output is written as a set of text files and three (or more) output files are generated.  One is the `model.out` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the `IO.xml` file.
 
-The option `-Dstochdiff.writers=h5` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the `.h5` extension.
+The option `-Dneurord.writers=h5` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the `.h5` extension.
 
 Overrides
 ~~~~~~~~~
@@ -394,13 +394,13 @@ XML configuration can be overriden on the commandline:
 
 .. code-block:: shell
 
-    java -Dstochdiff.sdrun.<element>=<value> ...
+    java -Dneurord.sdrun.<element>=<value> ...
 
 For example, to set /SDRun/discretization/maxElementSide to 3:
 
 .. code-block:: shell
 
-    java -Dstochdiff.sdrun.discretization.maxElementSide=3
+    java -Dneurord.sdrun.discretization.maxElementSide=3
 
 Logging
 ~~~~~~~
@@ -415,7 +415,7 @@ where level can be one of `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FAT
 
 .. code-block:: shell
 
-    java -Dlog.stochdiff.numeric.grid.NextEventQueue=debug ...
+    java -Dlog.neurord.numeric.grid.NextEventQueue=debug ...
 
 By default, the same output is printed to the console and to the log file (named after the model file, but with “.log” at the end).
 

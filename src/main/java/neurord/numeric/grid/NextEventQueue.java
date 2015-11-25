@@ -33,12 +33,12 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger();
 
-    final static boolean update_times = Settings.getProperty("stochdiff.neq.update_times", true);
-    final static boolean only_init = Settings.getProperty("stochdiff.neq.only_init", false);
-    final static boolean check_updates = Settings.getProperty("stochdiff.neq.check_updates", false);
+    final static boolean update_times = Settings.getProperty("neurord.neq.update_times", true);
+    final static boolean only_init = Settings.getProperty("neurord.neq.only_init", false);
+    final static boolean check_updates = Settings.getProperty("neurord.neq.check_updates", false);
 
-    final static boolean log_queue = Settings.getProperty("stochdiff.neq.log_queue", false);
-    final static boolean log_propensity = Settings.getProperty("stochdiff.neq.log_propensity", false);
+    final static boolean log_queue = Settings.getProperty("neurord.neq.log_queue", false);
+    final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity", false);
 
     public static class Numbering {
         int count = 0;
@@ -96,7 +96,7 @@ public class NextEventQueue {
 
         void build(T[] nodes) {
             if (!update_times)
-                log.info("stochdiff.neq.update_times is false, will regenerate times");
+                log.info("neurord.neq.update_times is false, will regenerate times");
 
             Comparator<T> c = new Comparator<T>() {
                 @Override
@@ -1497,7 +1497,7 @@ public class NextEventQueue {
             log.info("Leaping disabled");
 
         if (log_propensity && !check_updates)
-            log.warn("stochdiff.neq.log_propensity has no effect without stochdiff.neq.check_updates");
+            log.warn("neurord.neq.log_propensity has no effect without neurord.neq.check_updates");
     }
 
     ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab) {

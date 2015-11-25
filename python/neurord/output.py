@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 
 r"""
-Wrapper which makes reading stochdiff HDF5 output easier to use
+Wrapper which makes reading neurord HDF5 output easier to use
 
->>> from stochdiff.output import Output
+>>> from neurord.output import Output
 >>> out = Output('model.h5')
 
 Units: concentrations are expressed in nM and volumes in cubic microns.
@@ -257,8 +257,8 @@ class Simulation(object):
         >>> out = Output('model.h5')
         >>> xml = out.simulation(0).config()
         >>> xml
-        <Element {http://stochdiff.textensor.org}SDRun at 0x...>
-        >>> xml.find('./ns:geometry', {'ns':'http://stochdiff.textensor.org'}).text
+        <Element {http://neurord.textensor.org}SDRun at 0x...>
+        >>> xml.find('./ns:geometry', {'ns':'http://neurord.textensor.org'}).text
         '2D'
         """
 
@@ -306,7 +306,7 @@ class Output(object):
         >>> sim.number
         0
         >>> sim.config()
-        <Element {http://stochdiff.textensor.org}SDRun at 0x...>
+        <Element {http://neurord.textensor.org}SDRun at 0x...>
         """
         trial = self.file.get_node('/trial{}'.format(num))
         return Simulation(trial, self.model)

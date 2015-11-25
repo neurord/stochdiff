@@ -1,7 +1,7 @@
-stochdiff.output module
+neurord.output module
 ***********************
 
-.. automodule:: stochdiff.output
+.. automodule:: neurord.output
     :members:
 
 Examples
@@ -13,7 +13,7 @@ Examples
    import matplotlib.pyplot as plt
    import numpy as np
    
-   from stochdiff import output
+   from neurord import output
    
    out = output.Output('model.h5')
    counts = out.counts()
