@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration status="WARN" packages="org.textensor.util">
+<configuration status="WARN" packages="neurord.util">
   <appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}"/>
@@ -15,8 +15,8 @@
       <appender-ref ref="Console"/>
       <appender-ref ref="model-logfile"/>
     </root>
-    <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterHDF5" level="info" />
-    <logger name="org.textensor.stochdiff.numeric.grid.ResultWriterText" level="info" />
-    <logger name="org.textensor.stochdiff.numeric.grid.NextEventQueue" level="info" />
+    <logger name="neurord.numeric.grid.ResultWriterHDF5" level="info" />
+    <logger name="neurord.numeric.grid.ResultWriterText" level="info" />
+    <logger name="neurord.numeric.grid.NextEventQueue" level="info" />
   </loggers>
 </configuration>
