@@ -624,7 +624,7 @@ def print_config(output):
     tree = output.simulation(0).config()
     if opts.config:
 #        snippets = tree.xpath(opts.config,
-#                              namespaces=dict(ns2="http://neurord.textensor.org"))
+#                              namespaces=dict(ns2="http://stochdiff.textensor.org"))
         expr = '//*[local-name() = $name]'
         snippets = tree.xpath(expr, name=opts.config)
     else:

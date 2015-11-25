@@ -257,8 +257,8 @@ class Simulation(object):
         >>> out = Output('model.h5')
         >>> xml = out.simulation(0).config()
         >>> xml
-        <Element {http://neurord.textensor.org}SDRun at 0x...>
-        >>> xml.find('./ns:geometry', {'ns':'http://neurord.textensor.org'}).text
+        <Element {http://stochdiff.textensor.org}SDRun at 0x...>
+        >>> xml.find('./ns:geometry', {'ns':'http://stochdiff.textensor.org'}).text
         '2D'
         """
 
@@ -306,7 +306,7 @@ class Output(object):
         >>> sim.number
         0
         >>> sim.config()
-        <Element {http://neurord.textensor.org}SDRun at 0x...>
+        <Element {http://stochdiff.textensor.org}SDRun at 0x...>
         """
         trial = self.file.get_node('/trial{}'.format(num))
         return Simulation(trial, self.model)

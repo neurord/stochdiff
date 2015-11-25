@@ -45,7 +45,7 @@ import neurord.model.SDRun;
 public class ModelReader<T> {
     static final Logger log = LogManager.getLogger(ModelReader.class);
 
-    public static final String NEURORD_NS = "http://neurord.textensor.org";
+    public static final String NEURORD_NS = "http://stochdiff.textensor.org";
 
     public static class NamespaceFiller extends XMLFilterImpl {
         boolean sdrun_seen = false;

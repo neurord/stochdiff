@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns="http://neurord.textensor.org"
-        targetNamespace="http://neurord.textensor.org"
+        xmlns="http://stochdiff.textensor.org"
+        targetNamespace="http://stochdiff.textensor.org"
         elementFormDefault="qualified">
 
   <xs:element name="SDRun">

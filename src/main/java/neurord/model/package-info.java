@@ -13,10 +13,10 @@
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlJavaTypeAdapter(value=StringTrimAdapter.class, type=String.class)
-@XmlSchema(namespace="http://neurord.textensor.org",
+@XmlSchema(namespace="http://stochdiff.textensor.org",
            elementFormDefault=XmlNsForm.QUALIFIED,
            xmlns={
-               @XmlNs(prefix="", namespaceURI="http://neurord.textensor.org")
+               @XmlNs(prefix="", namespaceURI="http://stochdiff.textensor.org")
            })
 package neurord.model;
 
