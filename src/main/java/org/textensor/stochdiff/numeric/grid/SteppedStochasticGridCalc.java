@@ -32,7 +32,6 @@ import org.textensor.stochdiff.numeric.morph.VolumeGrid;
 import org.textensor.stochdiff.numeric.stochastic.InterpolatingStepGenerator;
 import org.textensor.stochdiff.numeric.stochastic.StepGenerator;
 import org.textensor.util.ArrayUtil;
-import org.textensor.vis.CCViz3D;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
