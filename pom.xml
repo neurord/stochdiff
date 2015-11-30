@@ -198,30 +198,6 @@
     </dependency>
 
     <dependency>
-      <groupId>java3d</groupId>
-      <artifactId>j3d-vectmath</artifactId>
-      <version>1.5.2</version>
-      <scope>system</scope>
-      <systemPath>${j3ddir}/vecmath.jar</systemPath>
-    </dependency>
-
-    <dependency>
-      <groupId>java3d</groupId>
-      <artifactId>j3d-core</artifactId>
-      <version>1.5.2</version>
-      <scope>system</scope>
-      <systemPath>${j3ddir}/j3dcore.jar</systemPath>
-    </dependency>
-
-    <dependency>
-      <groupId>java3d</groupId>
-      <artifactId>j3d-core-utils</artifactId>
-      <version>1.5.2</version>
-      <scope>system</scope>
-      <systemPath>${j3ddir}/j3dutils.jar</systemPath>
-    </dependency>
-
-    <dependency>
       <groupId>org.jblas</groupId>
       <artifactId>jblas</artifactId>
       <version>1.2.2</version>
