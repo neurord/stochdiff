@@ -19,7 +19,7 @@ import neurord.util.CustomFileAppender;
 import neurord.util.Settings;
 
 public class StochDiff {
-    static final Logger log = LogManager.getLogger("neurord");
+    static final Logger log = LogManager.getLogger();
 
     final static boolean log_to_file = Settings.getProperty("neurord.log", true);
 
@@ -54,7 +54,7 @@ public class StochDiff {
         Properties props = System.getProperties();
         for (String key : props .stringPropertyNames())
             if (key.startsWith("log.")) {
-                String logger = "org.textensor." + key.substring(4);
+                String logger = key.substring(4);
                 String value = props.getProperty(key);
                 Level level = Level.getLevel(value.toUpperCase());
                 if (level == null) {
