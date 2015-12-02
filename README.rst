@@ -419,4 +419,10 @@ where level can be one of `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FAT
 
 By default, the same output is printed to the console and to the log file (named after the model file, but with “.log” at the end).
 
+For long simulations the log file can get pretty big. To disable the log file altogether, use:
+
+.. code-block:: shell
+
+    java -Dstochdiff.log=false ...
+
 [HDF5]: https://www.hdfgroup.org/HDF5/
