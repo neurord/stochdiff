@@ -2,6 +2,7 @@
 //written by Robert Cannon
 package neurord.model;
 
+import java.io.File;
 import java.util.List;
 
 import neurord.disc.SpineLocator;
@@ -15,6 +16,7 @@ import neurord.numeric.morph.VolumeGrid;
 import neurord.numeric.morph.VolumeGrid.geometry_t;
 import neurord.numeric.chem.ReactionTable;
 import neurord.numeric.chem.StimulationTable;
+import neurord.numeric.grid.ResultWriterHDF5;
 import neurord.util.ArrayUtil;
 import neurord.xml.StringListAdapter;
 import neurord.xml.ModelReader;
@@ -63,7 +65,7 @@ public class SDRun implements IOutputSet {
 
 
     public int spineSeed;
-    public int simulationSeed;
+    public long simulationSeed;
 
     // time step for fixed step calculations;
     private Double fixedStepDt;
@@ -334,6 +336,25 @@ public class SDRun implements IOutputSet {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static SDRun deserialize(String xml, long seed) {
+        ModelReader<SDRun> loader = new ModelReader(SDRun.class);
+        SDRun res;
+        try {
+            res = loader.unmarshall(xml);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+        return res;
+    }
+
+    public static SDRun loadFromFile(File filename, int trial) {
+        Object[] java_sucks = ResultWriterHDF5.loadModel(filename, trial);
+        String xml = (String) java_sucks[0];
+        long seed = (Long) java_sucks[1];
+
+        return deserialize(xml, seed);
     }
 
     public double stepSize() {

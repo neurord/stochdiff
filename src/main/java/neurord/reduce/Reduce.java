@@ -16,7 +16,7 @@ public class Reduce {
     static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     public static void main(String[] argv) throws Exception {
-        File modelFile = null;
+        File modelFile;
         File stateFile = null;
 
         if (argv.length < 2) {

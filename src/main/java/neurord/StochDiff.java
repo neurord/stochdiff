@@ -88,7 +88,7 @@ public class StochDiff {
     }
 
     public static void main(String[] argv) throws Exception {
-        File modelFile = null;
+        File modelFile;
         final File outputFile;
 
         List<String> args = Arrays.asList(argv);
@@ -124,9 +124,13 @@ public class StochDiff {
         if (log_to_file)
             log.info("Writing logs to {}", logfile);
 
-        SDRun sdModel = loader.unmarshall(modelFile);
+        final SDRun model;
+        if (modelFile.toString().endsWith(".h5"))
+            model = SDRun.loadFromFile(modelFile, 0);
+        else
+            model = loader.unmarshall(modelFile);
 
-        SDCalc sdCalc = new SDCalc(sdModel, outputFile);
-        sdCalc.run();
+        SDCalc calc = new SDCalc(model, outputFile);
+        calc.run();
     }
 }

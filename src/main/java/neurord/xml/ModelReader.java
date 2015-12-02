@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
+import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.Properties;
 import java.net.URL;
@@ -121,6 +122,7 @@ public class ModelReader<T> {
             if (override != null) {
                 String s = new String(ch, start, length).trim();
                 log.info("Overriding {}: {} → {}", loc, s, override);
+
                 ch = override.toCharArray();
                 start = 0;
                 length = ch.length;
@@ -178,11 +180,9 @@ public class ModelReader<T> {
         }
     }
 
-    public T unmarshall(String filename)
+    public T unmarshall(InputSource xml)
         throws Exception
     {
-        log.info("umarshalling {}", filename);
-
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setXIncludeAware(true);
         spf.setNamespaceAware(true);
@@ -197,8 +197,6 @@ public class ModelReader<T> {
         NamespaceFiller filter = new NamespaceFiller();
         XMLReader xr = spf.newSAXParser().getXMLReader();
         filter.setParent(xr);
-
-        InputSource xml = new InputSource(filename);
 
         Unmarshaller u = jc.createUnmarshaller();
         UnmarshallerHandler uh = u.getUnmarshallerHandler();
@@ -217,7 +215,19 @@ public class ModelReader<T> {
     public T unmarshall(File filename)
         throws Exception
     {
-        return this.unmarshall(filename.toString());
+        log.info("Umarshalling file {}", filename);
+
+        InputSource source = new InputSource(filename.toString());
+        return unmarshall(source);
+    }
+
+    public T unmarshall(String xml)
+        throws Exception
+    {
+        log.info("Umarshalling string");
+
+        InputSource source = new InputSource(new StringReader(xml));
+        return unmarshall(source);
     }
 
     public Marshaller getMarshaller(T object)

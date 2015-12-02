@@ -1111,6 +1111,61 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     /***********************************************************************
+     ***************             Model loading            ******************
+     ***********************************************************************/
+
+    protected static Object[] _loadModel(File filename, int trial)
+        throws Exception
+    {
+        FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
+        if (fileFormat == null)
+            throw new UnsatisfiedLinkError("hdf5");
+
+        log.debug("Opening input file {}", filename);
+        final H5File h5;
+        try {
+            h5 = (H5File) fileFormat.createInstance(filename.toString(), FileFormat.READ);
+        } catch(Exception e) {
+            log.error("Failed to open input file {}", filename);
+            throw e;
+        }
+        assert h5 != null;
+
+        final String xml;
+        {
+            String path = "/model/serialized_config";
+            Dataset obj = (Dataset) h5.get(path);
+            if (obj == null)
+                log.error("Failed to retrieve \"{}\"", path);
+
+            String[] data = (String[]) obj.getData();
+            xml = data[0];
+        }
+
+        final long seed;
+        {
+            String path = "/trial" + trial + "/simulation_seed";
+            Dataset obj = (Dataset) h5.get(path);
+            if (obj == null)
+                log.error("Failed to retrieve \"{}\"", path);
+
+            long[] data = (long[]) obj.getData();
+            seed = data[0];
+        }
+
+        return new Object[]{xml, seed};
+    }
+
+    public static Object[] loadModel(File filename, int trial) {
+        try {
+            return _loadModel(filename, trial);
+        } catch(Exception e) {
+            log.error("Failed to read input file \"{}\"", filename);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /***********************************************************************
      ***************           Utility functions          ******************
      ***********************************************************************/
 
