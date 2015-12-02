@@ -1,9 +1,8 @@
-//5 16 2007: modified by RO
-//written by Robert Cannon
 package neurord.model;
 
 import java.io.File;
 import java.util.List;
+import java.util.HashMap;
 
 import neurord.disc.SpineLocator;
 import neurord.disc.TreeBoxDiscretizer;
@@ -340,13 +339,14 @@ public class SDRun implements IOutputSet {
 
     public static SDRun deserialize(String xml, long seed) {
         ModelReader<SDRun> loader = new ModelReader(SDRun.class);
-        SDRun res;
+        HashMap<String,String> overrides = new HashMap<>();
+        overrides.put("SDRun.simulationSeed", "" + seed);
+
         try {
-            res = loader.unmarshall(xml);
+            return loader.unmarshall(xml, overrides);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
-        return res;
     }
 
     public static SDRun loadFromFile(File filename, int trial) {

@@ -55,14 +55,23 @@ public class ModelReader<T> {
 
         SAXParseException exception = null;
 
-        ArrayDeque<String> names = new ArrayDeque<>();
+        final ArrayDeque<String> names = new ArrayDeque<>();
+        final HashMap<String, String>[] overrides;
 
-        HashMap<String, String> overrides = new HashMap<>();
-        {
-            Properties props = System.getProperties();
-            for (String key : props .stringPropertyNames())
-                if (key.startsWith("neurord.sdrun") || key.startsWith("neurord.SDRun"))
-                    overrides.put("SDRun" + key.substring(15), props.getProperty(key));
+        public NamespaceFiller(HashMap<String, String> ...overrides) {
+            this.overrides = overrides;
+
+            boolean first = true;
+            for (HashMap<String,String> map: overrides)
+                if (map != null) {
+                    if (first) {
+                        log.debug("Overrides (higher priority first):");
+                        first = false;
+                    }
+                    log.debug("{}", map);
+                }
+            if (first)
+                log.debug("No overrides");
         }
 
         @Override
@@ -118,15 +127,20 @@ public class ModelReader<T> {
             throws SAXException
         {
             String loc = this.location(true);
-            String override = this.overrides.get(loc);
-            if (override != null) {
-                String s = new String(ch, start, length).trim();
-                log.info("Overriding {}: {} → {}", loc, s, override);
 
-                ch = override.toCharArray();
-                start = 0;
-                length = ch.length;
-            }
+            for (HashMap<String,String> map: this.overrides)
+                if (map != null) {
+                    String override = map.get(loc);
+                    if (override != null) {
+                        String s = new String(ch, start, length).trim();
+                        log.info("Overriding {}: {} → {}", loc, s, override);
+
+                        ch = override.toCharArray();
+                        start = 0;
+                        length = ch.length;
+                        break;
+                    }
+                }
 
             super.characters(ch, start, length);
         }
@@ -180,7 +194,16 @@ public class ModelReader<T> {
         }
     }
 
-    public T unmarshall(InputSource xml)
+    protected HashMap<String, String> propertyOverrides() {
+        HashMap<String, String> overrides = new HashMap<>();
+        Properties props = System.getProperties();
+        for (String key : props .stringPropertyNames())
+            if (key.startsWith("neurord.sdrun") || key.startsWith("neurord.SDRun"))
+                overrides.put("SDRun" + key.substring(13), props.getProperty(key));
+        return overrides;
+    }
+
+    public T unmarshall(InputSource xml, HashMap<String,String> extra_overrides)
         throws Exception
     {
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -194,7 +217,7 @@ public class ModelReader<T> {
         Schema schema = factory.newSchema(schemaSource);
         spf.setSchema(schema);
 
-        NamespaceFiller filter = new NamespaceFiller();
+        NamespaceFiller filter = new NamespaceFiller(this.propertyOverrides(), extra_overrides);
         XMLReader xr = spf.newSAXParser().getXMLReader();
         filter.setParent(xr);
 
@@ -212,22 +235,22 @@ public class ModelReader<T> {
         return result;
     }
 
-    public T unmarshall(File filename)
+    public T unmarshall(File filename, HashMap<String,String> extra_overrides)
         throws Exception
     {
         log.info("Umarshalling file {}", filename);
 
         InputSource source = new InputSource(filename.toString());
-        return unmarshall(source);
+        return unmarshall(source, extra_overrides);
     }
 
-    public T unmarshall(String xml)
+    public T unmarshall(String xml, HashMap<String,String> extra_overrides)
         throws Exception
     {
         log.info("Umarshalling string");
 
         InputSource source = new InputSource(new StringReader(xml));
-        return unmarshall(source);
+        return unmarshall(source, extra_overrides);
     }
 
     public Marshaller getMarshaller(T object)
@@ -268,7 +291,7 @@ public class ModelReader<T> {
     public static void main(String... args) throws Exception {
         ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
-        SDRun sdrun = loader.unmarshall(args[0]);
+        SDRun sdrun = loader.unmarshall(args[0], null);
 
         loader.marshall(sdrun, System.out);
     }

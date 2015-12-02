@@ -40,7 +40,7 @@ public class Reduce {
                 }
             }
 
-            SDRun sdModel = loader.unmarshall(modelFile);
+            SDRun sdModel = loader.unmarshall(modelFile, null);
 
             String stxt = FileUtil.readStringFromFile(stateFile);
             SDState sdState = StateReader.readStateString(stxt);

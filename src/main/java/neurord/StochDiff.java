@@ -128,7 +128,7 @@ public class StochDiff {
         if (modelFile.toString().endsWith(".h5"))
             model = SDRun.loadFromFile(modelFile, 0);
         else
-            model = loader.unmarshall(modelFile);
+            model = loader.unmarshall(modelFile, null);
 
         SDCalc calc = new SDCalc(model, outputFile);
         calc.run();
