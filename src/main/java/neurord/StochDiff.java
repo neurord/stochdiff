@@ -62,17 +62,23 @@ public class StochDiff {
                     continue;
                 }
 
-                // Force the logger to exist
-                LogManager.getLogger(logger);
-
-                LoggerConfig loggerConfig = config.getLoggerConfig(logger);
-                if (!loggerConfig.getName().equals(logger)) {
-                    log.warn("Failed to find logger \"{}\"", logger);
+                try {
+                    Class<?> cls = Class.forName(logger);
+                } catch(ClassNotFoundException e) {
+                    log.warn("Failed to find logger \"{}\": {}", logger, e);
                     continue;
                 }
 
-                log.debug("Logging level {}={}", logger, level);
-                loggerConfig.setLevel(level);
+                LoggerConfig loggerConfig = config.getLoggerConfig(logger);
+                if (loggerConfig.getName().equals(logger)) {
+                    loggerConfig.setLevel(level);
+                    log.debug("Setting logger level {}={}", logger, level);
+                } else {
+                    log.debug("Creating logger {}={}", logger, level);
+                    loggerConfig = new LoggerConfig(logger, level, false);
+                    config.addLogger(logger, loggerConfig);
+                }
+
                 any = true;
             }
 
