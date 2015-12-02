@@ -517,7 +517,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             {
                 long seed = source.getSimulationSeed();
-                Dataset ds = writeVector("simulation_seed", this.sim, seed);
+                Dataset ds = writeVector("simulation_seed", this.group, seed);
                 setAttribute(ds, "TITLE", "the calculation seed");
                 setAttribute(ds, "LAYOUT", "seed");
                 setAttribute(ds, "UNITS", "number");
