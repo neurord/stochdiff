@@ -1137,10 +1137,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         final int index;
         {
             double[] times = getSomething(h5, path + "/times");
-            index = Arrays.binarySearch(times, pop_from_time);
-            if (index < 0)
-                throw new Exception("time={} " + pop_from_time + " not found "
-                                    + "in " + path + "/times");
+            if (pop_from_time == -1)
+                index = times.length - 1;
+            else if (pop_from_time < 0)
+                throw new Exception("Time must be nonnegative or -1");
+            else {
+                index = Arrays.binarySearch(times, pop_from_time);
+                if (index < 0)
+                    throw new Exception("time= " + pop_from_time + " not found "
+                                        + "in " + path + "/times");
+            }
         }
 
         String poppath = path + "/population";

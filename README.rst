@@ -387,6 +387,12 @@ With the default options, output is written as a set of text files and three (or
 
 The option `-Dneurord.writers=h5` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the `.h5` extension.
 
+It is also possible to use an HDF5 file as a source of the model and/or exact population. The `.h5` file contains the serialized XML which was used to create the model. If a file with the `.h5` extension is given as the first argument (instead of an `.xml` file), model description will be extracted from it.
+
+The random seed is also extracted from the `.h5` file, which means that by using the HDF5 file as input, we can rerun the exact same simulation. In case the source `.h5` file contains multiple trials, `-Dneurord.source_trial=N` can be used to specify which trial's seed should be used. It is also possible to override the seed as usual with `-Dneurord.sdrun.simulationSeed=X`. If the current simulation includes multiple trials, the seed is ignored; this is the case always when multiple trials are simulated. In effect, if an `.h5` file is used as model source, the seed may be the seed specified by the original model, the seed used for the original simulation, the seed specifed through Java properties, or the randomized value if multiple trials are executed.
+
+When an `.h5` file is used as model input, the initial population can be taken from the results of that simulation. This is achieved by specifying `-Dneurord.source_time=T`, where `T` is a timestamp of some saved state (`T` >= 0). It is also possible to specify `-Dneurord.source_time=-1`, which uses the last `T` found in the file. As with the random seed, `-Dneurord.source_trial=N` can be used to pick a specific trial.
+
 Overrides
 ~~~~~~~~~
 
