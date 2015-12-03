@@ -30,6 +30,16 @@ public abstract class Settings {
             return fallback;
     }
 
+    static public double getProperty(String name, double fallback) {
+        String val = System.getProperty(name);
+        if (val != null) {
+            double ret = Double.valueOf(val);
+            log.debug("Overriding {}: {} → {}", name, fallback, ret);
+            return ret;
+        } else
+            return fallback;
+    }
+
     static public String getProperty(String name, String fallback) {
         String val = System.getProperty(name);
         if (val != null) {

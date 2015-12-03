@@ -349,12 +349,28 @@ public class SDRun implements IOutputSet {
         }
     }
 
-    public static SDRun loadFromFile(File filename, int trial) {
-        Object[] java_sucks = ResultWriterHDF5.loadModel(filename, trial);
+    /**
+     * A helper field to transport the population between
+     * HDF5 source file and actual simulation.
+     */
+    private transient int[][] population;
+
+    public int[][] getPopulation() {
+        return this.population;
+    }
+
+    public static SDRun loadFromFile(File filename,
+                                     int trial,
+                                     double population_from_time) {
+        Object[] java_sucks =
+            ResultWriterHDF5.loadModel(filename, trial, population_from_time);
         String xml = (String) java_sucks[0];
         long seed = (Long) java_sucks[1];
+        int[][] population = (int[][]) java_sucks[2];
 
-        return deserialize(xml, seed);
+        SDRun run = deserialize(xml, seed);
+        run.population = population;
+        return run;
     }
 
     public double stepSize() {

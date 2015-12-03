@@ -1114,7 +1114,66 @@ public class ResultWriterHDF5 implements ResultWriter {
      ***************             Model loading            ******************
      ***********************************************************************/
 
-    protected static Object[] _loadModel(File filename, int trial)
+    private static <T> T getSomething(H5File h5, String path)
+        throws Exception
+    {
+        Dataset obj = (Dataset) h5.get(path);
+        if (obj == null) {
+            log.error("Failed to retrieve \"{}\"", path);
+            throw new Exception("Path \"" + path + "\" not found");
+        }
+
+        return (T) obj.getData();
+    }
+
+    private static int[][] loadPopulationFromTime(H5File h5,
+                                                  int trial,
+                                                  String output_set,
+                                                  double pop_from_time)
+        throws Exception
+    {
+        String path = "/trial" + trial + "/output/" + output_set;
+
+        final int index;
+        {
+            double[] times = getSomething(h5, path + "/times");
+            index = Arrays.binarySearch(times, pop_from_time);
+            if (index < 0)
+                throw new Exception("time={} " + pop_from_time + " not found "
+                                    + "in " + path + "/times");
+        }
+
+        String poppath = path + "/population";
+        Dataset obj = (Dataset) h5.get(poppath);
+        if (obj == null) {
+            log.error("Failed to retrieve \"{}\"", path);
+            throw new Exception("Path \"" + path + "\" not found");
+        }
+
+        /* This is necessary to retrieve dimensions */
+        obj.init();
+
+        int rank = obj.getRank();
+        long[] dims = obj.getDims();
+        long[] start = obj.getStartDims();
+        long[] selected = obj.getSelectedDims();
+        int[] selectedIndex = obj.getSelectedIndex();
+
+        log.debug("pristine rank={} dims={} start={} selected={} selectedIndex={}",
+                  rank, dims, start, selected, selectedIndex);
+        start[0] = index;
+        selected[0] = 1;
+        selected[1] = dims[1];
+        selected[2] = dims[2];
+        log.debug("selected rank={} dims={} start={} selected={} selectedIndex={}",
+                  rank, dims, start, selected, selectedIndex);
+        int[] data = (int[]) obj.getData();
+        int[][] pop = ArrayUtil.shape(data, (int) dims[1], (int) dims[2]);
+        log.debug("retrieved population {}", (Object) pop);
+        return pop;
+    }
+
+    protected static Object[] _loadModel(File filename, int trial, Double pop_from_time)
         throws Exception
     {
         FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
@@ -1133,32 +1192,26 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         final String xml;
         {
-            String path = "/model/serialized_config";
-            Dataset obj = (Dataset) h5.get(path);
-            if (obj == null)
-                log.error("Failed to retrieve \"{}\"", path);
-
-            String[] data = (String[]) obj.getData();
+            String[] data = getSomething(h5, "/model/serialized_config");
             xml = data[0];
         }
 
         final long seed;
         {
-            String path = "/trial" + trial + "/simulation_seed";
-            Dataset obj = (Dataset) h5.get(path);
-            if (obj == null)
-                log.error("Failed to retrieve \"{}\"", path);
-
-            long[] data = (long[]) obj.getData();
+            long[] data = getSomething(h5, "/trial" + trial + "/simulation_seed");
             seed = data[0];
         }
 
-        return new Object[]{xml, seed};
+        int[][] pop = null;
+        if (!Double.isNaN(pop_from_time))
+            pop = loadPopulationFromTime(h5, trial, "__main__", pop_from_time);
+
+        return new Object[]{xml, seed, pop};
     }
 
-    public static Object[] loadModel(File filename, int trial) {
+    public static Object[] loadModel(File filename, int trial, double pop_from_time) {
         try {
-            return _loadModel(filename, trial);
+            return _loadModel(filename, trial, pop_from_time);
         } catch(Exception e) {
             log.error("Failed to read input file \"{}\"", filename);
             throw new RuntimeException(e);

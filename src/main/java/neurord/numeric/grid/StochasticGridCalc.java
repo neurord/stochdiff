@@ -27,17 +27,31 @@ public abstract class StochasticGridCalc extends GridCalc {
         super.init();
 
         // something to generate the random nunmbers
-        random = new MersenneTwister(getSimulationSeed());
+        this.random = new MersenneTwister(getSimulationSeed());
 
         // workspace for the calculation
         assert(nel > 0);
         assert(nspec > 0);
-        wkA = new int[nel][nspec];
+        this.wkA = new int[nel][nspec];
+
+        int[][] pop = this.sdRun.getPopulation();
+        if (pop != null) {
+            log.info("Using preexisting population");
+            if (pop.length != this.wkA.length ||
+                pop[0].length != this.wkA[0].length)
+                throw new RuntimeException("Preexisting population shape mismatch");
+            ArrayUtil.copy(pop, this.wkA);
+        } else
+            this.initPopulation(this.wkA, this.sdRun);
+    }
+
+    protected void initPopulation(int[][] counts, SDRun sdrun) {
+        log.debug("Initializing population based on volume and surface concentrations");
 
         /* volume concentrations */
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
-            double[] rcs = this.sdRun.getRegionConcentrations()[eltregions[i]];
+            double[] rcs = sdrun.getRegionConcentrations()[eltregions[i]];
 
             for (int j = 0; j < nspec; j++)
                 wkA[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);
@@ -56,6 +70,8 @@ public abstract class StochasticGridCalc extends GridCalc {
                         // nan means not specified by the user;
                         wkA[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
         }
+
+
     }
 
     @Override

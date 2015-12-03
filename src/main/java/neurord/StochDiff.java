@@ -23,6 +23,9 @@ public class StochDiff {
 
     final static boolean log_to_file = Settings.getProperty("neurord.log", true);
 
+    final static int source_trial = Settings.getProperty("neurord.source_trial", 0);
+    final static double source_time = Settings.getProperty("neurord.source_time", Double.NaN);
+
     static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     // The main method - a bit of basic checking and if all is well, create the
@@ -126,7 +129,7 @@ public class StochDiff {
 
         final SDRun model;
         if (modelFile.toString().endsWith(".h5"))
-            model = SDRun.loadFromFile(modelFile, 0);
+            model = SDRun.loadFromFile(modelFile, source_trial, source_time);
         else
             model = loader.unmarshall(modelFile, null);
 
