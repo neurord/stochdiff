@@ -1179,7 +1179,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         return pop;
     }
 
-    protected static Object[] _loadModel(File filename, int trial, Double pop_from_time)
+    protected static LoadModelResult _loadModel(File filename, int trial, Double pop_from_time)
         throws Exception
     {
         FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
@@ -1212,15 +1212,27 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (!Double.isNaN(pop_from_time))
             pop = loadPopulationFromTime(h5, trial, "__main__", pop_from_time);
 
-        return new Object[]{xml, seed, pop};
+        return new LoadModelResult(xml, seed, pop);
     }
 
-    public static Object[] loadModel(File filename, int trial, double pop_from_time) {
+    public static LoadModelResult loadModel(File filename, int trial, double pop_from_time) {
         try {
             return _loadModel(filename, trial, pop_from_time);
         } catch(Exception e) {
             log.error("Failed to read input file \"{}\"", filename);
             throw new RuntimeException(e);
+        }
+    }
+
+    public static class LoadModelResult {
+        final public String xml;
+        final public long seed;
+        final public int[][] population;
+
+        LoadModelResult(String xml, long seed, int[][] population) {
+            this.xml = xml;
+            this.seed = seed;
+            this.population = population;
         }
     }
 

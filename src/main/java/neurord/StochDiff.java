@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import neurord.xml.ModelReader;
 import neurord.model.SDRun;
 
 import org.apache.logging.log4j.Logger;
@@ -27,8 +26,6 @@ import neurord.util.Settings;
 
 public class StochDiff {
     static final Logger log = LogManager.getLogger();
-
-    static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     // The main method - a bit of basic checking and if all is well, create the
     // SDCalc object and run it;
@@ -108,7 +105,7 @@ public class StochDiff {
 
         options.addOption("i", "ic", true, "output file to take the initial conditions from");
         options.addOption(null, "ic-trial", true, "trial to take the seed from (default: 0)");
-        options.addOption(null, "ic-time", true, "time to take the ICs from (default: 0)");
+        options.addOption(null, "ic-time", true, "time to take the ICs from (default: none)");
 
         options.addOption(null, "log", false, "log file name (\"no\" to disable)");
 
@@ -157,14 +154,11 @@ public class StochDiff {
         if (log_to_file)
             log.info("Writing logs to {}", logfile);
 
-        final int source_trial = Settings.getOption(cmd, "ic-trial", 0);
-        final int source_time = Settings.getOption(cmd, "ic-time", 0);
+        final File ic_file = new File(cmd.getOptionValue("ic"));
+        final int ic_trial = Settings.getOption(cmd, "ic-trial", 0);
+        final int ic_time = Settings.getOption(cmd, "ic-time", 0);
 
-        final SDRun model;
-        if (modelFile.toString().endsWith(".h5"))
-            model = SDRun.loadFromFile(modelFile, source_trial, source_time);
-        else
-            model = loader.unmarshall(modelFile, null);
+        final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
 
         SDCalc calc = new SDCalc(model, outputFile);
         calc.run();

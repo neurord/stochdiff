@@ -16,6 +16,7 @@ import neurord.numeric.morph.VolumeGrid.geometry_t;
 import neurord.numeric.chem.ReactionTable;
 import neurord.numeric.chem.StimulationTable;
 import neurord.numeric.grid.ResultWriterHDF5;
+import neurord.numeric.grid.ResultWriterHDF5.LoadModelResult;
 import neurord.util.ArrayUtil;
 import neurord.xml.StringListAdapter;
 import neurord.xml.ModelReader;
@@ -337,13 +338,33 @@ public class SDRun implements IOutputSet {
         }
     }
 
-    public static SDRun deserialize(String xml, long seed) {
+    protected static SDRun deserialize(String xml, Long seed) {
         ModelReader<SDRun> loader = new ModelReader(SDRun.class);
-        HashMap<String,String> overrides = new HashMap<>();
-        overrides.put("SDRun.simulationSeed", "" + seed);
+        HashMap<String,String> overrides = null;
+
+        if (seed != null) {
+            overrides = new HashMap<>();
+            overrides.put("SDRun.simulationSeed", "" + seed);
+        }
 
         try {
             return loader.unmarshall(xml, overrides);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected static SDRun deserialize(File filename, Long seed) {
+        ModelReader<SDRun> loader = new ModelReader(SDRun.class);
+        HashMap<String,String> overrides = null;
+
+        if (seed != null) {
+            overrides = new HashMap<>();
+            overrides.put("SDRun.simulationSeed", "" + seed);
+        }
+
+        try {
+            return loader.unmarshall(filename, overrides);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -359,18 +380,38 @@ public class SDRun implements IOutputSet {
         return this.population;
     }
 
-    public static SDRun loadFromFile(File filename,
+    public static SDRun loadFromFile(File model_file,
+                                     File ic_file,
                                      int trial,
                                      double population_from_time) {
-        Object[] java_sucks =
-            ResultWriterHDF5.loadModel(filename, trial, population_from_time);
-        String xml = (String) java_sucks[0];
-        long seed = (Long) java_sucks[1];
-        int[][] population = (int[][]) java_sucks[2];
+        boolean h5 = model_file.toString().endsWith(".h5");
+        if (Double.isNaN(population_from_time) && ic_file != null)
+            population_from_time = 0; /* the default */
+        boolean have_time = !Double.isNaN(population_from_time);
 
-        SDRun run = deserialize(xml, seed);
-        run.population = population;
-        return run;
+        if (!h5 && ic_file == null && have_time)
+            throw new RuntimeException("Cannot load population from .xml file (--ic-time option)");
+
+        final String xml;
+
+        LoadModelResult ic = null;
+        if (ic_file != null)
+             ic = ResultWriterHDF5.loadModel(ic_file, trial, population_from_time);
+
+        final SDRun sdrun;
+        LoadModelResult model = null;
+        if (h5) {
+            /* load full state from model_file if wanted and ic_file not specified separately */
+            model =
+                ResultWriterHDF5.loadModel(model_file, trial,
+                                           ic_file == null ? population_from_time : Double.NaN);
+            sdrun = deserialize(model.xml, ic != null ? ic.seed : model.seed);
+        } else
+            sdrun = deserialize(model_file, ic != null ? ic.seed : null);
+
+        if (have_time)
+            sdrun.population = ic == null ? model.population : ic.population;
+        return sdrun;
     }
 
     public double stepSize() {
