@@ -409,8 +409,14 @@ public class SDRun implements IOutputSet {
         } else
             sdrun = deserialize(model_file, ic != null ? ic.seed : null);
 
-        if (have_time)
+        if (have_time) {
+            String[] species = ic == null ? model.species : ic.species;
+            if (!ArrayUtil.arraysMatch(sdrun.getSpecies(), species))
+                throw new RuntimeException("Species list mismatch");
+
             sdrun.population = ic == null ? model.population : ic.population;
+        }
+
         return sdrun;
     }
 

@@ -1208,11 +1208,13 @@ public class ResultWriterHDF5 implements ResultWriter {
             seed = data[0];
         }
 
+        final String[] species = getSomething(h5, "/model" + trial + "/species");
+
         int[][] pop = null;
         if (!Double.isNaN(pop_from_time))
             pop = loadPopulationFromTime(h5, trial, "__main__", pop_from_time);
 
-        return new LoadModelResult(xml, seed, pop);
+        return new LoadModelResult(xml, seed, species, pop);
     }
 
     public static LoadModelResult loadModel(File filename, int trial, double pop_from_time) {
@@ -1227,11 +1229,13 @@ public class ResultWriterHDF5 implements ResultWriter {
     public static class LoadModelResult {
         final public String xml;
         final public long seed;
+        final public String[] species;
         final public int[][] population;
 
-        LoadModelResult(String xml, long seed, int[][] population) {
+        LoadModelResult(String xml, long seed, String[] species, int[][] population) {
             this.xml = xml;
             this.seed = seed;
+            this.species = species;
             this.population = population;
         }
     }
