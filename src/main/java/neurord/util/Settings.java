@@ -7,6 +7,8 @@ import java.util.jar.Manifest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import org.apache.commons.cli.CommandLine;
+
 public abstract class Settings {
     static final Logger log = LogManager.getLogger();
 
@@ -78,5 +80,41 @@ public abstract class Settings {
         }
 
         return "NeuroRD " + (value != null ? value : "(unknown version)");
+    }
+
+    static public int getEnvironmentVariable(String name, int fallback) {
+        String val = System.getenv(name);
+        if (val != null) {
+            int ret = Integer.valueOf(val);
+            return ret;
+        } else
+            return fallback;
+    }
+
+    static public int getOption(CommandLine cmd, String name, int fallback) {
+        String val = cmd.getOptionValue(name);
+        if (val != null) {
+            int ret = Integer.valueOf(val);
+            return ret;
+        } else
+            return fallback;
+    }
+
+    static public boolean getOption(CommandLine cmd, String name, boolean fallback) {
+        String val = cmd.getOptionValue(name);
+        if (val != null) {
+            boolean ret = Boolean.valueOf(val);
+            return ret;
+        } else
+            return fallback;
+    }
+
+    static public double getOption(CommandLine cmd, String name, double fallback) {
+        String val = cmd.getOptionValue(name);
+        if (val != null) {
+            double ret = Double.valueOf(val);
+            return ret;
+        } else
+            return fallback;
     }
 }

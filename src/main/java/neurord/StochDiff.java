@@ -1,6 +1,7 @@
 package neurord;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -15,34 +16,46 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+
 import neurord.util.CustomFileAppender;
 import neurord.util.Settings;
 
 public class StochDiff {
     static final Logger log = LogManager.getLogger();
 
-    final static boolean log_to_file = Settings.getProperty("neurord.log", true);
-
-    final static int source_trial = Settings.getProperty("neurord.source_trial", 0);
-    final static double source_time = Settings.getProperty("neurord.source_time", Double.NaN);
-
     static final ModelReader<SDRun> loader = new ModelReader(SDRun.class);
 
     // The main method - a bit of basic checking and if all is well, create the
     // SDCalc object and run it;
 
-    public static void help_exit(boolean error) {
-        String msg = "Usage: neurord.StochDiff <model> [<output>]\n"
-            + " where the <model> is an XML specification of the model to run. \n "
-            + "The optional <output> specifies where the results should be stored (w/o extension).\n"
-            + "If it is not supplied, they are written to <model> but with .out extension.";
-        if (error) {
-            System.err.println(msg);
-            System.exit(1);
-        } else {
-            System.out.println(msg);
-            System.exit(0);
-        }
+    public static void help_exit(Options options, boolean error) {
+        String header =
+            "\nwhere the <model> is an XML specification of the model to run. "
+            + "The optional <output> specifies where the results should be stored "
+            + "(w/o extension). When not supplied, <output> defaults to <model> "
+            + "without the extension.\n\n";
+
+        HelpFormatter formatter = new HelpFormatter();
+        PrintWriter pw = new PrintWriter(error ? System.err : System.out);
+        int columns =
+            Math.max(Math.min(Settings.getEnvironmentVariable("COLUMNS", 80),
+                              120),
+                     20);
+        formatter.printHelp(pw,
+                            columns,
+                            "neurord.StochDiff <model> [<output>]",
+                            header,
+                            options,
+                            HelpFormatter.DEFAULT_LEFT_PAD,
+                            HelpFormatter.DEFAULT_DESC_PAD,
+                            "");
+        pw.flush();
+        System.exit(error ? 1 : 0);
     }
 
     /**
@@ -90,14 +103,31 @@ public class StochDiff {
             ctx.updateLoggers();
     }
 
+    static Options buildOptions() {
+        Options options = new Options();
+
+        options.addOption("i", "ic", true, "output file to take the initial conditions from");
+        options.addOption(null, "ic-trial", true, "trial to take the seed from (default: 0)");
+        options.addOption(null, "ic-time", true, "time to take the ICs from (default: 0)");
+
+        options.addOption(null, "log", false, "log file name (\"no\" to disable)");
+
+        return options;
+    }
+
     public static void main(String[] argv) throws Exception {
         File modelFile;
         final File outputFile;
 
+        CommandLineParser parser = new DefaultParser();
+        Options options = buildOptions();
+
         List<String> args = Arrays.asList(argv);
         boolean help_requested = args.contains("-h") || args.contains("--help");
         if (help_requested || argv.length == 0)
-            help_exit(!help_requested);
+            help_exit(options, !help_requested);
+
+        CommandLine cmd = parser.parse(options, argv);
 
         modelFile = new File(argv[0]);
         if (!modelFile.exists()) {
@@ -114,10 +144,10 @@ public class StochDiff {
             outputFile = new File(s);
         }
 
-        final String logfile = outputFile + ".log";
-
         setLogLevels();
 
+        final String logfile = cmd.getOptionValue("log", outputFile + ".log");
+        boolean log_to_file = !logfile.equals("no");
         if (log_to_file)
             CustomFileAppender.addFileAppender(logfile);
 
@@ -126,6 +156,9 @@ public class StochDiff {
 
         if (log_to_file)
             log.info("Writing logs to {}", logfile);
+
+        final int source_trial = Settings.getOption(cmd, "ic-trial", 0);
+        final int source_time = Settings.getOption(cmd, "ic-time", 0);
 
         final SDRun model;
         if (modelFile.toString().endsWith(".h5"))
