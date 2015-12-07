@@ -48,10 +48,6 @@ public class SDRun implements IOutputSet {
 
     private Discretization discretization;
 
-    public String initialStateFile;
-    public double stateSaveInterval;
-    public String stateSavePrefix;
-
     public String action;
 
     private String geometry;
@@ -134,10 +130,6 @@ public class SDRun implements IOutputSet {
 
     public double getOutputInterval() {
         return this.outputInterval;
-    }
-
-    public double getStateSaveInterval() {
-        return stateSaveInterval;
     }
 
     public double getFixedStepDt() {
@@ -380,6 +372,21 @@ public class SDRun implements IOutputSet {
         return this.population;
     }
 
+    public static boolean speciesMatch(String[] a, String[] b) {
+        if (a.length != b.length) {
+            log.error("Different number of species: {} vs {}", a.length, b.length);
+            return false;
+        }
+
+        for (int i = 0; i < a.length; i++)
+            if (!a[i].equals(b[i])) {
+                log.error("Species {}mismatch: {} vs {}", i, a[i], b[i]);
+                return false;
+            }
+
+        return true;
+    }
+
     public static SDRun loadFromFile(File model_file,
                                      File ic_file,
                                      int trial,
@@ -411,7 +418,7 @@ public class SDRun implements IOutputSet {
 
         if (have_time) {
             String[] species = ic == null ? model.species : ic.species;
-            if (!ArrayUtil.arraysMatch(sdrun.getSpecies(), species))
+            if (!speciesMatch(sdrun.getSpecies(), species))
                 throw new RuntimeException("Species list mismatch");
 
             sdrun.population = ic == null ? model.population : ic.population;

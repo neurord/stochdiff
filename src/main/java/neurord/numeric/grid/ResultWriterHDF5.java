@@ -295,26 +295,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
-    @Override
-    synchronized public void saveState(double time, String prefix, IGridCalc source) {
-        try {
-            Trial t = this.getTrial(source.trial());
-            t._saveState(time, prefix, source);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    synchronized public Object loadState(String filename, IGridCalc source) {
-        try {
-            Trial t = this.getTrial(source.trial());
-            return t._loadState(filename, source);
-        } catch(Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     protected class PopulationOutput {
         final H5ScalarDS concs;
         final int[][][] concs_cache;
@@ -404,7 +384,6 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected H5ScalarDS
             events_event, events_kind,
             events_extent, events_time, events_waited, events_original;
-        protected Dataset saved_state = null;
 
         public Trial(Group group)
             throws Exception
@@ -1039,74 +1018,6 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             if (this.events_cache.size() > CACHE_SIZE2)
                 this.flushEvents(time, false);
-        }
-
-        protected void writeSavedStateI(int nspecies, IGridCalc source)
-            throws Exception
-        {
-            int[][] state = {};
-            if (this.saved_state == null) {
-                Dataset ds = writeArray("state", this.sim, state, -1);
-                setAttribute(ds, "TITLE", "saved state");
-                setAttribute(ds, "LAYOUT", "[nelements × nspecies]");
-                setAttribute(ds, "UNITS", "count");
-
-                this.saved_state = ds;
-            } else {
-                int[] data = (int[]) this.saved_state.getData();
-                int columns = state[0].length; /* should all be the same */
-                ArrayUtil._flatten(data, state, columns, -1);
-                this.saved_state.write(data);
-            }
-        }
-
-        protected void writeSavedStateD(int nspecies, IGridCalc source)
-            throws Exception
-        {
-            double[][] state = {};
-            if (this.saved_state == null) {
-                Dataset ds = writeArray("state", this.sim, state);
-                setAttribute(ds, "TITLE", "saved state");
-                setAttribute(ds, "LAYOUT", "[nelements × nspecies]");
-                setAttribute(ds, "UNITS", "nm/l ?");
-
-                this.saved_state = ds;
-            } else {
-                double[] data = (double[]) this.saved_state.getData();
-                int columns = state[0].length; /* should all be the same */
-                ArrayUtil._flatten(data, state, columns);
-                this.saved_state.write(data);
-            }
-        }
-
-        public void _saveState(double time, String prefix, IGridCalc source)
-            throws Exception
-        {
-            log.debug("state saved at t={} ms for trial {}", time, source.trial());
-            assert nel == source.getNumberElements();
-            int nspecies = source.getSource().getSpecies().length;
-            if (source.preferConcs())
-                this.writeSavedStateD(nspecies, source);
-            else
-                this.writeSavedStateI(nspecies, source);
-        }
-
-        public Object _loadState(String filename, IGridCalc source)
-            throws Exception
-        {
-            // FIXME: This is totally not going to work, because we delete
-            // the file on creation...
-            Dataset obj = (Dataset) output.get("/output/state");
-            int nspecies = source.getSource().getSpecies().length;
-            if (obj == null)
-                throw new RuntimeException("state hasn't been saved");
-            if (source.preferConcs()) {
-                double[] data = (double[]) obj.getData();
-                return ArrayUtil.shape(data, nel, nspecies);
-            } else {
-                int[] data = (int[]) obj.getData();
-                return ArrayUtil.shape(data, nel, nspecies);
-            }
         }
     }
 

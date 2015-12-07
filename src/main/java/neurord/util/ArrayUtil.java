@@ -221,17 +221,6 @@ public class ArrayUtil {
 
     }
 
-    public static boolean arraysMatch(String[] a, String[] b) {
-        if (a.length != b.length)
-            return false;
-
-        for (int i = 0; i < a.length; i++)
-            if (!a[i].equals(b[i]))
-                return false;
-
-        return true;
-    }
-
     public static void copy(int[][] src, int dst[][]) {
         assert src.length == dst.length;
         for(int i = 0; i < src.length; i++)

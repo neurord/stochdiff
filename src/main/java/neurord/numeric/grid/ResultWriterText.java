@@ -379,34 +379,6 @@ public class ResultWriterText implements ResultWriter {
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
 
-    @Override
-    public void saveState(double time, String prefix, IGridCalc source) {
-        String state = getStateText(source);
-        this.writeToFinalSiblingFile(state, prefix + Math.round(time) + ".nrds");
-    }
-
-    protected String getStateText(IGridCalc source) {
-        String[] species = source.getSource().getSpecies();
-        int nel = source.getNumberElements();
-
-        StringBuffer sb = new StringBuffer();
-        sb.append("nrds " + nel + " " + species.length + "\n");
-        for (int i = 0; i < species.length; i++) {
-            sb.append(species[i] + " ");
-        }
-        sb.append("\n");
-        for (int i = 0; i < nel; i++) {
-            for (int j = 0; j < species.length; j++) {
-                if (source.preferConcs())
-                    sb.append(stringd(source.getGridPartConc(i, j)));
-                else
-                    sb.append(stringi(source.getGridPartNumb(i, j)));
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
     // let's park those two here for now
     public static String stringd(double d) {
         if (d == 0.0)
@@ -422,42 +394,6 @@ public class ResultWriterText implements ResultWriter {
             return "00 ";
         else
             return String.format("%d ", id);
-    }
-
-    public double[][] _readInitialState(String fnm, int nel, int nspec, String[] specids) {
-        String sdata = this.readSibling(fnm);
-        SDState sds = StateReader.readStateString(sdata);
-
-        double[][] ret = null;
-        if (sds.nel == nel && sds.nspec == nspec) {
-            if (ArrayUtil.arraysMatch(sds.specids, specids)) {
-                ret = sds.getData();
-            } else {
-                log.error("Initial conditions species mismatch");
-                for (int i = 0; i < specids.length; i++)
-                    log.warn("species {} {} {}", i, specids[i], sds.specids[i]);
-            }
-        } else
-            throw new RuntimeException("initial conditions file does not match model: elements "
-                                       + nel + ", " + sds.nel +
-                                       "  species: " + nspec + ", " + sds.nspec);
-
-        return ret;
-    }
-
-    public Object loadState(String fnm, IGridCalc source) {
-            int nel = source.getNumberElements();
-            String[] species = source.getSource().getSpecies();
-            double[][] state = this._readInitialState(fnm, nel, species.length, species);
-            if (source.preferConcs())
-                return state;
-            else {
-                int[][] nums = new int[nel][species.length];
-                for (int i = 0; i < nums.length; i++)
-                    for (int j = 0; j < nums[0].length; j++)
-                        nums[i][j] = (int) Math.round(state[i][j]);
-                return nums;
-            }
     }
 
     @Override

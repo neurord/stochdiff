@@ -37,9 +37,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     double[] surfaceAreas;
 
-    double stateSaveTime;
-
-
     /** The number of events of each reaction since last writeGridConcs.
      * Shapes is [nel x nreactions]. */
     int reactionEvents[][];
@@ -72,11 +69,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     }
 
     protected void init() {
-        stateSaveTime = this.sdRun.getStateSaveInterval();
-        if (stateSaveTime <= 0.0) {
-            stateSaveTime = 1.e9;
-        }
-
         VolumeGrid grid = this.sdRun.getVolumeGrid();
 
         nel = grid.size();
@@ -135,7 +127,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         long old_events = 0;
         long old_wall_time = System.currentTimeMillis();
 
-        log.info("dt={} dtsOut={} saveStateTime={}", dt, this.dtsOut, stateSaveTime);
+        log.info("dt={} dtsOut={}", dt, this.dtsOut);
 
         while (time <= endtime) {
 
@@ -172,15 +164,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     writeTimeArray[i] += Double.valueOf(this.dtsOut[i]);
                 }
 
-            if (time < endtime) {
+            if (time < endtime)
                 time += advance(time, time + dt);
-
-                if (time >= stateSaveTime) {
-                    for(ResultWriter resultWriter: this.resultWriters)
-                        resultWriter.saveState(time, this.sdRun.stateSavePrefix, this);
-                    stateSaveTime += this.sdRun.getStateSaveInterval();
-                }
-            } else
+            else
                 break;
         }
 

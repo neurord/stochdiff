@@ -119,18 +119,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         wkB = new int[nel][nspec];
         ArrayUtil.copy(wkA, wkB);
 
-        String statefile = this.sdRun.initialStateFile;
-        if (statefile != null) {
-            if (this.resultWriters.size() == 0) {
-                log.error("Unable to read state because writers are disabled");
-                throw new RuntimeException("Unable to read state because writers are disabled");
-            }
-
-            int[][] cc = (int[][]) resultWriters.get(0).loadState(statefile, this);
-            ArrayUtil.copy(cc, this.wkA);
-            ArrayUtil.copy(cc, this.wkB);
-        }
-
         lndt = Math.log(dt);
 
         // final things we need is something to generate particle numbers

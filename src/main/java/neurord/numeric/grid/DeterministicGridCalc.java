@@ -115,25 +115,14 @@ public class DeterministicGridCalc extends GridCalc {
                 // actual concentration
                 double concfac = a / volumes[i];
 
-                for (int j = 0; j < nspec; j++) {
-                    if (Double.isNaN(scs[j])) {
-                        // means not specified by the user;
-
-                    } else {
+                for (int j = 0; j < nspec; j++)
+                    if (!Double.isNaN(scs[j])) {
                         wkA[i][j] = concfac * scs[j];
                         //AB 2012-apr 3 change wkB to wk[time-1]
                         wktm1[i][j] = concfac * scs[j];
                         wkC[i][j] = concfac * scs[j];
                     }
-                }
             }
-        }
-
-        if (this.sdRun.initialStateFile != null) {
-            double[][] cc = (double[][])
-                resultWriters.get(0).loadState(this.sdRun.initialStateFile, this);
-            ArrayUtil.copy(cc, this.wkA);
-            ArrayUtil.copy(cc, this.wktm1);
         }
     }
 
