@@ -107,7 +107,7 @@ public class StochDiff {
         options.addOption(null, "ic-trial", true, "trial to take the seed from (default: 0)");
         options.addOption(null, "ic-time", true, "time to take the ICs from (default: none)");
 
-        options.addOption(null, "log", false, "log file name (\"no\" to disable)");
+        options.addOption(null, "log", true, "log file name (\"no\" to disable)");
 
         return options;
     }
@@ -125,6 +125,7 @@ public class StochDiff {
             help_exit(options, !help_requested);
 
         CommandLine cmd = parser.parse(options, argv);
+        argv = cmd.getArgs();
 
         modelFile = new File(argv[0]);
         if (!modelFile.exists()) {
@@ -154,9 +155,9 @@ public class StochDiff {
         if (log_to_file)
             log.info("Writing logs to {}", logfile);
 
-        final File ic_file = new File(cmd.getOptionValue("ic"));
+        final File ic_file = Settings.getOption(cmd, "ic", null);
         final int ic_trial = Settings.getOption(cmd, "ic-trial", 0);
-        final int ic_time = Settings.getOption(cmd, "ic-time", 0);
+        final double ic_time = Settings.getOption(cmd, "ic-time", Double.NaN);
 
         final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
 

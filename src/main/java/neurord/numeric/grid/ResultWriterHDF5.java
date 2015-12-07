@@ -1208,7 +1208,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             seed = data[0];
         }
 
-        final String[] species = getSomething(h5, "/model" + trial + "/species");
+        final String[] species = getSomething(h5, "/model/species");
 
         int[][] pop = null;
         if (!Double.isNaN(pop_from_time))

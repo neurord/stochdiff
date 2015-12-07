@@ -2,6 +2,7 @@ package neurord.util;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.File;
 import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Logger;
@@ -115,6 +116,14 @@ public abstract class Settings {
             double ret = Double.valueOf(val);
             return ret;
         } else
+            return fallback;
+    }
+
+    static public File getOption(CommandLine cmd, String name, File fallback) {
+        String val = cmd.getOptionValue(name);
+        if (val != null)
+            return new File(val);
+        else
             return fallback;
     }
 }
