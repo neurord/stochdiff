@@ -2,9 +2,6 @@
 //written by Robert Cannon
 package neurord.model;
 
-import neurord.numeric.chem.ReactionTable;
-import neurord.numeric.chem.StimulationTable;
-
 import javax.xml.bind.annotation.*;
 
 public class InjectionStim {
@@ -12,7 +9,7 @@ public class InjectionStim {
     @XmlAttribute public String specieID;
 
     // this should be the ID of a point in the morphology file
-    @XmlAttribute public String injectionSite;
+    @XmlAttribute private String injectionSite;
 
     private double rate;
 
@@ -25,29 +22,18 @@ public class InjectionStim {
     //the start(onset) of two consecutive input trains
     private Integer numTrains;
 
-    public void writeTo(StimulationTable stab, ReactionTable rtab) {
-        int specInd = rtab.getSpecieIndex(specieID);
-        double[] vrate = new double[rtab.getNSpecies()];
-        vrate[specInd] = rate;
-        // above allows option of injecting a combination of species
+    public String getInjectionSite() {
+        assert this.injectionSite != null; /* required in the schema */
+        return this.injectionSite;
+    }
 
-        if (Double.isInfinite(this.getEnd()) && this.getNumTrains() > 1)
-            throw new RuntimeException("end must be specified with numTrains");
+    public String getSpecies() {
+        assert this.specieID != null;      /* required in the schema */
+        return this.specieID;
+    }
 
-        if (injectionSite == null)
-            throw new RuntimeException("injectionSite must be specified");
-
-        for (int i = 0; i < this.getNumTrains(); i++)
-            if (period == null)
-                stab.addSquarePulse(injectionSite,
-                                    vrate,
-                                    onset + i*(duration + this.getInterTrainInterval()),
-                                    duration);
-            else
-                stab.addPeriodicSquarePulse(injectionSite, vrate,
-                                            onset + i*((end-onset) + this.getInterTrainInterval()),
-                                            duration, period,
-                                            end + i*((end-onset) + this.getInterTrainInterval()));
+    public double getRate() {
+        return this.rate;
     }
 
     public double getOnset() {

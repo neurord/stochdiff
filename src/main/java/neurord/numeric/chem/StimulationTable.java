@@ -1,23 +1,33 @@
 package neurord.numeric.chem;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import neurord.model.InjectionStim;
 
 public class StimulationTable {
 
     public static class Stimulation {
+        public final int species;
         public final String site;
-        public final double[] rates;
-        public final double onset, duration, period, end;
+        public final double rate, onset, duration, period, end;
 
-        public Stimulation(String site,
-                           double[] rates,
-                           double onset, double duration, double period, double end) {
-            this.site = site;
-            this.rates = rates;
-            this.onset = onset;
-            this.duration = duration;
-            this.period = period;
+        public Stimulation(InjectionStim source, int species, int train) {
+            final double train_offset, end;
+            if (Double.isNaN(source.getPeriod())) {
+                train_offset = source.getDuration() + source.getInterTrainInterval();
+                end = source.getOnset() + source.getDuration();
+            } else {
+                train_offset = source.getEnd() - source.getOnset() + source.getInterTrainInterval();
+                end = source.getEnd() + train*train_offset;
+            }
+
+            this.species = species;
+            this.site = source.getInjectionSite();
+            this.rate = source.getRate();
+            this.onset = source.getOnset() + train*train_offset;
+            this.duration = source.getDuration();
+            this.period = source.getPeriod();
             this.end = end;
         }
 
@@ -58,29 +68,29 @@ public class StimulationTable {
         }
     }
 
-    private final ArrayList<Stimulation> stims = new ArrayList<>();
+    private final ArrayList<Stimulation> stims;
+    private final int nspec;
 
-    public void addSquarePulse(String site, double[] rate, double onset, double duration) {
-        this.addPeriodicSquarePulse(site, rate, onset, duration,
-                                    Double.NaN, onset + duration);
+    public StimulationTable(List<InjectionStim> stims, ReactionTable rtab) {
+        this.stims = new ArrayList<>();
+        this.nspec = rtab.getSpecies().length;
+
+        if (stims != null)
+            for (InjectionStim stim: stims) {
+                int species = rtab.getSpecieIndex(stim.getSpecies());
+                for (int i = 0; i < stim.getNumTrains(); i++)
+                    this.stims.add(new Stimulation(stim, species, i));
+            }
     }
-
-    public void addPeriodicSquarePulse(String site, double[] rate, double onset,
-                                       double duration, double period, double end) {
-        this.stims.add(new Stimulation(site, rate, onset, duration, period, end));
-    }
-
 
     public double[][] getStimsForInterval(double time, double dt) {
-        int nspec = getNStim() > 0 ? this.stims.get(0).rates.length : 0;
         double[][] ret = new double[getNStim()][nspec];
         for (int i = 0; i < ret.length; i++) {
             Stimulation stim = this.stims.get(i);
             double f = stim.effectiveRate(time, dt);
 
             if (f > 0)
-                for (int j = 0; j < nspec; j++)
-                    ret[i][j] = f * stim.rates[j] * dt;
+                ret[i][stim.species] = f * stim.rate * dt;
         }
         return ret;
     }

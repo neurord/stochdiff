@@ -1352,7 +1352,8 @@ public class NextEventQueue {
 
         @Override
         public double calcPropensity() {
-            double ans = this.stim.rates[this.sp] / this.neighbors;
+            assert this.sp == this.stim.species;
+            double ans = this.stim.rate / this.neighbors;
             assert ans >= 0: ans;
             return ans;
         }
@@ -1597,15 +1598,13 @@ public class NextEventQueue {
             Stimulation stim = stimtab.getStimulations().get(i);
             int[] targets = stimtargets[i];
 
-            for (int sp = 0; sp < stim.rates.length; sp++)
-                if (stim.rates[sp] > 0) {
-                    for (int el: targets)
-                        ans.add(new NextStimulation(numbering.get(),
-                                                    el, targets.length,
-                                                    sp,
-                                                    species[sp],
-                                                    stim));
-                }
+            for (int el: targets)
+                // FIXME: check how the splitting between targets works
+                ans.add(new NextStimulation(numbering.get(),
+                                            el, targets.length,
+                                            stim.species,
+                                            species[stim.species],
+                                            stim));
         }
 
         log.info("Created {} stimulation events", ans.size());

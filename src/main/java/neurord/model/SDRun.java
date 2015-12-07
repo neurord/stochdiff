@@ -166,11 +166,11 @@ public class SDRun implements IOutputSet {
     transient private StimulationTable stimulationTable;
     public StimulationTable getStimulationTable() {
         if (this.stimulationTable == null) {
+            List<InjectionStim> stimulations = null;
             if (this.stimulationSet != null)
-                this.stimulationTable = this.stimulationSet.makeStimulationTable(this.getReactionTable());
-            else
-                this.stimulationTable = new StimulationTable();
-            assert this.stimulationTable != null;
+                stimulations = this.stimulationSet.stimulations;
+            this.stimulationTable = new StimulationTable(stimulations,
+                                                         this.getReactionTable());
         }
         return this.stimulationTable;
     }
