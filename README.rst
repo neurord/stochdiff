@@ -393,6 +393,8 @@ The random seed is also extracted from the `.h5` file, which means that by using
 
 When an `.h5` file is used as model input, the initial population can be taken from the results of that simulation. This is achieved by specifying `-Dneurord.source_time=T`, where `T` is a timestamp of some saved state (`T` >= 0). It is also possible to specify `-Dneurord.source_time=-1`, which uses the last `T` found in the file. As with the random seed, `-Dneurord.source_trial=N` can be used to pick a specific trial.
 
+Please note: the list of species in the file containing the input state must match exactly. This is checked by the program. The list of reactions *doesn't* have to match, but be aware that if the list of reactions (or their constants) is changed, if the input state was a steady state, it might not be anymore with the new set of reactions.
+
 Overrides
 ~~~~~~~~~
 
