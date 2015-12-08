@@ -187,20 +187,37 @@
 
   <xs:element name="InjectionStim">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element name="onset" type="non-negative-real" />
-        <xs:element name="duration" type="non-negative-real" />
-        <xs:element name="rate" type="non-negative-real" />
-        <xs:element name="period" type="non-negative-real" minOccurs="0" />
-        <xs:element name="end" type="non-negative-real" minOccurs="0" />
+      <xs:choice minOccurs="1" maxOccurs="1">
+        <xs:sequence>
+          <xs:element name="onset" type="non-negative-real" />
+          <xs:element name="duration" type="non-negative-real" />
+          <xs:element name="rate" type="non-negative-real" />
+          <xs:element name="period" type="non-negative-real" minOccurs="0" />
+          <xs:element name="end" type="non-negative-real" minOccurs="0" />
 
-        <xs:element name="interTrainInterval" type="non-negative-real" minOccurs="0" />
-        <xs:element name="numTrains" type="xs:positiveInteger" minOccurs="0" />
-      </xs:sequence>
+          <xs:element name="interTrainInterval" type="non-negative-real" minOccurs="0" />
+          <xs:element name="numTrains" type="xs:positiveInteger" minOccurs="0" />
+        </xs:sequence>
+        <xs:sequence>
+          <xs:element ref="times" />
+          <xs:element ref="rates" />
+        </xs:sequence>
+      </xs:choice>
 
       <xs:attribute name="specieID" type="xs:string" use="required" />
       <xs:attribute name="injectionSite" type="xs:string" use="required" />
     </xs:complexType>
+  </xs:element>
+
+  <xs:element name="times">
+    <xs:simpleType>
+      <xs:list itemType="xs:double"/>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="rates">
+    <xs:simpleType>
+      <xs:list itemType="xs:double"/>
+    </xs:simpleType>
   </xs:element>
 
   <xs:element name="OutputScheme">

@@ -214,7 +214,9 @@ Note that the initial conditions file should contain somewhere within it a state
 Stimulation File
 ----------------
 
-The stimulation file specifies the time and location of injection of molecules (which is optional) during a simulation. For example, calcium influx from extracellular space might occur or glutamate might be released from a neighboring terminal. Each program statement must specify the molecule injected and its site of injection. The injectionSite needs to be a labeld point, either a spine (below) or labeled segment.  The injection into a segment occurs in the middle mesh element of the labeled end of the segment.  Additional required statements provide onset (in msec), duration (in msec) and rate (particles/msec). Optional statements can be used to specify a train of input by providing two more parameters: period, and end.
+The stimulation file specifies the time and location of injection of molecules (which is optional) during a simulation. For example, calcium influx from extracellular space might occur or glutamate might be released from a neighboring terminal. Each program statement must specify the molecule injected and its site of injection. The injectionSite needs to be a labeld point, either a spine (below) or labeled segment.  The injection into a segment occurs in the middle mesh element of the labeled end of the segment. There are two ways to specify the timing and rate of injection: in the first a pattern is interpreted by NeuroRD, in the second a simple array of values specifies the pattern.
+
+In the first version, additional statements provide onset (in ms), duration (in ms) and rate (particles/ms). Optional statements can be used to specify a train of input by providing two more parameters: period, and end.
 
 Multiple trains are possible with two more parameters — intertrain interval and number of trains:
 
@@ -235,9 +237,21 @@ Note that the intertrain interval specifies the interval between repetition of t
 .. image:: stim-params.png
    :align: center
 
+In the second version, two arrays must be given
+
+.. code-block:: xml
+
+     <InjectionStim specieID="glu"  injectionSite="pointA">
+          <times>100 120 300 320 400 420</times>
+          <rates> 30   0  40   0  50   0</rates>
+     </InjectionStim>
+
+.. image:: stim-params2.png
+   :align: center
+
 Since particles can only be injected, and not withdrawn, to produce transient elevations in concentration it may be necessary to inject a "binding partner" and add a reaction between the injected particle and the binding partner to lower the concentration of the unbound injected molecule.
 
-Injection to spines is also possible by specifying which spine as follows:
+Injection to spines is also possible by specifying a spine as follows:
 
 .. code-block:: xml
 

@@ -3,32 +3,45 @@ package neurord.numeric.chem;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import neurord.model.InjectionStim;
 
 public class StimulationTable {
+    static final Logger log = LogManager.getLogger();
 
     public static class Stimulation {
         public final int species;
         public final String site;
         public final double rate, onset, duration, period, end;
 
-        public Stimulation(InjectionStim source, int species, int train) {
-            final double train_offset, end;
-            if (Double.isNaN(source.getPeriod())) {
-                train_offset = source.getDuration() + source.getInterTrainInterval();
-                end = source.getOnset() + source.getDuration();
+        public Stimulation(int species,
+                           String site,
+                           int train,
+                           double rate,
+                           double onset,
+                           double duration,
+                           double iti,
+                           double period,
+                           double end) {
+            this.species = species;
+            this.site = site;
+
+            final double train_offset, real_end;
+            if (Double.isNaN(period)) {
+                train_offset = duration + iti;
+                real_end = onset + duration;
             } else {
-                train_offset = source.getEnd() - source.getOnset() + source.getInterTrainInterval();
-                end = source.getEnd() + train*train_offset;
+                train_offset = end - onset + iti;
+                real_end = end + train*train_offset;
             }
 
-            this.species = species;
-            this.site = source.getInjectionSite();
-            this.rate = source.getRate();
-            this.onset = source.getOnset() + train*train_offset;
-            this.duration = source.getDuration();
-            this.period = source.getPeriod();
-            this.end = end;
+            this.rate = rate;
+            this.onset = onset + train*train_offset;
+            this.duration = duration;
+            this.period = period;
+            this.end = real_end;
         }
 
         @Override
@@ -50,7 +63,7 @@ public class StimulationTable {
             }
         }
 
-        private double pulseOverlap(double t, double dt, double ons, double dur) {
+        private static double pulseOverlap(double t, double dt, double ons, double dur) {
             if (t + dt < ons || t > ons + dur)
                 return 0;
             else if (t >= ons && t + dt <= ons + dur)
@@ -66,6 +79,44 @@ public class StimulationTable {
                 // straddles end;
                 return (ons + dur - t) / dt;
         }
+
+        public static void addTo(ArrayList<Stimulation> stims, int species, InjectionStim stim) {
+            if (stim.getRates() == null) {
+                for (int i = 0; i < stim.getNumTrains(); i++)
+                    stims.add(new Stimulation(species,
+                                              stim.getInjectionSite(),
+                                              i,
+                                              stim.getRate(),
+                                              stim.getOnset(),
+                                              stim.getDuration(),
+                                              stim.getInterTrainInterval(),
+                                              stim.getPeriod(),
+                                              stim.getEnd()));
+            } else {
+                List<Double> times = stim.getTimes();
+                List<Double> rates = stim.getRates();
+                for (int i = 0; i < times.size(); i++) {
+                    if (rates.get(i) == 0)
+                        continue;
+
+                    final double duration;
+                    if (i < times.size()-1)
+                        duration = times.get(i+1) - times.get(i);
+                    else
+                        duration = Double.POSITIVE_INFINITY;
+
+                    stims.add(new Stimulation(species,
+                                              stim.getInjectionSite(),
+                                              0,
+                                              rates.get(i),
+                                              times.get(i),
+                                              duration,
+                                              0,
+                                              Double.NaN,
+                                              Double.NaN));
+                }
+            }
+        }
     }
 
     private final ArrayList<Stimulation> stims;
@@ -76,11 +127,10 @@ public class StimulationTable {
         this.nspec = rtab.getSpecies().length;
 
         if (stims != null)
-            for (InjectionStim stim: stims) {
-                int species = rtab.getSpecieIndex(stim.getSpecies());
-                for (int i = 0; i < stim.getNumTrains(); i++)
-                    this.stims.add(new Stimulation(stim, species, i));
-            }
+            for (InjectionStim stim: stims)
+                Stimulation.addTo(this.stims,
+                                  rtab.getSpecieIndex(stim.getSpecies()),
+                                  stim);
     }
 
     public double[][] getStimsForInterval(double time, double dt) {
