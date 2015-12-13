@@ -1458,10 +1458,10 @@ public class NextEventQueue {
     public int updatePopulation(int element, int specie, int count, NextEvent event) {
         final int done;
         if (count < 0 && this.particles[element][specie] < -count) {
-            log.warn("{}: population would become negative for element {} sp {}: changing {} by {} {}",
-                     event, element, specie,
-                     this.particles[element][specie], count,
-                     this.particles);
+            log.debug("{}: population would become negative for element {} sp {}: changing {} by {} {}",
+                      event, element, specie,
+                      this.particles[element][specie], count,
+                      this.particles);
             done = -this.particles[element][specie];
             this.particles[element][specie] = 0;
         } else {
