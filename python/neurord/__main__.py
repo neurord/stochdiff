@@ -18,7 +18,7 @@ import contextlib
 from lxml import etree
 from pygments import highlight
 from pygments.lexers import XmlLexer
-from pygments.formatters import Terminal256Formatter as Formatter
+from pygments.formatters import Terminal256Formatter
 import pandas as pd
 
 from . import output, ks
@@ -633,7 +633,11 @@ def print_config(output):
         if i > 0:
             print()
         text = etree.tostring(what, encoding='unicode')
-        print(highlight(text, XmlLexer(), Formatter()))
+        if sys.stdout.isatty():
+            formatter = Terminal256Formatter()
+            print(highlight(text, XmlLexer(), formatter))
+        else:
+            print(text)
 
 if __name__ == '__main__':
     opts = parser.parse_args()
