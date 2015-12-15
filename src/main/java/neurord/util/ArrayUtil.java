@@ -104,7 +104,7 @@ public class ArrayUtil {
         return flat;
     }
 
-    public static String xJoined(int[] dims) {
+    public static String xJoined(int... dims) {
         if (dims.length == 0)
             return "";
         String s = "" + dims[0];
@@ -113,7 +113,7 @@ public class ArrayUtil {
         return s;
     }
 
-    public static String xJoined(long[] dims) {
+    public static String xJoined(long... dims) {
         if (dims.length == 0)
             return "";
         String s = dims[0] == -1 ? "∞" : "" + dims[0];

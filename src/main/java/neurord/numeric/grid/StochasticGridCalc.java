@@ -38,8 +38,12 @@ public abstract class StochasticGridCalc extends GridCalc {
         if (pop != null) {
             log.info("Using preexisting population");
             if (pop.length != this.wkA.length ||
-                pop[0].length != this.wkA[0].length)
+                pop[0].length != this.wkA[0].length) {
+                log.error("Preexisting population shape mismatch (nel×nspec {} != {})",
+                          ArrayUtil.xJoined(pop.length, pop[0].length),
+                          ArrayUtil.xJoined(this.wkA.length, this.wkA[0].length));
                 throw new RuntimeException("Preexisting population shape mismatch");
+            }
             ArrayUtil.copy(pop, this.wkA);
         } else
             this.initPopulation(this.wkA, this.sdRun);
