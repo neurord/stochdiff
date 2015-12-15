@@ -81,7 +81,31 @@ public class StimulationTable {
         }
 
         public static void addTo(ArrayList<Stimulation> stims, int species, InjectionStim stim) {
-            if (stim.getRates() == null) {
+            final double[][] rates = stim.getRates();
+
+            if (rates != null)
+                for (int i = 0; i < rates.length; i++) {
+                    double time = rates[i][0], rate = rates[i][1];
+                    if (rate == 0)
+                        continue;
+
+                    final double duration;
+                    if (i < rates.length - 1)
+                        duration = rates[i+1][0] - time;
+                    else
+                        duration = Double.POSITIVE_INFINITY;
+
+                    stims.add(new Stimulation(species,
+                                              stim.getInjectionSite(),
+                                              0,
+                                              rate,
+                                              time,
+                                              duration,
+                                              0,
+                                              Double.NaN,
+                                              Double.NaN));
+                }
+            else
                 for (int i = 0; i < stim.getNumTrains(); i++)
                     stims.add(new Stimulation(species,
                                               stim.getInjectionSite(),
@@ -92,30 +116,6 @@ public class StimulationTable {
                                               stim.getInterTrainInterval(),
                                               stim.getPeriod(),
                                               stim.getEnd()));
-            } else {
-                List<Double> times = stim.getTimes();
-                List<Double> rates = stim.getRates();
-                for (int i = 0; i < times.size(); i++) {
-                    if (rates.get(i) == 0)
-                        continue;
-
-                    final double duration;
-                    if (i < times.size()-1)
-                        duration = times.get(i+1) - times.get(i);
-                    else
-                        duration = Double.POSITIVE_INFINITY;
-
-                    stims.add(new Stimulation(species,
-                                              stim.getInjectionSite(),
-                                              0,
-                                              rates.get(i),
-                                              times.get(i),
-                                              duration,
-                                              0,
-                                              Double.NaN,
-                                              Double.NaN));
-                }
-            }
         }
     }
 

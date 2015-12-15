@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import neurord.xml.DoubleListAdapter;
+import neurord.xml.DoubleMatrixAdapter;
+
+import org.jblas.DoubleMatrix;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.*;
@@ -28,11 +31,8 @@ public class InjectionStim {
     //the start(onset) of two consecutive input trains
     private Integer numTrains;
 
-    @XmlJavaTypeAdapter(DoubleListAdapter.class)
-    private List<Double> times;
-
-    @XmlJavaTypeAdapter(DoubleListAdapter.class)
-    private List<Double> rates;
+    @XmlJavaTypeAdapter(DoubleMatrixAdapter.class)
+    private DoubleMatrix rates;
 
     public String getInjectionSite() {
         assert this.injectionSite != null; /* required in the schema */
@@ -72,25 +72,15 @@ public class InjectionStim {
         return this.interTrainInterval != null ? this.interTrainInterval : 0;
     }
 
-    public List<Double> getTimes() {
-        this.getRates(); /* do asserts... */
-
-        return this.times;
-    }
-
-    public List<Double> getRates() {
+    public double[][] getRates() {
         if (this.rates != null) {
             assert this.rate == null;
             assert this.onset == null;
             assert this.duration == null;
             assert this.period == null;
             assert this.end == null;
-
-            assert this.times != null;
-            if (this.times.size() != this.rates.size())
-                throw new RuntimeException("<times> and <rates> lengths must match");
         }
 
-        return this.rates;
+        return this.rates.toArray2();
     }
 }

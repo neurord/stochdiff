@@ -202,7 +202,6 @@
           <xs:element name="numTrains" type="xs:positiveInteger" minOccurs="0" />
         </xs:sequence>
         <xs:sequence>
-          <xs:element ref="times" />
           <xs:element ref="rates" />
         </xs:sequence>
       </xs:choice>
@@ -212,14 +211,11 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="times">
-    <xs:simpleType>
-      <xs:list itemType="xs:double"/>
-    </xs:simpleType>
-  </xs:element>
   <xs:element name="rates">
     <xs:simpleType>
-      <xs:list itemType="xs:double"/>
+      <xs:restriction base="xs:string">
+        <xs:whiteSpace value="preserve" />
+      </xs:restriction>
     </xs:simpleType>
   </xs:element>
 
