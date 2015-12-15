@@ -12,14 +12,13 @@ import neurord.numeric.morph.SpinePopulation;
 public class SpineAllocation {
     static final Logger log = LogManager.getLogger();
 
-    @XmlAttribute public String id;
+    @XmlAttribute private String id;
 
-    @XmlAttribute public String spineType;
-    @XmlAttribute public String region;
+    @XmlAttribute private String spineType;
+    @XmlAttribute private String region;
 
-    @XmlAttribute public double lengthDensity;
-
-    @XmlAttribute public double areaDensity;
+    @XmlAttribute private Double lengthDensity;
+    @XmlAttribute private Double areaDensity;
 
     transient private SpineType r_spineType;
 
@@ -33,9 +32,9 @@ public class SpineAllocation {
 
     public SpinePopulation makePopulation() {
         final double density;
-        if (areaDensity > 0)
+        if (this.areaDensity != null)
             density = this.areaDensity;
-        else if (lengthDensity > 0) {
+        else if (this.lengthDensity != null) {
             log.warn("'lengthDensity' is deprecated, use 'areaDensity' instead");
             density = this.lengthDensity;
         } else

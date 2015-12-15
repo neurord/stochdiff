@@ -119,6 +119,9 @@
       <xs:attribute name="id" type="xs:string" />
       <xs:attribute name="spineType" type="xs:string" />
       <xs:attribute name="region" type="xs:string" />
+      <xs:attribute name="areaDensity" type="non-negative-real" />
+
+      <!-- deprecated -->
       <xs:attribute name="lengthDensity" type="non-negative-real" />
     </xs:complexType>
   </xs:element>
