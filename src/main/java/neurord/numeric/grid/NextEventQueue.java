@@ -39,6 +39,7 @@ public class NextEventQueue {
 
     final static boolean log_queue = Settings.getProperty("neurord.neq.log_queue", false);
     final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity", false);
+    final static boolean log_reposition = Settings.getProperty("neurord.neq.log_reposition", false);
 
     public static class Numbering {
         int count = 0;
@@ -675,7 +676,8 @@ public class NextEventQueue {
 
                 return this.reverse.update_and_reposition(current, false);
             } else {
-                log.debug("update_and_reposition: {}", this);
+                if (log_reposition)
+                    log.debug("update_and_reposition: {}", this);
                 boolean expect_changed = changed && !this.bidirectional_leap;
                 double old = this._update_propensity(expect_changed);
                 boolean inf = Double.isInfinite(this.time);
