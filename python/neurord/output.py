@@ -226,24 +226,24 @@ class Simulation(object):
         self.number = int(element._v_name[5:])
         self.model = model
 
-    def times(self):
-        times = self._element.output.__main__.times[:]
+    def times(self, output_group='__main__'):
+        times = self._element.output._v_children[output_group].times[:]
         diff = times[1] - times[0]
         return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
-    def counts(self):
-        data = self._element.output.__main__.population
+    def counts(self, output_group='__main__'):
+        data = self._element.output._v_children[output_group].population
         panel= pd.Panel(data.read(),
-                        items=self.times(),
+                        items=self.times(output_group),
                         major_axis=range(data.shape[1]),
                         minor_axis=self.model.species())
         frame = panel.transpose(2, 1, 0).to_frame()
         frame.index.names = ['voxel', 'time']
         return frame
 
-    def concentrations(self):
+    def concentrations(self, output_group='__main__'):
         "Counts converted to concentrations using voxel volumes"
-        counts = self.counts()
+        counts = self.counts(output_group)
         volumes = self.model.grid().volume
         ans = counts / volumes / PUVC
         ans.rename(columns={'count':'concentration'}, inplace=1)
@@ -320,7 +320,7 @@ class Output(object):
         return sims
 
     @functools.lru_cache()
-    def counts(self):
+    def counts(self, output_group='__main__'):
         """Aggregated table of particle counts
 
         >>> out = Output('model.h5')
@@ -350,7 +350,7 @@ class Output(object):
                    C          0.00  0.000000
         """
         sims = self.simulations()
-        data = dict((i, sim.counts())
+        data = dict((i, sim.counts(output_group))
                     for (i, sim) in enumerate(sims))
         panel = pd.Panel(data)
         series = panel.to_frame().stack()
@@ -359,7 +359,7 @@ class Output(object):
         return frame
 
     @functools.lru_cache()
-    def concentrations(self):
+    def concentrations(self, output_group='__main__'):
         """Counts converted to concentrations using voxel volumes
 
         >>> out = Output('model.h5')
@@ -372,7 +372,7 @@ class Output(object):
         voxel time specie trial               
         0     0    A      0         1050.29078
         """
-        counts = self.counts()
+        counts = self.counts(output_group)
         volumes = self.model.grid().volume
         ans = counts / volumes / PUVC
         ans.rename(columns={'count':'concentration'}, inplace=1)

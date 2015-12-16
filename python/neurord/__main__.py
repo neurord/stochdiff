@@ -80,6 +80,7 @@ parser.add_argument('--style', default='r-')
 parser.add_argument('--time', type=time_slice)
 parser.add_argument('--trial', type=int, default=0)
 parser.add_argument('--config', type=str, nargs='?', const='')
+parser.add_argument('--output-group', '-g', default='__main__')
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -508,7 +509,7 @@ def plot_history(output, species):
     if not species:
         species = model.species()
     # filter time. level 0 is voxel, level 1 is time
-    counts = simul.counts()
+    counts = simul.counts(opts.output_group)
     if opts.time:
         counts = counts.loc[(slice(None), opts.time), :]
 
