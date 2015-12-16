@@ -79,8 +79,9 @@ public class InjectionStim {
             assert this.duration == null;
             assert this.period == null;
             assert this.end == null;
-        }
 
-        return this.rates.toArray2();
+            return this.rates.toArray2();
+        } else
+            return null;
     }
 }
