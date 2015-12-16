@@ -18,6 +18,7 @@ public class DoubleMatrixAdapter extends XmlAdapter<String, DoubleMatrix> {
 
     @Override
     public String marshal(final DoubleMatrix values) {
-        return values.toString("%f", "\n", "\n", " ", "\n");
+        final String SP12 = "            ", SP16 = SP12 + "    ";
+        return values.toString("%f", "\n" + SP16, "\n" + SP12, " ", "\n" + SP16);
     }
 }
