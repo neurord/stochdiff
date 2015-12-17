@@ -92,10 +92,10 @@ public class VolumeSlice {
                     CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
                                                                      boxSize * sl,
                                                                      boxSize * boxSize,
-                                                                     boxSize * sl);
+                                                                     boxSize * sl,
+                                                                     boxSize * boxSize * sl, /* volume */
+                                                                     boxSize);               /* deltaZ */
                     elements[i][j] = ve;
-                    ve.setVolume(boxSize * boxSize * sl);
-                    ve.setDeltaZ(boxSize);
 
                     Position cp = Geom.position(vcx, vcy, 0.);
                     Position pr = rot.getRotatedPosition(cp);

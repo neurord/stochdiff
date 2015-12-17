@@ -130,10 +130,11 @@ public class CurvedVolumeSlice {
 
                 double theta = ia * eltangle;
 
-                CurvedVolumeElement ve = new CurvedVolumeElement(null, regionLabel, null);
+                CurvedVolumeElement ve = new CurvedVolumeElement(null, regionLabel, null,
+                                                                 eltvol,  /* volume */
+                                                                 0.0);    /* deltaZ */
 
                 ve.setPositionIndexes(ir, ia);
-                ve.setVolume(eltvol);
 
                 if (na > 1) {
                     if (ia > 0) {
@@ -150,8 +151,6 @@ public class CurvedVolumeSlice {
                     azb.get(ib).coupleTo(ve, subarea);
                 }
 
-
-
                 double thetaC = theta + 0.5 * eltangle;
                 double vcx = rc * Math.cos(thetaC);
                 double vcy = 0.;
@@ -161,14 +160,10 @@ public class CurvedVolumeSlice {
                 Position pc = trans.getTranslated(pr);
                 ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
-
                 double rca = (ra1 + ra2) / 2;
                 double rcb = (rb1 + rb2) / 2;
 
-                double dtheta = eltangle / 2;
-                if (dtheta > 1) {
-                    dtheta = 1;
-                }
+                double dtheta = Math.max(eltangle / 2, 1);
                 double ha = 0.5 * axlen;
 
                 Position[] pbdry = new Position[4];

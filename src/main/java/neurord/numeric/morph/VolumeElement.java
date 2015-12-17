@@ -15,8 +15,8 @@ public abstract class VolumeElement {
     protected final String region;
     protected final String groupID;
 
-    protected double volume;
-    protected double deltaZ;
+    protected final double volume;
+    protected final double deltaZ;
     protected double exposedArea;
 
     protected int icache;
@@ -36,7 +36,8 @@ public abstract class VolumeElement {
     protected boolean submembrane;
 
     public VolumeElement(String label, String region, String groupID,
-                         double alongArea, double sideArea, double topArea) {
+                         double alongArea, double sideArea, double topArea,
+                         double volume, double deltaZ) {
         this.label = label;
         this.region = region;
         this.groupID = groupID;
@@ -44,6 +45,9 @@ public abstract class VolumeElement {
         this.alongArea = alongArea;
         this.sideArea = sideArea;
         this.topArea = topArea;
+
+        this.volume = volume;
+        this.deltaZ = deltaZ;
     }
 
     public double getAlongArea() {
@@ -97,16 +101,8 @@ public abstract class VolumeElement {
         return connections;
     }
 
-    public void setVolume(double v) {
-        volume = v;
-    }
-
     public double getVolume() {
         return this.volume;
-    }
-
-    public void setDeltaZ(double d) {
-        deltaZ = d;
     }
 
     public double getDeltaZ() {

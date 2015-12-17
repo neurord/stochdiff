@@ -207,15 +207,19 @@ public abstract class SpineLocator {
             final String lroot = popid + "[" + idx + "]";
             final String label = lbls[i] != null ? lroot + "." + lbls[i] : null;
             final String groupID = lbls[i] == null ? lroot : null;
+            final double deltaZ = 0.5 * (rb[i] + rb[i + 1]);
 
             for (int j = 0; j < pbdry.length; j++)
                 pbdry[j] = trans.getTranslated(rot.getRotatedPosition(pbdry[j]));
 
             if (vedend instanceof CuboidVolumeElement) {
-                ve = new CuboidVolumeElement(label, rgns[i], groupID);
+                ve = new CuboidVolumeElement(label, rgns[i], groupID,
+                                             0.0, 0.0, 0.0,
+                                             vol, deltaZ);
                 ve.setBoundary(pbdry);
             } else if (vedend instanceof CurvedVolumeElement) {
-                CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i], groupID);
+                CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i], groupID,
+                                                                  vol, deltaZ);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
                 ts.rotate(rot);
@@ -225,9 +229,6 @@ public abstract class SpineLocator {
                 cve.setBoundary(pbdry);
             } else
                 throw new RuntimeException("unknown element type " + vedend);
-
-            ve.setVolume(vol);
-            ve.setDeltaZ(0.5 * (rb[i] + rb[i + 1]));
 
             Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
             Position pr = rot.getRotatedPosition(cp);
