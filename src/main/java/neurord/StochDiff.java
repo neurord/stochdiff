@@ -55,13 +55,44 @@ public class StochDiff {
         System.exit(error ? 1 : 0);
     }
 
+    public static boolean setLogLevel(LoggerContext context, String logger, Level level) {
+        final LoggerContext ctx;
+        if (context != null)
+            ctx = context;
+        else
+            ctx = (LoggerContext) LogManager.getContext(false);
+
+        final Configuration config = ctx.getConfiguration();
+
+        try {
+            Class.forName(logger);
+        } catch(ClassNotFoundException e) {
+            log.warn("Failed to find logger \"{}\": {}", logger, e);
+            return false;
+        }
+
+        LoggerConfig loggerConfig = config.getLoggerConfig(logger);
+        if (loggerConfig.getName().equals(logger)) {
+            loggerConfig.setLevel(level);
+            log.debug("Setting logger level {}={}", logger, level);
+        } else {
+            log.debug("Creating logger {}={}", logger, level);
+            loggerConfig = new LoggerConfig(logger, level, false);
+            config.addLogger(logger, loggerConfig);
+        }
+
+        /* Tell logger to refetch configuration */
+        if (context == null)
+            ctx.updateLoggers();
+        return true;
+    }
+
     /**
      * Set log4j2 log levels based on properties:
      * log.&lt;logger-name&gt;=info|debug|warning|...
      */
     public static void setLogLevels() {
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration config = ctx.getConfiguration();
         boolean any = false;
 
         Properties props = System.getProperties();
@@ -75,24 +106,8 @@ public class StochDiff {
                     continue;
                 }
 
-                try {
-                    Class<?> cls = Class.forName(logger);
-                } catch(ClassNotFoundException e) {
-                    log.warn("Failed to find logger \"{}\": {}", logger, e);
-                    continue;
-                }
-
-                LoggerConfig loggerConfig = config.getLoggerConfig(logger);
-                if (loggerConfig.getName().equals(logger)) {
-                    loggerConfig.setLevel(level);
-                    log.debug("Setting logger level {}={}", logger, level);
-                } else {
-                    log.debug("Creating logger {}={}", logger, level);
-                    loggerConfig = new LoggerConfig(logger, level, false);
-                    config.addLogger(logger, loggerConfig);
-                }
-
-                any = true;
+                if (setLogLevel(ctx, logger, level))
+                    any = true;
             }
 
         if (any)
