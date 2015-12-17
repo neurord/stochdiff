@@ -89,7 +89,7 @@ public class VolumeSlice {
 
                     final String label = i==this.icenter && j==this.jcenter ? pointLabel : null;
 
-                    CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel);
+                    CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null);
                     elements[i][j] = ve;
                     ve.setVolume(boxSize * boxSize * sl);
                     ve.setDeltaZ(boxSize);

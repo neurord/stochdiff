@@ -11,8 +11,8 @@ public class CurvedVolumeElement extends VolumeElement {
     float[][] verts;
     float[][] norms;
 
-    public CurvedVolumeElement(String label, String region) {
-        super(label, region);
+    public CurvedVolumeElement(String label, String region, String groupID) {
+        super(label, region, groupID);
     }
 
     public void setPositionIndexes(int ir, int ia) {
