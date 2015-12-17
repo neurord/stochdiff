@@ -6,14 +6,14 @@ import java.util.ArrayList;
 
 public class VolumeSlice {
 
-    int nx;
-    int ny;
+    final int nx;
+    final int ny;
     double boxSize;
     double radius;
 
 
-    int icenter;
-    int jcenter;
+    final int icenter;
+    final int jcenter;
     boolean[][] present;
 
     VolumeElement[][] elements;
@@ -24,21 +24,21 @@ public class VolumeSlice {
 
         int nr = (int)(r / delta);
         int n = 1 + 2 * nr;
-        nx = n;
-        ny = n;
-        icenter = nr;
-        jcenter = nr;
+        this.nx = n;
+        this.ny = n;
+        this.icenter = nr;
+        this.jcenter = nr;
 
 
         // work out which squares in the grid are going to be present as elements.
         // for a square section, just set all elements of present to true
-        present = new boolean[nx][ny];
+        present = new boolean[this.nx][this.ny];
         int nt = 0;
         int nf = 0;
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
-                double dx = (i - icenter) * boxSize;
-                double dy = (j - jcenter) * boxSize;
+        for (int i = 0; i < this.nx; i++) {
+            for (int j = 0; j < this.ny; j++) {
+                double dx = (i - this.icenter) * boxSize;
+                double dy = (j - this.jcenter) * boxSize;
                 double r2 = dx * dx + dy * dy;
                 if (r2 < radius * radius) {
                     present[i][j] = true;
@@ -49,7 +49,7 @@ public class VolumeSlice {
                 }
             }
         }
-        // E.info("created a volume slice " + nx + " by " + ny + " filling " + nt + " of " + (nt + nf));
+        // E.info("created a volume slice " + this.nx + " by " + this.ny + " filling " + nt + " of " + (nt + nf));
     }
 
 
@@ -66,12 +66,12 @@ public class VolumeSlice {
         double theta = Geom.zRotationAngle(Geom.unitY(), vab);
         Rotation rot = Geom.aboutZRotation(theta);
 
-        elements = new VolumeElement[nx][ny];
+        elements = new VolumeElement[this.nx][this.ny];
 
 
         // center of the box at 0,0
-        double x0 = -1 * icenter * boxSize;
-        double y0 = -1 * jcenter * boxSize;
+        double x0 = -1 * this.icenter * boxSize;
+        double y0 = -1 * this.jcenter * boxSize;
 
 
         // this is a little confusing. X and Y axes are used within the slice, but when these are
@@ -79,8 +79,8 @@ public class VolumeSlice {
         // into place
 
 
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
+        for (int i = 0; i < this.nx; i++) {
+            for (int j = 0; j < this.ny; j++) {
 
                 if (present[i][j]) {
 
@@ -138,7 +138,7 @@ public class VolumeSlice {
                         psb[2] = Geom.position(xb, 0.5 * sl, vcy + hb);
                         psb[3] = Geom.position(xb, 0.5 * sl, vcy - hb);
 
-                    } else if (i == nx-1 || !present[i+1][j]) {
+                    } else if (i == this.nx-1 || !present[i+1][j]) {
                         surf = true;
                         double xb = vcx + 0.5 * boxSize;
                         psb[0] = Geom.position(xb, -0.5 * sl, vcy + hb);
@@ -154,7 +154,7 @@ public class VolumeSlice {
                         psb[2] = Geom.position(vcx - hb, 0.5 * sl, yb);
                         psb[3] = Geom.position(vcx + hb, 0.5 * sl, yb);
 
-                    } else if (j == ny - 1 || !present[i][j+1]) {
+                    } else if (j == this.ny - 1 || !present[i][j+1]) {
                         surf = true;
                         double yb = vcy + 0.5 * boxSize;
                         psb[0] = Geom.position(vcx - hb, -0.5 * sl, yb);
@@ -185,15 +185,15 @@ public class VolumeSlice {
 
 
     public void neighborize() {
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
+        for (int i = 0; i < this.nx; i++) {
+            for (int j = 0; j < this.ny; j++) {
                 CuboidVolumeElement cv = (CuboidVolumeElement)elements[i][j];
                 CuboidVolumeElement cvx = null;
                 CuboidVolumeElement cvy = null;
-                if (i+1 < nx) {
+                if (i+1 < this.nx) {
                     cvx = (CuboidVolumeElement)elements[i+1][j];
                 }
-                if (j+1 < ny) {
+                if (j+1 < this.ny) {
                     cvy = (CuboidVolumeElement)elements[i][j+1];
                 }
 
@@ -213,10 +213,10 @@ public class VolumeSlice {
 
 
     public void planeConnect(VolumeSlice tgt) {
-        if (tgt.nx == nx && tgt.ny == ny) {
+        if (tgt.nx == this.nx && tgt.ny == this.ny) {
             // the easy case;
-            for (int i = 0; i < nx; i++) {
-                for (int j = 0; j < ny; j++) {
+            for (int i = 0; i < this.nx; i++) {
+                for (int j = 0; j < this.ny; j++) {
                     CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
                     CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(i, j);
                     if (va != null && vb != null) {
@@ -226,7 +226,7 @@ public class VolumeSlice {
             }
 
         } else {
-            if (tgt.nx < nx) {
+            if (tgt.nx < this.nx) {
                 tgt.planeConnectUp(this);
             } else {
                 planeConnectUp(tgt);
@@ -237,11 +237,11 @@ public class VolumeSlice {
 
     private void planeConnectUp(VolumeSlice tgt) {
         // tgt is bigger than present slice;
-        int io = (tgt.nx - nx) / 2;
-        int jo = (tgt.ny - ny) / 2;
+        int io = (tgt.nx - this.nx) / 2;
+        int jo = (tgt.ny - this.ny) / 2;
 
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
+        for (int i = 0; i < this.nx; i++) {
+            for (int j = 0; j < this.ny; j++) {
                 CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
                 CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(io + i, jo + j);
                 if (va != null && vb != null) {
@@ -254,8 +254,8 @@ public class VolumeSlice {
 
     public ArrayList<VolumeElement> getElements() {
         ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
-        for (int i = 0; i < nx; i++) {
-            for (int j = 0; j < ny; j++) {
+        for (int i = 0; i < this.nx; i++) {
+            for (int j = 0; j < this.ny; j++) {
                 VolumeElement ve = getElement(i, j);
                 if (ve != null) {
                     ave.add(ve);
@@ -272,9 +272,9 @@ public class VolumeSlice {
 
         /*
         E.info("connecting to a subplane size " + vg.radius + " np=" + vg.nx +
-        		" offset by " + pbo);
+                " offset by " + pbo);
         E.info("boxes and dims: " + boxSize + ", " + vg.boxSize + " " +
-        		nx + "," + vg.nx + "  rads " + radius + ", " + vg.radius);
+                this.nx + "," + vg.nx + "  rads " + radius + ", " + vg.radius);
         */
 
         // pbo is the offset in y to be applied to the target slice, vg
@@ -370,20 +370,20 @@ public class VolumeSlice {
 
 
     public double getX(int i) {
-        double ret = (-nx/2. + i) * boxSize;
+        double ret = (-this.nx/2. + i) * boxSize;
         return ret;
     }
 
 
     public double getY(int j) {
-        double ret = (-ny/2. + j) * boxSize;
+        double ret = (-this.ny/2. + j) * boxSize;
         return ret;
     }
 
 
     public boolean hasElement(int i, int j) {
         boolean ret = false;
-        if (i >= 0 && i < nx && j >= 0 && j < ny) {
+        if (i >= 0 && i < this.nx && j >= 0 && j < this.ny) {
             ret = present[i][j];
         }
         return ret;
@@ -391,12 +391,12 @@ public class VolumeSlice {
 
 
     public int getIBox(double x) {
-        int ret = (int)(x / boxSize + nx / 2.);
+        int ret = (int)(x / boxSize + this.nx / 2.);
         return ret;
     }
 
     public int getJBox(double y) {
-        int ret = (int)(y / boxSize + ny / 2.);
+        int ret = (int)(y / boxSize + this.ny / 2.);
         return ret;
     }
 
