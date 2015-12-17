@@ -13,6 +13,7 @@ public abstract class VolumeElement {
 
     protected String label;
     protected String region;
+    protected String groupID;
 
     protected double volume;
     protected double deltaZ;
@@ -24,16 +25,14 @@ public abstract class VolumeElement {
     protected double sideArea;
     protected double topArea;
 
-    protected ArrayList<ElementConnection> connections;
+    protected ArrayList<ElementConnection> connections = new ArrayList<>();
 
     protected Position[] boundary;
     protected  Position[] surfaceBoundary;
 
-    boolean fixcon = false;
+    protected boolean fixcon = false;
 
     boolean submembrane = false; //true if this volume element lies on submembrane
-
-    protected String groupID;
 
     public void setAlongArea(double d) {
         alongArea = d;
@@ -61,7 +60,6 @@ public abstract class VolumeElement {
     }
 
     public VolumeElement() {
-        connections = new ArrayList<ElementConnection>();
     }
 
 

@@ -204,11 +204,8 @@ public abstract class SpineLocator {
                                  Geom.position(xp[i], -rb[i], 0), Geom.position(xp[i + 1], -rb[i + 1], 0)
                                };
 
-            for (int ib = 0; ib < pbdry.length; ib++) {
-                pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
-            }
-
-
+            for (int j = 0; j < pbdry.length; j++)
+                pbdry[j] = trans.getTranslated(rot.getRotatedPosition(pbdry[j]));
 
             if (vedend instanceof CuboidVolumeElement) {
                 ve = new CuboidVolumeElement();
@@ -222,10 +219,8 @@ public abstract class SpineLocator {
 
                 cve.setTriangles(ts.getStripLengths(), ts.getPositions(), ts.getNormals());
                 cve.setBoundary(pbdry);
-            } else {
+            } else
                 throw new RuntimeException("unknown element type " + vedend);
-            }
-
 
             ve.setVolume(vol);
             ve.setDeltaZ(0.5 * (rb[i] + rb[i + 1]));
