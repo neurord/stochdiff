@@ -204,14 +204,17 @@ public abstract class SpineLocator {
                                  Geom.position(xp[i], -rb[i], 0), Geom.position(xp[i + 1], -rb[i + 1], 0)
                                };
 
+            final String lroot = popid + "[" + idx + "]";
+            final String label = lbls[i] != null ? lroot + "." + lbls[i] : null;
+
             for (int j = 0; j < pbdry.length; j++)
                 pbdry[j] = trans.getTranslated(rot.getRotatedPosition(pbdry[j]));
 
             if (vedend instanceof CuboidVolumeElement) {
-                ve = new CuboidVolumeElement();
+                ve = new CuboidVolumeElement(label);
                 ve.setBoundary(pbdry);
             } else if (vedend instanceof CurvedVolumeElement) {
-                CurvedVolumeElement cve = new CurvedVolumeElement();
+                CurvedVolumeElement cve = new CurvedVolumeElement(label);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
                 ts.rotate(rot);
@@ -232,11 +235,7 @@ public abstract class SpineLocator {
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
 
-            String lroot = popid + "[" + idx + "]";
-            if (lbls[i] != null) {
-                String ll = lroot + "." + lbls[i];
-                ve.setLabel(ll);
-            } else {
+            if (lbls[i] == null) {
                 ve.setGroupID(lroot);
             }
             if (rgns[i] != null) {

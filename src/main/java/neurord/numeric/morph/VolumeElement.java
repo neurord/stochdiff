@@ -11,7 +11,7 @@ public abstract class VolumeElement {
     protected double cy;
     protected double cz;
 
-    protected String label;
+    protected final String label;
     protected String region;
     protected String groupID;
 
@@ -32,7 +32,12 @@ public abstract class VolumeElement {
 
     protected boolean fixcon = false;
 
-    boolean submembrane = false; //true if this volume element lies on submembrane
+    /* true if this volume element lies on submembrane */
+    protected boolean submembrane;
+
+    public VolumeElement(String label) {
+        this.label = label;
+    }
 
     public void setAlongArea(double d) {
         alongArea = d;
@@ -59,10 +64,6 @@ public abstract class VolumeElement {
         return topArea;
     }
 
-    public VolumeElement() {
-    }
-
-
     public void setCenterPosition(double x, double y, double z) {
         cx = x;
         cy = y;
@@ -81,18 +82,12 @@ public abstract class VolumeElement {
         return cz;
     }
 
-
     public boolean isSubmembrane() {
         return submembrane;
     }
 
     public void setSubmembrane() {
         submembrane = true;
-    }
-
-
-    public void setLabel(String s) {
-        label = s;
     }
 
     public String getLabel() {
@@ -107,13 +102,10 @@ public abstract class VolumeElement {
         return region;
     }
 
-
     public ArrayList<ElementConnection> getConnections() {
         fixcon = true;
         return connections;
-
     }
-
 
     public void setVolume(double v) {
         volume = v;
@@ -134,8 +126,6 @@ public abstract class VolumeElement {
     public void setExposedArea(double ea) {
         exposedArea = ea;
     }
-
-
 
     public void coupleTo(VolumeElement vx, double ca) {
         // ca is the area of contact between the elements;

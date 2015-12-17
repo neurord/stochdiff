@@ -87,7 +87,9 @@ public class VolumeSlice {
                     double vcx = x0 + i * boxSize;
                     double vcy =  y0 + j * boxSize;
 
-                    CuboidVolumeElement ve = new CuboidVolumeElement();
+                    final String label = i==this.icenter && j==this.jcenter ? pointLabel : null;
+
+                    CuboidVolumeElement ve = new CuboidVolumeElement(label);
                     elements[i][j] = ve;
                     if (regionLabel != null) {
                         ve.setRegion(regionLabel);
@@ -175,9 +177,6 @@ public class VolumeSlice {
             }
         }
 
-        if (pointLabel != null) {
-            elements[icenter][icenter].setLabel(pointLabel);
-        }
         neighborize();
     }
 

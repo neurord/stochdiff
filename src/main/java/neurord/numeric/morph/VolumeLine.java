@@ -67,7 +67,10 @@ public class VolumeLine {
             double dl = areg[1] - areg[0];
             double vcl = 0.5 * (areg[0] + areg[1]);
 
-            CuboidVolumeElement ve = new CuboidVolumeElement();
+
+            final String label = i == nl/2 ? pointLabel : null;
+
+            CuboidVolumeElement ve = new CuboidVolumeElement(label);
 
             ve.setAlongArea(depth * sl);
             ve.setSideArea(depth * dl);
@@ -127,10 +130,6 @@ public class VolumeLine {
             ve.setVolume(dl * sl * depth);
             ve.setDeltaZ(depth);
             elements[i][0] = ve;
-        }
-
-        if (pointLabel != null) {
-            elements[nl/2][0].setLabel(pointLabel);
         }
 
         neighborize();

@@ -11,6 +11,10 @@ public class CurvedVolumeElement extends VolumeElement {
     float[][] verts;
     float[][] norms;
 
+    public CurvedVolumeElement(String label) {
+        super(label);
+    }
+
     public void setPositionIndexes(int ir, int ia) {
         iradial = ir;
         iazimuthal = ia;
