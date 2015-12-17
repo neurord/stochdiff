@@ -91,7 +91,8 @@ public abstract class SpineLocator {
                     nspines = (int)(eltSA.length);
                 }
 
-                log.info("Surface area for spine group  " + popid + " on " + reg + " is " + sum + ". nspines=" + nspines);
+                log.info("Surface area for spine group \"{}\" on \"{}\" is {} (nspines={})",
+                         popid, reg, sum, nspines);
 
                 int ndone = 0;
 
