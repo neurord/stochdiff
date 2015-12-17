@@ -89,7 +89,10 @@ public class VolumeSlice {
 
                     final String label = i==this.icenter && j==this.jcenter ? pointLabel : null;
 
-                    CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null);
+                    CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
+                                                                     boxSize * sl,
+                                                                     boxSize * boxSize,
+                                                                     boxSize * sl);
                     elements[i][j] = ve;
                     ve.setVolume(boxSize * boxSize * sl);
                     ve.setDeltaZ(boxSize);
@@ -98,12 +101,6 @@ public class VolumeSlice {
                     Position pr = rot.getRotatedPosition(cp);
                     Position pc = trans.getTranslated(pr);
                     ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
-
-
-                    ve.setAlongArea(boxSize * sl);
-                    ve.setSideArea(boxSize * boxSize);
-                    ve.setTopArea(boxSize * sl);
-
 
                     // this is the boundary of a slice through the box perpendicular to the z axis
                     // it is not used for the computation, just for visualization

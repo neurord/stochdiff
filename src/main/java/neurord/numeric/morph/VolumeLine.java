@@ -70,10 +70,8 @@ public class VolumeLine {
 
             final String label = i == nl/2 ? pointLabel : null;
 
-            CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null);
-
-            ve.setAlongArea(depth * sl);
-            ve.setSideArea(depth * dl);
+            CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
+                                                             depth * sl, depth * dl, 0.0);
 
             Position cp = Geom.position(vcl, 0., 0.);
             Position pr = rot.getRotatedPosition(cp);

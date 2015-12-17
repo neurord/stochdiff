@@ -21,9 +21,9 @@ public abstract class VolumeElement {
 
     protected int icache;
 
-    protected double alongArea;
-    protected double sideArea;
-    protected double topArea;
+    protected final double alongArea;
+    protected final double sideArea;
+    protected final double topArea;
 
     protected ArrayList<ElementConnection> connections = new ArrayList<>();
 
@@ -35,30 +35,23 @@ public abstract class VolumeElement {
     /* true if this volume element lies on submembrane */
     protected boolean submembrane;
 
-    public VolumeElement(String label, String region, String groupID) {
+    public VolumeElement(String label, String region, String groupID,
+                         double alongArea, double sideArea, double topArea) {
         this.label = label;
         this.region = region;
         this.groupID = groupID;
-    }
 
-    public void setAlongArea(double d) {
-        alongArea = d;
+        this.alongArea = alongArea;
+        this.sideArea = sideArea;
+        this.topArea = topArea;
     }
 
     public double getAlongArea() {
         return alongArea;
     }
 
-    public void setSideArea(double d) {
-        sideArea = d;
-    }
     public double getSideArea() {
         return sideArea;
-    }
-
-
-    public void setTopArea(double d) {
-        topArea = d;
     }
 
     public double getTopArea() {
