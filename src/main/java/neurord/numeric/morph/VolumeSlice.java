@@ -89,11 +89,8 @@ public class VolumeSlice {
 
                     final String label = i==this.icenter && j==this.jcenter ? pointLabel : null;
 
-                    CuboidVolumeElement ve = new CuboidVolumeElement(label);
+                    CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel);
                     elements[i][j] = ve;
-                    if (regionLabel != null) {
-                        ve.setRegion(regionLabel);
-                    }
                     ve.setVolume(boxSize * boxSize * sl);
                     ve.setDeltaZ(boxSize);
 
@@ -120,12 +117,6 @@ public class VolumeSlice {
                         pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
                     }
                     ve.setBoundary(pbdry);
-
-
-                    if (regionLabel != null) {
-                        ve.setRegion(regionLabel);
-                    }
-
 
                     boolean surf = false;
                     double hb = 0.5 * boxSize;
@@ -347,7 +338,6 @@ public class VolumeSlice {
         return ret;
     }
 
-
     private double ovlp1D(double mex, double med, double tgtx, double tgtd) {
         double ret = 0.;
         if (mex <= tgtx) {
@@ -356,7 +346,6 @@ public class VolumeSlice {
             } else {
                 ret = mex + med - tgtx;
             }
-
         } else {
             if (mex + med > tgtx + tgtd) {
                 ret = med;
@@ -366,7 +355,6 @@ public class VolumeSlice {
         }
         return ret / med;
     }
-
 
     public double getX(int i) {
         double ret = (-this.nx/2. + i) * boxSize;
@@ -379,7 +367,6 @@ public class VolumeSlice {
         return ret;
     }
 
-
     public boolean hasElement(int i, int j) {
         boolean ret = false;
         if (i >= 0 && i < this.nx && j >= 0 && j < this.ny) {
@@ -387,7 +374,6 @@ public class VolumeSlice {
         }
         return ret;
     }
-
 
     public int getIBox(double x) {
         int ret = (int)(x / boxSize + this.nx / 2.);
@@ -398,8 +384,4 @@ public class VolumeSlice {
         int ret = (int)(y / boxSize + this.ny / 2.);
         return ret;
     }
-
-
-
-
 }

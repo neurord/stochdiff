@@ -70,7 +70,7 @@ public class VolumeLine {
 
             final String label = i == nl/2 ? pointLabel : null;
 
-            CuboidVolumeElement ve = new CuboidVolumeElement(label);
+            CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel);
 
             ve.setAlongArea(depth * sl);
             ve.setSideArea(depth * dl);
@@ -95,12 +95,6 @@ public class VolumeLine {
             }
 
             ve.setBoundary(pbdry);
-
-
-            if (regionLabel != null) {
-                ve.setRegion(regionLabel);
-            }
-
 
             if (i == 0 || i == nl-1) {
                 Position[] psb = new Position[4];

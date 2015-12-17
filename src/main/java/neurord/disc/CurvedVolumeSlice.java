@@ -130,10 +130,7 @@ public class CurvedVolumeSlice {
 
                 double theta = ia * eltangle;
 
-                CurvedVolumeElement ve = new CurvedVolumeElement(null);
-                if (regionLabel != null) {
-                    ve.setRegion(regionLabel);
-                }
+                CurvedVolumeElement ve = new CurvedVolumeElement(null, regionLabel);
 
                 ve.setPositionIndexes(ir, ia);
                 ve.setVolume(eltvol);

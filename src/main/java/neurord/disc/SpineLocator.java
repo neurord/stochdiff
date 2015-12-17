@@ -211,10 +211,10 @@ public abstract class SpineLocator {
                 pbdry[j] = trans.getTranslated(rot.getRotatedPosition(pbdry[j]));
 
             if (vedend instanceof CuboidVolumeElement) {
-                ve = new CuboidVolumeElement(label);
+                ve = new CuboidVolumeElement(label, rgns[i]);
                 ve.setBoundary(pbdry);
             } else if (vedend instanceof CurvedVolumeElement) {
-                CurvedVolumeElement cve = new CurvedVolumeElement(label);
+                CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i]);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
                 ts.rotate(rot);
@@ -237,9 +237,6 @@ public abstract class SpineLocator {
 
             if (lbls[i] == null) {
                 ve.setGroupID(lroot);
-            }
-            if (rgns[i] != null) {
-                ve.setRegion(rgns[i]);
             }
 
             vprev = ve;

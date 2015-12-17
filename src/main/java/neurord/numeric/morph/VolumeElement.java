@@ -12,7 +12,7 @@ public abstract class VolumeElement {
     protected double cz;
 
     protected final String label;
-    protected String region;
+    protected final String region;
     protected String groupID;
 
     protected double volume;
@@ -35,8 +35,9 @@ public abstract class VolumeElement {
     /* true if this volume element lies on submembrane */
     protected boolean submembrane;
 
-    public VolumeElement(String label) {
+    public VolumeElement(String label, String region) {
         this.label = label;
+        this.region = region;
     }
 
     public void setAlongArea(double d) {
@@ -92,10 +93,6 @@ public abstract class VolumeElement {
 
     public String getLabel() {
         return label;
-    }
-
-    public void setRegion(String s) {
-        region = s;
     }
 
     public String getRegion() {
