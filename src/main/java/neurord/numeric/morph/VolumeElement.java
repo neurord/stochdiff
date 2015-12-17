@@ -11,8 +11,8 @@ public abstract class VolumeElement {
     protected double cy;
     protected double cz;
 
-    String label;
-    String region;
+    protected String label;
+    protected String region;
 
     protected double volume;
     protected double deltaZ;
