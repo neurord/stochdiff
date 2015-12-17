@@ -36,6 +36,9 @@ AVOGADRO = 6.02214179
 PUVC = AVOGADRO / 10
 """Converts concentrations to particle numbers"""
 
+def decode_species_names(array):
+    return list(sp.decode('utf-8') for sp in array)
+
 class EventType(enum.IntEnum):
     """Event types matching IGridCalc.EventType enumeration"""
     REACTION = 0
@@ -170,7 +173,9 @@ class Model(object):
         ['A', 'B', 'C', 'D']
         """
         what = self._element.species[indices] if indices is not None else self._element.species
-        return list(sp.decode('utf-8') for sp in what)
+        return decode_species_names(what)
+
+    # FIXME: output groups
 
     def grid(self):
         """Voxels of the simulation
@@ -218,6 +223,41 @@ class Model(object):
         what = self._element.regions[indices] if indices is not None else self._element.regions
         return [row.decode('utf-8') for row in what]
 
+class OutputGroup(object):
+    def __init__(self, element, model_element):
+        self._element = element
+        self._model_element = model_element
+
+    def times(self):
+        times = self._element.times[:]
+        diff = times[1] - times[0]
+        return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
+
+    def counts(self):
+        data = self._element.population
+        panel= pd.Panel(data.read(),
+                        items=self.times(),
+                        major_axis=range(data.shape[1]),
+                        minor_axis=self.species())
+        frame = panel.transpose(2, 1, 0).to_frame()
+        frame.index.names = ['voxel', 'time']
+        return frame
+
+    def concentrations(self):
+        "Counts converted to concentrations using voxel volumes"
+        counts = self.counts()
+        volumes = self.model.grid().volume
+        ans = counts / volumes / PUVC
+        ans.rename(columns={'count':'concentration'}, inplace=1)
+        return ans
+
+    def species(self):
+        """List of specie names present in this output group
+        """
+        return decode_species_names(self._model_element.species)
+
+    # FIXME: elements
+
 class Simulation(object):
     """Information about the results of a trial
     """
@@ -225,29 +265,6 @@ class Simulation(object):
         self._element = element
         self.number = int(element._v_name[5:])
         self.model = model
-
-    def times(self, output_group='__main__'):
-        times = self._element.output._v_children[output_group].times[:]
-        diff = times[1] - times[0]
-        return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
-
-    def counts(self, output_group='__main__'):
-        data = self._element.output._v_children[output_group].population
-        panel= pd.Panel(data.read(),
-                        items=self.times(output_group),
-                        major_axis=range(data.shape[1]),
-                        minor_axis=self.model.species())
-        frame = panel.transpose(2, 1, 0).to_frame()
-        frame.index.names = ['voxel', 'time']
-        return frame
-
-    def concentrations(self, output_group='__main__'):
-        "Counts converted to concentrations using voxel volumes"
-        counts = self.counts(output_group)
-        volumes = self.model.grid().volume
-        ans = counts / volumes / PUVC
-        ans.rename(columns={'count':'concentration'}, inplace=1)
-        return ans
 
     def config(self):
         """lxml etree of de-serialized config the simulation was run with
@@ -265,6 +282,20 @@ class Simulation(object):
         xml = self.model._element.serialized_config
         # FIXME: overwrite seed?
         return etree.fromstring(xml.read()[0])
+
+    @functools.lru_cache()
+    def output_group(self, name):
+        return OutputGroup(self._element.output._v_children[name],
+                           self.model._element.output._v_children[name])
+
+    def times(self, output_group='__main__'):
+        return self.output_group(output_group).times()
+
+    def counts(self, output_group='__main__'):
+        return self.output_group(output_group).counts()
+
+    def concentrations(self, output_group='__main__'):
+        return self.output_group(output_group).concentrations()
 
     def events(self):
         "A full history of events"
