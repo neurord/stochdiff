@@ -79,8 +79,34 @@ public class VolumeLine {
             for (int ib = 0; ib < pbdry.length; ib++)
                 pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
 
+            final Position[] psb;
+            if (i == 0) {
+                double xb  = vcl - 0.5 * dl;
+                psb = new Position[] {
+                    Geom.position(xb, -0.5 * sl, -0.5*depth),
+                    Geom.position(xb, -0.5 * sl, 0.5*depth),
+                    Geom.position(xb, 0.5 * sl, 0.5*depth),
+                    Geom.position(xb, 0.5 * sl, -0.5*depth)
+                };
+            } else if (i == nl-1) {
+                double xb =  vcl + 0.5 * dl;
+                psb = new Position[] {
+                    Geom.position(xb, -0.5 * sl, -0.5*depth),
+                    Geom.position(xb, 0.5 * sl, -0.5*depth),
+                    Geom.position(xb, 0.5 * sl, 0.5*depth),
+                    Geom.position(xb, -0.5 * sl, 0.5*depth)
+                };
+            } else
+                psb = null;
+
+            if (psb != null)
+                for (int ib = 0; ib < psb.length; ib++)
+                    psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
+
             CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
                                                              pbdry,
+                                                             psb,
+                                                             psb != null ? sl * depth : 0.0,
                                                              depth * sl,      /* along */
                                                              depth * dl,      /* side */
                                                              0.0,             /* top */
@@ -91,34 +117,6 @@ public class VolumeLine {
             Position pr = rot.getRotatedPosition(cp);
             Position pc = trans.getTranslated(pr);
             ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
-
-
-            if ((i == 0) || (i == (nl-1)))
-                ve.setSubmembrane();
-
-            if (i == 0 || i == nl-1) {
-                Position[] psb = new Position[4];
-                if (i == 0) {
-                    double xb  = vcl - 0.5 * dl;
-                    psb[0] = Geom.position(xb, -0.5 * sl, -0.5*depth);
-                    psb[1] = Geom.position(xb, -0.5 * sl, 0.5*depth);
-                    psb[2] = Geom.position(xb, 0.5 * sl, 0.5*depth);
-                    psb[3] = Geom.position(xb, 0.5 * sl, -0.5*depth);
-
-                } else {
-                    double xb =  vcl + 0.5 * dl;
-                    psb[0] = Geom.position(xb, -0.5 * sl, -0.5*depth);
-                    psb[1] = Geom.position(xb, 0.5 * sl, -0.5*depth);
-                    psb[2] = Geom.position(xb, 0.5 * sl, 0.5*depth);
-                    psb[3] = Geom.position(xb, -0.5 * sl, 0.5*depth);
-                }
-
-                for (int ib = 0; ib < psb.length; ib++) {
-                    psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
-                }
-                ve.setSurfaceBoundary(psb);
-                ve.setExposedArea(sl * depth);
-            }
 
             elements[i][0] = ve;
         }

@@ -142,7 +142,7 @@ public class VolumeGrid {
 
             eltLabels[i] = ve.getLabel();
             eltGroupIDs[i] = ve.getGroupID();
-            submembranes[i] = ve.getSubmembrane();
+            submembranes[i] = ve.isSubmembrane();
 
             String sr = ve.getRegion();
             if (sr == null || sr.length() == 0) {

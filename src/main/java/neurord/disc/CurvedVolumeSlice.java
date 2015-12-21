@@ -153,8 +153,24 @@ public class CurvedVolumeSlice {
                 for (int ib = 0; ib < pbdry.length; ib++)
                     pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
 
+
+                final Position[] praw;
+                if (ir == bdsa.length - 1) {
+                    praw = new Position[] {
+                        Geom.position(ra2 * Math.cos(thetaC - dtheta), -ha, ra2 * Math.sin(thetaC - dtheta)),
+                        Geom.position(rb2 * Math.cos(thetaC - dtheta), ha, rb2 * Math.sin(thetaC - dtheta)),
+                        Geom.position(rb2 * Math.cos(thetaC + dtheta), ha, rb2 * Math.sin(thetaC + dtheta)),
+                        Geom.position(ra2 * Math.cos(thetaC + dtheta), -ha, ra2 * Math.sin(thetaC + dtheta))
+                    };
+                    for (int i = 0; i < praw.length; i++)
+                        praw[i] = trans.getTranslated(rot.getRotatedPosition(praw[i]));
+                } else
+                    praw = null;
+
                 CurvedVolumeElement ve = new CurvedVolumeElement(null, regionLabel, null,
                                                                  pbdry,
+                                                                 praw,
+                                                                 praw != null ? surfouter / na : 0.0,
                                                                  eltvol,  /* volume */
                                                                  0.0);    /* deltaZ */
 
@@ -182,23 +198,6 @@ public class CurvedVolumeSlice {
                 ts.translate(trans);
 
                 ve.setTriangles(ts.getStripLengths(), ts.getPositions(), ts.getNormals());
-
-                if (ir == bdsa.length - 1) {
-                    ve.setSubmembrane();
-                    ve.setExposedArea(surfouter / na);
-
-                    Position[] praw = new Position[4];
-                    praw[0] = Geom.position(ra2 * Math.cos(thetaC - dtheta), -ha, ra2 * Math.sin(thetaC - dtheta));
-                    praw[1] = Geom.position(rb2 * Math.cos(thetaC - dtheta), ha, rb2 * Math.sin(thetaC - dtheta));
-                    praw[2] = Geom.position(rb2 * Math.cos(thetaC + dtheta), ha, rb2 * Math.sin(thetaC + dtheta));
-                    praw[3] = Geom.position(ra2 * Math.cos(thetaC + dtheta), -ha, ra2 * Math.sin(thetaC + dtheta));
-                    Position[] ps = new Position[praw.length];
-                    for (int i = 0; i < praw.length; i++) {
-                        ps[i] = trans.getTranslated(rot.getRotatedPosition(praw[i]));
-                    }
-
-                    ve.setSurfaceBoundary(ps);
-                }
 
                 az.add(ve);
                 elements.add(ve);

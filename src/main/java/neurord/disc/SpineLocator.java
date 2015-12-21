@@ -215,11 +215,13 @@ public abstract class SpineLocator {
             if (vedend instanceof CuboidVolumeElement) {
                 ve = new CuboidVolumeElement(label, rgns[i], groupID,
                                              pbdry,
+                                             null, 0.0,
                                              0.0, 0.0, 0.0,
                                              vol, deltaZ);
             } else if (vedend instanceof CurvedVolumeElement) {
                 CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i], groupID,
                                                                   pbdry,
+                                                                  null, 0.0,
                                                                   vol, deltaZ);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);

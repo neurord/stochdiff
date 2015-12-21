@@ -13,10 +13,14 @@ public class CurvedVolumeElement extends VolumeElement {
 
     public CurvedVolumeElement(String label, String region, String groupID,
                                Position[] boundary,
+                               Position[] surfaceBoundary,
+                               double exposedArea,
                                double volume, double deltaZ) {
 
         super(label, region, groupID,
               boundary,
+              surfaceBoundary,
+              exposedArea,
               0.0, 0.0, 0.0,
               volume, deltaZ);
     }

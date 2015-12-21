@@ -28,22 +28,25 @@ public abstract class VolumeElement {
     protected final ArrayList<ElementConnection> connections = new ArrayList<>();
 
     protected final Position[] boundary;
-    protected Position[] surfaceBoundary;
+    protected final Position[] surfaceBoundary;
 
     protected boolean fixcon = false;
 
-    /* true if this volume element lies on submembrane */
-    protected boolean submembrane;
-
     public VolumeElement(String label, String region, String groupID,
                          Position[] boundary,
+                         Position[] surfaceBoundary,
+                         double exposedArea,
                          double alongArea, double sideArea, double topArea,
                          double volume, double deltaZ) {
         this.label = label;
         this.region = region;
         this.groupID = groupID;
 
+        assert !(surfaceBoundary == null && exposedArea != 0.0);
+
         this.boundary = boundary;
+        this.surfaceBoundary = surfaceBoundary;
+        this.exposedArea = exposedArea;
 
         this.alongArea = alongArea;
         this.sideArea = sideArea;
@@ -84,11 +87,7 @@ public abstract class VolumeElement {
     }
 
     public boolean isSubmembrane() {
-        return submembrane;
-    }
-
-    public void setSubmembrane() {
-        submembrane = true;
+        return this.surfaceBoundary != null;
     }
 
     public String getLabel() {
@@ -112,10 +111,6 @@ public abstract class VolumeElement {
         return this.deltaZ;
     }
 
-    public void setExposedArea(double ea) {
-        exposedArea = ea;
-    }
-
     public void coupleTo(VolumeElement vx, double ca) {
         // ca is the area of contact between the elements;
         assert !fixcon;
@@ -123,11 +118,7 @@ public abstract class VolumeElement {
     }
 
     public double getExposedArea() {
-        return exposedArea;
-    }
-
-    public boolean getSubmembrane() {
-        return submembrane;
+        return this.exposedArea;
     }
 
     public void cache(int ind) {
@@ -140,10 +131,6 @@ public abstract class VolumeElement {
 
     public Position[] getBoundary() {
         return this.boundary;
-    }
-
-    public void setSurfaceBoundary(Position[] boundary) {
-        this.surfaceBoundary = boundary;
     }
 
     public Position[] getSurfaceBoundary() {

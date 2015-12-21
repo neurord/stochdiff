@@ -99,8 +99,55 @@ public class VolumeSlice {
                     for (int ib = 0; ib < pbdry.length; ib++)
                         pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
 
+                    final double hb = 0.5 * boxSize;
+                    final Position[] psb;
+
+                    /* Four different cases here since the boundary points have to go
+                     *  in the right order to give the right-hand normal pointing outwards.
+                     */
+                    if (i == 0 || !present[i-1][j]) {
+                        double xb = vcx + -0.5 * boxSize;
+                        psb = new Position[] {
+                            Geom.position(xb, -0.5 * sl, vcy - hb),
+                            Geom.position(xb, -0.5 * sl, vcy + hb),
+                            Geom.position(xb, 0.5 * sl, vcy + hb),
+                            Geom.position(xb, 0.5 * sl, vcy - hb)
+                        };
+                    } else if (i == this.nx-1 || !present[i+1][j]) {
+                        double xb = vcx + 0.5 * boxSize;
+                        psb = new Position[] {
+                            Geom.position(xb, -0.5 * sl, vcy + hb),
+                            Geom.position(xb, -0.5 * sl, vcy - hb),
+                            Geom.position(xb, 0.5 * sl, vcy - hb),
+                            Geom.position(xb, 0.5 * sl, vcy + hb)
+                        };
+                    } else if (j == 0 || !present[i][j-1]) {
+                        double yb = vcy - 0.5 * boxSize;
+                        psb = new Position[] {
+                            Geom.position(vcx + hb, -0.5 * sl, yb),
+                            Geom.position(vcx - hb, -0.5 * sl, yb),
+                            Geom.position(vcx - hb, 0.5 * sl, yb),
+                            Geom.position(vcx + hb, 0.5 * sl, yb)
+                        };
+                    } else if (j == this.ny - 1 || !present[i][j+1]) {
+                        double yb = vcy + 0.5 * boxSize;
+                        psb = new Position[] {
+                            Geom.position(vcx - hb, -0.5 * sl, yb),
+                            Geom.position(vcx + hb, -0.5 * sl, yb),
+                            Geom.position(vcx + hb, 0.5 * sl, yb),
+                            Geom.position(vcx - hb, 0.5 * sl, yb)
+                        };
+                    } else
+                        psb = null;
+
+                    if (psb != null)
+                        for (int ib = 0; ib < psb.length; ib++)
+                            psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
+
                     CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
                                                                      pbdry,
+                                                                     psb,
+                                                                     psb != null ? sl * boxSize : 0,
                                                                      boxSize * sl,
                                                                      boxSize * boxSize,
                                                                      boxSize * sl,
@@ -113,61 +160,12 @@ public class VolumeSlice {
                     Position pc = trans.getTranslated(pr);
                     ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
-                    boolean surf = false;
-                    double hb = 0.5 * boxSize;
-                    Position[] psb = new Position[4];
-                    // four different cases here since the boundary points have to go in the right order to give
-                    // the right-hand normal pointing outwards
-                    if (i == 0 || !present[i-1][j]) {
-                        surf = true;
-                        double xb = vcx + -0.5 * boxSize;
-                        psb[0] = Geom.position(xb, -0.5 * sl, vcy - hb);
-                        psb[1] = Geom.position(xb, -0.5 * sl, vcy + hb);
-                        psb[2] = Geom.position(xb, 0.5 * sl, vcy + hb);
-                        psb[3] = Geom.position(xb, 0.5 * sl, vcy - hb);
-
-                    } else if (i == this.nx-1 || !present[i+1][j]) {
-                        surf = true;
-                        double xb = vcx + 0.5 * boxSize;
-                        psb[0] = Geom.position(xb, -0.5 * sl, vcy + hb);
-                        psb[1] = Geom.position(xb, -0.5 * sl, vcy - hb);
-                        psb[2] = Geom.position(xb, 0.5 * sl, vcy - hb);
-                        psb[3] = Geom.position(xb, 0.5 * sl, vcy + hb);
-
-                    } else if (j == 0 || !present[i][j-1]) {
-                        surf = true;
-                        double yb = vcy - 0.5 * boxSize;
-                        psb[0] = Geom.position(vcx + hb, -0.5 * sl, yb);
-                        psb[1] = Geom.position(vcx - hb, -0.5 * sl, yb);
-                        psb[2] = Geom.position(vcx - hb, 0.5 * sl, yb);
-                        psb[3] = Geom.position(vcx + hb, 0.5 * sl, yb);
-
-                    } else if (j == this.ny - 1 || !present[i][j+1]) {
-                        surf = true;
-                        double yb = vcy + 0.5 * boxSize;
-                        psb[0] = Geom.position(vcx - hb, -0.5 * sl, yb);
-                        psb[1] = Geom.position(vcx + hb, -0.5 * sl, yb);
-                        psb[2] = Geom.position(vcx + hb, 0.5 * sl, yb);
-                        psb[3] = Geom.position(vcx - hb, 0.5 * sl, yb);
-                    }
-
-                    if (surf) {
-                        ve.setSubmembrane();
-                        for (int ib = 0; ib < psb.length; ib++) {
-                            psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
-                        }
-                        ve.setSurfaceBoundary(psb);
-                        ve.setExposedArea(sl * boxSize);
-                    }
                 }
             }
         }
 
         neighborize();
     }
-
-
-
 
     public void neighborize() {
         for (int i = 0; i < this.nx; i++) {
@@ -191,11 +189,6 @@ public class VolumeSlice {
             }
         }
     }
-
-
-
-
-
 
     public void planeConnect(VolumeSlice tgt) {
         if (tgt.nx == this.nx && tgt.ny == this.ny) {
