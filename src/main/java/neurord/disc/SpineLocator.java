@@ -214,11 +214,12 @@ public abstract class SpineLocator {
 
             if (vedend instanceof CuboidVolumeElement) {
                 ve = new CuboidVolumeElement(label, rgns[i], groupID,
+                                             pbdry,
                                              0.0, 0.0, 0.0,
                                              vol, deltaZ);
-                ve.setBoundary(pbdry);
             } else if (vedend instanceof CurvedVolumeElement) {
                 CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i], groupID,
+                                                                  pbdry,
                                                                   vol, deltaZ);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
@@ -226,7 +227,6 @@ public abstract class SpineLocator {
                 ts.translate(trans);
 
                 cve.setTriangles(ts.getStripLengths(), ts.getPositions(), ts.getNormals());
-                cve.setBoundary(pbdry);
             } else
                 throw new RuntimeException("unknown element type " + vedend);
 

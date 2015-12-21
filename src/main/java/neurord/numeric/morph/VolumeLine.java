@@ -70,7 +70,17 @@ public class VolumeLine {
 
             final String label = i == nl/2 ? pointLabel : null;
 
+            Position[] pbdry = {Geom.position(vcl - 0.5 * dl, -0.5 * sl, 0),
+                                Geom.position(vcl - 0.5 * dl, 0.5 * sl, 0),
+                                Geom.position(vcl + 0.5 * dl, 0.5 * sl, 0),
+                                Geom.position(vcl + 0.5 * dl, -0.5 * sl, 0)
+                               };
+
+            for (int ib = 0; ib < pbdry.length; ib++)
+                pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
+
             CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
+                                                             pbdry,
                                                              depth * sl,      /* along */
                                                              depth * dl,      /* side */
                                                              0.0,             /* top */
@@ -85,18 +95,6 @@ public class VolumeLine {
 
             if ((i == 0) || (i == (nl-1)))
                 ve.setSubmembrane();
-
-            Position[] pbdry = {Geom.position(vcl - 0.5 * dl, -0.5 * sl, 0),
-                                Geom.position(vcl - 0.5 * dl, 0.5 * sl, 0),
-                                Geom.position(vcl + 0.5 * dl, 0.5 * sl, 0),
-                                Geom.position(vcl + 0.5 * dl, -0.5 * sl, 0)
-                               };
-
-            for (int ib = 0; ib < pbdry.length; ib++) {
-                pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
-            }
-
-            ve.setBoundary(pbdry);
 
             if (i == 0 || i == nl-1) {
                 Position[] psb = new Position[4];

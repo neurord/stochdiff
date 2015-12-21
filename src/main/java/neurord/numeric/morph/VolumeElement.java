@@ -25,10 +25,10 @@ public abstract class VolumeElement {
     protected final double sideArea;
     protected final double topArea;
 
-    protected ArrayList<ElementConnection> connections = new ArrayList<>();
+    protected final ArrayList<ElementConnection> connections = new ArrayList<>();
 
-    protected Position[] boundary;
-    protected  Position[] surfaceBoundary;
+    protected final Position[] boundary;
+    protected Position[] surfaceBoundary;
 
     protected boolean fixcon = false;
 
@@ -36,11 +36,14 @@ public abstract class VolumeElement {
     protected boolean submembrane;
 
     public VolumeElement(String label, String region, String groupID,
+                         Position[] boundary,
                          double alongArea, double sideArea, double topArea,
                          double volume, double deltaZ) {
         this.label = label;
         this.region = region;
         this.groupID = groupID;
+
+        this.boundary = boundary;
 
         this.alongArea = alongArea;
         this.sideArea = sideArea;
@@ -133,10 +136,6 @@ public abstract class VolumeElement {
 
     public int getCached() {
         return icache;
-    }
-
-    public void setBoundary(Position[] boundary) {
-        this.boundary = boundary;
     }
 
     public Position[] getBoundary() {

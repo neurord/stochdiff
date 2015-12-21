@@ -89,7 +89,18 @@ public class VolumeSlice {
 
                     final String label = i==this.icenter && j==this.jcenter ? pointLabel : null;
 
+                    // this is the boundary of a slice through the box perpendicular to the z axis
+                    // it is not used for the computation, just for visualization
+                    Position[] pbdry = {Geom.position(vcx - 0.5 * boxSize, -0.5 * sl, vcy),
+                                        Geom.position(vcx - 0.5 * boxSize, 0.5 * sl, vcy),
+                                        Geom.position(vcx + 0.5 * boxSize, 0.5 * sl, vcy),
+                                        Geom.position(vcx + 0.5 * boxSize, -0.5 * sl, vcy)
+                                       };
+                    for (int ib = 0; ib < pbdry.length; ib++)
+                        pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
+
                     CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
+                                                                     pbdry,
                                                                      boxSize * sl,
                                                                      boxSize * boxSize,
                                                                      boxSize * sl,
@@ -101,19 +112,6 @@ public class VolumeSlice {
                     Position pr = rot.getRotatedPosition(cp);
                     Position pc = trans.getTranslated(pr);
                     ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
-
-                    // this is the boundary of a slice through the box perpendicular to the z axis
-                    // it is not used for the computation, just for visualization
-                    Position[] pbdry = {Geom.position(vcx - 0.5 * boxSize, -0.5 * sl, vcy),
-                                        Geom.position(vcx - 0.5 * boxSize, 0.5 * sl, vcy),
-                                        Geom.position(vcx + 0.5 * boxSize, 0.5 * sl, vcy),
-                                        Geom.position(vcx + 0.5 * boxSize, -0.5 * sl, vcy)
-                                       };
-
-                    for (int ib = 0; ib < pbdry.length; ib++) {
-                        pbdry[ib] = trans.getTranslated(rot.getRotatedPosition(pbdry[ib]));
-                    }
-                    ve.setBoundary(pbdry);
 
                     boolean surf = false;
                     double hb = 0.5 * boxSize;
