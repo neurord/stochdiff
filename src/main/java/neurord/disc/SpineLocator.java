@@ -38,104 +38,103 @@ public abstract class SpineLocator {
             if (popid == null)
                 popid = "";
 
-            double density = sp.getDensity();
-            String reg = sp.getTargetRegion();
+            final double density = sp.getDensity();
+            final String reg = sp.getTargetRegion();
 
             log.info("Allocating spines in popid=\"{}\" region=\"{}\"",
                      popid, reg);
 
-            ArrayList<VolumeElement> surfVE = new ArrayList<>();
-            ArrayList<Double> surfA = new ArrayList<>();
+            final ArrayList<VolumeElement> surfVE = new ArrayList<>();
+            final ArrayList<Double> surfA = new ArrayList<>();
 
             for (VolumeElement ve : grid.getElementsInRegion(reg)) {
                 Position[] sbdry = ve.getSurfaceBoundary();
                 if (sbdry != null) {
                     surfVE.add(ve);
                     surfA.add(new Double(ve.getExposedArea()));
-//					surfA.add(new Double(Geom.getArea(sbdry)));
                 }
             }
 
-            if (surfA.size() <= 0)
-                log.warn("There no elements labelled \"{}\" but it is referenced from spine allocation", reg);
+            if (surfA.isEmpty()) {
+                log.warn("There surface elements labelled \"{}\" found");
+                throw new RuntimeException("SpineAllocation references surface-less region");
+            }
 
-            else {
-                double[] eltSA = new double[surfA.size()];
+            final double[] eltSA = new double[surfA.size()];
 
-                double sum = 0.;
-                for (int i = 0; i < eltSA.length; i++) {
-                    sum += surfA.get(i).doubleValue();
-                    eltSA[i] = sum;
+            double sum = 0.;
+            for (int i = 0; i < eltSA.length; i++) {
+                sum += surfA.get(i).doubleValue();
+                eltSA[i] = sum;
+            }
+
+
+            double totalArea = eltSA[eltSA.length - 1];
+            double avgNoSpines = totalArea * density;
+
+            // double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
+            double nspines = avgNoSpines;
+
+            // the above might take a variable number of random nos off
+            // rngen
+            // for certain small variations in avgNoSpines so reseed rngen
+            // now
+            // to get reliable spine position repeats;
+
+            rngen.setSeed(seed + ipop);
+
+            /*			****		AB: 0.5 produces too few spines
+                        if (nspines > 0.5 * eltSA.length) {
+                        E.error("too many spines (need more than one per segment");
+                        nspines = (int) (0.5 * eltSA.length);
+                        }
+            */
+            if (nspines > eltSA.length) {
+                log.warn("too many spines (need more than one per segment)");
+                nspines = (int)(eltSA.length);
+            }
+
+            log.info("Surface area for spine group \"{}\" on \"{}\" is {} (nspines={})",
+                     popid, reg, sum, nspines);
+
+            int ndone = 0;
+
+            if (avgNoSpines > 0 && nspines == 0)
+                log.info("spines : although the density is non-zero, random allocation "
+                         + "gives no spines for region \"{}\" (avg={})", reg, avgNoSpines);
+
+            ArrayList<Integer> positionA = new ArrayList<Integer>();
+            while (ndone < nspines) {
+                double abelow = rngen.random() * totalArea;
+                int posInArray = ArrayUtil.findBracket(eltSA, abelow);
+
+                if (posInArray < 0) {
+                    log.info("Total area: {}", totalArea);
+                    log.error("Cannot get pos {}. {}", abelow, eltSA);
+                    throw new RuntimeException("Cannot get pos " + abelow);
                 }
 
+                if (volumes.contains(surfVE.get(posInArray))) {
+                    // already got a spine - go round again;
+                    nblocked += 1;
 
-                double totalArea = eltSA[eltSA.length - 1];
-                double avgNoSpines = totalArea * density;
-
-                // double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
-                double nspines = avgNoSpines;
-
-                // the above might take a variable number of random nos off
-                // rngen
-                // for certain small variations in avgNoSpines so reseed rngen
-                // now
-                // to get reliable spine position repeats;
-
-                rngen.setSeed(seed + ipop);
-
-                /*			****		AB: 0.5 produces too few spines
-                				if (nspines > 0.5 * eltSA.length) {
-                					E.error("too many spines (need more than one per segment");
-                					nspines = (int) (0.5 * eltSA.length);
-                				}
-                */
-                if (nspines > eltSA.length) {
-                    log.warn("too many spines (need more than one per segment)");
-                    nspines = (int)(eltSA.length);
-                }
-
-                log.info("Surface area for spine group \"{}\" on \"{}\" is {} (nspines={})",
-                         popid, reg, sum, nspines);
-
-                int ndone = 0;
-
-                if (avgNoSpines > 0 && nspines == 0)
-                    log.info("spines : although the density is non-zero, random allocation "
-                             + "gives no spines for region \"{}\" (avg={})", reg, avgNoSpines);
-
-                ArrayList<Integer> positionA = new ArrayList<Integer>();
-                while (ndone < nspines) {
-                    double abelow = rngen.random() * totalArea;
-                    int posInArray = ArrayUtil.findBracket(eltSA, abelow);
-
-                    if (posInArray < 0) {
-                        log.info("Total area: {}", totalArea);
-                        log.error("Cannot get pos {}. {}", abelow, eltSA);
-                        throw new RuntimeException("Cannot get pos " + abelow);
-                    }
-
-                    if (volumes.contains(surfVE.get(posInArray))) {
-                        // already got a spine - go round again;
-                        nblocked += 1;
-
-                    } else {
-                        positionA.add(posInArray);
-                        ndone += 1;
-                    }
-                    if (nblocked > 100) {
-                        throw new RuntimeException("Can't fine any vacant elements to add a spine to");
-                    }
-                }
-                Collections.sort(positionA);
-
-                ndone = 0;
-                for (int posInArray : positionA) {
-                    List<VolumeElement> elts = addSpineTo(spines, delta,
-                                                          surfVE.get(posInArray),
-                                                          sp.getProfile(), popid, ndone);
-                    grid.addElements(elts);
+                } else {
+                    positionA.add(posInArray);
                     ndone += 1;
                 }
+                if (nblocked > 100) {
+                    throw new RuntimeException("Can't fine any vacant elements to add a spine to");
+                }
+            }
+            Collections.sort(positionA);
+
+            ndone = 0;
+            for (int posInArray : positionA) {
+                List<VolumeElement> elts = addSpineTo(spines, delta,
+                                                      surfVE.get(posInArray),
+                                                      sp.getProfile(), popid, ndone);
+                grid.addElements(elts);
+                ndone += 1;
             }
         }
     }
