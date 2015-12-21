@@ -15,7 +15,7 @@ public abstract class VolumeElement {
 
     protected final double volume;
     protected final double deltaZ;
-    protected double exposedArea;
+    protected final double exposedArea;
 
     protected int icache;
 
