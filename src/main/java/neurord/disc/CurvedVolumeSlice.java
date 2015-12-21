@@ -134,9 +134,9 @@ public class CurvedVolumeSlice {
                 final double vcx = rc * Math.cos(thetaC);
                 final double vcy = 0.;
                 final double vcz = rc * Math.sin(thetaC);
-                final Position pc = trans.getTranslated(
-                                        rot.getRotatedPosition(
-                                            Geom.position(vcx, vcy, vcz)));
+                final Position center = trans.getTranslated(
+                                            rot.getRotatedPosition(
+                                                Geom.position(vcx, vcy, vcz)));
 
                 final double rca = (ra1 + ra2) / 2;
                 final double rcb = (rb1 + rb2) / 2;
@@ -171,12 +171,11 @@ public class CurvedVolumeSlice {
                                                                  pbdry,
                                                                  praw,
                                                                  praw != null ? surfouter / na : 0.0,
+                                                                 center,
                                                                  eltvol,  /* volume */
                                                                  0.0);    /* deltaZ */
 
                 ve.setPositionIndexes(ir, ia);
-
-                ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
                 if (na > 1) {
                     if (ia > 0) {

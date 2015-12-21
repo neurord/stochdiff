@@ -103,20 +103,21 @@ public class VolumeLine {
                 for (int ib = 0; ib < psb.length; ib++)
                     psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
 
+            final Position
+                cp = Geom.position(vcl, 0., 0.),
+                pr = rot.getRotatedPosition(cp),
+                center = trans.getTranslated(pr);
+
             CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
                                                              pbdry,
                                                              psb,
                                                              psb != null ? sl * depth : 0.0,
+                                                             center,
                                                              depth * sl,      /* along */
                                                              depth * dl,      /* side */
                                                              0.0,             /* top */
                                                              dl * sl * depth, /* volume */
                                                              depth);          /* deltaZ */
-
-            Position cp = Geom.position(vcl, 0., 0.);
-            Position pr = rot.getRotatedPosition(cp);
-            Position pc = trans.getTranslated(pr);
-            ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
 
             elements[i][0] = ve;
         }

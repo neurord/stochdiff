@@ -15,12 +15,14 @@ public class CurvedVolumeElement extends VolumeElement {
                                Position[] boundary,
                                Position[] surfaceBoundary,
                                double exposedArea,
+                               Position center,
                                double volume, double deltaZ) {
 
         super(label, region, groupID,
               boundary,
               surfaceBoundary,
               exposedArea,
+              center,
               0.0, 0.0, 0.0,
               volume, deltaZ);
     }

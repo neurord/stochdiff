@@ -7,6 +7,7 @@ public class CuboidVolumeElement extends VolumeElement {
                                Position[] boundary,
                                Position[] surfaceBoundary,
                                double exposedArea,
+                               Position center,
                                double alongArea, double sideArea, double topArea,
                                double volume, double deltaZ) {
 
@@ -14,6 +15,7 @@ public class CuboidVolumeElement extends VolumeElement {
               boundary,
               surfaceBoundary,
               exposedArea,
+              center,
               alongArea, sideArea, topArea,
               volume, deltaZ);
     }

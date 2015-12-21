@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import neurord.geom.Position;
 
 public abstract class VolumeElement {
-    protected double cx;
-    protected double cy;
-    protected double cz;
+    protected final Position center;
 
     protected final String label;
     protected final String region;
@@ -36,6 +34,7 @@ public abstract class VolumeElement {
                          Position[] boundary,
                          Position[] surfaceBoundary,
                          double exposedArea,
+                         Position center,
                          double alongArea, double sideArea, double topArea,
                          double volume, double deltaZ) {
         this.label = label;
@@ -47,6 +46,8 @@ public abstract class VolumeElement {
         this.boundary = boundary;
         this.surfaceBoundary = surfaceBoundary;
         this.exposedArea = exposedArea;
+
+        this.center = center;
 
         this.alongArea = alongArea;
         this.sideArea = sideArea;
@@ -68,22 +69,16 @@ public abstract class VolumeElement {
         return topArea;
     }
 
-    public void setCenterPosition(double x, double y, double z) {
-        cx = x;
-        cy = y;
-        cz = z;
-    }
-
     public double getX() {
-        return cx;
+        return this.center.getX();
     }
 
     public double getY() {
-        return cy;
+        return this.center.getY();
     }
 
     public double getZ() {
-        return cz;
+        return this.center.getZ();
     }
 
     public boolean isSubmembrane() {
@@ -148,7 +143,7 @@ public abstract class VolumeElement {
         else
             sb.append(String.format("%s(%.5g %.5g %.5g)",
                                     sb.length() > 0 ? " " : "",
-                                    cx, cy, cz));
+                                    this.getX(), this.getY(), this.getZ()));
         return sb.toString();
     }
 
@@ -186,9 +181,8 @@ public abstract class VolumeElement {
             ans[i++] = deltaZ;
             assert i == ans.length;
             return ans;
-        } else {
-            return new double[]{cx, cy, cz, volume, deltaZ};
-        }
+        } else
+            return new double[]{this.getX(), this.getY(), this.getZ(), volume, deltaZ};
     }
 
     public String getGroupID() {

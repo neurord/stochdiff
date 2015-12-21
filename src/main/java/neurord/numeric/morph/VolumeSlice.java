@@ -144,22 +144,22 @@ public class VolumeSlice {
                         for (int ib = 0; ib < psb.length; ib++)
                             psb[ib] = trans.getTranslated(rot.getRotatedPosition(psb[ib]));
 
+                    final Position
+                        cp = Geom.position(vcx, vcy, 0.),
+                        pr = rot.getRotatedPosition(cp),
+                        center = trans.getTranslated(pr);
+
                     CuboidVolumeElement ve = new CuboidVolumeElement(label, regionLabel, null,
                                                                      pbdry,
                                                                      psb,
                                                                      psb != null ? sl * boxSize : 0,
+                                                                     center,
                                                                      boxSize * sl,
                                                                      boxSize * boxSize,
                                                                      boxSize * sl,
                                                                      boxSize * boxSize * sl, /* volume */
                                                                      boxSize);               /* deltaZ */
                     elements[i][j] = ve;
-
-                    Position cp = Geom.position(vcx, vcy, 0.);
-                    Position pr = rot.getRotatedPosition(cp);
-                    Position pc = trans.getTranslated(pr);
-                    ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
-
                 }
             }
         }

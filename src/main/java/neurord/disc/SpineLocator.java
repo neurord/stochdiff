@@ -212,16 +212,23 @@ public abstract class SpineLocator {
             for (int j = 0; j < pbdry.length; j++)
                 pbdry[j] = trans.getTranslated(rot.getRotatedPosition(pbdry[j]));
 
+            final Position
+                cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.),
+                pr = rot.getRotatedPosition(cp),
+                center = trans.getTranslated(pr);
+
             if (vedend instanceof CuboidVolumeElement) {
                 ve = new CuboidVolumeElement(label, rgns[i], groupID,
                                              pbdry,
                                              null, 0.0,
+                                             center,
                                              0.0, 0.0, 0.0,
                                              vol, deltaZ);
             } else if (vedend instanceof CurvedVolumeElement) {
                 CurvedVolumeElement cve = new CurvedVolumeElement(label, rgns[i], groupID,
                                                                   pbdry,
                                                                   null, 0.0,
+                                                                  center,
                                                                   vol, deltaZ);
                 ve = cve;
                 TrianglesSet ts = makeTriangles(xp[i], xp[i+1], rb[i], rb[i+1]);
@@ -232,10 +239,6 @@ public abstract class SpineLocator {
             } else
                 throw new RuntimeException("unknown element type " + vedend);
 
-            Position cp = Geom.position(0.5 * (xp[i] + xp[i + 1]), 0., 0.);
-            Position pr = rot.getRotatedPosition(cp);
-            Position pc = trans.getTranslated(pr);
-            ve.setCenterPosition(pc.getX(), pc.getY(), pc.getZ());
             vprev.coupleTo(ve, baseArea);
             ret.add(ve);
 
