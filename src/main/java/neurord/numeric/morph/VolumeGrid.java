@@ -87,7 +87,10 @@ public class VolumeGrid {
         this.elements.add(ve);
 
         final String region = ve.getRegion();
-        assert region != null;
+        if (region == null) {
+            log.debug("VolumeElement has null region and cannot be accessed");
+            return;
+        }
 
         log.debug("Processing VolumeElement {} from region {}", ve.getAsText(), region);
 
@@ -101,13 +104,10 @@ public class VolumeGrid {
     }
 
     public ArrayList<VolumeElement> getElementsInRegion(String reg) {
-        final ArrayList<VolumeElement> ret;
         if (regionHM.containsKey(reg))
-            ret = regionHM.get(reg);
+            return regionHM.get(reg);
         else
-            // POSERR - any use in impty array - error?
-            ret = new ArrayList<VolumeElement>();
-        return ret;
+            return new ArrayList<>();
     }
 
     // switch from collections to arrays for the calculation

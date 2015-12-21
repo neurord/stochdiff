@@ -4,7 +4,12 @@ import java.util.ArrayList;
 
 import neurord.geom.Position;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public abstract class VolumeElement {
+    static final Logger log = LogManager.getLogger();
+
     protected final Position center;
 
     protected final String label;
@@ -31,6 +36,16 @@ public abstract class VolumeElement {
                          Position center,
                          double alongArea, double sideArea, double topArea,
                          double volume, double deltaZ) {
+        log.debug("New {}(label={}, region={}, groupID={}, boundary={}, surfaceBoundary={}," +
+                  " exposedArea={}, center={}, along {}, side {}, top {}, volume={}, Δz={})",
+                  this.getClass().getName(),
+                  label, region, groupID,
+                  boundary,
+                  surfaceBoundary, exposedArea,
+                  center,
+                  alongArea, sideArea, topArea,
+                  volume, deltaZ);
+
         this.label = label;
         this.region = region;
         this.groupID = groupID;

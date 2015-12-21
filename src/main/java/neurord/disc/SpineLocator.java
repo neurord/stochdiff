@@ -41,6 +41,9 @@ public abstract class SpineLocator {
             double density = sp.getDensity();
             String reg = sp.getTargetRegion();
 
+            log.info("Allocating spines in popid=\"{}\" region=\"{}\"",
+                     popid, reg);
+
             ArrayList<VolumeElement> surfVE = new ArrayList<>();
             ArrayList<Double> surfA = new ArrayList<>();
 
