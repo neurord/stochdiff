@@ -1,5 +1,3 @@
-//6 18 2007: WK added a boolean variable (submembrane), and three functions (isSubmembrane, getSubmembrane, and setSubmembrane)
-//written by Robert Cannon
 package neurord.numeric.morph;
 
 import java.util.ArrayList;
@@ -17,8 +15,6 @@ public abstract class VolumeElement {
     protected final double deltaZ;
     protected final double exposedArea;
 
-    protected int icache;
-
     protected final double alongArea;
     protected final double sideArea;
     protected final double topArea;
@@ -27,8 +23,6 @@ public abstract class VolumeElement {
 
     protected final Position[] boundary;
     protected final Position[] surfaceBoundary;
-
-    protected boolean fixcon = false;
 
     public VolumeElement(String label, String region, String groupID,
                          Position[] boundary,
@@ -93,11 +87,6 @@ public abstract class VolumeElement {
         return region;
     }
 
-    public ArrayList<ElementConnection> getConnections() {
-        fixcon = true;
-        return connections;
-    }
-
     public double getVolume() {
         return this.volume;
     }
@@ -106,22 +95,8 @@ public abstract class VolumeElement {
         return this.deltaZ;
     }
 
-    public void coupleTo(VolumeElement vx, double ca) {
-        // ca is the area of contact between the elements;
-        assert !fixcon;
-        connections.add(new ElementConnection(this, vx, ca));
-    }
-
     public double getExposedArea() {
         return this.exposedArea;
-    }
-
-    public void cache(int ind) {
-        icache = ind;
-    }
-
-    public int getCached() {
-        return icache;
     }
 
     public Position[] getBoundary() {
@@ -131,6 +106,39 @@ public abstract class VolumeElement {
     public Position[] getSurfaceBoundary() {
         return this.surfaceBoundary;
     }
+
+    public String getGroupID() {
+        return this.groupID;
+    }
+
+    /* connections */
+
+    private boolean fixcon = false;
+
+    public void coupleTo(VolumeElement vx, double ca) {
+        // ca is the area of contact between the elements;
+        assert !fixcon;
+        connections.add(new ElementConnection(this, vx, ca));
+    }
+
+    public ArrayList<ElementConnection> getConnections() {
+        fixcon = true;
+        return connections;
+    }
+
+    /* icache */
+
+    private int icache;
+
+    public void cache(int ind) {
+        icache = ind;
+    }
+
+    public int getCached() {
+        return icache;
+    }
+
+    /* obsolete text functions */
 
     public String getAsText() {
         StringBuffer sb = new StringBuffer();
@@ -183,9 +191,5 @@ public abstract class VolumeElement {
             return ans;
         } else
             return new double[]{this.getX(), this.getY(), this.getZ(), volume, deltaZ};
-    }
-
-    public String getGroupID() {
-        return this.groupID;
     }
 }
