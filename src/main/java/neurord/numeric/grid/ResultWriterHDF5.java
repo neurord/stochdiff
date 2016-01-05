@@ -1076,6 +1076,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         long[] selected = obj.getSelectedDims();
         int[] selectedIndex = obj.getSelectedIndex();
 
+        log.info("Retrieving population from {}:{} row {}", h5, poppath, index);
         log.debug("pristine rank={} dims={} start={} selected={} selectedIndex={}",
                   rank, dims, start, selected, selectedIndex);
         start[0] = index;
@@ -1085,8 +1086,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         log.debug("selected rank={} dims={} start={} selected={} selectedIndex={}",
                   rank, dims, start, selected, selectedIndex);
         int[] data = (int[]) obj.getData();
-        int[][] pop = ArrayUtil.shape(data, (int) dims[1], (int) dims[2]);
-        log.debug("retrieved population {}", (Object) pop);
+        int[][] pop = ArrayUtil.reshape(data, (int) dims[1], (int) dims[2]);
+        // log.debug("{}", (Object) pop);
         return pop;
     }
 

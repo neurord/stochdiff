@@ -339,6 +339,7 @@ public class SDRun implements IOutputSet {
             overrides.put("SDRun.simulationSeed", "" + seed);
         }
 
+        log.info("Loading model from xml with seed {}", seed);
         try {
             return loader.unmarshall(xml, overrides);
         } catch(Exception e) {
@@ -355,6 +356,7 @@ public class SDRun implements IOutputSet {
             overrides.put("SDRun.simulationSeed", "" + seed);
         }
 
+        log.info("Loading model from \"{}\" with seed {}", filename, seed);
         try {
             return loader.unmarshall(filename, overrides);
         } catch(Exception e) {
