@@ -249,17 +249,10 @@ public class ArrayUtil {
                 Arrays.fill(subarray, value);
     }
 
-    public static int[][] shape(int[] flat, int rows, int cols) {
+    public static int[][] reshape(int[] flat, int rows, int cols) {
         int[][] ans = new int[rows][cols];
         for (int i = 0; i < rows; i++)
-            System.arraycopy(flat, rows * i, ans[i], 0, cols);
-        return ans;
-    }
-
-    public static double[][] shape(double[] flat, int rows, int cols) {
-        double[][] ans = new double[rows][cols];
-        for (int i = 0; i < rows; i++)
-            System.arraycopy(flat, rows * i, ans[i], 0, cols);
+            System.arraycopy(flat, cols * i, ans[i], 0, cols);
         return ans;
     }
 
