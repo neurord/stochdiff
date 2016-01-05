@@ -27,8 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
 
 public class NextEventQueue {
     static final Logger log = LogManager.getLogger();
@@ -561,6 +559,9 @@ public class NextEventQueue {
             }
 
             double normal =  this._new_time(current);
+
+            assert !Double.isNaN(current);
+            assert !Double.isNaN(normal);
 
             log.debug("waiting {} {}→{}", normal - current, current, normal);
             this.setEvent(1, false, false, current, normal);
@@ -1461,10 +1462,9 @@ public class NextEventQueue {
     public int updatePopulation(int element, int specie, int count, NextEvent event) {
         final int done;
         if (count < 0 && this.particles[element][specie] < -count) {
-            log.debug("{}: population would become negative for element {} sp {}: changing {} by {} {}",
+            log.debug("{}: population would become negative for element {} sp {}: changing {} by {}",
                       event, element, specie,
-                      this.particles[element][specie], count,
-                      this.particles);
+                      this.particles[element][specie], count);
             done = -this.particles[element][specie];
             this.particles[element][specie] = 0;
         } else {
