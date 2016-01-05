@@ -681,7 +681,7 @@ public class NextEventQueue {
                     log.debug("update_and_reposition: {}", this);
                 boolean expect_changed = changed && !this.bidirectional_leap;
                 double old = this._update_propensity(expect_changed);
-                boolean inf = Double.isInfinite(this.time);
+                boolean inf = Double.isInfinite(this.time) || this.propensity == 0;
                 final double ans;
                 if (update_times && !inf) {
                     this.time = (this.time - current) * old / this.propensity + current;
@@ -692,7 +692,7 @@ public class NextEventQueue {
                         this.original_wait = this.time - current;
                     ans = 0;
                 }
-                assert this.time >= 0: this.time;
+                assert this.time >= 0: this;
 
                 queue.reposition("upd.dep", this);
                 return ans;
