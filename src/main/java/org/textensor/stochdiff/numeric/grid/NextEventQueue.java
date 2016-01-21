@@ -469,7 +469,7 @@ public class NextEventQueue {
          * Reculculate propensity. Return old.
          */
         int[] old_pop;
-        double _update_propensity(boolean warn) {
+        double _update_propensity(boolean warn, boolean leap) {
             double old = this.propensity;
             this.propensity = this.calcPropensity();
 
@@ -486,15 +486,19 @@ public class NextEventQueue {
                             higher = true;
                     }
                     log.log(higher && lower ? Level.DEBUG : Level.ERROR,
-                            "{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
-                            this, old, this.propensity,
+                            "{}: after {} propensity changed {} → {} ({}, n={} → {}), extent={}",
+                            this,
+                            leap ? "leap" : "exact event",
+                            old, this.propensity,
                             (this.propensity - old) / old,
                             old_pop, pop, this.extent);
                     if (!(higher && lower))
                         throw new RuntimeException();
                 } else if (log_propensity)
-                    log.debug("{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
-                              this, old, this.propensity,
+                    log.debug("{}: after {} propensity changed {} → {} ({}, n={} → {}), extent={}",
+                              this,
+                              leap ? "leap" : "exact event",
+                              old, this.propensity,
                               (this.propensity - old) / old,
                               old_pop, pop, this.extent);
 
@@ -612,14 +616,14 @@ public class NextEventQueue {
 
             /* In reactions of the type Da→Da+MaI the propensity does not change
              * after execution, but there's nothing to warn about. */
-            this._update_propensity(false);
+            this._update_propensity(false, was_leap);
 
             if (this.bidirectional_leap) {
                 assert this.reverse.reverse_is_leaping;
                 this.reverse.reverse_is_leaping = false;
                 this.bidirectional_leap = false;
 
-                this.reverse._update_propensity(false);
+                this.reverse._update_propensity(false, true);
             }
 
             this.pick_time(current, timelimit);
@@ -629,7 +633,7 @@ public class NextEventQueue {
                 this.reverse.reverse_is_leaping = true;
                 queue.reposition("reverse", this.reverse);
             } else if (this.reverse != null)
-                this.reverse.update_and_reposition(current, false);
+                this.reverse.update_and_reposition(current, false, was_leap);
 
             double max_fraction = 0;
             NextEvent worst = null;
@@ -638,7 +642,7 @@ public class NextEventQueue {
              * so no need to go over both. */
             for (NextEvent dep: this.dependent)
                 if (dep != this.reverse) {
-                    double fraction = dep.update_and_reposition(current, changed);
+                    double fraction = dep.update_and_reposition(current, changed, was_leap);
                     if (fraction > max_fraction) {
                         max_fraction = fraction;
                         worst = dep;
@@ -657,7 +661,7 @@ public class NextEventQueue {
          * For a reaction subjugate to the reverse, it returns the ratio
          * for the reverse reaction.
          */
-        double update_and_reposition(double current, boolean changed) {
+        double update_and_reposition(double current, boolean changed, boolean leap) {
             /* When reverse is leaping, we do not update the time or other
              * fields on this event. We push all updates of time and propensity
              * to the reverse. */
@@ -673,11 +677,11 @@ public class NextEventQueue {
                 assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
-                return this.reverse.update_and_reposition(current, false);
+                return this.reverse.update_and_reposition(current, false, leap);
             } else {
                 log.debug("update_and_reposition: {}", this);
                 boolean expect_changed = changed && !this.bidirectional_leap;
-                double old = this._update_propensity(expect_changed);
+                double old = this._update_propensity(expect_changed, leap);
                 boolean inf = Double.isInfinite(this.time) || this.propensity == 0;
                 final double ans;
                 if (update_times && !inf) {
@@ -1375,7 +1379,7 @@ public class NextEventQueue {
         }
 
         @Override
-        public double _update_propensity(boolean warn) {
+        public double _update_propensity(boolean warn, boolean leap) {
             // does not change
             return this.propensity;
         }
