@@ -616,7 +616,7 @@ public class NextEventQueue {
 
             /* In reactions of the type Da→Da+MaI the propensity does not change
              * after execution, but there's nothing to warn about. */
-            this._update_propensity(false, was_leap);
+            double old = this._update_propensity(false, was_leap);
 
             if (this.bidirectional_leap) {
                 assert this.reverse.reverse_is_leaping;
@@ -635,22 +635,29 @@ public class NextEventQueue {
             } else if (this.reverse != null)
                 this.reverse.update_and_reposition(current, false, was_leap);
 
-            double max_fraction = 0;
-            NextEvent worst = null;
+            double max_fraction = (this.propensity - old) / old;
+            NextEvent worst = this;
 
             /* dependent of this must be the same as dependent of reverse reaction
              * so no need to go over both. */
             for (NextEvent dep: this.dependent)
                 if (dep != this.reverse) {
                     double fraction = dep.update_and_reposition(current, changed, was_leap);
-                    if (fraction > max_fraction) {
+                    if (Math.abs(fraction) > Math.abs(max_fraction)) {
                         max_fraction = fraction;
                         worst = dep;
                     }
                 }
-            if (was_leap && max_fraction >= 5 * tolerance)
-                log.warn("{}, extent {}: max {} change fraction {} for {}",
-                         this, done, was_leap ? "leap" : "exact", max_fraction, worst);
+
+            /* Propensity is allowed to change arbitrarily after an exact event,
+             * so only warn about changes after leap. */
+            boolean big = was_leap && Math.abs(max_fraction) >= 2 * tolerance;
+            if (log_propensity || big)
+                log.log(big ? Level.WARN : Level.DEBUG,
+                        "{}, extent {}: max change fraction after {} {} for {}",
+                        this, done,
+                        was_leap ? "leap" : "exact", max_fraction,
+                        worst == this ? "self" : worst);
         }
 
         /**
