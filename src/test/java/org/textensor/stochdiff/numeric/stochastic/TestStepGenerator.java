@@ -70,10 +70,10 @@ public class TestStepGenerator {
         for (int i = 0; i < ntrials; i++)
             nsp += stepper.gaussianStep(ntot, p);
 
-        double sigma = Math.sqrt(mean * (ntrials - mean) / ntrials) * Math.sqrt(ntrials);
+        double sigma = Math.sqrt(mean / ntrials * (ntrials - mean) / ntrials * ntrials);
         log.info("gaussian step: mean={} σ={} expect={} actual={}({}σ)",
                  mean, sigma, ntrials * mean, nsp, (ntrials*mean - nsp) / sigma);
-        assertApproxEquals(nsp, ntrials * mean, 0, Math.max(10 * sigma, 1));
+        assertApproxEquals(nsp, ntrials * mean, 0.01, Math.max(10 * sigma, 1));
     }
 
     @DataProvider
