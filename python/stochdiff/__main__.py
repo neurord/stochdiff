@@ -63,7 +63,7 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
-parser.add_argument('--format', default='dot', choices=('dot', 'tex'))
+parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
@@ -227,7 +227,7 @@ def save_or_dot(ident):
     file.flush()
     if opts.save:
         print('Written', file.name)
-    else:
+    elif opts.format == 'dot':
         command = ['neato', '-Tx11', file.name]
         print('running', ' '.join(command))
         subprocess.check_call(command)
@@ -378,10 +378,36 @@ def _productions_tex(dst, species, reactants, r_stoichio, products, p_stoichio, 
         print('  ' + left + ('\n    & ' + right if right else '') + r'\\')
     print(r'\end{align*}')
 
+def _reaction_name_plain(rr, rr_s, pp, pp_s, species, forward, backward, unit, align=True):
+    if backward:
+        arrow = ' ←→ '
+    else:
+        arrow = ' → '
+    return arrow.join(
+        (' + '.join('%s%s' % (s if s > 1 else '', species[r])
+                    for r, s in zip(rr_, ss_)
+                    if r >= 0)
+         for rr_, ss_ in ((rr, rr_s), (pp, pp_s))))
+
+def _plain_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    for i, rr, rr_s, pp, pp_s, rate in zip(range(len(rates)),
+                                           reactants, r_stoichio,
+                                           products, p_stoichio, rates):
+        if i in reversibles:
+            if i < reversibles[i]:
+                yield _reaction_name_plain(rr, rr_s, pp, pp_s, species, rate, rates[reversibles[i]], opts.units)
+        else:
+            yield _reaction_name_plain(rr, rr_s, pp, pp_s, species, rate, None, opts.units)
+
+def _productions_plain(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    print(r'reactions:')
+    for react in _plain_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+        print('  ' + react)
+
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
-    func = {'dot':_productions_dot, 'tex':_productions_tex}[opts.format]
+    func = {'dot':_productions_dot, 'tex':_productions_tex, 'plain':_productions_plain}[opts.format]
     with save_or_dot('reactions') as file:
         func(file, model.species(),
              reactions.reactants(), reactions.reactant_stoichiometry(),
