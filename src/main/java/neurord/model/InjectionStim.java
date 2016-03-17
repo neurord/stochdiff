@@ -34,6 +34,19 @@ public class InjectionStim {
     @XmlJavaTypeAdapter(DoubleMatrixAdapter.class)
     private DoubleMatrix rates;
 
+    /* For testing only */
+    public InjectionStim(String species,
+                         String site,
+                         Double rate, Double onset, Double duration, Double period, Double end) {
+        this.specieID = species;
+        this.injectionSite = site;
+        this.rate = rate;
+        this.onset = onset;
+        this.duration = duration;
+        this.period = period;
+        this.end = end;
+    }
+
     public String getInjectionSite() {
         assert this.injectionSite != null; /* required in the schema */
         return this.injectionSite;

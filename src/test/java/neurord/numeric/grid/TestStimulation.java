@@ -1,8 +1,11 @@
 package neurord.numeric.grid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import neurord.model.InjectionStim;
 import neurord.numeric.math.RandomGenerator;
+import neurord.numeric.chem.ReactionTable;
 import neurord.numeric.chem.StimulationTable;
 import neurord.numeric.chem.StimulationTable.Stimulation;
 
@@ -12,13 +15,20 @@ import static neurord.util.TestUtil.assertApproxEquals;
 import org.testng.annotations.*;
 
 public class TestStimulation {
-    final double[] rates = {2.};
+    public final String SPECIES = "A";
+    public final String SITE = "xxx";
+    public final double RATE = 2;
+    public final double ONSET = 100;
+    public final double DURATION = 10;
+    public final double PERIOD = 30;
     public final double END = 200;
-    StimulationTable stimtab = new StimulationTable();
-    {
-        stimtab.addPeriodicSquarePulse("xxx", rates,
-                                       100., 10., 30., END);
-    }
+
+    final ReactionTable rtab = new ReactionTable(0,
+                                                 new String[]{ SPECIES },
+                                                 new double[]{ });
+
+    final InjectionStim stim = new InjectionStim(SPECIES, SITE, RATE, ONSET, DURATION, PERIOD, END);
+    final StimulationTable stimtab = new StimulationTable(Arrays.asList(stim), rtab);
 
     static class FakeRandom implements RandomGenerator {
         @Override public float random() { return 0.5f; }
@@ -32,43 +42,43 @@ public class TestStimulation {
     NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], true, 0.1, 1);
     NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
-        queue.createStimulations(numbering, null, null, stimtab, new int[][]{{0}});
+        queue.createStimulations(numbering, null, rtab, stimtab, new int[][]{{0}});
 
     @Test
     public void testStim() {
         Stimulation stim = stimtab.getStimulations().get(0);
-        assertEquals(stim.site, "xxx");
-        assertEquals(stim.rates, rates);
-        assertEquals(stim.onset, 100.);
-        assertEquals(stim.duration, 10.);
-        assertEquals(stim.period, 30.);
+        assertEquals(stim.site, SITE);
+        assertEquals(stim.rate, RATE);
+        assertEquals(stim.onset, ONSET);
+        assertEquals(stim.duration, DURATION);
+        assertEquals(stim.period, PERIOD);
         assertEquals(stim.end, END);
 
         assertEquals(stims.size(), 1);
 
         NextEventQueue.NextStimulation ev = stims.get(0);
-        assertEquals(ev.calcPropensity(), rates[0]);
+        assertEquals(ev.calcPropensity(), RATE);
 
-        assertEquals(ev.time(), stim.onset + 1/rates[0]);
+        assertEquals(ev.time(), stim.onset + 1/RATE);
 
         // Check that time is properly counted from the onset,
         // execting: onset + exp(tau) = onset + tau
-        assertEquals(ev._new_time(0), stim.onset + 1/rates[0]);
+        assertEquals(ev._new_time(0), stim.onset + 1/RATE);
 
         // Check that when current < onset, time does not change
-        assertEquals(ev._new_time(50), stim.onset + 1/rates[0]);
-        assertEquals(ev._new_time(100), stim.onset + 1/rates[0]);
+        assertEquals(ev._new_time(50), stim.onset + 1/RATE);
+        assertEquals(ev._new_time(100), stim.onset + 1/RATE);
 
         // Check that when inside first window, time moves to the right
-        assertEquals(ev._new_time(100 + 5), stim.onset + 1/rates[0] + 5);
+        assertEquals(ev._new_time(100 + 5), stim.onset + 1/RATE + 5);
 
         // Check that when before second window, time is stuck
-        assertEquals(ev._new_time(100 + stim.duration), stim.onset + stim.period + 1/rates[0]);
+        assertEquals(ev._new_time(100 + stim.duration), stim.onset + stim.period + 1/RATE);
 
         // Check that when inside second window, time moves to the right
-        assertEquals(ev._new_time(100 + stim.period), stim.onset + stim.period + 1/rates[0]);
+        assertEquals(ev._new_time(100 + stim.period), stim.onset + stim.period + 1/RATE);
         assertEquals(ev._new_time(100 + stim.period + 5),
-                     stim.onset + stim.period + 1/rates[0] + 5);
+                     stim.onset + stim.period + 1/RATE + 5);
 
         // Check that when after end, time is infinity
         assertEquals(ev._new_time(END), Double.POSITIVE_INFINITY);
