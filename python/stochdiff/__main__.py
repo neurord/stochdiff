@@ -475,7 +475,7 @@ def _history(simul, species, region_indices, region_labels,
         ax.legend(loc='best', fontsize=7)
     ax.set_xlabel('t / ms')
     if opts.save:
-        fname = opts.save + ', particle numbers of species {}.svg'.format(', '.join(species))
+        fname = opts.save + ',_particle_numbers_of_species_{}.svg'.format(','.join(species))
         f.savefig(fname)
         print('saved {}'.format(fname))
     else:
