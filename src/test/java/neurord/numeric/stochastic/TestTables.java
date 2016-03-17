@@ -41,7 +41,7 @@ public class TestTables {
             double r = i / 50.;
             int n1 = jc.nGo(r);
             int n2 = jc.nGoBS(r);
-            assertEquals(n1, n2, "i=" + i + " r=" + r + " jc=" + jc);
+            assertApproxEquals(n1, n2, 0.01, 1, "i=" + i + " r=" + r + " jc=" + jc);
         }
     }
 

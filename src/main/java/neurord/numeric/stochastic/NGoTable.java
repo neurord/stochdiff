@@ -19,8 +19,8 @@ public final class NGoTable {
     public final double lnp;
     public final int n;
 
-    private final double[] cprob; // cumulative probabilities
-    private int ncprob;
+    final double[] cprob; // cumulative probabilities
+    int ncprob;
 
     public final distribution_t mode;
 
@@ -53,7 +53,8 @@ public final class NGoTable {
                     ncprob = i;
                 }
             }
-
+            if (ncprob == -1)
+                ncprob = 0;
 
             /* at this stage, wk[i] contains the probability that
              * i or more particles move in the step. wk[0] must be 1

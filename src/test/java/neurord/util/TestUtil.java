@@ -45,14 +45,23 @@ public class TestUtil {
     }
 
     public static void assertApproxEquals(double a, double b,
-                                          double relative, double absolute) {
+                                          double relative, double absolute,
+                                          String message) {
         double diff = Math.abs(a-b);
         if (absolute >= 0 && diff <= absolute)
             return;
-        if (relative >= 0 && diff <= relative * a || diff <= relative * b)
+        double rel = diff / Math.max(a, b);
+        if (relative >= 0 && rel <= relative)
             return;
-        throw new AssertionError("two numbers are not equal enough: " + a + ", " + b
-                                 + " rel=" + relative + " abs=" + absolute);
+        throw new AssertionError("two numbers are not equal enough: " + a + "!= " + b
+                                 + ", rel=" + rel + ">" + relative
+                                 + ", abs=" + diff + ">" + absolute
+                                 + (message != null ? " (" + message + ")" : ""));
+    }
+
+    public static void assertApproxEquals(double a, double b,
+                                          double relative, double absolute) {
+        assertApproxEquals(a, b, relative, absolute, null);
     }
 
     /**
