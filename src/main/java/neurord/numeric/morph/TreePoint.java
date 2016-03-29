@@ -31,8 +31,6 @@ public class TreePoint implements Position {
     public double dgx;
     public double dgy;
 
-
-
     private ArrayList<TreePoint> offsetChildren;
 
     private HashMap<TreePoint, String> segidHM;
@@ -52,8 +50,6 @@ public class TreePoint implements Position {
 
     }
 
-
-
     public TreePoint(double x, double y, double z, double r) {
         this();
         this.x = x;
@@ -63,21 +59,17 @@ public class TreePoint implements Position {
 
     }
 
-
     public double getRadius() {
         return r;
     }
-
 
     public double getX() {
         return x;
     }
 
-
     public double getY() {
         return y;
     }
-
 
     public double getZ() {
         return z;
@@ -91,36 +83,29 @@ public class TreePoint implements Position {
         return parent;
     }
 
-
     public TreePoint makeCopy() {
         return new TreePoint(x, y, z, r);
     }
-
 
     public void setWork(int iw) {
         iwork = iw;
     }
 
-
     public int getWork() {
         return iwork;
     }
-
 
     public String toString() {
         return ("(point x=" + x + ",y=" + y + ",z=" + z + ",r=" + r + ",nnbr=" + nnbr + ")");
     }
 
-
     public void setPosition(double[] a) {
         x = a[0];
         y = a[1];
         z = a[2];
-        if (a.length >= 3) {
+        if (a.length >= 3)
             r = a[3];
-        }
     }
-
 
     public void locateBetween(TreePoint cpa, TreePoint cpb, double f) {
         double wf = 1. - f;
@@ -131,9 +116,8 @@ public class TreePoint implements Position {
 
     }
 
-
     // REFAC - these should all be private, so only the
-    // static methods that presever symmetry are visible
+    // static methods that preserve symmetry are visible
     public void addNeighbor(TreePoint cpn) {
         for (int i = 0; i < nnbr; i++)
             if (nbr[i] == cpn)
@@ -151,83 +135,65 @@ public class TreePoint implements Position {
 
     public void removeNeighbor(TreePoint cp) {
         int ii = -1;
-        for (int i = 0; i < nnbr; i++) {
-            if (nbr[i] == cp) {
+        for (int i = 0; i < nnbr; i++)
+            if (nbr[i] == cp)
                 ii = i;
-            }
-        }
         if (ii >= 0) {
-            for (int i = ii; i < nnbr - 1; i++) {
+            for (int i = ii; i < nnbr - 1; i++)
                 nbr[i] = nbr[i + 1];
-            }
             nnbr--;
         }
     }
 
-
     public void replaceNeighbor(TreePoint cp, TreePoint cr) {
-
         int ii = -1;
-        for (int i = 0; i < nnbr; i++) {
-            if (nbr[i] == cp) {
+        for (int i = 0; i < nnbr; i++)
+            if (nbr[i] == cp)
                 ii = i;
-            }
-        }
-        if (ii >= 0) {
+
+        if (ii >= 0)
             nbr[ii] = cr;
-        } else
+        else
             throw new RuntimeException("(replaceNeighbor) couldn't find nbr " + cp + " in nbrs list of " + this);
 
-        if (segidHM != null && segidHM.containsKey(cp)) {
+        if (segidHM != null && segidHM.containsKey(cp))
             segidHM.put(cr, segidHM.get(cp));
-        }
-        if (regionHM != null && regionHM.containsKey(cp)) {
+
+        if (regionHM != null && regionHM.containsKey(cp))
             regionHM.put(cr, regionHM.get(cp));
-        }
-
     }
-
 
     public boolean hasNeighbor(TreePoint cp) {
-        boolean hn = false;
-        for (int i = 0; i < nnbr; i++) {
-            if (nbr[i] == cp) {
-                hn = true;
-            }
-        }
-        return hn;
-    }
+        for (int i = 0; i < nnbr; i++)
+            if (nbr[i] == cp)
+                return true;
 
+        return false;
+    }
 
     public void removeDeadNeighbors() {
-        for (int i = nnbr - 1; i >= 0; i--) {
-            if (nbr[i].dead) {
+        for (int i = nnbr - 1; i >= 0; i--)
+            if (nbr[i].dead)
                 removeNeighbor(nbr[i]);
-            }
-        }
     }
-
 
     // these are branches that start some way down a segment, but are
     // linked from here temporarily until the tree is discretized and a new point
     // is available to have them connected from as neighbors
     public void addOffsetChild(TreePoint p) {
-        if (offsetChildren == null) {
+        if (offsetChildren == null)
             offsetChildren = new ArrayList<TreePoint>();
-        }
+
         offsetChildren.add(p);
     }
 
-
     public boolean hasOffsetChildren() {
-        return (offsetChildren != null);
+        return offsetChildren != null;
     }
-
 
     public ArrayList<TreePoint> getOffsetChildren() {
         return offsetChildren;
     }
-
 
     public double distanceTo(TreePoint cp) {
         double dx = x - cp.x;
@@ -235,7 +201,6 @@ public class TreePoint implements Position {
         double dz = z - cp.z;
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
-
 
     public void movePerp(TreePoint ca, TreePoint cb, double dperp) {
         double dx = cb.x - ca.x;
@@ -247,14 +212,11 @@ public class TreePoint implements Position {
         y -= dperp * dx;
     }
 
-
     public static void neighborize(TreePoint tp, TreePoint tpn) {
         tp.addNeighbor(tpn);
         tpn.addNeighbor(tp);
 
     }
-
-
 
     public ArrayList<TreePoint> getNeighbors() {
         ArrayList<TreePoint> ret = new ArrayList<TreePoint>();
@@ -266,40 +228,26 @@ public class TreePoint implements Position {
 
 
     public boolean isEndPoint() {
-        boolean ret = false;
-        if (nnbr == 1) {
-            ret = true;
-        }
-        return ret;
+        return nnbr == 1;
     }
-
-
 
     public TreePoint oppositeNeighbor(TreePoint tpp) {
-        TreePoint ret = null;
-        if (nnbr == 2) {
-            if (nbr[0] == tpp) {
-                ret = nbr[1];
-            } else {
-                ret = nbr[0];
-            }
-        }
-        return ret;
+        if (nnbr != 2)
+            return null;
+        if (tpp == nbr[0])
+            return nbr[1];
+        else
+            return nbr[0];
     }
-
-
-
 
     public void setLabel(String s) {
         label = s;
     }
 
-
-
     public void setIDWith(TreePoint point, String s) {
-        if (segidHM == null) {
+        if (segidHM == null)
             segidHM = new HashMap<TreePoint, String>();
-        }
+
         //  E.info("tp set region id to " + point + " as " + s);
         segidHM.put(point, s);
     }
@@ -315,43 +263,39 @@ public class TreePoint implements Position {
 
     public String regionClassWith(TreePoint tp) {
         String ret = null;
-        if (regionHM != null && regionHM.containsKey(tp)) {
+        if (regionHM != null && regionHM.containsKey(tp))
             ret = regionHM.get(tp);
-        }
+
         // June 2009: this could change a lot of things: previously
         // we required both ends to be in the same region. Now it is
         // enough to have the first point of a slice as long as there isn't
         // a potential ambiguity (eg this point in two regions, but its
         // neighbor in neither of them)
-        if (ret == null) {
+        if (ret == null)
             ret = soleRegion();
-        }
+
         return ret;
     }
 
     public String soleRegion() {
         String ret = null;
-        if (regionHM != null && regionHM.size() == 1) {
+        if (regionHM != null && regionHM.size() == 1)
             ret = firstRegion;
-        }
+
         return ret;
     }
 
     public String segmentIDWith(TreePoint tp) {
         String ret = null;
-        if (segidHM != null && segidHM.containsKey(tp)) {
+        if (segidHM != null && segidHM.containsKey(tp))
             ret = segidHM.get(tp);
-        }
+
         return ret;
     }
-
-
 
     public void setSubAreaOf(TreePoint cpa) {
         subAreaPeer = cpa;
     }
-
-
 
     public void alignTop(TreePoint tpon, TreePoint tpdir, double offset) {
         // align the "top" of this point ofset below the top of tpon
@@ -376,17 +320,13 @@ public class TreePoint implements Position {
         z = tpon.getZ();
     }
 
-
-
     public TreePoint largestNeighborNot(TreePoint cpb) {
         TreePoint ret = null;
-        for (int i = 0; i < nnbr; i++) {
+        for (int i = 0; i < nnbr; i++)
             if ((ret == null && nbr[i] != cpb) ||
-                    (ret != null && nbr[i].r > ret.r)) {
+                    (ret != null && nbr[i].r > ret.r))
                 ret = nbr[i];
-            }
-        }
+
         return ret;
     }
-
 }
