@@ -46,7 +46,7 @@ public class TreeWriter {
         pointCount += 1;
 
         String s = String.format("%6d %10.5g %10.5g %10.5g %10.5g %6d ",
-                                 p.getWork(), p.x, p.y, p.z, p.r, ipar);
+                                 p.getWork(), p.getX(), p.getY(), p.getZ(), p.getRadius(), ipar);
         sb.append(s);
         sb.append("\n");
         for (int i = 0; i < p.nnbr; i++) {

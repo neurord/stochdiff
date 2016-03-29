@@ -7,9 +7,9 @@ import java.util.HashMap;
 
 public class TreePoint implements Position {
 
-    public double x;
-    public double y;
-    public double z;
+    private double x;
+    private double y;
+    private double z;
     public double r;
 
     public TreePoint[] nbr;
@@ -97,14 +97,6 @@ public class TreePoint implements Position {
 
     public String toString() {
         return ("(point x=" + x + ",y=" + y + ",z=" + z + ",r=" + r + ",nnbr=" + nnbr + ")");
-    }
-
-    public void setPosition(double[] a) {
-        x = a[0];
-        y = a[1];
-        z = a[2];
-        if (a.length >= 3)
-            r = a[3];
     }
 
     public void locateBetween(TreePoint cpa, TreePoint cpb, double f) {
