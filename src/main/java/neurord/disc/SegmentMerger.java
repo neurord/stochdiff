@@ -45,7 +45,7 @@ public class SegmentMerger {
         for (int j = 0; j < cp.nnbr; j++) {
             TreePoint cq = cp.nbr[j];
             if (cq.getWork() == 2 && cq.nnbr == 2
-                    && Math.abs((cq.r - cp.r) / (cq.r + cp.r)) < 0.5 * maxdr
+                    && Math.abs((cq.getRadius() - cp.getRadius()) / (cq.getRadius() + cp.getRadius())) < 0.5 * maxdr
                     && cp.distanceTo(cq) < maxlen) {
                 // if nnbr is not two, either it is a terminal, or a branch point:
                 // in either case there is nothing to do;
@@ -55,11 +55,11 @@ public class SegmentMerger {
                 double ltot = 0.;
                 double ldtot = 0.;
                 while (cq.nnbr == 2 && cprev.distanceTo(cq) < maxlen
-                        && Math.abs((cq.r - cp.r) / (cq.r + cp.r)) < 0.5 * maxdr) {
+                        && Math.abs((cq.getRadius() - cp.getRadius()) / (cq.getRadius() + cp.getRadius())) < 0.5 * maxdr) {
                     vpt.add(cq);
                     double dl = cprev.distanceTo(cq);
                     ltot += dl;
-                    ldtot += dl * (cprev.r + cq.r);
+                    ldtot += dl * (cprev.getRadius() + cq.getRadius());
 
                     TreePoint cnxt = (cq.nbr[0] == cprev ? cq.nbr[1] : cq.nbr[0]);
                     cprev = cq;
@@ -67,11 +67,11 @@ public class SegmentMerger {
                 }
                 double dl = cprev.distanceTo(cq);
                 ltot += dl;
-                ldtot += dl * (cprev.r + cq.r);
+                ldtot += dl * (cprev.getRadius() + cq.getRadius());
 
 
                 double lab = cp.distanceTo(cq);
-                double ldab = lab * (cp.r + cq.r);
+                double ldab = lab * (cp.getRadius() + cq.getRadius());
                 int nadd = (int)(ltot / maxlen);
                 if (nadd > vpt.size())
                     nadd = vpt.size(); // cannot happen at present;
@@ -112,22 +112,16 @@ public class SegmentMerger {
                     double dperp = Math.sqrt((fl * fl - 1) * dpar * dpar);
                     double fr = ldtot / (fl * ldab);
                     for (int i = 0; i < nadd; i++) {
-                        TreePoint cm = (vpt.get(i));
-                        cm.r *= fr;
-                        if (i % 2 == 0) {
+                        TreePoint cm = vpt.get(i);
+                        cm.setRadius(cm.getRadius() * fr);
+                        if (i % 2 == 0)
                             cm.movePerp(cp, cq, ((i / 2) % 2 == 0 ? dperp : -dperp));
-                        }
                     }
-
                 }
-
-
-
             }
+
             if (cq.getWork() == 2)
                 recMerge(cq, maxdr, maxlen, tol);
         }
     }
-
-
 }

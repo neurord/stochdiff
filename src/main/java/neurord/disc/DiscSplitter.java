@@ -107,7 +107,7 @@ public class DiscSplitter {
 
                     vg = baseGrid(tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
-                    par.partBranchOffset += 2 * tpn.r;
+                    par.partBranchOffset += 2 * tpn.getRadius();
 
                 } else {
                     // normal case: make a new one or add a slice and connect

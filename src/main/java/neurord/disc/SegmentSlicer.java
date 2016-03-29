@@ -121,7 +121,7 @@ public class SegmentSlicer {
                                 cpb.setSubAreaOf(cpa);
 
                                 cpb.alignTop(cpa, cpa.largestNeighborNot(cpb), cpa.partBranchOffset);
-                                cpa.partBranchOffset += 2 * cpb.r;
+                                cpa.partBranchOffset += 2 * cpb.getRadius();
 
                             } else
                                 log.warn("Distance between points is smaller than the desired element size {} {} {} {}",
@@ -284,8 +284,8 @@ public class SegmentSlicer {
 
     private double[] getBalancedSubdivision(TreePoint cpa, TreePoint cpb) {
         double dab = cpa.distanceTo(cpb);
-        double ra = cpa.r;
-        double rb = cpb.r;
+        double ra = cpa.getRadius();
+        double rb = cpb.getRadius();
 
         double localDelta = resolution.getLocalDelta(cpa, cpb);
 

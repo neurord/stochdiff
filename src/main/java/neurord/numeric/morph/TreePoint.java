@@ -10,7 +10,7 @@ public class TreePoint implements Position {
     private double x;
     private double y;
     private double z;
-    public double r;
+    private double r;
 
     public TreePoint[] nbr;
     public int nnbr;
@@ -61,6 +61,10 @@ public class TreePoint implements Position {
 
     public double getRadius() {
         return r;
+    }
+
+    public void setRadius(double r) {
+        this.r = r;
     }
 
     public double getX() {

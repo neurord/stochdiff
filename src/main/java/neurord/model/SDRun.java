@@ -270,7 +270,7 @@ public class SDRun implements IOutputSet {
             double[] diameters = new double[tpa.length];
             double[] candidate_grid_sizes = new double[tpa.length];
             for (int i = 0; i < tpa.length; i++) {
-                double diameter = tpa[i].r * 2;
+                double diameter = tpa[i].getRadius() * 2;
                 diameters[i] = diameter;
                 double denominator = 1;
                 while (diameter / denominator > d)

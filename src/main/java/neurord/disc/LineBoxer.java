@@ -92,7 +92,7 @@ public class LineBoxer {
 
                     vg = baseGrid(surfaceLayers, depth, resolution, tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
-                    par.partBranchOffset += 2 * tpn.r;
+                    par.partBranchOffset += 2 * tpn.getRadius();
 
                 } else {
                     log.debug("Creating new grid between neighbouring points");

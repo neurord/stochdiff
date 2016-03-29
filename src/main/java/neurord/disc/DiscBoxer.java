@@ -97,7 +97,7 @@ public class DiscBoxer {
 
                     vg = baseGrid(tp, tpn, lbl);
                     pGrid.subPlaneConnect(tp, tpn, vg, par.partBranchOffset);
-                    par.partBranchOffset += 2 * tpn.r;
+                    par.partBranchOffset += 2 * tpn.getRadius();
 
                 } else {
                     // normal case: make a new one or add a slice and connect
@@ -128,9 +128,6 @@ public class DiscBoxer {
         }
     }
 
-
-
-
     public VolumeSlice baseGrid(TreePoint tpa, TreePoint tpb, String lbl) {
         double r = 0.5 * (tpa.getRadius() + tpb.getRadius());
 
@@ -143,16 +140,4 @@ public class DiscBoxer {
 
         return ret;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
