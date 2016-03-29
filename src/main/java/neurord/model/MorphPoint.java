@@ -16,7 +16,7 @@ public class MorphPoint {
     @XmlAttribute protected Double x;
     @XmlAttribute protected Double y;
     @XmlAttribute protected Double z;
-    @XmlAttribute protected double r;
+    @XmlAttribute protected Double r;
     @XmlAttribute protected String label;
 
 
@@ -35,6 +35,8 @@ public class MorphPoint {
     protected MorphPoint() { }
 
     public MorphPoint(String label, double x, double y, double z, double r) {
+        assert r > 0;
+
         this.label = label;
         this.x = x;
         this.y = y;
@@ -85,6 +87,7 @@ public class MorphPoint {
     }
 
     public TreePoint toTreePoint() {
+        assert this.r > 0;
         TreePoint tp = new TreePoint(this.x, this.y, this.z, this.r);
         if (label != null)
             tp.setLabel(label);
