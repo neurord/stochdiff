@@ -267,9 +267,11 @@ public class SDRun implements IOutputSet {
             // (2) divide each radius by successively increasing odd numbers until
             // the divided value becomes less than the defaultMaxElementSide.
             // (3) select the smallest among the divided radii values as d.
+            double[] diameters = new double[tpa.length];
             double[] candidate_grid_sizes = new double[tpa.length];
             for (int i = 0; i < tpa.length; i++) {
                 double diameter = tpa[i].r * 2;
+                diameters[i] = diameter;
                 double denominator = 1;
                 while (diameter / denominator > d)
                     denominator += 2; // divide by successive odd numbers
@@ -278,8 +280,8 @@ public class SDRun implements IOutputSet {
             }
 
             d = Math.min(d, ArrayUtil.min(candidate_grid_sizes));
-            log.info("subvolume grid size is: {} (from {}, {})",
-                     d, disc.getDefaultMaxElementSide(), candidate_grid_sizes);
+            log.info("subvolume grid size is: {} (from radii {}, candidates {}, default {})",
+                     d, diameters, candidate_grid_sizes, disc.getDefaultMaxElementSide());
 
             if (disc.curvedElements()) {
                 TreeCurvedElementDiscretizer tced = new TreeCurvedElementDiscretizer(tpa);
