@@ -4,7 +4,11 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class Segment {
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String id;
     @XmlAttribute public String region;
@@ -56,9 +60,8 @@ public class Segment {
 
     public void checkHasPositions() {
         if (!start.hasPosition())
-            throw new RuntimeException("Start point of " + id + " still has no position " + start.writePos());
-
+            throw new RuntimeException("Start point of " + id + " has no position: " + start);
         if (!end.hasPosition())
-            throw new RuntimeException("Start point of " + id + " still has no position " + end.writePos());
+            throw new RuntimeException("Start point of " + id + " has no position: " + end);
     }
 }

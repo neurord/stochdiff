@@ -10,7 +10,11 @@ import neurord.numeric.morph.SpineDistribution;
 import neurord.numeric.morph.SpinePopulation;
 import neurord.numeric.morph.TreePoint;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class Morphology {
+    static final Logger log = LogManager.getLogger();
 
     @XmlElement(name="SpineType")
     public ArrayList<SpineType> spineTypes;
@@ -66,6 +70,7 @@ public class Morphology {
         int ic = 0;
         for (MorphPoint mp : p_points) {
             TreePoint tp = mp.toTreePoint();
+            log.debug("new tree point: {}", tp);
             tpts.add(tp);
             mtHM.put(mp, tp);
             tp.setWork(ic++);

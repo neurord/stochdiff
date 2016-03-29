@@ -14,7 +14,7 @@ public class EndPoint extends MorphPoint {
     @XmlAttribute public String at;
     @XmlAttribute public Double atFraction;
 
-    public EndPoint() { }
+    private EndPoint() { }
 
     public EndPoint(String id, double x, double y, double z, double r) {
         super(id, x, y, z, r);
@@ -22,42 +22,40 @@ public class EndPoint extends MorphPoint {
 
     public void resolve(HashMap<String, Segment> segmentHM, MorphPoint ep) {
         if (on != null) {
-            if (segmentHM.containsKey(on)) {
-                Segment tgtSeg = segmentHM.get(on);
-                if (at != null) {
-                    if (at.equals("start"))
-                        pointConnect(tgtSeg.getStart());
-                    else if (at.equals("end"))
-                        pointConnect(tgtSeg.getEnd());
-                    else {
-                        log.error("connection to segment: at value can only be 'start' or 'end', not '{}'", at);
-                        throw new RuntimeException("connection to segment: at value can only be 'start' or 'end', not " + at);
-                    }
-
-                } else if (atFraction != null) {
-
-                    if (atFraction == 0) {
-                        pointConnect(tgtSeg.getStart());
-
-                    } else if (atFraction == 1) {
-                        pointConnect(tgtSeg.getEnd());
-
-                    } else {
-                        tgtSeg.checkResolved(segmentHM);
-                        tgtSeg.checkHasPositions();
-
-                        interiorPointConnect(tgtSeg, atFraction, ep);
-                    }
-                } else {
-                    log.error("must either set 'at' or 'atFraction' if 'on' is specified");
-                    throw new RuntimeException("must either set 'at' or 'atFraction' if 'on' is specified");
-                }
-
-            } else {
+            Segment tgtSeg = segmentHM.get(on);
+            if (tgtSeg == null) {
                 log.error("point refers to segment '{}' but that segment cannot be found", on);
                 throw new RuntimeException("point refers to segment " + on + " but that segment cannot be found");
             }
 
+            if (at != null) {
+                if (at.equals("start"))
+                    pointConnect(tgtSeg.getStart());
+                else if (at.equals("end"))
+                    pointConnect(tgtSeg.getEnd());
+                else {
+                    log.error("connection to segment: at value can only be 'start' or 'end', not '{}'", at);
+                    throw new RuntimeException("connection to segment: at value can only be 'start' or 'end', not " + at);
+                }
+
+            } else if (atFraction != null) {
+
+                if (atFraction == 0) {
+                    pointConnect(tgtSeg.getStart());
+
+                } else if (atFraction == 1) {
+                    pointConnect(tgtSeg.getEnd());
+
+                } else {
+                    tgtSeg.checkResolved(segmentHM);
+                    tgtSeg.checkHasPositions();
+
+                    interiorPointConnect(tgtSeg, atFraction, ep);
+                }
+            } else {
+                log.error("must either set 'at' or 'atFraction' if 'on' is specified");
+                throw new RuntimeException("must either set 'at' or 'atFraction' if 'on' is specified");
+            }
         }
 
     }
@@ -79,16 +77,15 @@ public class EndPoint extends MorphPoint {
     }
 
 
-    private void pointConnect(MorphPoint tgtEP) {
-        supplySize(tgtEP.x, tgtEP.y, tgtEP.z, tgtEP.r);
+    private void pointConnect(MorphPoint target) {
+        log.debug("pointConnect: {} to {}", this, target);
+        this.supplySize(target.x, target.y, target.z, target.r);
 
-        if (radiiDiffer(tgtEP)) {
-            tgtEP.addNeighbor(this);
-            addNeighbor(tgtEP);
-
-        } else {
-            r_peerPoint = tgtEP;
-        }
+        if (this.radiiDiffer(target)) {
+            target.addNeighbor(this);
+            this.addNeighbor(target);
+        } else
+            this.r_peerPoint = target;
     }
 
     public void interiorPointConnect(Segment tgtSeg, double f, MorphPoint twds) {
@@ -115,7 +112,10 @@ public class EndPoint extends MorphPoint {
         st.addOffsetChild(this);
     }
 
-    public String writePos() {
-        return "(x=" + x + ", y=" + y + ", z=" + z +")";
+    public String toString() {
+        String on = this.on != null ? " on=" + this.on : "";
+        String at = this.at != null ? " at=" + this.at : "";
+        String atFraction = this.atFraction != null ? " atFraction=" + this.atFraction : "";
+        return super.toString() + on + at + atFraction;
     }
 }

@@ -13,11 +13,11 @@ import org.apache.logging.log4j.LogManager;
 public class MorphPoint {
     static final Logger log = LogManager.getLogger();
 
-    @XmlAttribute public Double x;
-    @XmlAttribute public Double y;
-    @XmlAttribute public Double z;
-    @XmlAttribute public double r;
-    @XmlAttribute public String label;
+    @XmlAttribute protected Double x;
+    @XmlAttribute protected Double y;
+    @XmlAttribute protected Double z;
+    @XmlAttribute protected double r;
+    @XmlAttribute protected String label;
 
 
     transient private Segment r_segment;
@@ -32,7 +32,7 @@ public class MorphPoint {
     transient HashMap<MorphPoint, String> segidHM = new HashMap<>();
     transient HashMap<MorphPoint, String> regionHM = new HashMap<>();
 
-    public MorphPoint() { }
+    protected MorphPoint() { }
 
     public MorphPoint(String label, double x, double y, double z, double r) {
         this.label = label;
@@ -85,7 +85,7 @@ public class MorphPoint {
     }
 
     public TreePoint toTreePoint() {
-        TreePoint tp = new TreePoint(x, y, z, r);
+        TreePoint tp = new TreePoint(this.x, this.y, this.z, this.r);
         if (label != null)
             tp.setLabel(label);
 
@@ -157,5 +157,18 @@ public class MorphPoint {
             regionHM.put(mpnew, regionHM.get(mp));
             regionHM.remove(mp);
         }
+    }
+
+    public String toString() {
+        String seg_id = this.r_segment != null && this.r_segment.id != null ?
+            " @" + this.r_segment.id : "";
+        String reg_id = this.r_segment != null && this.r_segment.region != null ?
+            " @@" + this.r_segment.region : "";
+
+        return String.format("%s x=%s y=%s z=%s r=%s%s%s",
+                             getClass().getSimpleName(),
+                             x, y, z, r,
+                             label != null ? " \"" + label + "\"" : "",
+                             seg_id, reg_id);
     }
 }
