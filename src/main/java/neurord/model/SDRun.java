@@ -175,13 +175,9 @@ public class SDRun implements IOutputSet {
         return this.stimulationTable;
     }
 
-    transient private boolean _morphologyResolved = false;
     public Morphology getMorphology() {
-        if (!this._morphologyResolved) {
-            if (this.morphology != null)
-                this.morphology.resolve();
-            this._morphologyResolved =true;
-        }
+        if (this.morphology != null)
+            this.morphology.resolve();
         return this.morphology;
     }
 

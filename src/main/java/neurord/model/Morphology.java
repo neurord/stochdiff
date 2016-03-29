@@ -18,15 +18,19 @@ public class Morphology {
     @XmlElement(name="Segment")
     public ArrayList<Segment> segments;
 
-    transient private ArrayList<MorphPoint> p_points;
-
     @XmlElement(name="SpineAllocation")
     private ArrayList<SpineAllocation> p_spineAllocations;
 
     transient private boolean resolved = false;
+    transient private TreePoint[] tree_points;
 
-    public void resolve() {
-        HashMap<String, SpineType> spineHM = new HashMap<>();
+    public synchronized void resolve() {
+        if (this.resolved)
+            return;
+
+        final ArrayList<MorphPoint> p_points = new ArrayList<>();
+        final HashMap<String, SpineType> spineHM = new HashMap<>();
+
         if (spineTypes != null)
             for (SpineType st : spineTypes)
                 spineHM.put(st.id, st);
@@ -49,7 +53,6 @@ public class Morphology {
                 wk.add(seg.getEnd());
             }
 
-            p_points = new ArrayList<>();
             for (MorphPoint mp : wk)
                 if (mp.redundant())
                     mp.transferConnections();
@@ -57,20 +60,9 @@ public class Morphology {
                     p_points.add(mp);
         }
 
-        resolved = true;
-    }
+        final ArrayList<TreePoint> tpts = new ArrayList<>();
+        final HashMap<MorphPoint, TreePoint> mtHM = new HashMap<>();
 
-
-    /* export the morphology from the Segement/MorphPoint format (which is
-     * designed for IO) to the TreePoint format for the calculation
-     */
-
-    public TreePoint[] getTreePoints() {
-        if (!resolved)
-            resolve();
-
-        ArrayList<TreePoint> tpts = new ArrayList<>();
-        HashMap<MorphPoint, TreePoint> mtHM = new HashMap<>();
         int ic = 0;
         for (MorphPoint mp : p_points) {
             TreePoint tp = mp.toTreePoint();
@@ -99,31 +91,31 @@ public class Morphology {
                 }
         }
 
-        TreePoint[] ret = tpts.toArray(new TreePoint[0]);
-        return ret;
+        this.tree_points = tpts.toArray(new TreePoint[0]);
+        this.resolved = true;
     }
 
 
+    /* export the morphology from the Segement/MorphPoint format (which is
+     * designed for IO) to the TreePoint format for the calculation
+     */
 
+    public synchronized TreePoint[] getTreePoints() {
+        this.resolve();
+        return this.tree_points;
+    }
 
     public SpineDistribution getSpineDistribution() {
 
         ArrayList<SpinePopulation> spa = new ArrayList<SpinePopulation>();
-        if (p_spineAllocations != null) {
+        if (p_spineAllocations != null)
             for (SpineAllocation sa: p_spineAllocations) {
                 SpinePopulation sp = sa.makePopulation();
-                if (sp != null) {
+                if (sp != null)
                     spa.add(sp);
-                }
             }
-        }
+
         SpinePopulation[] pa = spa.toArray(new SpinePopulation[0]);
-
-        SpineDistribution sd = new SpineDistribution(pa);
-
-        return sd;
-
+        return new SpineDistribution(pa);
     }
-
-
 }
