@@ -43,6 +43,9 @@ public class Segment {
             this.end.setIDWith(this.start, this.id);
         }
 
+        assert this.start.r > 0;
+        assert this.end.r > 0;
+
         resolved = true;
     }
 
