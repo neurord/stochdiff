@@ -58,7 +58,7 @@ public abstract class StochasticGridCalc extends GridCalc {
             double[] rcs = sdrun.getRegionConcentrations()[eltregions[i]];
 
             for (int j = 0; j < nspec; j++)
-                wkA[i][j] = this.randomRound(v * rcs[j] * PARTICLES_PUVC);
+                wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
         }
 
         /* surface concentrations */
@@ -72,7 +72,7 @@ public abstract class StochasticGridCalc extends GridCalc {
                 for (int j = 0; j < nspec; j++)
                     if (!Double.isNaN(scs[j]))
                         // nan means not specified by the user;
-                        wkA[i][j] = this.randomRound(a * scs[j] * PARTICLES_PUASD);
+                        wkA[i][j] = this.random.round(a * scs[j] * PARTICLES_PUASD);
         }
 
 
@@ -81,18 +81,6 @@ public abstract class StochasticGridCalc extends GridCalc {
     @Override
     protected void footer() {
         log.info("Used up {} random numbers", this.random.used());
-    }
-
-    protected int randomRound(double number) {
-        int i = (int) number;
-        double d = number - i;
-
-        // random allocation to implement the remainder
-        // (some cells get an extra particle, some don't)
-        if (random.random() < d)
-            i++;
-
-        return i;
     }
 
     @Override

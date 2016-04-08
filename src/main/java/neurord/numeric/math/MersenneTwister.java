@@ -201,6 +201,14 @@ public class MersenneTwister implements RandomGenerator {
             return - Math.log1p(-random()) / tau;
     }
 
+    @Override
+    public final int round(double mean) {
+        int n = (int) mean;
+        if (this.random() > mean - n)
+            n++;
+        return n;
+    }
+
     public static void main(String[] argv) {
 
         MersenneTwister mt = new MersenneTwister();
