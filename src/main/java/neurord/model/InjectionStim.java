@@ -34,6 +34,8 @@ public class InjectionStim {
     @XmlJavaTypeAdapter(DoubleMatrixAdapter.class)
     private DoubleMatrix rates;
 
+    InjectionStim() {};
+
     /* For testing only */
     public InjectionStim(String species,
                          String site,
