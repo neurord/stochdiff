@@ -1350,7 +1350,20 @@ public class NextEventQueue {
 
         @Override
         double _new_time(double current) {
-            return _continous_delta_to_real_time(current, super._new_time(0), false);
+            final double time;
+            switch (this.stim.distribution) {
+            case POISSON:
+                time = super._new_time(0);
+                break;
+            case EXACT:
+                /* One event every in every 1/propensity interval */
+                time = 1 / this.propensity;
+                break;
+            default:
+                throw new RuntimeException("not implemented");
+            }
+
+            return _continous_delta_to_real_time(current, time, false);
         }
 
         @Override
