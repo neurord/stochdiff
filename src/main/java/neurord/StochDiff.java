@@ -118,6 +118,8 @@ public class StochDiff {
     static Options buildOptions() {
         Options options = new Options();
 
+        options.addOption(null, "version", false, "print version string and exit");
+
         options.addOption("i", "ic", true, "output file to take the initial conditions from");
         options.addOption(null, "ic-trial", true, "trial to take the seed from (default: 0)");
         options.addOption(null, "ic-time", true, "time to take the ICs from (default: none)");
@@ -140,8 +142,12 @@ public class StochDiff {
             help_exit(options, !help_requested);
 
         CommandLine cmd = parser.parse(options, argv);
-        argv = cmd.getArgs();
+        if (cmd.hasOption("version")) {
+            System.out.println(Settings.getProgramVersion());
+            System.exit(0);
+        }
 
+        argv = cmd.getArgs();
         modelFile = new File(argv[0]);
         if (!modelFile.exists()) {
             log.fatal("no such file: {}", modelFile);
