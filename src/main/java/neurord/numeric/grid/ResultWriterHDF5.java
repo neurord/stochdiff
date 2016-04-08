@@ -606,6 +606,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeReactionDependencies(Group parent, IGridCalc source)
             throws Exception
         {
+            if (!source.getSource().writeDependencies()) {
+                    log.debug("Dependency scheme writing disabled");
+                    return;
+            }
+
             Collection<IGridCalc.Event> events = source.getEvents();
             if (events == null) {
                     log.debug("No dependency data, not writing dependency scheme");

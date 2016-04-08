@@ -146,6 +146,12 @@ public class SDRun implements IOutputSet {
             return null;
     }
 
+    public boolean writeDependencies() {
+        if (this.outputScheme == null || this.outputScheme.dependencies == null)
+            return false;
+        return this.outputScheme.dependencies;
+    }
+
     transient private boolean _reactionSchemeResolved = false;
     public ReactionScheme getReactionScheme() {
         if (!this._reactionSchemeResolved) {

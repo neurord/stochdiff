@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.*;
 
 public class OutputScheme {
 
+    @XmlAttribute public Boolean dependencies;
+
     @XmlElement(name="OutputSet")
     public ArrayList<OutputSet> outputSets;
 }
