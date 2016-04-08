@@ -7,6 +7,7 @@ import java.util.List;
 
 import neurord.xml.DoubleListAdapter;
 import neurord.xml.DoubleMatrixAdapter;
+import neurord.numeric.BaseCalc.distribution_t;
 
 import org.jblas.DoubleMatrix;
 
@@ -19,6 +20,8 @@ public class InjectionStim {
 
     // this should be the ID of a point in the morphology file
     @XmlAttribute private String injectionSite;
+
+    @XmlAttribute private distribution_t distribution;
 
     private Double rate;
 
@@ -37,9 +40,9 @@ public class InjectionStim {
     InjectionStim() {};
 
     /* For testing only */
-    public InjectionStim(String species,
-                         String site,
-                         Double rate, Double onset, Double duration, Double period, Double end) {
+    InjectionStim(String species,
+                  String site,
+                  Double rate, Double onset, Double duration, Double period, Double end) {
         this.specieID = species;
         this.injectionSite = site;
         this.rate = rate;
@@ -57,6 +60,13 @@ public class InjectionStim {
     public String getSpecies() {
         assert this.specieID != null;      /* required in the schema */
         return this.specieID;
+    }
+
+    public distribution_t getDistribution() {
+        if (this.distribution != null)
+            return this.distribution;
+        else
+            return distribution_t.POISSON;
     }
 
     public double getRate() {

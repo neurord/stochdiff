@@ -1416,7 +1416,14 @@ public class NextEventQueue {
         public int leap_count(double current, double time, boolean bidirectional) {
             /* There should be no reverse reaction, hence no bidirectional leaps */
             assert !bidirectional;
-            return stepper.poissonStep(this.propensity * time);
+            switch (this.stim.distribution) {
+            case POISSON:
+                return random.poisson(this.propensity * time);
+            case EXACT:
+                return random.round(this.propensity * time);
+            default:
+                throw new RuntimeException("not implemented");
+            }
         }
 
         public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {

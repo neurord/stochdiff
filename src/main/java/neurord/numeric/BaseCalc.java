@@ -50,6 +50,7 @@ public abstract class BaseCalc implements Runnable {
     public enum distribution_t {
         BINOMIAL,
         POISSON,
+        EXACT,
     }
 
     public enum algorithm_t {

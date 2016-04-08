@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import neurord.model.InjectionStim;
+import neurord.numeric.BaseCalc.distribution_t;
 
 public class StimulationTable {
     static final Logger log = LogManager.getLogger();
@@ -14,10 +15,12 @@ public class StimulationTable {
     public static class Stimulation {
         public final int species;
         public final String site;
+        public final distribution_t distribution;
         public final double rate, onset, duration, period, end;
 
         public Stimulation(int species,
                            String site,
+                           distribution_t distribution,
                            int train,
                            double rate,
                            double onset,
@@ -27,6 +30,7 @@ public class StimulationTable {
                            double end) {
             this.species = species;
             this.site = site;
+            this.distribution = distribution;
 
             final double train_offset, real_end;
             if (Double.isNaN(period)) {
@@ -46,8 +50,8 @@ public class StimulationTable {
 
         @Override
         public String toString() {
-            return String.format("%s →%s onset=%f duration=%f period=%f end=%f",
-                                 getClass().getSimpleName(), site,
+            return String.format("%s →%s %s onset=%f duration=%f period=%f end=%f",
+                                 getClass().getSimpleName(), site, distribution,
                                  onset, duration, period, end);
         }
 
@@ -97,6 +101,7 @@ public class StimulationTable {
 
                     stims.add(new Stimulation(species,
                                               stim.getInjectionSite(),
+                                              stim.getDistribution(),
                                               0,
                                               rate,
                                               time,
@@ -109,6 +114,7 @@ public class StimulationTable {
                 for (int i = 0; i < stim.getNumTrains(); i++)
                     stims.add(new Stimulation(species,
                                               stim.getInjectionSite(),
+                                              stim.getDistribution(),
                                               i,
                                               stim.getRate(),
                                               stim.getOnset(),

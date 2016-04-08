@@ -208,6 +208,7 @@
 
       <xs:attribute name="specieID" type="xs:string" use="required" />
       <xs:attribute name="injectionSite" type="xs:string" use="required" />
+      <xs:attribute name="distribution" type="distribution" />
     </xs:complexType>
   </xs:element>
 
@@ -307,6 +308,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="BINOMIAL" />
       <xs:enumeration value="POISSON" />
+      <xs:enumeration value="EXACT" />
       <xs:whiteSpace value="collapse" />
     </xs:restriction>
   </xs:simpleType>
