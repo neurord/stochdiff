@@ -569,9 +569,8 @@ public class NextEventQueue {
 
             assert this.reverse != null || this.extent >= 0: this.extent;
 
-            boolean changed = this.extent != 0;
-            final boolean was_leap = this.leap;
-            final int done;
+            boolean changed = !this.leap; /* leaps were already executed before... */
+            int done;
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
@@ -590,9 +589,9 @@ public class NextEventQueue {
                 if (done == 0)
                     changed = false;
             } else
-                done = 0;
+                done = this.extent; /* just accounting for the leap that already happened */
 
-            if (was_leap) {
+            if (this.leap) {
                 leaps += 1; /* We count a bidirectional leap as one */
                 leap_extent += Math.abs(done);
             } else
@@ -600,7 +599,7 @@ public class NextEventQueue {
 
             log.debug("Advanced to {} with {} {}extent={}{}",
                       time, this,
-                      was_leap ? "leap " : "",
+                      this.leap ? "leap " : "",
                       done,
                       done == this.extent ? "" : " (planned " + this.extent + ")");
 
@@ -608,7 +607,7 @@ public class NextEventQueue {
              * after execution, but there's nothing to warn about. */
             this._update_propensity(false);
 
-            if (was_leap && this.reverse != null) {
+            if (this.leap && this.reverse != null) {
                 assert this.reverse.reverse_is_leaping;
                 this.reverse.reverse_is_leaping = false;
                 this.reverse._update_propensity(false);
@@ -616,6 +615,14 @@ public class NextEventQueue {
 
             this.pick_time(current, timelimit);
             queue.reposition("update", this);
+
+            /* Execute leaps immediately */
+            if (this.leap)
+                done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
+                                    diffusionEvents != null ? diffusionEvents[this.element()] : null,
+                                    stimulationEvents != null ? stimulationEvents[this.element()] : null,
+                                    this.extent);
+
             if (this.leap && this.reverse != null) {
                 this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
                 this.reverse.reverse_is_leaping = true;
@@ -636,9 +643,9 @@ public class NextEventQueue {
                         worst = dep;
                     }
                 }
-            if (was_leap && max_fraction >= 5 * tolerance)
+            if (this.leap && max_fraction >= 5 * tolerance)
                 log.warn("{}, extent {}: max {} change fraction {} for {}",
-                         this, done, was_leap ? "leap" : "exact", max_fraction, worst);
+                         this, done, this.leap ? "leap" : "exact", max_fraction, worst);
         }
 
         /**
