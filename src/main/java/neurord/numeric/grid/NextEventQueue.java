@@ -276,16 +276,11 @@ public class NextEventQueue {
         /**
          * leap: when the event was generated as an "exact" event (false), or "leap"
          * event (true). In the first case, extent must be 1.
+         * If this.reverse is non-null, a leap is always bidirecational.
          */
         protected boolean leap;
 
         protected NextEvent reverse;
-
-        /*
-         * We calculated the leap size including both forward and reverse propensities.
-         * Reverse event is "taken care of".
-         */
-        protected boolean bidirectional_leap;
 
         /*
          * reverse_is_leaping: set when this Event is "taken care of" by the reverse Event.
@@ -311,12 +306,11 @@ public class NextEventQueue {
             this.reactant_stoichiometry = reactant_stoichiometry;
         }
 
-        protected void setEvent(int extent, boolean leap, boolean bidirectional,
+        protected void setEvent(int extent, boolean leap,
                                 double wait_start, double time) {
             assert !this.reverse_is_leaping;
             this.extent = extent;
             this.leap = leap;
-            this.bidirectional_leap = bidirectional;
             this.wait_start = wait_start;
             this.time = time;
             this.original_wait = time - wait_start;
@@ -553,7 +547,7 @@ public class NextEventQueue {
                               this,
                               bidirectional ? "bi" : "uni",
                               leap, current, current + leap, count);
-                    this.setEvent(count, true, bidirectional, current, current + leap);
+                    this.setEvent(count, true, current, current + leap);
                     return;
                 }
             }
@@ -564,7 +558,7 @@ public class NextEventQueue {
             assert !Double.isNaN(normal);
 
             log.debug("waiting {} {}→{}", normal - current, current, normal);
-            this.setEvent(1, false, false, current, normal);
+            this.setEvent(1, false, current, normal);
         }
 
         void update(int[][] reactionEvents,
@@ -573,8 +567,7 @@ public class NextEventQueue {
                     double current, double tstop, double timelimit,
                     List<IGridCalc.Happening> events) {
 
-            assert this.bidirectional_leap || this.extent >= 0: this.extent;
-            assert !(this.bidirectional_leap && !this.leap);
+            assert this.reverse != null || this.extent >= 0: this.extent;
 
             boolean changed = this.extent != 0;
             final boolean was_leap = this.leap;
@@ -605,7 +598,6 @@ public class NextEventQueue {
             } else
                 normal_waits += 1;
 
-
             log.debug("Advanced to {} with {} {}extent={}{}",
                       time, this,
                       was_leap ? "leap " : "",
@@ -616,18 +608,16 @@ public class NextEventQueue {
              * after execution, but there's nothing to warn about. */
             this._update_propensity(false);
 
-            if (this.bidirectional_leap) {
+            if (was_leap && this.reverse != null) {
                 assert this.reverse.reverse_is_leaping;
                 this.reverse.reverse_is_leaping = false;
-                this.bidirectional_leap = false;
-
                 this.reverse._update_propensity(false);
             }
 
             this.pick_time(current, timelimit);
             queue.reposition("update", this);
-            if (this.bidirectional_leap) {
-                this.reverse.setEvent(1, false, false, current, Double.POSITIVE_INFINITY);
+            if (this.leap && this.reverse != null) {
+                this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
                 this.reverse.reverse_is_leaping = true;
                 queue.reposition("reverse", this.reverse);
             } else if (this.reverse != null)
@@ -672,14 +662,13 @@ public class NextEventQueue {
              * do not assume propensity changed for those reactions.. */
             if (this.reverse_is_leaping) {
                 log.debug("update_and_reposition: {}, doing reverse", this);
-                assert this.reverse.bidirectional_leap: this.reverse;
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
                 return this.reverse.update_and_reposition(current, false);
             } else {
                 if (log_reposition)
                     log.debug("update_and_reposition: {}", this);
-                boolean expect_changed = changed && !this.bidirectional_leap;
+                boolean expect_changed = changed && (this.reverse == null || !this.leap);
                 double old = this._update_propensity(expect_changed);
                 boolean inf = Double.isInfinite(this.time) || this.propensity == 0;
                 final double ans;
@@ -805,7 +794,7 @@ public class NextEventQueue {
             this.fdiff = fdiff;
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, false, 0.0,
+            this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {}: t={}", this, this.time);
@@ -1036,7 +1025,7 @@ public class NextEventQueue {
             this.substrate_stoichiometry = tmp[1];
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, false, 0.0,
+            this.setEvent(1, false, 0.0,
                           this.propensity > 0 ? this._new_time(0) : Double.POSITIVE_INFINITY);
 
             log.debug("Created {} rate={} vol={} time={}", this,
@@ -1263,7 +1252,7 @@ public class NextEventQueue {
             this.stim = stim;
 
             this.propensity = this.calcPropensity();
-            this.setEvent(1, false, false, 0.0, this._new_time(0));
+            this.setEvent(1, false, 0.0, this._new_time(0));
 
             log.info("Created {}: t={} [{}]", this, this.time, this.stim);
         }
