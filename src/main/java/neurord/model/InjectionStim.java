@@ -37,12 +37,12 @@ public class InjectionStim {
     @XmlJavaTypeAdapter(DoubleMatrixAdapter.class)
     private DoubleMatrix rates;
 
-    InjectionStim() {};
+    private InjectionStim() {};
 
     /* For testing only */
-    InjectionStim(String species,
-                  String site,
-                  Double rate, Double onset, Double duration, Double period, Double end) {
+    public InjectionStim(String species,
+                         String site,
+                         Double rate, Double onset, Double duration, Double period, Double end) {
         this.specieID = species;
         this.injectionSite = site;
         this.rate = rate;

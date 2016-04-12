@@ -35,6 +35,7 @@ public class TestStimulation {
         @Override public double gaussian() { return 0; }
         @Override public double gammln(double xx) { return xx; }
         @Override public int poisson(double mean) { return (int) Math.ceil(mean); }
+        @Override public int round(double mean) { return (int) Math.floor(mean); }
         @Override public double exponential(double tau) { return 1/tau; }
         @Override public long used() { return 0; }
     }
