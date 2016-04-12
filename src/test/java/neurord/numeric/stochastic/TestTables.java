@@ -49,7 +49,8 @@ public class TestTables {
     public static Object[][] modes() {
         ArrayList<Object[]> t = new ArrayList<>();
         for (distribution_t mode: distribution_t.values())
-            t.add(new Object[] {mode});
+            if (mode != distribution_t.EXACT)
+                t.add(new Object[] {mode});
         return t.toArray(new Object[0][]);
     }
 
