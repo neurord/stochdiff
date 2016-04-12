@@ -237,17 +237,43 @@ Note that the intertrain interval specifies the interval between repetition of t
 .. image:: stim-params.png
    :align: center
 
-In the second version, two arrays must be given
+In the second version, the rates are given as an array of times and points. The injection rate is assumed to be constant between two time points. Thus a last time point with a rate of 0 should be used to terminate an injection that is bounded in time.
 
 .. code-block:: xml
 
      <InjectionStim specieID="glu"  injectionSite="pointA">
-          <times>100 120 300 320 400 420</times>
-          <rates> 30   0  40   0  50   0</rates>
+          <rates> 100 30
+                  120  0
+                  300 40
+                  320  0
+                  400 50
+                  420  0
+          </rates>
      </InjectionStim>
 
 .. image:: stim-params2.png
    :align: center
+
+For longer tables of injection values it might be convenient to store the table in an external file. This can be achieved using the standard XML include mechanism:
+
+.. code-block:: xml
+
+     <InjectionStim specieID="glu"  injectionSite="pointA">
+          <rates>
+               <xi:include href="rates.txt" parse="text" />
+          </rates>
+     </InjectionStim>
+
+and the ``rates.txt`` file:
+
+.. code-block::
+
+     100 30
+     120  0
+     300 40
+     320  0
+     400 50
+     420  0
 
 Since particles can only be injected, and not withdrawn, to produce transient elevations in concentration it may be necessary to inject a "binding partner" and add a reaction between the injected particle and the binding partner to lower the concentration of the unbound injected molecule.
 
