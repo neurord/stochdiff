@@ -447,4 +447,9 @@ For long simulations the log file can get pretty big. To disable the log file al
 
     java -Dneurord.log=false ...
 
+License
+-------
+
+This software is licensed under the GNU Publice License, version 2 or any later, at your option.
+
 [HDF5]: https://www.hdfgroup.org/HDF5/

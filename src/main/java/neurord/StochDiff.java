@@ -1,3 +1,10 @@
+/**
+ * NeuroRD — Stochastic reaction-diffusion simulator
+ *
+ * This software is licensed under the GNU Publice License, version 2
+ * or any later, at your option.
+ */
+
 package neurord;
 
 import java.io.File;
