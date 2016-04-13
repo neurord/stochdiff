@@ -617,6 +617,7 @@ public class NextEventQueue {
             queue.reposition("update", this);
 
             /* Execute leaps immediately */
+            double propensity = this.propensity;
             if (this.leap)
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
@@ -644,8 +645,10 @@ public class NextEventQueue {
                     }
                 }
             if (this.leap && max_fraction >= 5 * tolerance)
-                log.warn("{}, extent {}: max {} change fraction {} for {}",
-                         this, done, this.leap ? "leap" : "exact", max_fraction, worst);
+                log.warn("{}, extent {}, expected {}: max {} change fraction {} for {}",
+                         this, done,
+                         propensity * this.original_wait,
+                         this.leap ? "leap" : "exact", max_fraction, worst);
         }
 
         /**
