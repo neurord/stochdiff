@@ -1674,8 +1674,8 @@ public class NextEventQueue {
                     break;
                 }
 
-                /* only output the first 1000 events... */
-                if (i++ >= 999) {
+                /* only output the first 100 events... */
+                if (i++ >= 99) {
                     log.info("Not showing events {} — {}",
                              ev.index() + 1, obj.queue.nodes.length-1);
                     break;
