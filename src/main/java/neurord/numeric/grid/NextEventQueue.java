@@ -962,8 +962,7 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s %s el.%d→%d",
-                                 getClass().getSimpleName(),
+            return String.format("Diffusion %s el.%d→%d",
                                  signature, element(), element2);
         }
     }
@@ -1246,10 +1245,8 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el.%d %s",
-                                 getClass().getSimpleName(),
-                                 element(),
-                                 signature);
+            return String.format("Reaction el.%d %s",
+                                 element(), signature);
         }
     }
 
@@ -1463,8 +1460,7 @@ public class NextEventQueue {
 
         @Override
         public String toString() {
-            return String.format("%s el.%d %s",
-                                 getClass().getSimpleName(),
+            return String.format("Stimulation el.%d %s",
                                  element(), signature);
         }
     }
