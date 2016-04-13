@@ -731,8 +731,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                     final IOutputSet set = outputSets.get(i - 1);
                     assert set != null;
 
-                    log.info("elementsout2: {} {}", elementsout2, "");
-                    log.info("i:{} {}", i, elementsout2[i - 1]);
+                    log.debug("elementsout2: {} {}", elementsout2, "");
+                    log.debug("i:{} {}", i, elementsout2[i - 1]);
 
                     elements = elementsout2[i - 1];
                     ispecout = ispecout2[i - 1];

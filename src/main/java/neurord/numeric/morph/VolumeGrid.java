@@ -363,7 +363,7 @@ public class VolumeGrid {
         }
 
         for (String s : areaHM.keySet()) {
-            log.info("area key {}", s);
+            log.debug("area key {}", s);
 
             if (s.startsWith(pre) && s.endsWith(post)) {
                 String sin = s.substring(pre.length(), s.indexOf(post));

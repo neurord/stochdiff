@@ -338,8 +338,8 @@ public class VolumeLine {
         E.info("ranges: " + sr);
         */
 
-        log.info("nl={} nsl={} nr={} dreg={} dsl={}",
-                 nl, nsl, nreg, dreg, dsl);
+        log.debug("nl={} nsl={} nr={} dreg={} dsl={}",
+                  nl, nsl, nreg, dreg, dsl);
         assert Math.abs(wk - 0.5 * lSize) / lSize < 1.e-5: "range miscount : " + wk + " " + lSize;
         return ret;
     }
