@@ -1662,6 +1662,7 @@ public class NextEventQueue {
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
+            int i = 0;
 
             for (NextEvent ev: obj.queue.nodes) {
                 log.info("{} → {} prop={} t={}", ev.index(),
@@ -1669,6 +1670,13 @@ public class NextEventQueue {
 
                 if (Double.isInfinite(ev.time()) && ev.index() + 1 < obj.queue.nodes.length) {
                     log.info("{} — {} will happen at infinity",
+                             ev.index() + 1, obj.queue.nodes.length-1);
+                    break;
+                }
+
+                /* only output the first 1000 events... */
+                if (i++ >= 999) {
+                    log.info("Not showing events {} — {}",
                              ev.index() + 1, obj.queue.nodes.length-1);
                     break;
                 }
