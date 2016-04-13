@@ -8,6 +8,7 @@ import java.util.PriorityQueue;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.math.MersenneTwister;
@@ -766,7 +767,15 @@ public class NextEventQueue {
             throw new RuntimeException("wtf?");
         }
 
-        public abstract void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose);
+        /**
+         * @param map contains, for every voxel, a list of events which depend on the state of that
+         * voxel. Subsequently, if this event should look at events attached to any voxel it
+         * modifies, and maybe add them as its relation.
+         *
+         * @param species: species names by index
+         * @param verbose: print status info
+         */
+        public abstract void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose);
     }
 
     static void log_dependency_edges(ArrayList<NextEvent> events) {
@@ -939,14 +948,16 @@ public class NextEventQueue {
             return n1 - n2;
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
-            for (NextEvent e: coll)
-                if (e != this &&
-                    (e.element() == this.element() ||
-                     e.element() == this.element2) &&
-                    ArrayUtil.intersect(e.reactants(), this.sp))
+        @Override
+        public void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose) {
+            final HashSet<NextEvent> set = new HashSet<>(map.get(this.element()));
+            set.addAll(map.get(this.element2));
 
+            for (NextEvent e: set) {
+                assert e.element() == this.element() || e.element() == this.element2;
+                if (e != this && ArrayUtil.intersect(e.reactants(), this.sp))
                     this.addDependent(e, species, verbose);
+            }
         }
 
         @Override
@@ -1164,10 +1175,13 @@ public class NextEventQueue {
                     }
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
-            for (NextEvent e: coll)
-                if (e != this && e.element() == this.element())
+        @Override
+        public void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose) {
+            for (NextEvent e: map.get(this.element())) {
+                assert e.element() == this.element();
+                if (e != this)
                     this.maybeAddRelation(e, species, verbose);
+            }
         }
 
         @Override
@@ -1438,13 +1452,13 @@ public class NextEventQueue {
             }
         }
 
-        public void addRelations(Collection<? extends NextEvent> coll, String[] species, boolean verbose) {
-            for (NextEvent e: coll)
-                if (e != this &&
-                    e.element() == this.element() &&
-                    ArrayUtil.intersect(e.reactants(), this.sp))
-
+        @Override
+        public void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose) {
+            for (NextEvent e: map.get(this.element())) {
+                assert e.element() == this.element();
+                if (e != this && ArrayUtil.intersect(e.reactants(), this.sp))
                     this.addDependent(e, species, verbose);
+            }
         }
 
         @Override
@@ -1644,21 +1658,26 @@ public class NextEventQueue {
                                         double tolerance,
                                         double leap_min_jump,
                                         boolean verbose) {
-        NextEventQueue obj = new NextEventQueue(random, stepper, particles, adaptive, tolerance, leap_min_jump);
+        final NextEventQueue obj = new NextEventQueue(random, stepper, particles, adaptive, tolerance, leap_min_jump);
 
-        ArrayList<NextEvent> e = new ArrayList<>();
-        Numbering numbering = new Numbering();
+        final ArrayList<NextEvent> e = new ArrayList<>();
+        final Numbering numbering = new Numbering();
         e.addAll(obj.createDiffusions(numbering, grid, rtab));
         e.addAll(obj.createReactions(numbering, grid, rtab));
         e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
         log.info("Creating dependency graph");
+        final HashMap<Integer, ArrayList<NextEvent>> map = new HashMap<>();
         for (NextEvent ev: e) {
             if (verbose)
                 log.debug("{}:{}", ev.index(), ev);
-            ev.addRelations(e, rtab.getSpecies(), verbose);
+            map.putIfAbsent(ev.element(), new ArrayList<NextEvent>());
+            map.get(ev.element()).add(ev);
         }
+
+        for (NextEvent ev: e)
+            ev.addRelations(map, rtab.getSpecies(), verbose);
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
