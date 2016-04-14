@@ -625,13 +625,14 @@ public class NextEventQueue {
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
                                     stimulationEvents != null ? stimulationEvents[this.element()] : null,
                                     this.extent);
-
-            if (this.leap && this.reverse != null) {
-                this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
-                this.reverse.reverse_is_leaping = true;
-                queue.reposition("reverse", this.reverse);
-            } else if (this.reverse != null)
-                this.reverse.update_and_reposition(current, false);
+            if (this.reverse != null) {
+                if (this.leap) {
+                    this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
+                    this.reverse.reverse_is_leaping = true;
+                    queue.reposition("reverse", this.reverse);
+                } else
+                    this.reverse.update_and_reposition(current, false);
+            }
 
             double max_fraction = 0;
             NextEvent worst = null;
