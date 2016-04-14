@@ -589,6 +589,12 @@ public class NextEventQueue {
                                     this.extent);
                 if (done == 0)
                     changed = false;
+                else
+                    /* In reactions of the type Da→Da+MaI the propensity does not change
+                     * after execution, but there's nothing to warn about, hence false.
+                     * We only update propensity if something actually happened now,
+                     * and for leaps we already updated it before. */
+                    this._update_propensity(false);
             } else
                 done = this.extent; /* just accounting for the leap that already happened */
 
@@ -604,14 +610,16 @@ public class NextEventQueue {
                       done,
                       done == this.extent ? "" : " (planned " + this.extent + ")");
 
-            /* In reactions of the type Da→Da+MaI the propensity does not change
-             * after execution, but there's nothing to warn about. */
-            this._update_propensity(false);
-
             if (this.leap && this.reverse != null) {
                 assert this.reverse.reverse_is_leaping;
                 this.reverse.reverse_is_leaping = false;
-                this.reverse._update_propensity(false);
+            }
+            /* Everybody except us still has old propensity here.
+             * Temporarily set reverse propensity to ease calculations. */
+            double old_reverse_propensity = 0;
+            if (this.reverse != null) {
+                old_reverse_propensity = this.reverse.propensity;
+                this.reverse.propensity = this.reverse.calcPropensity();
             }
 
             this.pick_time(current, timelimit);
@@ -620,18 +628,20 @@ public class NextEventQueue {
             /* Execute leaps immediately */
             double propensity = this.propensity -
                 (this.reverse != null && this.leap ? this.reverse.propensity : 0);
-            if (this.leap)
+            if (this.leap) {
+                if (this.reverse != null) {
+                    this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
+                    this.reverse.reverse_is_leaping = true;
+                    queue.reposition("reverse", this.reverse);
+                }
+
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
                                     stimulationEvents != null ? stimulationEvents[this.element()] : null,
                                     this.extent);
-            if (this.reverse != null) {
-                if (this.leap) {
-                    this.reverse.setEvent(1, false, current, Double.POSITIVE_INFINITY);
-                    this.reverse.reverse_is_leaping = true;
-                    queue.reposition("reverse", this.reverse);
-                } else
-                    this.reverse.update_and_reposition(current, false);
+            } else if (this.reverse != null) {
+                this.reverse.propensity = old_reverse_propensity;
+                this.reverse.update_and_reposition(current, false);
             }
 
             double max_fraction = 0;
