@@ -618,7 +618,8 @@ public class NextEventQueue {
             queue.reposition("update", this);
 
             /* Execute leaps immediately */
-            double propensity = this.propensity;
+            double propensity = this.propensity -
+                (this.reverse != null && this.leap ? this.reverse.propensity : 0);
             if (this.leap)
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
@@ -646,10 +647,11 @@ public class NextEventQueue {
                     }
                 }
             if (this.leap && max_fraction >= 5 * tolerance)
-                log.warn("{}, extent {}, expected {}: max {} change fraction {} for {}",
+                log.warn("{}, extent {} (µ={}): max {} change fraction {} for {} @ {}",
                          this, done,
                          propensity * this.original_wait,
-                         this.leap ? "leap" : "exact", max_fraction, worst);
+                         this.leap ? "leap" : "exact", max_fraction, worst,
+                         current);
         }
 
         /**
@@ -672,7 +674,8 @@ public class NextEventQueue {
              * which has higher propensity when the leap is queued). So be safe and
              * do not assume propensity changed for those reactions.. */
             if (this.reverse_is_leaping) {
-                log.debug("update_and_reposition: {}, doing reverse", this);
+                if (log_reposition)
+                    log.debug("update_and_reposition: {}, doing reverse", this);
                 assert !this.reverse.reverse_is_leaping: this.reverse;
 
                 return this.reverse.update_and_reposition(current, false);
@@ -915,11 +918,11 @@ public class NextEventQueue {
             if (arg > 0) {
                 final double t2 = Math.log(arg) / -this.fdiff;
                 ans = Math.min(t1, t2);
-                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→{}) → {}",
+                log.debug("leap time: min({}, {}, limit {}×ε={}: E→{}, V→{}) → {}",
                           X1, X2, limit1, tolerance * Xm, t1, t2, ans);
             } else {
                 ans = t1;
-                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→inf) → {}",
+                log.debug("leap time: min({}, {}, limit {}×ε={}: E→{}, V→inf) → {}",
                           X1, X2, limit1, tolerance * Xm, t1, ans);
             }
             return ans;
