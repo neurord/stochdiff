@@ -511,7 +511,9 @@ public class NextEventQueue {
             if (adaptive) {
                 double leap = this.leap_time(current);
 
-                log.debug("options: wait {}, leap {}", exact, leap);
+                log.debug("options: eff.prop={}, wait {}, leap {}",
+                          this.propensity - (this.reverse != null ? this.reverse.propensity : 0),
+                          exact, leap);
 
                 if (current + leap > timelimit) {
                     log.debug("Curtailing leap {}→{} to {}", current, current + leap, timelimit);
