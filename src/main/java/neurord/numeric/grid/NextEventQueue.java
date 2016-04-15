@@ -470,27 +470,29 @@ public class NextEventQueue {
             if (check_updates) {
                 int[] pop = this.reactantPopulation();
 
-                if (warn && this.propensity != 0 && this.propensity == old) {
-                    boolean higher = false;
-                    boolean lower = false;
-                    for (int i = 0; i < pop.length; i++) {
-                        if (pop[i] < old_pop[i])
-                            lower = true;
-                        if (pop[i] > old_pop[i])
-                            higher = true;
-                    }
-                    log.log(higher && lower ? Level.DEBUG : Level.ERROR,
-                            "{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
-                            this, old, this.propensity,
-                            (this.propensity - old) / old,
-                            old_pop, pop, this.extent);
-                    if (!(higher && lower))
-                        throw new RuntimeException();
-                } else if (log_propensity)
-                    log.debug("{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
-                              this, old, this.propensity,
-                              (this.propensity - old) / old,
-                              old_pop, pop, this.extent);
+                if (old_pop != null) {
+                    if (warn && this.propensity != 0 && this.propensity == old) {
+                        boolean higher = false;
+                        boolean lower = false;
+                        for (int i = 0; i < pop.length; i++) {
+                            if (pop[i] < old_pop[i])
+                                lower = true;
+                            if (pop[i] > old_pop[i])
+                                higher = true;
+                        }
+                        log.log(higher && lower ? Level.DEBUG : Level.ERROR,
+                                "{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
+                                this, old, this.propensity,
+                                (this.propensity - old) / old,
+                                old_pop, pop, this.extent);
+                        if (!(higher && lower))
+                            throw new RuntimeException();
+                    } else if (log_propensity)
+                        log.debug("{}: propensity changed {} → {} ({}, n={} → {}), extent={}",
+                                  this, old, this.propensity,
+                                  (this.propensity - old) / old,
+                                  old_pop, pop, this.extent);
+                }
 
                 this.old_pop = pop;
             }
