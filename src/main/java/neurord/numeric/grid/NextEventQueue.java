@@ -658,10 +658,11 @@ public class NextEventQueue {
                     }
                 }
             if (this.leap && max_fraction >= 5 * tolerance)
-                log.warn("{}, extent {} (µ={}): max {} change fraction {} for {} @ {}",
+                log.warn("{}, extent {} (µ={}, pop={}): max {} change fraction {} for {} (pop={}) @ {}",
                          this, done,
-                         propensity * this.original_wait,
-                         this.leap ? "leap" : "exact", max_fraction, worst,
+                         propensity * this.original_wait, this.reactantPopulation(),
+                         this.leap ? "leap" : "exact", max_fraction,
+                         worst, worst.reactantPopulation(),
                          current);
         }
 
@@ -1686,12 +1687,13 @@ public class NextEventQueue {
             map.get(ev.element()).add(ev);
         }
 
+        int i = 0;
         for (NextEvent ev: e)
-            ev.addRelations(map, rtab.getSpecies(), verbose);
+            ev.addRelations(map, rtab.getSpecies(), verbose && i++ < 99);
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
-            int i = 0;
+            i = 0;
 
             for (NextEvent ev: obj.queue.nodes) {
                 log.info("{} → {} prop={} t={}", ev.index(),
