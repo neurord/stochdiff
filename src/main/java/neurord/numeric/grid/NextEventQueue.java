@@ -23,6 +23,7 @@ import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import static neurord.numeric.BaseCalc.distribution_t.*;
+import static neurord.StochDiff.setLogLevel;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +40,7 @@ public class NextEventQueue {
     final static boolean log_queue = Settings.getProperty("neurord.neq.log_queue", false);
     final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity", false);
     final static boolean log_reposition = Settings.getProperty("neurord.neq.log_reposition", false);
+    final static double log_debug_start = Settings.getProperty("neurord.neq.log_debug", Double.NaN);
 
     public static class Numbering {
         int count = 0;
@@ -603,6 +605,9 @@ public class NextEventQueue {
 
             boolean was_leap = !this.leap;
             int done;
+
+            if (current == log_debug_start)
+                setLogLevel(null, "neurord.numeric.grid.NextEventQueue", Level.DEBUG);
 
             /* As an ugly optimization, this is only created when it will be used. */
             if (events != null)
