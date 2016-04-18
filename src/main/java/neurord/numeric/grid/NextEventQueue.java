@@ -582,7 +582,10 @@ public class NextEventQueue {
                         worst = dep;
                     }
                 }
-            if (leap_extent != 0 && max_fraction >= 5 * tolerance)
+            if (leap_extent != 0 && max_fraction >= 5 * tolerance) {
+                double propensity = this.propensity -
+                    (this.reverse != null && this.leap ? this.reverse.propensity : 0);
+
                 log.warn("{}, extent {} (µ={}, pop={}):\n" +
                          "        max change fraction {} @ {}\n" +
                          "        for {} (pop={})\n" +
@@ -593,6 +596,7 @@ public class NextEventQueue {
                          worst, worst.reactantPopulation(),
                          worst.reverse != null ? worst.reverse : "(none)",
                          worst.reverse != null ? worst.reverse.reactantPopulation() : "");
+            }
         }
 
         void update(int[][] reactionEvents,
@@ -666,9 +670,6 @@ public class NextEventQueue {
 
             /* Execute leaps immediately */
             if (this.leap) {
-                double propensity = this.propensity -
-                    (this.reverse != null && this.leap ? this.reverse.propensity : 0);
-
                 done = this.execute(reactionEvents != null ? reactionEvents[this.element()] : null,
                                     diffusionEvents != null ? diffusionEvents[this.element()] : null,
                                     stimulationEvents != null ? stimulationEvents[this.element()] : null,
