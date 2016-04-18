@@ -905,8 +905,10 @@ public class NextEventQueue {
          * for large times, use the following formulas:
          *
          *   y = (N/2 - Xm) p
-         *   V = N p/2 (1 - p/2)
-         *   p = 1 - e^{-2rt}
+         *   V = V1 + V2 =
+         *     = X1 p1 (1-p1) + X2 p2 (1-p2)
+         *   p1 = 1 - r1/(r1+r2) (1 - exp[-(r1+r2)t])
+         *   p2 = 1 - r2/(r1+r2) (1 - exp[-(r1+r2)t])
          *
          * But assume linearity in y:
          *
@@ -917,8 +919,9 @@ public class NextEventQueue {
          *  t  ≤ ε/2r Xm/(N/2 - Xm)
          *
          *  V ≤ ε^2 Xm^2
-         *  p ≤ ε^2 Xm^2 2/N (approx)
-         *  t ≤ - log (1-ε^2Xm^2 2/N) / r
+         *  p ≤ ε^2 Xm^2 / (X1 + ρX2)  (in linear approximation for the square root)
+         *  ρ = r2/r1
+         *  t ≤ - log (1-p1 (1+ρ)) / (r1 + r2)
          *
          * @returns time step relative to @current.
          */
@@ -942,13 +945,14 @@ public class NextEventQueue {
 
             final double limit = tolerance * Math.min(limit1, Xm);
 
-            final double t1 = limit / Math.abs(this.fdiff * X1
-                                               - ((NextDiffusion) this.reverse).fdiff * X2);
+            final double r1 = this.fdiff;
+            final double r2 = ((NextDiffusion) this.reverse).fdiff;
+            final double t1 = limit / Math.abs(r1 * X1 - r2 * X2);
 
-            final double arg = 1 - limit * limit * 2 / Xtotal;
+            final double arg = 1 - limit * limit * (r1+r2)/(r1*X1 + r2*X2);
             final double ans;
             if (arg > 0) {
-                final double t2 = Math.log(arg) / -this.fdiff;
+                final double t2 = Math.log(arg) / -(r1+r2);
                 ans = Math.min(t1, t2);
                 log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→{}) → {}",
                           X1, X2, limit1, Xm, t1, t2, ans);
