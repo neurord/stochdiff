@@ -936,19 +936,20 @@ public class NextEventQueue {
 
             final double limit = tolerance * Math.min(limit1, Xm);
 
-            final double t1 = limit / this.fdiff / 2 / (Xtotal/2 - Xm);
+            final double t1 = limit / Math.abs(this.fdiff * X1
+                                               - ((NextDiffusion) this.reverse).fdiff * X2);
 
             final double arg = 1 - limit * limit * 2 / Xtotal;
             final double ans;
             if (arg > 0) {
                 final double t2 = Math.log(arg) / -this.fdiff;
                 ans = Math.min(t1, t2);
-                log.debug("leap time: min({}, {}, limit {}×ε={}: E→{}, V→{}) → {}",
-                          X1, X2, limit1, tolerance * Xm, t1, t2, ans);
+                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→{}) → {}",
+                          X1, X2, limit1, Xm, t1, t2, ans);
             } else {
                 ans = t1;
-                log.debug("leap time: min({}, {}, limit {}×ε={}: E→{}, V→inf) → {}",
-                          X1, X2, limit1, tolerance * Xm, t1, ans);
+                log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→inf) → {}",
+                          X1, X2, limit1, Xm, t1, ans);
             }
             return ans;
             /*
