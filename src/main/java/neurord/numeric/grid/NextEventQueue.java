@@ -586,13 +586,13 @@ public class NextEventQueue {
                 double propensity = this.propensity -
                     (this.reverse != null && this.leap ? this.reverse.propensity : 0);
 
-                log.warn("{}, extent {} (µ={}, pop={}):\n" +
-                         "        max change fraction {} @ {}\n" +
+                log.warn("max change fraction {} @ {}:\n" +
+                         "        {}, extent {} (µ={}, pop={})\n" +
                          "        for {} (pop={})\n" +
                          "        reverse {} (pop={})",
+                         max_fraction, current,
                          this, leap_extent,
                          propensity * this.original_wait, this.reactantPopulation(),
-                         max_fraction, current,
                          worst, worst.reactantPopulation(),
                          worst.reverse != null ? worst.reverse : "(none)",
                          worst.reverse != null ? worst.reverse.reactantPopulation() : "");
@@ -951,6 +951,11 @@ public class NextEventQueue {
             final double r1 = this.fdiff;
             final double r2 = ((NextDiffusion) this.reverse).fdiff;
             final double t1 = limit / Math.abs(r1 * X1 - r2 * X2);
+
+            log.debug("diff propensity: {}, {}, r1={}, r2={} → propensity={}-{}={}",
+                      X1, X2, r1, r2,
+                      this.propensity, this.reverse.propensity,
+                      this.propensity - this.reverse.propensity);
 
             final double arg = 1 - limit * limit * (r1+r2)/(r1*X1 + r2*X2);
             final double ans;
