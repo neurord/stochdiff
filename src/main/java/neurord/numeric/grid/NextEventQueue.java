@@ -978,15 +978,27 @@ public class NextEventQueue {
 
         @Override
         public int leap_count(double current, double time, boolean bidirectional) {
-            /* Diffusion is a first order reaction, governed by the
-             * sum of binomial distributions. */
-            int X1 = particles[this.element()][this.sp];
-            int n1 = stepper.versatile_ngo("neq diffusion", X1, time * this.fdiff);
+            /* Diffusion is a first order reaction. For small times is can be described
+             * by the sum of binomial distributions. More general formula:
+             *
+             * E(ΔX1) = (X1-X1∞) exp[(-r1+r2)t] + X1∞
+             *
+             * but to generate the variance properly, we should use the
+             * separate binomial formulas.
+             */
+
+            final int X1 = particles[this.element()][this.sp];
+            final double r1 = this.fdiff;
+
             if (!bidirectional)
-                return n1;
-            int X2 = particles[this.element2][this.sp];
-            double reverse_fdiff = ((NextDiffusion) this.reverse).fdiff;
-            int n2 = stepper.versatile_ngo("neq diffusion", X2, time * reverse_fdiff);
+                return stepper.versatile_ngo("neq diffusion", X1, time * r1);
+
+            final double r2 = ((NextDiffusion) this.reverse).fdiff;
+            final double r12 = r1 + r2;
+            final int X2 = particles[this.element2][this.sp];
+            final double mult = -Math.expm1(-r12 * time) / r12;
+            final int n1 = stepper.versatile_ngo("neq f.diffusion", X1, r1*mult);
+            final int n2 = stepper.versatile_ngo("neq r.diffusion", X2, r2*mult);
             return n1 - n2;
         }
 
