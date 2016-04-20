@@ -44,9 +44,11 @@ def int_list(arg):
     return list(int(part) for part in parts)
 
 def time_slice(arg):
+    if not arg:
+        raise ValueError("either t₁-t₂, t₁-, -t₂, or t₁ must be specified")
     a, b, c = arg.partition('-')
     if not b:
-        raise ValueError("either t₁-t₂, t₁-, or -t₂ must be used")
+        return float(a)
     a = float(a) if a else None
     c = float(c) if c else None
     return slice(a, c)
@@ -546,7 +548,7 @@ def plot_history(output, species):
         species = model.species()
     # filter time. level 0 is voxel, level 1 is time
     counts = simul.counts(opts.output_group)
-    if opts.time:
+    if opts.time is not None:
         counts = counts.loc[(slice(None), opts.time), :]
 
     regions = model.grid().region
