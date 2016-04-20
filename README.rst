@@ -471,7 +471,7 @@ For long simulations the log file can get pretty big. To disable the log file al
 
 .. code-block:: shell
 
-    java -Dneurord.log=false ...
+    java --log=no ...
 
 License
 -------
