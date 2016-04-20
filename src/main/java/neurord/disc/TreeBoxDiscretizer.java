@@ -26,8 +26,11 @@ public class TreeBoxDiscretizer {
 
         TreePoint[] slicedPoints = ss.getFixedWidthSlices(d, resHM);
 
-        TreeWriter tw = new TreeWriter(slicedPoints);
-        tw.writeSWC(new File("discretized-tree.swc")); // FIXME
+        /*
+           // FIXME: this output is useful, but it shouldn't be written by default
+           TreeWriter tw = new TreeWriter(slicedPoints);
+           tw.writeSWC(new File("discretized-tree.swc"));
+        */
 
         VolumeGrid vgrid = null;
 
