@@ -63,7 +63,7 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
-parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain'))
+parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--regions', type=str_list, nargs='?')
@@ -81,6 +81,11 @@ parser.add_argument('--time', type=time_slice)
 parser.add_argument('--trial', type=int, default=0)
 parser.add_argument('--config', type=str, nargs='?', const='')
 parser.add_argument('--output-group', '-g', default='__main__')
+
+def filename_for_saving(opts, descr):
+    if opts.save_data == '-':
+        return '/dev/stdout'
+    return opts.save_data + descr.replace(' ', '_') + '.' + opts.format
 
 class Drawer(object):
     def __init__(self, f, ax, xlabel, names, times, data, title=''):
@@ -515,8 +520,13 @@ def _history_data(simul, species, region_indices, region_labels,
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
     df = pd.DataFrame(d, index=xx[0])
-    fname = opts.save_data + ', particle numbers.pickle'
-    df.to_pickle(fname)
+    fname = filename_for_saving(opts, 'particle numbers')
+    if opts.format == 'pickle':
+        df.to_pickle(fname)
+    elif opts.format == 'plain':
+        print(df)
+    else:
+        raise ValueError("don't know how to save {}".format(opts.format))
     print('saved', fname)
 
 def find_regions(regions, region_names, spec):
