@@ -40,7 +40,9 @@ import java.util.HashMap;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
 
+import neurord.StochDiff;
 import neurord.model.SDRun;
 
 public class ModelReader<T> {
@@ -133,7 +135,9 @@ public class ModelReader<T> {
                     String override = map.get(loc);
                     if (override != null) {
                         String s = new String(ch, start, length).trim();
-                        log.info("Overriding {}: {} → {}", loc, s, override);
+                        Level level = s.equals(override) ? Level.INFO : StochDiff.NOTICE;
+                        log.log(level,
+                                "Overriding {}: {} → {}", loc, s, override);
 
                         ch = override.toCharArray();
                         start = 0;
@@ -238,7 +242,7 @@ public class ModelReader<T> {
     public T unmarshall(File filename, HashMap<String,String> extra_overrides)
         throws Exception
     {
-        log.info("Umarshalling file {}", filename);
+        log.debug("Unmarshalling file {}", filename);
 
         InputSource source = new InputSource(filename.toString());
         return unmarshall(source, extra_overrides);
@@ -247,7 +251,7 @@ public class ModelReader<T> {
     public T unmarshall(String xml, HashMap<String,String> extra_overrides)
         throws Exception
     {
-        log.info("Umarshalling string");
+        log.debug("Unmarshalling string");
 
         InputSource source = new InputSource(new StringReader(xml));
         return unmarshall(source, extra_overrides);

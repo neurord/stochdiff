@@ -1,5 +1,6 @@
 package neurord.numeric.grid;
 
+import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.math.MersenneTwister;
@@ -87,7 +88,8 @@ public abstract class StochasticGridCalc extends GridCalc {
 
     @Override
     protected void footer() {
-        log.info("Used up {} random numbers", this.random.used());
+        log.log(StochDiff.NOTICE,
+                "Used up {} random numbers", this.random.used());
     }
 
     @Override

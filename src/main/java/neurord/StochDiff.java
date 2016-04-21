@@ -34,6 +34,9 @@ import neurord.util.Settings;
 public class StochDiff {
     static final Logger log = LogManager.getLogger();
 
+    /* Like INFO, but we want to show it by default. */
+    public static final Level NOTICE = Level.forName("NOTICE", 350);
+
     // The main method - a bit of basic checking and if all is well, create the
     // SDCalc object and run it;
 

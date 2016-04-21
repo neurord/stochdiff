@@ -3,8 +3,9 @@ package neurord.numeric.grid;
 import java.util.List;
 import java.util.Collection;
 
-import neurord.model.SDRun;
+import neurord.StochDiff;
 import neurord.SDCalcType;
+import neurord.model.SDRun;
 import neurord.util.Settings;
 import neurord.util.ArrayUtil;
 
@@ -53,15 +54,18 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
     public void footer() {
         super.footer();
         log.info("Queue suffered {} swaps", this.neq.queue.swaps);
-        log.info("Accuracy control parameter ε={}", this.neq.tolerance);
-        log.info("Leapt {} ({} events, {} e/l average), waited {} times",
+        log.log(StochDiff.NOTICE,
+                "Accuracy control parameter ε={}", this.neq.tolerance);
+        log.log(StochDiff.NOTICE,
+                "Leapt {} ({} events, {} e/l average), waited {} times",
                  this.neq.leap_extent, this.neq.leaps,
                  (double)this.neq.leap_extent / this.neq.leaps,
                  this.neq.normal_waits);
 
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
-        log.info("Real simulation took {} ms, {} ms/s", time, speed);
+        log.log(StochDiff.NOTICE,
+                "Real simulation took {} ms, {} ms/s", time, speed);
     }
 
     @Override

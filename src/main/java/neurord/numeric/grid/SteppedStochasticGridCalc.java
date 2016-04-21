@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.Collection;
 
+import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.numeric.BaseCalc;
 import neurord.numeric.morph.VolumeGrid;
@@ -278,7 +279,8 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     @Override
     public void footer() {
         super.footer();
-        log.info("Leapt {} times", this.eventCount());
+        log.log(StochDiff.NOTICE,
+                "Leapt {} times", this.eventCount());
     }
 
     @Override

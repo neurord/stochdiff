@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration status="WARN" packages="neurord.util">
+  <CustomLevels>
+    <CustomLevel name="NOTICE" intLevel="350" />
+  </CustomLevels>
+
   <appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}"/>
+      <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}{INFO=cyan, NOTICE=green}"/>
     </Console>
 
     <CustomFile name="model-logfile" fileName="...">
