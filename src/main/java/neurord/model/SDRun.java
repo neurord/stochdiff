@@ -315,6 +315,13 @@ public class SDRun implements IOutputSet {
         return this.stimulationTargets;
     }
 
+    public double[] getRegionConcentration(int region) {
+        String[] allregions = this.getVolumeGrid().getRegionLabels();
+        String[] regions = new String[]{ allregions[region] };
+
+        return this.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies())[0];
+    }
+
     public double[][] getRegionConcentrations() {
         String[] regions = this.getVolumeGrid().getRegionLabels();
         return this.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies());

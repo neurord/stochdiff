@@ -55,7 +55,7 @@ public abstract class StochasticGridCalc extends GridCalc {
         /* volume concentrations */
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
-            double[] rcs = sdrun.getRegionConcentrations()[eltregions[i]];
+            double[] rcs = sdrun.getRegionConcentration(this.eltregions[i]);
 
             for (int j = 0; j < nspec; j++)
                 wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
