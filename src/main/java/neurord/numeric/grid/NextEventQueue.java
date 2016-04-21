@@ -23,6 +23,7 @@ import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import static neurord.numeric.BaseCalc.distribution_t.*;
+import neurord.StochDiff;
 import static neurord.StochDiff.setLogLevel;
 
 import org.apache.logging.log4j.Logger;
@@ -585,17 +586,20 @@ public class NextEventQueue {
             if (leap_extent != 0 && max_fraction >= 5 * tolerance) {
                 double propensity = this.propensity -
                     (this.reverse != null && this.leap ? this.reverse.propensity : 0);
+                double linear = propensity * this.original_wait;
+                double ratio = max_fraction / Math.abs(leap_extent / linear);
+                Level level = ratio < 2 ? Level.INFO : StochDiff.NOTICE;
 
-                log.warn("max change fraction {} @ {}:\n" +
-                         "        {}, extent {} (µ={}, pop={})\n" +
-                         "        for {} (pop={})\n" +
-                         "        reverse {} (pop={})",
+                log.log(level,
+                        "max change fraction {} @ {}:\n" +
+                        "        {}, extent {} (µ={}, pop={})\n" +
+                        "        for {} (pop={})\n" +
+                        "        reverse {} (pop={})",
                          max_fraction, current,
-                         this, leap_extent,
-                         propensity * this.original_wait, this.reactantPopulation(),
-                         worst, worst.reactantPopulation(),
-                         worst.reverse != null ? worst.reverse : "(none)",
-                         worst.reverse != null ? worst.reverse.reactantPopulation() : "");
+                        this, leap_extent, linear, this.reactantPopulation(),
+                        worst, worst.reactantPopulation(),
+                        worst.reverse != null ? worst.reverse : "(none)",
+                        worst.reverse != null ? worst.reverse.reactantPopulation() : "");
             }
         }
 
