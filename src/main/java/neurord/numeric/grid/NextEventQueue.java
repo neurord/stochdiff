@@ -612,7 +612,7 @@ public class NextEventQueue {
 
             assert this.reverse != null || this.extent >= 0: this.extent;
 
-            boolean was_leap = !this.leap;
+            boolean was_leap = this.leap;
             int done;
 
             if (!_log_level_enabled && current >= log_debug_start) {
