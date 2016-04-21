@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.CommandLineParser;
@@ -187,12 +188,21 @@ public class StochDiff {
 
         setLogLevels();
 
+        if (System.console() != null) {
+            Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
+            org.apache.logging.log4j.core.Logger coreLogger
+                = (org.apache.logging.log4j.core.Logger) logger;
+            LoggerContext context = (LoggerContext) coreLogger.getContext();
+            Configuration configuration = context.getConfiguration();
+            coreLogger.addAppender(configuration.getAppender("Console"));
+        }
+
         final String logfile = cmd.getOptionValue("log", outputFile + ".log");
         boolean log_to_file = !logfile.equals("no");
         if (log_to_file)
             CustomFileAppender.addFileAppender(logfile);
 
-        /* Write out the version, after opening the log file. */
+        /* Write out the version, after creating the log appenders. */
         log.info("{}", Settings.getProgramVersion());
 
         if (log_to_file)

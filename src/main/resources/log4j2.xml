@@ -12,11 +12,10 @@
     <CustomFile name="model-logfile" fileName="...">
         <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %logger{1.} - %msg%n"/>
     </CustomFile>
-
   </appenders>
+
   <loggers>
     <root level="notice">
-      <appender-ref ref="Console"/>
       <appender-ref ref="model-logfile"/>
     </root>
   </loggers>
