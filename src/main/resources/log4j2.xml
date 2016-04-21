@@ -6,7 +6,7 @@
 
   <appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}{INFO=cyan, NOTICE=green}"/>
+      <PatternLayout pattern="%highlight{%d{HH:mm:ss.SSS} %replace{%level}{(.).*}{$1} %logger{1.} - %msg%n}{INFO=cyan, NOTICE=green, DEBUG=white}"/>
     </Console>
 
     <CustomFile name="model-logfile" fileName="...">
