@@ -51,15 +51,22 @@ public abstract class StochasticGridCalc extends GridCalc {
 
     protected void initPopulation(int[][] counts, SDRun sdrun) {
         log.debug("Initializing population based on volume and surface concentrations");
+        final String[] species = sdrun.getSpecies();
 
         /* volume concentrations */
         for (int i = 0; i < nel; i++) {
             double v = volumes[i];
             double[] rcs = sdrun.getRegionConcentration(this.eltregions[i]);
 
-            for (int j = 0; j < nspec; j++)
+            for (int j = 0; j < nspec; j++) {
                 wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
+                log.debug("{} el.{}: {} × {} × {} → {}",
+                          species[j], i,
+                          v, rcs[j], PARTICLES_PUVC, wkA[i][j]);
+            }
         }
+
+        log.debug("volume only:\n{}", wkA);
 
         /* surface concentrations */
         double[][] regsd = this.sdRun.getRegionSurfaceDensities();
@@ -75,7 +82,7 @@ public abstract class StochasticGridCalc extends GridCalc {
                         wkA[i][j] = this.random.round(a * scs[j] * PARTICLES_PUASD);
         }
 
-
+        log.debug("with surface:\n{}", wkA);
     }
 
     @Override
