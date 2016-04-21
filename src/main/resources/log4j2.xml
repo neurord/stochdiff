@@ -15,12 +15,9 @@
 
   </appenders>
   <loggers>
-    <root level="info">
+    <root level="notice">
       <appender-ref ref="Console"/>
       <appender-ref ref="model-logfile"/>
     </root>
-    <logger name="neurord.numeric.grid.ResultWriterHDF5" level="info" />
-    <logger name="neurord.numeric.grid.ResultWriterText" level="info" />
-    <logger name="neurord.numeric.grid.NextEventQueue" level="info" />
   </loggers>
 </configuration>

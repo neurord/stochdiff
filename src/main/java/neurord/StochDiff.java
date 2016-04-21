@@ -74,12 +74,13 @@ public class StochDiff {
 
         final Configuration config = ctx.getConfiguration();
 
-        try {
-            Class.forName(logger);
-        } catch(ClassNotFoundException e) {
-            log.warn("Failed to find logger \"{}\": {}", logger, e);
-            return false;
-        }
+        if (!logger.equals(LogManager.ROOT_LOGGER_NAME))
+            try {
+                Class.forName(logger);
+            } catch(ClassNotFoundException e) {
+                log.warn("Failed to find logger \"{}\": {}", logger, e);
+                return false;
+            }
 
         LoggerConfig loggerConfig = config.getLoggerConfig(logger);
         if (loggerConfig.getName().equals(logger)) {
@@ -135,6 +136,7 @@ public class StochDiff {
         options.addOption(null, "ic-time", true, "time to take the ICs from (default: none)");
 
         options.addOption(null, "log", true, "log file name (\"no\" to disable)");
+        options.addOption("v", "verbose", false, "increase log level");
 
         return options;
     }
@@ -155,6 +157,16 @@ public class StochDiff {
         if (cmd.hasOption("version")) {
             System.out.println(Settings.getProgramVersion());
             System.exit(0);
+        }
+        if (cmd.hasOption("verbose")) {
+            int count = 0;
+            for (String arg: argv)
+                if (arg.equals("-v") || arg.equals("--verbose"))
+                    count ++;
+            assert count > 0: count;
+
+            Level level = count == 1 ? Level.INFO : Level.DEBUG;
+            setLogLevel(null, LogManager.ROOT_LOGGER_NAME, level);
         }
 
         argv = cmd.getArgs();
