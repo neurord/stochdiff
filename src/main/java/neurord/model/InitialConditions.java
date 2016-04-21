@@ -55,11 +55,13 @@ public class InitialConditions {
         double[][] ret = new double[regions.length][species.length];
         for (int i = 0; i < regions.length; i++) {
             ConcentrationSet set = this.getConcentrationSets().get(regions[i]);
-            if (set == null)
-                set = defaults;
 
             for (int j = 0; j < species.length; j++) {
-                Double val = set.getNanoMolarConcentration(species[j]);
+                Double val = null;
+                if (set != null)
+                    val = set.getNanoMolarConcentration(species[j]);
+                if (val == null)
+                    val = defaults.getNanoMolarConcentration(species[j]);
                 if (val != null)
                     ret[i][j] = val;
             }
