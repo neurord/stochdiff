@@ -46,7 +46,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                 "/usr/lib/jhdf5");
     }
 
-    final static int compression_level = Settings.getProperty("neurord.compression", 0);
+    final static int compression_level = Settings.getProperty("neurord.compression", 1);
 
     final protected File outputFile;
     protected H5File output;
