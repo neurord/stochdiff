@@ -33,10 +33,10 @@ public class TestStepGenerator {
             new Object[] { 0.9, r.nextLong()},
             new Object[] { 1.1, r.nextLong()},
             new Object[] { 3., r.nextLong()},
-            new Object[] { 10, r.nextLong()},
-            new Object[] { 30, r.nextLong()},
-            new Object[] { 100, r.nextLong()},
-            new Object[] { 300, r.nextLong()},
+            new Object[] { 10., r.nextLong()},
+            new Object[] { 30., r.nextLong()},
+            new Object[] { 100., r.nextLong()},
+            new Object[] { 300., r.nextLong()},
         };
     };
 
@@ -113,7 +113,7 @@ public class TestStepGenerator {
             (   new Object[]{ new InterpolatingStepGenerator(distribution_t.BINOMIAL, new MersenneTwister(0)),
                               new InterpolatingStepGenerator(distribution_t.POISSON, new MersenneTwister(0)) },
                 new Object[]{   /* n, lnp, rs, expected */
-                    new Object[]{ 2 + r.nextInt(119), Float.NEGATIVE_INFINITY,
+                    new Object[]{ 2 + r.nextInt(119), Double.NEGATIVE_INFINITY,
                                   rs(r, 1000000), 0 },
                     new Object[]{ 2 + r.nextInt(119), -20., rs(r, 1000000), 0 },
                     new Object[]{ 2 + r.nextInt(119), -19., rs(r, 1000000), 0 },
