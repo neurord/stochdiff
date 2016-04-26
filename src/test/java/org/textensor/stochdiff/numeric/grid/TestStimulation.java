@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.textensor.stochdiff.numeric.math.RandomGenerator;
 import org.textensor.stochdiff.numeric.chem.StimulationTable;
+import org.textensor.stochdiff.numeric.chem.ReactionTable;
 import org.textensor.stochdiff.numeric.chem.StimulationTable.Stimulation;
 
 import static org.testng.Assert.assertEquals;
@@ -20,6 +21,8 @@ public class TestStimulation {
                                        100., 10., 30., END);
     }
 
+    ReactionTable rtab = new ReactionTable(0, new String[]{"xxx"}, new double[]{0});
+
     static class FakeRandom implements RandomGenerator {
         @Override public float random() { return 0.5f; }
         @Override public double gaussian() { return 0; }
@@ -32,7 +35,7 @@ public class TestStimulation {
     NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], true, 0.1, 1);
     NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
-        queue.createStimulations(numbering, null, null, stimtab, new int[][]{{0}});
+        queue.createStimulations(numbering, null, rtab, stimtab, new int[][]{{0}});
 
     @Test
     public void testStim() {
