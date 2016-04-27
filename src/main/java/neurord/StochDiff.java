@@ -143,8 +143,7 @@ public class StochDiff {
     }
 
     public static void main(String[] argv) throws Exception {
-        File modelFile;
-        final File outputFile;
+        File modelFile, outputFile;
 
         CommandLineParser parser = new DefaultParser();
         Options options = buildOptions();
@@ -177,14 +176,18 @@ public class StochDiff {
             System.exit(2);
         }
 
-        if (argv.length > 1)
+        final File unsuffixed;
+        if (argv[0].indexOf(".") > 0)
+            unsuffixed = new File(argv[0].substring(0, argv[0].lastIndexOf(".")));
+        else
+            unsuffixed = new File(argv[0]);
+
+        if (argv.length > 1) {
             outputFile = new File(argv[1]);
-        else {
-            String s = argv[0];
-            if (s.indexOf(".") > 0)
-                s = s.substring(0, s.lastIndexOf("."));
-            outputFile = new File(s);
-        }
+            if (outputFile.isDirectory())
+                outputFile = new File(outputFile, unsuffixed.getName());
+        } else
+              outputFile = unsuffixed;
 
         setLogLevels();
 
