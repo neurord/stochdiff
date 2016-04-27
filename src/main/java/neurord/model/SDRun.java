@@ -229,7 +229,7 @@ public class SDRun implements IOutputSet {
     public double getEndTime() {
         if (this.endtime != null)
             return this.endtime;
-        else if (this.runtime != 0)
+        else if (this.runtime != null)
             return this.runtime + getStartTime();
         else {
             log.error("Either runtime or endtime must be specified in the model file");
