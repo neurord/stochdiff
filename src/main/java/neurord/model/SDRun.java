@@ -155,8 +155,11 @@ public class SDRun implements IOutputSet {
     transient private boolean _reactionSchemeResolved = false;
     public ReactionScheme getReactionScheme() {
         if (!this._reactionSchemeResolved) {
-            if (this.reactionScheme != null)
-                this.reactionScheme.resolve();
+            if (this.reactionScheme == null) {
+                log.error("<ReactionScheme> element is required");
+                throw new RuntimeException("<ReactionScheme> element is required");
+            }
+            this.reactionScheme.resolve();
             this._reactionSchemeResolved =true;
         }
         return this.reactionScheme;
@@ -182,8 +185,11 @@ public class SDRun implements IOutputSet {
     }
 
     public Morphology getMorphology() {
-        if (this.morphology != null)
-            this.morphology.resolve();
+        if (this.morphology == null) {
+            log.error("<Morphology> element is required");
+            throw new RuntimeException("<Morphology> element is required");
+        }
+        this.morphology.resolve();
         return this.morphology;
     }
 
