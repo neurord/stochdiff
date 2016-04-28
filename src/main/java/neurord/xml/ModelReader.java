@@ -54,6 +54,7 @@ public class ModelReader<T> {
         boolean sdrun_seen = false;
         boolean ns_warning = false;
         boolean failed = false;
+        boolean conversion_hint = false;
 
         SAXParseException exception = null;
 
@@ -109,6 +110,18 @@ public class ModelReader<T> {
                 AttributesImpl filtered = new AttributesImpl(atts);
                 filtered.setLocalName(atts.getIndex("dt"), "outputInterval");
                 atts = filtered;
+            }
+
+            /* provide a helpful error message for files of the old type */
+            if (this.sdrun_seen &&
+                (localName.equals("reactionSchemeFile") ||
+                 localName.equals("morphologyFile") ||
+                 localName.equals("stimulationFile") ||
+                 localName.equals("initialConditionsFile") ||
+                 localName.equals("outputSchemeFile"))) {
+                log.warn("<{}> is not supported any more. Replace with <xi:include href=\"...\" />",
+                         localName);
+                this.conversion_hint = true;
             }
 
             super.startElement(uri, localName, qName, atts);
@@ -207,7 +220,7 @@ public class ModelReader<T> {
         return overrides;
     }
 
-    public T unmarshall(InputSource xml, HashMap<String,String> extra_overrides)
+    protected T unmarshall(File filename, InputSource xml, HashMap<String,String> extra_overrides)
         throws Exception
     {
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -236,6 +249,14 @@ public class ModelReader<T> {
         if (result == null || filter.failed)
             throw new RuntimeException("Unmarshalling failed");
 
+        if (filter.conversion_hint)
+            log.log(StochDiff.NOTICE,
+                    "Use the following command to convert old style files to the new format:\n" +
+                    "sed '1d; 2i <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\\n<SDRun xmlns:xi=\"http://www.w3.org/2001/XInclude\" xmlns=\"{}\">\n" +
+                    "s#<(reactionScheme|morphology|stimulation|initialConditions|outputScheme)File>\\s*(\\w+)\\s*</.*>#<xi:include href=\"\\2.xml\" />#' -r -i.bak \"{}\"",
+                    NEURORD_NS,
+                    filename != null ? filename : "...");
+
         return result;
     }
 
@@ -245,7 +266,7 @@ public class ModelReader<T> {
         log.debug("Unmarshalling file {}", filename);
 
         InputSource source = new InputSource(filename.toString());
-        return unmarshall(source, extra_overrides);
+        return unmarshall(filename, source, extra_overrides);
     }
 
     public T unmarshall(String xml, HashMap<String,String> extra_overrides)
@@ -254,7 +275,7 @@ public class ModelReader<T> {
         log.debug("Unmarshalling string");
 
         InputSource source = new InputSource(new StringReader(xml));
-        return unmarshall(source, extra_overrides);
+        return unmarshall(null, source, extra_overrides);
     }
 
     public Marshaller getMarshaller(T object)
