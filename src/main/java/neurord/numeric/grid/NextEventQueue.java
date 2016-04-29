@@ -42,6 +42,7 @@ public class NextEventQueue {
     final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity", false);
     final static boolean log_reposition = Settings.getProperty("neurord.neq.log_reposition", false);
     final static double log_debug_start = Settings.getProperty("neurord.neq.log_debug_start", Double.NaN);
+    final static int log_start_events = Settings.getProperty("neurord.neq.log_start_events", 99);
 
     public static class Numbering {
         int count = 0;
@@ -1737,7 +1738,8 @@ public class NextEventQueue {
 
         int i = 0;
         for (NextEvent ev: e)
-            ev.addRelations(map, rtab.getSpecies(), verbose && i++ < 99);
+            ev.addRelations(map, rtab.getSpecies(),
+                            verbose && (log_start_events == -1 || i++ < log_start_events));
 
         if (verbose) {
             log.info("{} events at the beginning:", obj.queue.nodes.length);
@@ -1754,7 +1756,7 @@ public class NextEventQueue {
                 }
 
                 /* only output the first 100 events... */
-                if (i++ >= 99) {
+                if (log_start_events >= 0 && i++ >= log_start_events) {
                     log.info("Not showing events {} — {}",
                              ev.index() + 1, obj.queue.nodes.length-1);
                     break;
