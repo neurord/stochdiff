@@ -20,13 +20,9 @@ import java.util.ArrayList;
 @Plugin(name="CustomFile", category="core", elementType="appender", printObject=true)
 public final class CustomFileAppender extends AbstractAppender {
 
-    final private List<Appender> appenders = new ArrayList<>();
+    final private List<MemoryMappedFileAppender> appenders = new ArrayList<>();
 
     static private CustomFileAppender instance = null;
-    static public CustomFileAppender getInstance() {
-        // TODO: support for multiple instances
-        return instance;
-    }
 
     private CustomFileAppender(String name, Filter filter, Layout layout,
                                boolean handleException) {
@@ -84,14 +80,13 @@ public final class CustomFileAppender extends AbstractAppender {
     }
 
     public static void addFileAppender(String filename) {
-        final CustomFileAppender instance = getInstance();
         if (instance == null) {
             LOGGER.error("CustomFileAppender hasn't been initalized, ignoring output "
                          + filename);
             return;
         }
 
-        final AbstractAppender appender =
+        final MemoryMappedFileAppender appender =
             MemoryMappedFileAppender.createAppender(filename,
                                                     "false", filename,
                                                     "false", "8192", "false",
@@ -101,5 +96,13 @@ public final class CustomFileAppender extends AbstractAppender {
                                                     new DefaultConfiguration());
         LOGGER.info("registering custom logfile '{}'", appender);
         instance.appenders.add(appender);
+    }
+
+    public static void close() {
+        if (instance == null)
+            return;
+
+        for (Appender appender: instance.appenders)
+            appender.stop();
     }
 }

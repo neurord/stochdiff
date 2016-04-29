@@ -219,5 +219,7 @@ public class StochDiff {
 
         SDCalc calc = new SDCalc(model, outputFile);
         calc.run();
+
+        CustomFileAppender.close();
     }
 }
