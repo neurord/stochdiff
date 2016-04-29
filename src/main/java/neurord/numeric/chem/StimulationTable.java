@@ -50,8 +50,9 @@ public class StimulationTable {
 
         @Override
         public String toString() {
-            return String.format("%s →%s %s onset=%f duration=%f period=%f end=%f",
+            return String.format("%s →%s %s rate=%g onset=%f duration=%f period=%f end=%f",
                                  getClass().getSimpleName(), site, distribution,
+                                 rate,
                                  onset, duration, period, end);
         }
 
