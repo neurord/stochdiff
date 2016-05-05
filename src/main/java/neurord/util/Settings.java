@@ -3,6 +3,8 @@ package neurord.util;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Logger;
@@ -10,10 +12,26 @@ import org.apache.logging.log4j.LogManager;
 
 import org.apache.commons.cli.CommandLine;
 
-public abstract class Settings {
+public class Settings {
     static final Logger log = LogManager.getLogger();
 
-    static public int getProperty(String name, int fallback) {
+    final String name;
+    final String description;
+    final Object fallback;
+
+    public static ArrayList<Settings> all_settings = new ArrayList<>();
+
+    private Settings(String name, String description, Object fallback) {
+        this.name = name;
+        this.description = description;
+        this.fallback = fallback;
+
+        all_settings.add(this);
+    }
+
+    static public int getProperty(String name, String description, int fallback) {
+        new Settings(name, description, fallback);
+
         String val = System.getProperty(name);
         if (val != null) {
             int ret = Integer.valueOf(val);
@@ -23,7 +41,9 @@ public abstract class Settings {
             return fallback;
     }
 
-    static public boolean getProperty(String name, boolean fallback) {
+    static public boolean getProperty(String name, String description, boolean fallback) {
+        new Settings(name, description, fallback);
+
         String val = System.getProperty(name);
         if (val != null) {
             boolean ret = Boolean.valueOf(val);
@@ -33,7 +53,9 @@ public abstract class Settings {
             return fallback;
     }
 
-    static public double getProperty(String name, double fallback) {
+    static public double getProperty(String name, String description, double fallback) {
+        new Settings(name, description, fallback);
+
         String val = System.getProperty(name);
         if (val != null) {
             double ret = Double.valueOf(val);
@@ -43,7 +65,9 @@ public abstract class Settings {
             return fallback;
     }
 
-    static public String getProperty(String name, String fallback) {
+    static public String getProperty(String name, String description, String fallback) {
+        new Settings(name, description, fallback);
+
         String val = System.getProperty(name);
         if (val != null) {
             log.debug("Overriding {}: {} → {}", name, fallback, val);
@@ -52,7 +76,9 @@ public abstract class Settings {
             return fallback;
     }
 
-    static public String[] getPropertyList(String name, String... fallback) {
+    static public String[] getPropertyList(String name, String description, String... fallback) {
+        new Settings(name, description, fallback);
+
         String val = System.getProperty(name);
         if (val == null)
             return fallback;
@@ -63,6 +89,27 @@ public abstract class Settings {
 
         log.debug("Overriding {}: {} → {}", name, fallback, ret);
         return ret;
+    }
+
+    static void forceLoading() {
+        Logger log;
+        log = neurord.SDCalc.log;
+        log = neurord.numeric.grid.AdaptiveGridCalc.log;
+        log = neurord.numeric.grid.GridCalc.log;
+        log = neurord.numeric.grid.NextEventQueue.log;
+        log = neurord.numeric.grid.ResultWriterHDF5.log;
+        log = neurord.numeric.grid.StochasticGridCalc.log;
+    }
+
+    static public void printAvailableSettings(PrintStream out) {
+        forceLoading();
+
+        out.println("Recognized properties:");
+        for (Settings s: all_settings)
+            out.println(String.format("%s (default: %s)\t%s",
+                                      s.name,
+                                      s.fallback,
+                                      s.description));
     }
 
     public static Manifest getManifest() throws IOException {

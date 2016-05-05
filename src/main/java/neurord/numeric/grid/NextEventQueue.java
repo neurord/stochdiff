@@ -32,17 +32,33 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
 
 public class NextEventQueue {
-    static final Logger log = LogManager.getLogger();
+    public static final Logger log = LogManager.getLogger();
 
-    final static boolean update_times = Settings.getProperty("neurord.neq.update_times", true);
-    final static boolean only_init = Settings.getProperty("neurord.neq.only_init", false);
-    final static boolean check_updates = Settings.getProperty("neurord.neq.check_updates", false);
+    final static boolean update_times = Settings.getProperty("neurord.neq.update_times",
+                                                             "Update putative times using Gibson&Bruck",
+                                                             true);
+    final static boolean only_init = Settings.getProperty("neurord.neq.only_init",
+                                                          "Terminate after initialization is finished",
+                                                          false);
+    final static boolean check_updates = Settings.getProperty("neurord.neq.check_updates",
+                                                              "Perform extensive checks of propensity changes",
+                                                              false);
 
-    final static boolean log_queue = Settings.getProperty("neurord.neq.log_queue", false);
-    final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity", false);
-    final static boolean log_reposition = Settings.getProperty("neurord.neq.log_reposition", false);
-    final static double log_debug_start = Settings.getProperty("neurord.neq.log_debug_start", Double.NaN);
-    final static int log_start_events = Settings.getProperty("neurord.neq.log_start_events", 99);
+    final static boolean log_queue = Settings.getProperty("neurord.neq.log_queue",
+                                                          "Log debug info about queue operations",
+                                                          false);
+    final static boolean log_propensity = Settings.getProperty("neurord.neq.log_propensity",
+                                                               "Log debug info about propensity calculations",
+                                                               false);
+    final static boolean log_reposition = Settings.getProperty("neurord.neq.log_reposition",
+                                                               "Log debug info about movements in the queue",
+                                                               false);
+    final static double log_debug_start = Settings.getProperty("neurord.neq.log_debug_start",
+                                                               "Turn on debugging at this time in simulation",
+                                                               Double.NaN);
+    final static int log_start_events = Settings.getProperty("neurord.neq.log_start_events",
+                                                             "Print information about this many events at startup",
+                                                             99);
 
     public static class Numbering {
         int count = 0;

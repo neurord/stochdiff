@@ -20,13 +20,19 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class SDCalc {
-    static final Logger log = LogManager.getLogger();
+    public static final Logger log = LogManager.getLogger();
 
     final SDRun sdRun;
 
-    final String[] writers = Settings.getPropertyList("neurord.writers", "h5");
-    final int trials = Settings.getProperty("neurord.trials", 1);
-    final int threads = Settings.getProperty("neurord.threads", 0);
+    final String[] writers = Settings.getPropertyList("neurord.writers",
+                                                      "Write output in those formats",
+                                                      "h5");
+    final int trials = Settings.getProperty("neurord.trials",
+                                            "How many trials to run",
+                                            1);
+    final int threads = Settings.getProperty("neurord.threads",
+                                             "How many threads to use (0 == #CPUs)",
+                                             0);
 
     protected final List<ResultWriter> resultWriters = new ArrayList<>();
 

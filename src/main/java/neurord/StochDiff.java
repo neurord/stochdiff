@@ -63,6 +63,12 @@ public class StochDiff {
                             HelpFormatter.DEFAULT_DESC_PAD,
                             "");
         pw.flush();
+
+        if (!error) {
+            System.out.println();
+            Settings.printAvailableSettings(System.out);
+        }
+
         System.exit(error ? 1 : 0);
     }
 

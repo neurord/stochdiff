@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
 
 public class ResultWriterHDF5 implements ResultWriter {
-    static final Logger log = LogManager.getLogger();
+    public static final Logger log = LogManager.getLogger();
 
     static {
         LibUtil.addLibraryPaths("/usr/lib64/jhdf",
@@ -46,7 +46,9 @@ public class ResultWriterHDF5 implements ResultWriter {
                                 "/usr/lib/jhdf5");
     }
 
-    final static int compression_level = Settings.getProperty("neurord.compression", 1);
+    final static int compression_level = Settings.getProperty("neurord.compression",
+                                                              "Compression level in HDF5 output",
+                                                              1);
 
     final protected File outputFile;
     protected H5File output;

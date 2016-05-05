@@ -18,9 +18,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public abstract class GridCalc extends BaseCalc implements IGridCalc {
-    static final Logger log = LogManager.getLogger();
+    public static final Logger log = LogManager.getLogger();
 
-    final static boolean count_events = Settings.getProperty("neurord.count_events", false);
+    final static boolean count_events = Settings.getProperty("neurord.count_events",
+                                                             "Collect statistics about firings of events",
+                                                             false);
 
     ReactionTable rtab;
 

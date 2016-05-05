@@ -15,9 +15,11 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class AdaptiveGridCalc extends StochasticGridCalc {
-    static final Logger log = LogManager.getLogger();
+    public static final Logger log = LogManager.getLogger();
 
-    final static boolean curtail_leaps = Settings.getProperty("neurord.curtail_leaps", false);
+    final static boolean curtail_leaps = Settings.getProperty("neurord.curtail_leaps",
+                                                              "Do not allow leaps to extend past reporting time",
+                                                              false);
 
     /* Timestamp when queue creation was finished */
     private long real_start_time;
