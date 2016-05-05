@@ -898,6 +898,7 @@ public class NextEventQueue {
 
             if (diffusionEvents != null)
                 diffusionEvents[this.sp][this.index2] += -done;
+            this.firings += done;
 
             return -done;
         }
@@ -1294,6 +1295,7 @@ public class NextEventQueue {
 
             if (reactionEvents != null)
                 reactionEvents[this.index] += count;
+            this.firings += count;
             return count;
         }
 
@@ -1377,6 +1379,7 @@ public class NextEventQueue {
 
             if (stimulationEvents != null)
                 stimulationEvents[this.sp] += count;
+            this.firings += count;
             return count;
         }
 
@@ -1586,8 +1589,6 @@ public class NextEventQueue {
             this.particles[element][specie] += count;
             done = count;
         }
-
-        event.firings += done;
 
         return done;
     }
