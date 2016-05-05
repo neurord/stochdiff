@@ -110,15 +110,34 @@ public class Settings {
             return x.toString();
     }
 
+    static String repeat(String s, int n) {
+        String ans = "";
+        while (n-- > 0)
+            ans += s;
+        return ans;
+    }
+
     static public void printAvailableSettings(PrintStream out) {
         forceLoading();
 
+        int n = 0;
+        for (Settings s: all_settings) {
+            String lhs = String.format("%s (default: %s)",
+                                       s.name,
+                                       stringify(s.fallback));
+            n = Math.max(n, lhs.length());
+        }
+
         out.println("Recognized properties:");
-        for (Settings s: all_settings)
-            out.println(String.format("%s (default: %s)\t%s",
-                                      s.name,
-                                      stringify(s.fallback),
+        for (Settings s: all_settings) {
+            String lhs = String.format("%s (default: %s)",
+                                       s.name,
+                                       stringify(s.fallback));
+            out.println(String.format("%s%s %s",
+                                      lhs,
+                                      repeat(" ", n - lhs.length()),
                                       s.description));
+        }
     }
 
     public static Manifest getManifest() throws IOException {
