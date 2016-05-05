@@ -1,11 +1,11 @@
 package neurord.numeric.grid;
 
-import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.math.MersenneTwister;
 import neurord.util.ArrayUtil;
 import neurord.util.Settings;
+import neurord.util.Logging;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -90,7 +90,7 @@ public abstract class StochasticGridCalc extends GridCalc {
 
     @Override
     protected void footer() {
-        log.log(StochDiff.NOTICE,
+        log.log(Logging.NOTICE,
                 "Used up {} random numbers", this.random.used());
     }
 

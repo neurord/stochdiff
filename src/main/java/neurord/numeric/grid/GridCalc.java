@@ -3,7 +3,6 @@ package neurord.numeric.grid;
 import java.util.Arrays;
 import java.util.List;
 
-import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.model.IOutputSet;
 import neurord.numeric.BaseCalc;
@@ -13,6 +12,7 @@ import neurord.numeric.chem.StimulationTable;
 import neurord.numeric.morph.VolumeGrid;
 import neurord.util.ArrayUtil;
 import neurord.util.Settings;
+import neurord.util.Logging;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -119,7 +119,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         for(ResultWriter resultWriter: this.resultWriters)
             resultWriter.writeGrid(this.sdRun.getVolumeGrid(), time, this);
 
-        log.log(StochDiff.NOTICE,
+        log.log(Logging.NOTICE,
                 "Trial {}: running from {} to {} ms",
                 this.trial(), time, endtime);
 
@@ -192,7 +192,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             resultWriter.closeTrial(this);
 
         long endTime = System.currentTimeMillis();
-        log.log(StochDiff.NOTICE,
+        log.log(Logging.NOTICE,
                 "Trial {}: total run time {} ms", this.trial(), endTime - startTime);
 
         this.footer();

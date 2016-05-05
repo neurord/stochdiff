@@ -42,9 +42,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
 
-import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.util.Settings;
+import neurord.util.Logging;
 
 public class ModelReader<T> {
     public static final Logger log = LogManager.getLogger(ModelReader.class);
@@ -149,7 +149,7 @@ public class ModelReader<T> {
                     String override = map.get(loc);
                     if (override != null) {
                         String s = new String(ch, start, length).trim();
-                        Level level = s.equals(override) ? Level.INFO : StochDiff.NOTICE;
+                        Level level = s.equals(override) ? Level.INFO : Logging.NOTICE;
                         log.log(level,
                                 "Overriding {}: {} → {}", loc, s, override);
 
@@ -255,7 +255,7 @@ public class ModelReader<T> {
             throw new RuntimeException("Unmarshalling failed");
 
         if (filter.conversion_hint)
-            log.log(StochDiff.NOTICE,
+            log.log(Logging.NOTICE,
                     "Use the following command to convert old style files to the new format:\n" +
                     "sed '1d; 2i <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\\n<SDRun xmlns:xi=\"http://www.w3.org/2001/XInclude\" xmlns=\"{}\">\n" +
                     "s#<(reactionScheme|morphology|stimulation|initialConditions|outputScheme)File>\\s*(\\w+)\\s*</.*>#<xi:include href=\"\\2.xml\" />#' -r -i.bak \"{}\"",

@@ -18,13 +18,13 @@ import neurord.numeric.chem.StimulationTable.Stimulation;
 import static neurord.numeric.chem.ReactionTable.getReactionSignature;
 import neurord.util.Settings;
 import neurord.util.ArrayUtil;
+import neurord.util.Logging;
+import static neurord.util.Logging.setLogLevel;
 import neurord.numeric.morph.VolumeGrid;
 import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import static neurord.numeric.BaseCalc.distribution_t.*;
-import neurord.StochDiff;
-import static neurord.StochDiff.setLogLevel;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -611,7 +611,7 @@ public class NextEventQueue {
                     (this.reverse != null && this.leap ? this.reverse.propensity : 0);
                 double linear = propensity * this.original_wait;
                 double ratio = max_fraction / Math.abs(leap_extent / linear);
-                Level level = ratio < 2 ? Level.INFO : StochDiff.NOTICE;
+                Level level = ratio < 2 ? Level.INFO : Logging.NOTICE;
 
                 log.log(level,
                         "max change fraction {} @ {}:\n" +

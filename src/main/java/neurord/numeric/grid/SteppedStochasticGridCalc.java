@@ -26,13 +26,13 @@ import java.util.StringTokenizer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import neurord.StochDiff;
 import neurord.model.SDRun;
 import neurord.numeric.BaseCalc;
 import neurord.numeric.morph.VolumeGrid;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.util.ArrayUtil;
+import neurord.util.Logging;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -279,7 +279,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     @Override
     public void footer() {
         super.footer();
-        log.log(StochDiff.NOTICE,
+        log.log(Logging.NOTICE,
                 "Leapt {} times", this.eventCount());
     }
 
