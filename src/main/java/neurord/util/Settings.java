@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Logger;
@@ -101,6 +102,13 @@ public class Settings {
         log = neurord.numeric.grid.StochasticGridCalc.log;
     }
 
+    static public String stringify(Object x) {
+        if (x instanceof String[])
+            return Arrays.toString((String[]) x);
+        else
+            return x.toString();
+    }
+
     static public void printAvailableSettings(PrintStream out) {
         forceLoading();
 
@@ -108,7 +116,7 @@ public class Settings {
         for (Settings s: all_settings)
             out.println(String.format("%s (default: %s)\t%s",
                                       s.name,
-                                      s.fallback,
+                                      stringify(s.fallback),
                                       s.description));
     }
 

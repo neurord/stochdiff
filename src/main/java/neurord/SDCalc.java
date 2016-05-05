@@ -24,15 +24,15 @@ public class SDCalc {
 
     final SDRun sdRun;
 
-    final String[] writers = Settings.getPropertyList("neurord.writers",
-                                                      "Write output in those formats",
-                                                      "h5");
-    final int trials = Settings.getProperty("neurord.trials",
-                                            "How many trials to run",
-                                            1);
-    final int threads = Settings.getProperty("neurord.threads",
-                                             "How many threads to use (0 == #CPUs)",
-                                             0);
+    final static String[] writers = Settings.getPropertyList("neurord.writers",
+                                                             "Write output in those formats",
+                                                             "h5");
+    final static  int trials = Settings.getProperty("neurord.trials",
+                                                    "How many trials to run",
+                                                    1);
+    final static int threads = Settings.getProperty("neurord.threads",
+                                                    "How many threads to use (0 == #CPUs)",
+                                                    0);
 
     protected final List<ResultWriter> resultWriters = new ArrayList<>();
 
