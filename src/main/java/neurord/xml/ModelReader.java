@@ -44,9 +44,10 @@ import org.apache.logging.log4j.Level;
 
 import neurord.StochDiff;
 import neurord.model.SDRun;
+import neurord.util.Settings;
 
 public class ModelReader<T> {
-    static final Logger log = LogManager.getLogger(ModelReader.class);
+    public static final Logger log = LogManager.getLogger(ModelReader.class);
 
     public static final String NEURORD_NS = "http://stochdiff.textensor.org";
 
@@ -209,6 +210,10 @@ public class ModelReader<T> {
         } catch(JAXBException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static {
+        Settings.getProperty("neurord.sdrun.*", "Override values in the XML tree", "none");
     }
 
     protected HashMap<String, String> propertyOverrides() {

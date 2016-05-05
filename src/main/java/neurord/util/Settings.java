@@ -100,6 +100,7 @@ public class Settings {
         log = neurord.numeric.grid.NextEventQueue.log;
         log = neurord.numeric.grid.ResultWriterHDF5.log;
         log = neurord.numeric.grid.StochasticGridCalc.log;
+        log = neurord.xml.ModelReader.log;
     }
 
     static public String stringify(Object x) {
