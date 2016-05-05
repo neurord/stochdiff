@@ -166,7 +166,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         try {
             for (Map.Entry<Integer, Trial> k_v: this.trials.entrySet())
-                this.closeTrial(k_v.getKey());
+                this.closeTrial(k_v.getKey(), null);
 
             this.output.close();
         } catch(Exception e) {
@@ -216,21 +216,21 @@ public class ResultWriterHDF5 implements ResultWriter {
         return new Trial(group);
     }
 
-    protected void closeTrial(int trial)
+    protected void closeTrial(int trial, IGridCalc source)
         throws Exception
     {
         Trial t = this.trials.get(trial);
         if (t == null)
             return;
 
-        t.close();
+        t.close(source);
         this.trials.remove(trial);
     }
 
     @Override
     public void closeTrial(IGridCalc source) {
         try {
-            this.closeTrial(source.trial());
+            this.closeTrial(source.trial(), source);
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
@@ -394,13 +394,16 @@ public class ResultWriterHDF5 implements ResultWriter {
             setAttribute(this.sim, "TITLE", "results of the simulation");
         }
 
-        protected void close()
+        protected void close(IGridCalc source)
             throws Exception
         {
             if (this.events_cache != null)
                 this.flushEvents(Double.POSITIVE_INFINITY, true);
             for (PopulationOutput output: this.populations)
                 output.flushPopulation(Double.POSITIVE_INFINITY);
+
+            if (source != null)
+                this.writeFiringsSummary(source);
         }
 
         protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
@@ -1023,6 +1026,20 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             if (this.events_cache.size() > CACHE_SIZE2)
                 this.flushEvents(time, false);
+        }
+
+        protected void writeFiringsSummary(IGridCalc source)
+            throws Exception
+        {
+            Collection<IGridCalc.Event> events = source.getEvents();
+            long array[] = new long[events.size()];
+            for (IGridCalc.Event event: events)
+                array[event.event_number()] = event.firings();
+
+            Dataset ds = writeVector("firings", this.sim, array);
+            setAttribute(ds, "TITLE", "Firings of each reaction");
+            setAttribute(ds, "LAYOUT", "[nevents]");
+            setAttribute(ds, "UNITS", "counts");
         }
     }
 

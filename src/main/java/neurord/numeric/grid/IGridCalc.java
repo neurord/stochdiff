@@ -44,6 +44,7 @@ public interface IGridCalc {
         String description();
         EventType event_type();
         Collection<Event> dependent();
+        long firings();
     }
 
     public interface Happening {

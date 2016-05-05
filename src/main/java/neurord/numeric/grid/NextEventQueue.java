@@ -256,6 +256,7 @@ public class NextEventQueue {
         final String signature;
         final private int[] reactants;
         final private int[] reactant_stoichiometry;
+        long firings;
 
         protected List<ScoeffElem> scoeff_ki = new ArrayList<>();
 
@@ -339,6 +340,11 @@ public class NextEventQueue {
         @Override
         public String description() {
             return this.toString();
+        }
+
+        @Override
+        public long firings() {
+            return this.firings;
         }
 
         @Override
@@ -1564,6 +1570,9 @@ public class NextEventQueue {
             this.particles[element][specie] += count;
             done = count;
         }
+
+        event.firings += done;
+
         return done;
     }
 
