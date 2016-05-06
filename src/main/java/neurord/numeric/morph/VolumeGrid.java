@@ -317,11 +317,11 @@ public class VolumeGrid {
         int[][] ret = new int[targetIDs.length][];
         for (int i = 0; i < targetIDs.length; i++) {
             String sti = targetIDs[i];
-            if (areaHM.containsKey(sti)) {
-                ret[i] = areaHM.get(sti);
+            if (this.areaHM.containsKey(sti)) {
+                ret[i] = this.areaHM.get(sti);
 
             } else if (sti.indexOf("[") >= 0) {
-                int[] ms = getMatches(areaHM, sti);
+                int[] ms = this.getMatches(this.areaHM, sti);
                 if (ms != null && ms.length > 0) {
                     ret[i] = ms;
                 } else

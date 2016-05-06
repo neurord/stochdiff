@@ -1,37 +1,31 @@
 package neurord.numeric.morph;
 
-
 public class SpinePopulation {
+    private final String id;
+    private final SpineProfile profile;
+    private final String targetRegion;
+    private final double density;
 
-    String id;
-    SpineProfile profile;
-    String targetRegion;
-    double density;
-
-
-
-    public SpinePopulation(String sid, SpineProfile sp, String tgt, double d) {
-        id = sid;
-        profile = sp;
-        targetRegion = tgt;
-        density = d;
+    public SpinePopulation(String id, SpineProfile profile, String targetRegion, double density) {
+        this.id = id;
+        this.profile = profile;
+        this.targetRegion = targetRegion;
+        this.density = density;
     }
 
-
     public SpineProfile getProfile() {
-        return profile;
+        return this.profile;
     }
 
     public String getTargetRegion() {
-        return targetRegion;
+        return this.targetRegion;
     }
 
     public double getDensity() {
-        return density;
+        return this.density;
     }
 
     public String getID() {
-        return id;
+        return this.id;
     }
-
 }

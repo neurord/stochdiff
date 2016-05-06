@@ -51,12 +51,12 @@ public abstract class SpineLocator {
                 Position[] sbdry = ve.getSurfaceBoundary();
                 if (sbdry != null) {
                     surfVE.add(ve);
-                    surfA.add(new Double(ve.getExposedArea()));
+                    surfA.add(ve.getExposedArea());
                 }
             }
 
             if (surfA.isEmpty()) {
-                log.warn("There surface elements labelled \"{}\" found");
+                log.warn("No surface elements labelled \"{}\" found");
                 throw new RuntimeException("SpineAllocation references surface-less region");
             }
 
