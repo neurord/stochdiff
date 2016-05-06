@@ -243,24 +243,6 @@ public class SDRun implements IOutputSet {
         }
     }
 
-    public boolean continueOutput() {
-        boolean ret = false;
-        if (output == null) {
-            // fine - not specified
-        } else {
-            String lco = output.toLowerCase().trim();
-            if (lco.equals("continue")) {
-                ret = true;
-            } else if (lco.equals("new")) {
-                ret = false;
-            } else {
-                log.error("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
-                throw new RuntimeException("Unrecognized output option: " + output + " (expecting 'new' or 'continue')");
-            }
-        }
-        return ret;
-    }
-
     public synchronized VolumeGrid getVolumeGrid() {
         if (this.volumeGrid == null) {
             final Morphology morph = this.getMorphology();

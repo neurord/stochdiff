@@ -60,9 +60,6 @@ public class SDCalc {
             }
             this.resultWriters.add(writer);
         }
-
-        //        if (sdRun.continueOutput() && outputFile.exists() && sdRun.getStartTime() > 0)
-        //            resultWriter.pruneFrom("gridConcentrations", 3, sdRun.getStartTime());
     }
 
     protected BaseCalc prepareCalc(int trial) {
