@@ -9,7 +9,7 @@ import java.util.Random;
 
 import neurord.geom.*;
 import neurord.numeric.math.MersenneTwister;
-import neurord.numeric.math.RandomMath;
+import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.morph.*;
 import neurord.util.ArrayUtil;
 
@@ -19,18 +19,19 @@ import org.apache.logging.log4j.LogManager;
 public abstract class SpineLocator {
     static final Logger log = LogManager.getLogger();
 
-    public static void locate(int seed, SpineDistribution dist, double delta, VolumeGrid grid) {
-
-        // FIXME: replace by random generator wrapper
-        final MersenneTwister rngen = new MersenneTwister();
-        rngen.setSeed(seed > 0 ? seed : Math.abs(new Random().nextLong()));
+    public static void locate(int spineSeed,
+                              SpineDistribution dist,
+                              double delta,
+                              VolumeGrid grid) {
 
         final HashMap<SpineProfile, DiscretizedSpine> spines = new HashMap<>();
         final HashSet<VolumeElement> volumes = new HashSet<>();
 
-        int nblocked = 0;
+        final RandomGenerator rngen = new MersenneTwister(spineSeed);
 
+        int nblocked = 0;
         int ipop = 0;
+
         for (SpinePopulation sp : dist.getPopulations()) {
             ipop += 1;
 
@@ -74,14 +75,6 @@ public abstract class SpineLocator {
 
             // double nspines = RandomMath.poissonInt(avgNoSpines, rngen);
             double nspines = avgNoSpines;
-
-            // the above might take a variable number of random nos off
-            // rngen
-            // for certain small variations in avgNoSpines so reseed rngen
-            // now
-            // to get reliable spine position repeats;
-
-            rngen.setSeed(seed + ipop);
 
             /*			****		AB: 0.5 produces too few spines
                         if (nspines > 0.5 * eltSA.length) {
