@@ -397,36 +397,32 @@ public class VolumeGrid {
     }
 
 
-    public void makeAreaHM() {
-        HashMap<String, ArrayList<Integer>> idHM;
-        idHM = new HashMap<String, ArrayList<Integer>>();
+    private void makeAreaHM() {
+        assert this.areaHM == null;
+
+        HashMap<String, ArrayList<Integer>> idHM = new HashMap<>();
 
         for (int i = 0; i < nelement; i++) {
             String sl = eltLabels[i];
             if (sl != null && sl.length() > 0) {
-                if (!idHM.containsKey(sl)) {
-                    idHM.put(sl, new ArrayList<Integer>());
-                }
-                idHM.get(sl).add(new Integer(i));
+                idHM.putIfAbsent(sl, new ArrayList<Integer>());
+                idHM.get(sl).add(i);
             }
 
             String sr = regionLabels[eltRegions[i]];
             if (sr != null && sr.length() > 0) {
-                if (!idHM.containsKey(sr)) {
-                    idHM.put(sr, new ArrayList<Integer>());
-                }
-                idHM.get(sr).add(new Integer(i));
+                idHM.putIfAbsent(sr, new ArrayList<Integer>());
+                idHM.get(sr).add(i);
             }
         }
 
-
-        areaHM = new HashMap<String, int[]>();
-        for (String s : idHM.keySet()) {
+        this.areaHM = new HashMap<>();
+        for (String s: idHM.keySet()) {
             ArrayList<Integer> ali = idHM.get(s);
             int[] ia = new int[ali.size()];
-            for (int i = 0; i < ia.length; i++) {
-                ia[i] = ali.get(i).intValue();
-            }
+            for (int i = 0; i < ia.length; i++)
+                ia[i] = ali.get(i);
+
             areaHM.put(s, ia);
         }
     }
