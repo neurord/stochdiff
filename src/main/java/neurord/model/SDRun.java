@@ -91,7 +91,6 @@ public class SDRun implements IOutputSet {
     public String algorithm;
 
     private transient VolumeGrid volumeGrid;
-    private transient int[][] stimulationTargets;
 
     // just getters from here on;
 
@@ -294,13 +293,9 @@ public class SDRun implements IOutputSet {
     }
 
     public synchronized int[][] getStimulationTargets() {
-        if (this.stimulationTargets == null) {
-            VolumeGrid grid = this.getVolumeGrid();
-            String[] targets = this.getStimulationTable().getTargetIDs();
-            this.stimulationTargets = grid.getAreaIndexes(targets);
-        }
-
-        return this.stimulationTargets;
+        VolumeGrid grid = this.getVolumeGrid();
+        String[] targets = this.getStimulationTable().getTargetIDs();
+        return grid.getAreaIndexes(targets);
     }
 
     public double[] getRegionConcentration(int region) {

@@ -62,7 +62,7 @@ public class DeterministicGridCalc extends GridCalc {
         // eltstims gives the index in the stim array for
         // the stim to element i, if any. -1 otherwise
         /* AB Dec 16 2011 - eltstims needs to be 2D, determine target element and share for each */
-        int numStim = this.sdRun.getStimulationTable().getNStim();
+        int numStim = this.sdRun.getStimulationTable().getStimulations().size();
         eltstims = new int[numStim][nel];
         eltstimshare = new double[numStim][nel];
         for (int stimnum = 0; stimnum < numStim; stimnum++) {

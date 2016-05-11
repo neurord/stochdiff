@@ -80,7 +80,7 @@ public class VolumeGrid {
 
     public void addElements(List<? extends VolumeElement> elements) {
         for (VolumeElement ve : elements)
-            addVolumeElement(ve);
+            this.addVolumeElement(ve);
     }
 
     private void addVolumeElement(VolumeElement ve) {

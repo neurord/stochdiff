@@ -141,7 +141,7 @@ public class StimulationTable {
     }
 
     public double[][] getStimsForInterval(double time, double dt) {
-        double[][] ret = new double[getNStim()][nspec];
+        double[][] ret = new double[this.stims.size()][nspec];
         for (int i = 0; i < ret.length; i++) {
             Stimulation stim = this.stims.get(i);
             double f = stim.effectiveRate(time, dt);
@@ -152,16 +152,12 @@ public class StimulationTable {
         return ret;
     }
 
-    public int getNStim() {
-        return this.stims.size();
-    }
-
     public ArrayList<Stimulation> getStimulations() {
         return this.stims;
     }
 
     public String[] getTargetIDs() {
-        String[] ret = new String[this.getNStim()];
+        String[] ret = new String[this.stims.size()];
         for (int i = 0; i < ret.length; i++)
             ret[i] = this.stims.get(i).site;
         return ret;
