@@ -21,6 +21,7 @@ import neurord.util.ArrayUtil;
 import neurord.util.Logging;
 import static neurord.util.Logging.setLogLevel;
 import neurord.numeric.morph.VolumeGrid;
+import neurord.numeric.morph.VolumeElement;
 import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
@@ -1339,31 +1340,31 @@ public class NextEventQueue {
     }
 
     public class NextStimulation extends NextEvent {
-        final int neighbors;
         final int sp;
+        final double fraction;
         final Stimulation stim;
 
         /**
          * @param element element to stimulate
-         * @param neighbors rate divisor (over how many neighbors the
+         * @param fraction rate multiplier (over how many neighbors the
          *        stimulation rate is split)
          * @param sp the species
          * @param signature description
          * @param stim stimulation parameters
          */
         NextStimulation(int event_number,
-                        int element, int neighbors, int sp, String signature,
+                        int element, double fraction, int sp, String signature,
                         Stimulation stim) {
             super(event_number, element, signature,
                   new int[]{}, new int[]{});
             this.sp = sp;
-            this.neighbors = neighbors;
+            this.fraction = fraction;
             this.stim = stim;
 
             this.propensity = this.calcPropensity();
             this.setEvent(1, false, 0.0, this._new_time(0));
 
-            log.info("Created {}: t={} [{}]", this, this.time, this.stim);
+            log.info("Created {}: t={} fraction={} [{}]", this, this.time, this.fraction, this.stim);
         }
 
         @Override
@@ -1468,7 +1469,7 @@ public class NextEventQueue {
         @Override
         public double calcPropensity() {
             assert this.sp == this.stim.species;
-            double ans = this.stim.rate / this.neighbors;
+            double ans = this.stim.rate * this.fraction;
             assert ans >= 0: ans;
             return ans;
         }
@@ -1710,19 +1711,24 @@ public class NextEventQueue {
     ArrayList<NextStimulation> createStimulations(Numbering numbering,
                                                   VolumeGrid grid,
                                                   ReactionTable rtab,
-                                                  StimulationTable stimtab,
-                                                  int[][] stimtargets) {
+                                                  StimulationTable stimtab) {
         String[] species = rtab.getSpecies();
-        ArrayList<NextStimulation> ans = new ArrayList<>(stimtargets.length * 3);
 
-        for (int i = 0; i < stimtab.getStimulations().size(); i++) {
-            Stimulation stim = stimtab.getStimulations().get(i);
-            int[] targets = stimtargets[i];
 
-            for (int el: targets)
-                // FIXME: check how the splitting between targets works
+        ArrayList<NextStimulation> ans = new ArrayList<>();
+
+        for (StimulationTable.Stimulation stim: stimtab.getStimulations()) {
+            ArrayList<VolumeElement> targets = grid.filterElementsByLabel(stim.site);
+            boolean fractional = grid.siteIsFractional(stim.site);
+
+            double sum = 0;
+            for (VolumeElement el: targets)
+                sum += el.getExposedArea();
+
+            for (VolumeElement el: targets)
                 ans.add(new NextStimulation(numbering.get(),
-                                            el, targets.length,
+                                            el.getNumber(),
+                                            fractional ? el.getExposedArea() / sum : 1.0,
                                             stim.species,
                                             species[stim.species],
                                             stim));
@@ -1739,7 +1745,6 @@ public class NextEventQueue {
                                         VolumeGrid grid,
                                         ReactionTable rtab,
                                         StimulationTable stimtab,
-                                        int[][] stimtargets,
                                         boolean adaptive,
                                         double tolerance,
                                         double leap_min_jump,
@@ -1750,7 +1755,7 @@ public class NextEventQueue {
         final Numbering numbering = new Numbering();
         e.addAll(obj.createDiffusions(numbering, grid, rtab));
         e.addAll(obj.createReactions(numbering, grid, rtab));
-        e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, stimtargets));
+        e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
         log.info("Creating dependency graph");

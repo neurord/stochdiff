@@ -1,6 +1,7 @@
 package neurord.numeric.morph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import neurord.geom.Position;
 
@@ -29,6 +30,8 @@ public abstract class VolumeElement {
     protected final Position[] boundary;
     protected final Position[] surfaceBoundary;
 
+    protected int number; /* this will be assigned by VolumeGrid */
+
     public VolumeElement(String label, String region, String groupID,
                          Position[] boundary,
                          Position[] surfaceBoundary,
@@ -36,15 +39,7 @@ public abstract class VolumeElement {
                          Position center,
                          double alongArea, double sideArea, double topArea,
                          double volume, double deltaZ) {
-        log.debug("New {}(label={}, region={}, groupID={}, boundary={}, surfaceBoundary={}," +
-                  " exposedArea={}, center={}, along {}, side {}, top {}, volume={}, Δz={})",
-                  this.getClass().getName(),
-                  label, region, groupID,
-                  boundary,
-                  surfaceBoundary, exposedArea,
-                  center,
-                  alongArea, sideArea, topArea,
-                  volume, deltaZ);
+        this.number = -1;
 
         this.label = label;
         this.region = region;
@@ -64,6 +59,21 @@ public abstract class VolumeElement {
 
         this.volume = volume;
         this.deltaZ = deltaZ;
+
+        log.debug("New {}", this);
+    }
+
+    public String toString() {
+        return String.format("%s(label=%s, region=%s, groupID=%s, boundary=%s, surfaceBoundary=%s," +
+                             " exposedArea=%g, center=%s, along %g, side %g, top %g, volume=%g, Δz=%g)",
+                             getClass().getSimpleName(),
+                             label, region, groupID,
+                             Arrays.toString(boundary),
+                             Arrays.toString(surfaceBoundary),
+                             exposedArea,
+                             center,
+                             alongArea, sideArea, topArea,
+                             volume, deltaZ);
     }
 
     public double getAlongArea() {
@@ -139,6 +149,17 @@ public abstract class VolumeElement {
     public ArrayList<ElementConnection> getConnections() {
         fixcon = true;
         return connections;
+    }
+
+    public void setNumber(int number) {
+        assert number >= 0;
+        assert this.number == -1;
+        this.number = number;
+    }
+
+    public int getNumber() {
+        assert this.number >= 0;
+        return this.number;
     }
 
     /* icache */

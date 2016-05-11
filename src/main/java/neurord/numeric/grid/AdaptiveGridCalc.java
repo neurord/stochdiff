@@ -44,7 +44,6 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
                                          this.sdRun.getVolumeGrid(), rtab,
                                          this.sdRun.getStimulationTable(),
-                                         this.sdRun.getStimulationTargets(),
                                          adaptive,
                                          this.sdRun.tolerance,
                                          this.sdRun.leap_min_jump,

@@ -131,14 +131,14 @@ public class VolumeGrid {
 
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
+            ve.setNumber(i);
+
             volumes[i] = ve.getVolume();
             exposedAreas[i] = ve.getExposedArea();
-
 
             positions[i][0] = ve.getX();
             positions[i][1] = ve.getY();
             positions[i][2] = ve.getZ();
-
 
             eltLabels[i] = ve.getLabel();
             eltGroupIDs[i] = ve.getGroupID();
@@ -321,22 +321,19 @@ public class VolumeGrid {
                 ret[i] = this.areaHM.get(sti);
 
             } else if (sti.indexOf("[") >= 0) {
-                int[] ms = this.getMatches(this.areaHM, sti);
-                if (ms != null && ms.length > 0) {
-                    ret[i] = ms;
-                } else
-                    throw new RuntimeException("There are no matches for target: " + sti);
-
+                ArrayList<VolumeElement> matches = this.getMatches(sti);
+                ret[i] = new int[matches.size()];
+                for (int j = 0; j < ret[i].length; j++)
+                    ret[i][j] = matches.get(j).getNumber();
             } else
                 throw new RuntimeException("An action is defined for area " + sti + " but there are no points with this label");
         }
         return ret;
     }
 
+    private ArrayList<VolumeElement> getMatches(String sti) {
 
-    private int[] getMatches(HashMap<String, int[]> areaHM, String sti) {
-
-        ArrayList<Integer> aidx = new ArrayList<Integer>();
+        ArrayList<VolumeElement> matched = new ArrayList<>();
 
         int iob = sti.indexOf("[");
         int icb = sti.indexOf("]");
@@ -346,56 +343,44 @@ public class VolumeGrid {
         String range = sti.substring(iob + 1, icb);
 
         range = range.replace(" ", "");
-        int rangemin = 0;
-        int rangemax = -1;
+        final int rangemin;
+        final int rangemax;
         if (range.indexOf(":") >= 0) {
             String rpre = range.substring(0, range.indexOf(":"));
             String rpost = range.substring(range.indexOf(":") + 1, range.length());
-            if (rpre.length() > 0) {
+            if (rpre.length() > 0)
                 rangemin = Integer.parseInt(rpre);
-            }
-            if (rpost.length() > 0) {
+            else
+                rangemin = 0;
+
+            if (rpost.length() > 0)
                 rangemax = Integer.parseInt(rpost);
-            } else {
-                rangemax = 1000000;
-                // just a large number bigger than the max number of spines
-            }
+            else
+                rangemax = Integer.MAX_VALUE;
+        } else {
+            rangemin = Integer.parseInt(range);
+            rangemax = Integer.MAX_VALUE;
         }
 
-        for (String s : areaHM.keySet()) {
-            log.debug("area key {}", s);
+        log.debug("Looking for {}{}:{}{}", pre, rangemin, rangemax, post);
 
-            if (s.startsWith(pre) && s.endsWith(post)) {
+        for (VolumeElement el: this.elements) {
+            String s = el.getLabel();
+
+            if (s != null && s.startsWith(pre) && s.endsWith(post)) {
                 String sin = s.substring(pre.length(), s.indexOf(post));
                 int ind = Integer.parseInt(sin);
-                boolean ok = false;
-                if (rangemin <= ind && rangemax >= ind) {
-                    ok = true;
-                } else if (("," + range + ",").indexOf("," + sin + ",") >= 0) {
-                    ok = true;
-                }
-                if (ok) {
-                    for (int i : areaHM.get(s)) {
-                        aidx.add(i);
-                    }
-                } else {
-                    //
-                }
 
+                if (rangemin <= ind && rangemax >= ind ||
+                    ("," + range + ",").indexOf("," + sin + ",") >= 0)
+                    matched.add(el);
             }
         }
 
-
-
-
-        int na = aidx.size();
-        int[] ret = new int[na];
-        for (int i = 0; i < na; i++) {
-            ret[i] = aidx.get(i);
-        }
-        return ret;
+        if (matched.isEmpty())
+            throw new RuntimeException("There are no matches for target: " + sti);
+        return matched;
     }
-
 
     private void makeAreaHM() {
         assert this.areaHM == null;
@@ -403,13 +388,13 @@ public class VolumeGrid {
         HashMap<String, ArrayList<Integer>> idHM = new HashMap<>();
 
         for (int i = 0; i < nelement; i++) {
-            String sl = eltLabels[i];
+            String sl = this.eltLabels[i];
             if (sl != null && sl.length() > 0) {
                 idHM.putIfAbsent(sl, new ArrayList<Integer>());
                 idHM.get(sl).add(i);
             }
 
-            String sr = regionLabels[eltRegions[i]];
+            String sr = this.regionLabels[eltRegions[i]];
             if (sr != null && sr.length() > 0) {
                 idHM.putIfAbsent(sr, new ArrayList<Integer>());
                 idHM.get(sr).add(i);
@@ -427,6 +412,39 @@ public class VolumeGrid {
         }
     }
 
+    public ArrayList<VolumeElement> filterElementsByLabel(String label) {
+        if (label.indexOf("[") >= 0)
+            return this.getMatches(label);
+
+        ArrayList<VolumeElement> ans = new ArrayList<>();
+
+        for (VolumeElement el: this.elements)
+            if (el.getLabel() != null &&
+                el.getLabel().equals(label) &&
+                el.isSubmembrane())
+                ans.add(el);
+        if (!ans.isEmpty())
+            return ans;
+
+        for (VolumeElement el: this.elements)
+            if (el.getRegion() != null &&
+                el.getRegion().equals(label) &&
+                el.isSubmembrane())
+                ans.add(el);
+        if (!ans.isEmpty())
+            return ans;
+
+        throw new RuntimeException("no elements labeled by \"" + label + "\"");
+    }
+
+    public boolean siteIsFractional(String label) {
+        /* FIXME: need a better way */
+        for (VolumeElement el: this.elements)
+            if (el.getRegion() != null &&
+                el.getRegion().equals(label))
+                return true;
+        return false;
+    }
 
     public boolean isCuboid() {
         return hasCuboids && !hasCurveds;
