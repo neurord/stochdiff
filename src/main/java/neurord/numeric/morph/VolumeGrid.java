@@ -55,8 +55,6 @@ public class VolumeGrid {
     int[][] eltNbrs;
     double[][] eltNbrG;
 
-    HashMap<String, int[]> areaHM;
-
     boolean hasCuboids = false;
     boolean hasCurveds = false;
 
@@ -166,9 +164,6 @@ public class VolumeGrid {
             ve.cache(i);
         }
         regionLabels = rA.toArray(new String[0]);
-
-        makeAreaHM();
-
 
         nconnection = connections.size();
         conI = new int[nconnection][2];
@@ -313,20 +308,13 @@ public class VolumeGrid {
         return eltGroupIDs[i];
     }
 
-    public int[][] getAreaIndexes(String[] targetIDs) {
-        int[][] ret = new int[targetIDs.length][];
-        for (int i = 0; i < targetIDs.length; i++) {
-            String sti = targetIDs[i];
-            if (this.areaHM.containsKey(sti)) {
-                ret[i] = this.areaHM.get(sti);
-
-            } else if (sti.indexOf("[") >= 0) {
-                ArrayList<VolumeElement> matches = this.getMatches(sti);
-                ret[i] = new int[matches.size()];
-                for (int j = 0; j < ret[i].length; j++)
-                    ret[i][j] = matches.get(j).getNumber();
-            } else
-                throw new RuntimeException("An action is defined for area " + sti + " but there are no points with this label");
+    public int[][] getAreaIndexes(String[] targets) {
+        int[][] ret = new int[targets.length][];
+        for (int i = 0; i < targets.length; i++) {
+            ArrayList<VolumeElement> matched = this.filterElementsByLabel(targets[i]);
+            ret[i] = new int[matched.size()];
+            for (int j = 0; j < ret[i].length; j++)
+                ret[i][j] = matched.get(j).getNumber();
         }
         return ret;
     }
@@ -380,36 +368,6 @@ public class VolumeGrid {
         if (matched.isEmpty())
             throw new RuntimeException("There are no matches for target: " + sti);
         return matched;
-    }
-
-    private void makeAreaHM() {
-        assert this.areaHM == null;
-
-        HashMap<String, ArrayList<Integer>> idHM = new HashMap<>();
-
-        for (int i = 0; i < nelement; i++) {
-            String sl = this.eltLabels[i];
-            if (sl != null && sl.length() > 0) {
-                idHM.putIfAbsent(sl, new ArrayList<Integer>());
-                idHM.get(sl).add(i);
-            }
-
-            String sr = this.regionLabels[eltRegions[i]];
-            if (sr != null && sr.length() > 0) {
-                idHM.putIfAbsent(sr, new ArrayList<Integer>());
-                idHM.get(sr).add(i);
-            }
-        }
-
-        this.areaHM = new HashMap<>();
-        for (String s: idHM.keySet()) {
-            ArrayList<Integer> ali = idHM.get(s);
-            int[] ia = new int[ali.size()];
-            for (int i = 0; i < ia.length; i++)
-                ia[i] = ali.get(i);
-
-            areaHM.put(s, ia);
-        }
     }
 
     public ArrayList<VolumeElement> filterElementsByLabel(String label) {
