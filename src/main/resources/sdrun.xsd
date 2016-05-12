@@ -259,6 +259,7 @@
 
   <xs:element name="fixedStepDt" type="non-negative-real" />
   <xs:element name="outputInterval" type="non-negative-real" />
+  <xs:element name="statistics" type="statistics" />
   <xs:element name="tolerance" type="non-negative-real" />
 
   <xs:element name="calculation" type="calculation" />
@@ -335,6 +336,15 @@
       <xs:enumeration value="GRID_EXACT" />
       <xs:enumeration value="GRID_ADAPTIVE" />
       <xs:whiteSpace value="collapse" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="statistics">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="full" />
+      <xs:enumeration value="by-reaction" />
+      <xs:enumeration value="by-type" />
+      <xs:enumeration value="none" />
     </xs:restriction>
   </xs:simpleType>
 

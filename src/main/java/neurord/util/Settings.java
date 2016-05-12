@@ -201,4 +201,15 @@ public class Settings {
         else
             return fallback;
     }
+
+    static public int optionCount(CommandLine cmd, String argv[], String longopt, String shortopt) {
+        int count = 0;
+        if (cmd.hasOption(longopt)) {
+            for (String arg: argv)
+                if (arg.equals("--" + longopt) || arg.equals("-" + shortopt))
+                    count ++;
+            assert count > 0: count;
+        }
+        return count;
+    }
 }

@@ -20,11 +20,6 @@ import org.apache.logging.log4j.LogManager;
 public abstract class GridCalc extends BaseCalc implements IGridCalc {
     public static final Logger log = LogManager.getLogger();
 
-    final static boolean count_events =
-        Settings.getProperty("neurord.count_events",
-                             "Collect statistics about firings of events",
-                             false);
-
     ReactionTable rtab;
 
     double dt;
@@ -90,7 +85,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         surfaceAreas = grid.getExposedAreas();
 
-        if (count_events) {
+        if (this.sdRun.getStatistics().startsWith("by-")) {
             this.stimulationEvents = new int[nel][nspec];
 
             this.reactionEvents = new int[nel][rtab.getNReaction()];
@@ -157,11 +152,12 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     resultWriter.writeOutputInterval(time, this);
 
                 writeTime += this.sdRun.getOutputInterval();
-                if (count_events) {
+                if (this.stimulationEvents != null)
                     ArrayUtil.fill(this.stimulationEvents, 0);
+                if (this.diffusionEvents != null)
                     ArrayUtil.fill(this.diffusionEvents, 0);
+                if (this.reactionEvents != null)
                     ArrayUtil.fill(this.reactionEvents, 0);
-                }
             }
             for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {

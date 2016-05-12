@@ -76,6 +76,7 @@ public class StochDiff {
 
         options.addOption(null, "log", true, "log file name (\"no\" to disable)");
         options.addOption("v", "verbose", false, "increase log level");
+        options.addOption("s", "statistics", false, "collect more statistics");
 
         return options;
     }
@@ -96,16 +97,14 @@ public class StochDiff {
             System.out.println(Settings.getProgramVersion());
             System.exit(0);
         }
-        if (cmd.hasOption("verbose")) {
-            int count = 0;
-            for (String arg: argv)
-                if (arg.equals("-v") || arg.equals("--verbose"))
-                    count ++;
-            assert count > 0: count;
 
-            Level level = count == 1 ? Level.INFO : Level.DEBUG;
+        final int verbose = Settings.optionCount(cmd, argv, "verbose", "v");
+        if (verbose > 0) {
+            Level level = verbose == 1 ? Level.INFO : Level.DEBUG;
             Logging.setLogLevel(null, LogManager.ROOT_LOGGER_NAME, level);
         }
+
+        final int statistics = Settings.optionCount(cmd, argv, "statistics", "s");
 
         argv = cmd.getArgs();
         modelFile = new File(argv[0]);
@@ -141,6 +140,8 @@ public class StochDiff {
         final double ic_time = Settings.getOption(cmd, "ic-time", Double.NaN);
 
         final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
+        if (statistics > 0)
+            model.overrideStatistics(statistics);
 
         SDCalc calc = new SDCalc(model, outputFile);
         calc.run();
