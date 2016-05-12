@@ -1653,6 +1653,9 @@ public class NextEventQueue {
                                                                    fdiff[sp] * cc / volumes[el]);
 
                             ans.add(diff);
+                            log.debug("diff {} → {}",
+                                      grid.getElement(el).getNumber(),
+                                      grid.getElement(el2).getNumber());
 
                             /* Here we take advantage of the fact that either
                              * the "forward" or "backward" diffusion must be added

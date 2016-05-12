@@ -102,6 +102,12 @@ public class VolumeGrid {
         }
     }
 
+    public VolumeElement getElement(int i) {
+        VolumeElement el = this.elements.get(i);
+        assert el.getNumber() == i;
+        return el;
+    }
+
     public ArrayList<VolumeElement> getElementsInRegion(String reg) {
         if (regionHM.containsKey(reg))
             return regionHM.get(reg);
