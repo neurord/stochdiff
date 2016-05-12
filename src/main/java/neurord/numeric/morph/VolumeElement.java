@@ -65,7 +65,8 @@ public abstract class VolumeElement {
 
     public String toString() {
         return String.format("%s(label=%s, region=%s, groupID=%s, boundary=%s, surfaceBoundary=%s," +
-                             " exposedArea=%g, center=%s, along %g, side %g, top %g, volume=%g, Δz=%g)",
+                             " exposedArea=%g, center=%s, along %g, side %g, top %g, volume=%g, Δz=%g, " +
+                             " number=%d)",
                              getClass().getSimpleName(),
                              label, region, groupID,
                              Arrays.toString(boundary),
@@ -73,7 +74,8 @@ public abstract class VolumeElement {
                              exposedArea,
                              center,
                              alongArea, sideArea, topArea,
-                             volume, deltaZ);
+                             volume, deltaZ,
+                             number);
     }
 
     public double getAlongArea() {
@@ -140,15 +142,17 @@ public abstract class VolumeElement {
 
     private boolean fixcon = false;
 
-    public void coupleTo(VolumeElement vx, double ca) {
-        // ca is the area of contact between the elements;
-        assert !fixcon;
-        connections.add(new ElementConnection(this, vx, ca));
+    public void coupleTo(VolumeElement other, double contactArea) {
+        assert !this.fixcon;
+        for (ElementConnection conn: this.connections)
+            assert conn.getElementB() != other;
+
+        this.connections.add(new ElementConnection(this, other, contactArea));
     }
 
     public ArrayList<ElementConnection> getConnections() {
-        fixcon = true;
-        return connections;
+        this.fixcon = true;
+        return this.connections;
     }
 
     public void setNumber(int number) {
@@ -160,18 +164,6 @@ public abstract class VolumeElement {
     public int getNumber() {
         assert this.number >= 0;
         return this.number;
-    }
-
-    /* icache */
-
-    private int icache;
-
-    public void cache(int ind) {
-        icache = ind;
-    }
-
-    public int getCached() {
-        return icache;
     }
 
     /* obsolete text functions */

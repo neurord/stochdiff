@@ -380,8 +380,12 @@ public class NextEventQueue {
         public abstract Map<Integer, int[]> substrates_by_voxel();
 
         public void addReverse(NextEvent other) {
-            assert this.reverse == null;
-            assert other.reverse == null;
+            if (this.reverse != null)
+                throw new RuntimeException(String.format("%s trying to add %s as reverse but %s was added before",
+                                                         this, other, this.reverse));
+            if (other.reverse != null)
+                throw new RuntimeException(String.format("%s added to %s as reverse but %s was added before",
+                                                         this, other, other.reverse));
 
             this.reverse = other;
             other.reverse = this;

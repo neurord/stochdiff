@@ -82,6 +82,7 @@ public class VolumeGrid {
     }
 
     private void addVolumeElement(VolumeElement ve) {
+        ve.setNumber(this.elements.size());
         this.elements.add(ve);
 
         final String region = ve.getRegion();
@@ -110,7 +111,7 @@ public class VolumeGrid {
 
     // switch from collections to arrays for the calculation
     public void fix() {
-        ArrayList<ElementConnection> connections = new ArrayList<ElementConnection>();
+        ArrayList<ElementConnection> connections = new ArrayList<>();
         for (VolumeElement ve : elements) {
             connections.addAll(ve.getConnections());
         }
@@ -129,7 +130,6 @@ public class VolumeGrid {
 
         for (int i = 0; i < nelement; i++) {
             VolumeElement ve = elements.get(i);
-            ve.setNumber(i);
 
             volumes[i] = ve.getVolume();
             exposedAreas[i] = ve.getExposedArea();
@@ -161,7 +161,6 @@ public class VolumeGrid {
                  		 positions[i][1] + " " + positions[i][2] +
                  		 " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
               */
-            ve.cache(i);
         }
         regionLabels = rA.toArray(new String[0]);
 
@@ -170,8 +169,8 @@ public class VolumeGrid {
         conG = new double[nconnection];
         for (int i = 0; i < nconnection; i++) {
             ElementConnection ec = connections.get(i);
-            int ia = ec.getElementA().getCached();
-            int ib = ec.getElementB().getCached();
+            int ia = ec.getElementA().getNumber();
+            int ib = ec.getElementB().getNumber();
             conI[i][0] = ia;
             conI[i][1] = ib;
             double d = Geom.distanceBetween(positions[ia], positions[ib]);
