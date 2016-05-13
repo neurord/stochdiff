@@ -266,7 +266,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         t.writeRegionLabels(model, source);
         t.writeStimulationData(model, source);
         t.writeReactionData(model, source);
-        t.writeReactionDependencies(model, source);
+        t.writeEventData(model, source);
 
         {
             Group output_info = this.output.createGroup("output", model);
@@ -606,13 +606,10 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
         }
 
-        protected void writeReactionDependencies(Group parent, IGridCalc source)
+        protected void writeEventData(Group parent, IGridCalc source)
             throws Exception
         {
-            if (!source.getSource().writeDependencies()) {
-                    log.debug("Dependency scheme writing disabled");
-                    return;
-            }
+            // FIXME: maybe make stoichiometry writing a separate switch?
 
             Collection<IGridCalc.Event> events = source.getEvents();
             if (events == null) {
@@ -620,26 +617,38 @@ public class ResultWriterHDF5 implements ResultWriter {
                     return;
             }
 
-            Group group = output.createGroup("dependencies", parent);
-            setAttribute(group, "TITLE", "dependency scheme");
+            Group group = output.createGroup("events", parent);
+            setAttribute(group, "TITLE", "description of all event types");
 
             {
                 String[] descriptions = new String[events.size()];
                 int[] types = new int[events.size()];
-                int[] elements = new int[events.size()];
-                int[][] dependent = new int[events.size()][];
+                int[][] elements = new int[events.size()][2];
+                int[][] substrates = new int[events.size()][];
+                int[][] stoichiometries = new int[events.size()][];
+                int[][] dependent = null;
+
+                if (source.getSource().writeDependencies()) {
+                    log.debug("Dependency scheme writing enabled");
+                    dependent = new int[events.size()][];
+                }
 
                 for (IGridCalc.Event event: events) {
                     int i = event.event_number();
                     descriptions[i] = event.description();
                     types[i] = event.event_type().ordinal();
-                    elements[i] = event.element();
+                    elements[i][0] = event.element();
+                    elements[i][1] = event.element2();
+                    substrates[i] = event.substrates();
+                    stoichiometries[i] = event.substrate_stoichiometry();
 
-                    Collection<IGridCalc.Event> dep = event.dependent();
-                    dependent[i] = new int[dep.size()];
-                    int j = 0;
-                    for (IGridCalc.Event child: dep)
-                        dependent[i][j++] = child.event_number();
+                    if (dependent != null) {
+                        Collection<IGridCalc.Event> dep = event.dependent();
+                        dependent[i] = new int[dep.size()];
+                        int j = 0;
+                        for (IGridCalc.Event child: dep)
+                            dependent[i][j++] = child.event_number();
+                    }
                 }
 
                 {
@@ -650,9 +659,9 @@ public class ResultWriterHDF5 implements ResultWriter {
                 }
 
                 {
-                    Dataset ds = writeVector("elements", group, elements);
+                    Dataset ds = writeArray("elements", group, elements, -1);
                     setAttribute(ds, "TITLE", "voxel numbers of reaction channels");
-                    setAttribute(ds, "LAYOUT", "[nchannel]");
+                    setAttribute(ds, "LAYOUT", "[nchannel x {source,target}]");
                     setAttribute(ds, "UNITS", "index");
                 }
 
@@ -664,6 +673,20 @@ public class ResultWriterHDF5 implements ResultWriter {
                 }
 
                 {
+                    Dataset ds = writeArray("substrates", group, substrates, -1);
+                    setAttribute(ds, "TITLE", "event substrates");
+                    setAttribute(ds, "LAYOUT", "[nchannel x nspecies*]");
+                    setAttribute(ds, "UNITS", "indices");
+                }
+
+                {
+                    Dataset ds = writeArray("stoichiometries", group, stoichiometries, 0);
+                    setAttribute(ds, "TITLE", "substrate stoichiometries");
+                    setAttribute(ds, "LAYOUT", "[nchannel x nspecies*]");
+                    setAttribute(ds, "UNITS", "indices");
+                }
+
+                if (dependent != null) {
                     Dataset ds = writeArray("dependent", group, dependent, -1);
                     setAttribute(ds, "TITLE", "dependent reaction channels");
                     setAttribute(ds, "LAYOUT", "[nchannel x ndependent*]");
@@ -930,8 +953,11 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             Collection<IGridCalc.Event> events = source.getEvents();
             long array[] = new long[events.size()];
-            for (IGridCalc.Event event: events)
+            int i=0;
+            for (IGridCalc.Event event: events) {
+                log.info("event {} pos={} number={}/{}", event, i++, event.event_number(), events.size());
                 array[event.event_number()] = event.firings();
+            }
 
             Dataset ds = writeVector("firings", this.sim, array);
             setAttribute(ds, "TITLE", "Firings of each reaction");

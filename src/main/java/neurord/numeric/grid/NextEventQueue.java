@@ -383,7 +383,9 @@ public class NextEventQueue {
             return this.time;
         }
 
+        @Override
         public abstract int[] substrates();
+        @Override
         public abstract int[] substrate_stoichiometry();
 
         public abstract Map<Integer, int[]> substrates_by_voxel();
@@ -926,6 +928,11 @@ public class NextEventQueue {
         }
 
         @Override
+        public int element2() {
+            return this.element2;
+        }
+
+        @Override
         public Map<Integer, int[]> substrates_by_voxel() {
             HashMap<Integer, int[]> map = new HashMap<>();
             map.put(this.element(), this.substrate_stoichiometry());
@@ -1105,6 +1112,8 @@ public class NextEventQueue {
         final double rate, volume;
 
         /**
+         * @param event_number the position in the events array
+         * @param stat_index the index to account the reaction under
          * @param index the index of this reaction in reactions array
          * @param element voxel number
          * @param reactants indices of reactants
@@ -1334,6 +1343,11 @@ public class NextEventQueue {
         }
 
         @Override
+        public int element2() {
+            return this.element();
+        }
+
+        @Override
         public String toString() {
             return String.format("Reaction el.%d %s",
                                  element(), signature);
@@ -1486,6 +1500,11 @@ public class NextEventQueue {
             HashMap<Integer, int[]> map = new HashMap<>();
             map.put(this.element(), this.substrate_stoichiometry());
             return map;
+        }
+
+        @Override
+        public int element2() {
+            return this.element();
         }
 
         @Override

@@ -37,10 +37,31 @@ public interface IGridCalc {
     }
 
     public interface Event {
+        /**
+         * Index in the sequential numbering of all events
+         */
         int event_number();
+        /**
+         * "source" voxel number
+         */
         int element();
+        /**
+         * "target" voxel number (different from source only for diffusion)
+         */
+        int element2();
+
         String description();
         EventType event_type();
+
+        /**
+         * Indices of species on both sides of the reaction
+         */
+        int[] substrates();
+        /**
+         * Stoichiometries of species, negative on the lhs, positive on the rhs
+         */
+        int[] substrate_stoichiometry();
+
         Collection<Event> dependent();
         long firings();
     }
