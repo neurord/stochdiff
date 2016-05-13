@@ -28,6 +28,8 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
     ArrayList<IGridCalc.Happening> events
         = log_events ? new ArrayList<IGridCalc.Happening>() : null;
 
+    int eventStatistics[][];
+
     public AdaptiveGridCalc(int trial, SDRun sdm) {
         super(trial, sdm);
     }
@@ -40,6 +42,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         assert calculationType == SDCalcType.GRID_EXACT ||
                calculationType == SDCalcType.GRID_ADAPTIVE;
         boolean adaptive = calculationType == SDCalcType.GRID_ADAPTIVE;
+        String statistics = this.sdRun.getStatistics();
 
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
                                          this.sdRun.getVolumeGrid(), rtab,
@@ -47,7 +50,18 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                                          adaptive,
                                          this.sdRun.tolerance,
                                          this.sdRun.leap_min_jump,
-                                         this.trial() == 0);
+                                         this.trial() == 0,
+                                         statistics);
+
+        switch (this.sdRun.getStatistics()) {
+        case "by-channel":
+            assert false: "not implemented";
+            break;
+        case "by-event":
+            this.eventStatistics = new int[this.neq.getEvents().size()][2];
+            break;
+        }
+
         this.real_start_time = System.currentTimeMillis();
     }
 
@@ -81,9 +95,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         for(double time = tnow; time < tend; ) {
             double next = this.neq.advance(time, tend,
                                            curtail_leaps ? tend : endtime,
-                                           this.reactionEvents,
-                                           this.diffusionEvents,
-                                           this.stimulationEvents,
+                                           this.eventStatistics,
                                            this.events);
             assert next >= time: next;
             time = next;
@@ -116,6 +128,16 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         }
 
         return ans;
+    }
+
+    @Override
+    public int[][] getEventStatistics() {
+        return this.eventStatistics;
+    }
+
+    @Override
+    protected void resetEventStatistics() {
+        ArrayUtil.fill(this.eventStatistics, 0);
     }
 
     @Override

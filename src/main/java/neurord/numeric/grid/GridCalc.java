@@ -36,17 +36,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     double[] surfaceAreas;
 
-    /** The number of events of each reaction since last writeGridConcs.
-     * Shapes is [nel x nreactions]. */
-    int reactionEvents[][];
-    /** The number of diffused particles since last writeGridConcs.
-     * Shape is [nel x nspecies x neighbors]. The third dimension is
-     * "rugged". */
-    int diffusionEvents[][][];
-    /** The number of injected particles since last writeGridConcs.
-     * Shape is [nel x nspecies]. */
-    int stimulationEvents[][];
-
     final double[] dtsOut;
 
     private static double[] makeDtsOut(List<? extends IOutputSet> outputs, double fallback) {
@@ -84,19 +73,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         fdiff = rtab.getDiffusionConstants();
 
         surfaceAreas = grid.getExposedAreas();
-
-        if (this.sdRun.getStatistics().startsWith("by-")) {
-            this.stimulationEvents = new int[nel][nspec];
-
-            this.reactionEvents = new int[nel][rtab.getNReaction()];
-
-            this.diffusionEvents = new int[nel][nspec][];
-            for (int iel = 0; iel < nel; iel++)
-                for (int k = 0; k < nspec; k++) {
-                    int nn = neighbors[iel].length;
-                    diffusionEvents[iel][k] = new int[nn];
-                }
-        }
 
         this.dt = this.sdRun.stepSize();
     }
@@ -152,12 +128,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     resultWriter.writeOutputInterval(time, this);
 
                 writeTime += this.sdRun.getOutputInterval();
-                if (this.stimulationEvents != null)
-                    ArrayUtil.fill(this.stimulationEvents, 0);
-                if (this.diffusionEvents != null)
-                    ArrayUtil.fill(this.diffusionEvents, 0);
-                if (this.reactionEvents != null)
-                    ArrayUtil.fill(this.reactionEvents, 0);
+                this.resetEventStatistics();
             }
             for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
@@ -202,6 +173,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     abstract protected long eventCount();
 
+    protected abstract void resetEventStatistics();
+
     @Override
     public int getNumberElements() {
         return nel;
@@ -215,21 +188,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                 ret += this.getGridPartNumb(i, j);
 
         return ret;
-    }
-
-    @Override
-    public int[][] getReactionEvents() {
-        return this.reactionEvents;
-    }
-
-    @Override
-    public int[][][] getDiffusionEvents() {
-        return this.diffusionEvents;
-    }
-
-    @Override
-    public int[][] getStimulationEvents() {
-        return this.stimulationEvents;
     }
 
     /*

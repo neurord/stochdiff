@@ -269,6 +269,14 @@ public class DeterministicGridCalc extends GridCalc {
         return (int) Math.round(val * volumes[i] * PARTICLES_PUVC);
     }
 
+    @Override
+    public int[][] getEventStatistics() {
+        return null;
+    }
+
+    @Override
+    protected void resetEventStatistics() {}
+
     public Collection<IGridCalc.Event> getEvents() {
         return null;
     }

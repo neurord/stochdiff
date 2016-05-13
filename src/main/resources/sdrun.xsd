@@ -341,10 +341,12 @@
 
   <xs:simpleType name="statistics">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="full" />
-      <xs:enumeration value="by-reaction" />
-      <xs:enumeration value="by-type" />
+      <!-- just report a count of stimulation, diffusion, and reaction events -->
       <xs:enumeration value="none" />
+      <!-- report each event as specified in the model file -->
+      <xs:enumeration value="by-channel" />
+      <!-- report each event as present in the dependency graph -->
+      <xs:enumeration value="by-event" />
     </xs:restriction>
   </xs:simpleType>
 

@@ -378,9 +378,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected final Group group;
         protected final Group sim;
         protected List<PopulationOutput> populations = new ArrayList<>();
-        protected H5ScalarDS stimulation_events;
-        protected H5ScalarDS diffusion_events;
-        protected H5ScalarDS reaction_events;
+        protected H5ScalarDS event_statistics;
         protected Group events;
         protected List<IGridCalc.Happening> events_cache;
         protected H5ScalarDS
@@ -710,9 +708,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             this.writePopulation(i, time, source);
             if (i == 0) {
-                this.writeStimulationEvents(time, source);
-                this.writeDiffusionEvents(time, source);
-                this.writeReactionEvents(time, source);
+                this.writeEventStatistics(time, source);
                 this.writeEvents(time, source);
             }
         }
@@ -762,139 +758,38 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.populations.get(i).writePopulation(time, source);
         }
 
-        protected void initStimulationEvents(int elements, int species)
+        protected void initEventStatistics(int events)
             throws Exception
         {
-            assert this.stimulation_events == null;
+            assert this.event_statistics == null;
 
-            /* times × elements × species */
-            this.stimulation_events =
-                createExtensibleArray("stimulation_events", this.sim, int_t,
+            /* times × events × 2 or times × channels × 2 */
+            String type = "events";
+            this.event_statistics =
+                createExtensibleArray("event_statistics", this.sim, int_t,
                                       "actual stimulation counts since last snapshot",
-                                      "[times × elements × species]",
+                                      "[times × " + type + " × species]",
                                       "count",
-                                      CACHE_SIZE1, elements, species);
+                                      CACHE_SIZE1, events, 2);
         }
 
-        protected void writeStimulationEvents(double time, IGridCalc source)
+        protected void writeEventStatistics(double time, IGridCalc source)
             throws Exception
         {
-            final int[][] events = source.getStimulationEvents();
-            if (events == null)
+            final int[][] stats = source.getEventStatistics();
+            if (stats == null)
                 return;
 
-            if (this.stimulation_events == null)
-                this.initStimulationEvents(events.length, events[0].length);
+            if (this.event_statistics == null)
+                this.initEventStatistics(stats.length);
 
-            log.debug("Writing stimulation events at time {}", time);
+            log.debug("Writing event statistics at time {}", time);
             {
-                extendExtensibleArray(this.stimulation_events, 1);
-                long[] dims = this.stimulation_events.getDims();
-                int[] data = (int[]) this.stimulation_events.getData();
-                ArrayUtil._flatten(data, events, dims[2], 0);
-                this.stimulation_events.write(data);
-            }
-        }
-
-        private boolean initDiffusionEvents_warning = false;
-
-        protected boolean initDiffusionEvents(int elements, int species, int neighbors)
-            throws Exception
-        {
-            assert this.diffusion_events == null;
-
-            if (elements == 0 || species == 0 || neighbors == 0) {
-                if (!initDiffusionEvents_warning) {
-                    log.info("Diffusion events are {}×{}×{}", elements, species, neighbors);
-                    log.log(elements > 1 ? Level.WARN : Level.DEBUG,
-                            "No diffusion events, not writing anything");
-                    initDiffusionEvents_warning = true;
-                }
-                return false;
-            }
-
-            /* times × reactions */
-            this.diffusion_events =
-                createExtensibleArray("diffusion_events", this.sim, int_t,
-                                      "actual diffusion counts since last snapshot",
-                                      "[times × nel × species × neighbors]",
-                                      "count",
-                                      CACHE_SIZE1, elements, species, neighbors);
-            return true;
-        }
-
-        protected void writeDiffusionEvents(double time, IGridCalc source)
-            throws Exception
-        {
-            final int[][][] events = source.getDiffusionEvents();
-            if (events == null)
-                return;
-
-            if (this.diffusion_events == null) {
-                int maxneighbors = ArrayUtil.maxLength(events);
-                boolean have = this.initDiffusionEvents(events.length, events[0].length,
-                                                        maxneighbors);
-                if (!have)
-                    return;
-            }
-
-            log.debug("Writing diffusion events at time {}", time);
-
-            {
-                extendExtensibleArray(this.diffusion_events, 1);
-                long dims[] = this.diffusion_events.getDims();
-                int[] data = (int[]) this.diffusion_events.getData();
-                ArrayUtil._flatten(data, events, dims[3], 0);
-                this.diffusion_events.write(data);
-            }
-        }
-
-        private boolean initReactionEvents_warning = false;
-
-        protected boolean initReactionEvents(int elements, int reactions)
-            throws Exception
-        {
-            assert this.reaction_events == null;
-
-            if (elements == 0 || reactions == 0) {
-                if (!initReactionEvents_warning) {
-                    log.info("No reaction events, not writing anything");
-                    initReactionEvents_warning = true;
-                }
-                return false;
-            }
-
-            /* times × reactions */
-            this.reaction_events =
-                createExtensibleArray("reaction_events", this.sim, int_t,
-                                      "actual reaction counts since last snapshot",
-                                      "[times × elements × reactions]",
-                                      "count",
-                                      CACHE_SIZE1, elements, reactions);
-
-            return true;
-        }
-
-        protected void writeReactionEvents(double time, IGridCalc source)
-            throws Exception
-        {
-            final int[][] events = source.getReactionEvents();
-            if (events == null)
-                return;
-
-            if (this.reaction_events == null) {
-                boolean have = this.initReactionEvents(events.length, events[0].length);
-                if (!have)
-                    return;
-            }
-
-            log.debug("Writing reaction events at time {}", time);
-            {
-                extendExtensibleArray(this.reaction_events, 1);
-                long[] dims = this.reaction_events.getDims();
-                int[] data = (int[]) this.reaction_events.getData();
-                ArrayUtil._flatten(data, events, dims[2], 0);
-                this.reaction_events.write(data);
+                extendExtensibleArray(this.event_statistics, 1);
+                long[] dims = this.event_statistics.getDims();
+                int[] data = (int[]) this.event_statistics.getData();
+                ArrayUtil._flatten(data, stats, 2, 0);
+                this.event_statistics.write(data);
             }
         }
 

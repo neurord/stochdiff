@@ -138,11 +138,9 @@ public class SDRun implements IOutputSet {
         case 0:
             repl = "none";
         case 1:
-            repl = "by-type";
-        case 2:
-            repl = "by-reaction";
+            repl = "by-channel";
         default:
-            repl = "full";
+            repl = "by-event";
         }
         log.debug("Overriding statistics gathering: {} → {}",
                   this.getStatistics(), repl);
@@ -152,7 +150,7 @@ public class SDRun implements IOutputSet {
     public String getStatistics() {
         if (this.statistics != null)
             return this.statistics;
-        return "by-type";
+        return "none";
     }
 
     public double getFixedStepDt() {

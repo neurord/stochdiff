@@ -209,8 +209,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                             int nin = this.random.round(as);
                             int tgt = stimtargets[i][k];
                             wkA[tgt][j] += nin;
-                            if (this.stimulationEvents != null)
-                                this.stimulationEvents[tgt][j] += nin;
                         }
                     }
 
@@ -355,9 +353,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
                 for (int k = 0; k < pi.length; k++)
                     nend[pi[k]] += ngo * ps[k];
-
-                if (this.reactionEvents != null)
-                    this.reactionEvents[iel][ireac] += ngo;
             }
         }
     }
@@ -387,8 +382,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     io++;
 
                 wkB[inbr[io]][k] ++;
-                if (this.diffusionEvents != null)
-                    this.diffusionEvents[iel][k][io] ++;
             }
         } else {
             /* MULTINOMIAL diffusion */
@@ -414,16 +407,11 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
                 wkB[iel][k] -= ngo2;
                 wkB[inbr[j]][k] += ngo2;
-                if (this.diffusionEvents != null)
-                    this.diffusionEvents[iel][k][j] += ngo2;
                 ngo -= ngo2;
             } //end of loop through all but last neighbor
 
             wkB[iel][k] -= ngo;
             wkB[inbr[inbr.length - 1]][k] += ngo;
-            if (this.diffusionEvents != null)
-                this.diffusionEvents[iel][k][inbr.length - 1] += ngo;
-
             if (wkB[iel][k] < 0)
                 log.warn("parallelAndSharedDiffusionStep multinomial: wkB[iel][k] = {} is negative",
                          wkB[iel][k]);
@@ -447,8 +435,6 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                     io++;
 
                 wkB[inbr[io]][k] += 1;
-                if (this.diffusionEvents != null)
-                    this.diffusionEvents[iel][k][io] ++;
             }
         }
     }
@@ -486,9 +472,20 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         return new Object[]{lnp, ns};
     }
 
+    @Override
+    public int[][] getEventStatistics() {
+        return null;
+    }
+
+    @Override
+    protected void resetEventStatistics() {}
+
+    @Override
     public Collection<IGridCalc.Event> getEvents() {
         return null;
     }
+
+    @Override
     public Collection<IGridCalc.Happening> getHappenings() {
         return null;
     }

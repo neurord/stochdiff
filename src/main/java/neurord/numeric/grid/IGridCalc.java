@@ -23,9 +23,7 @@ public interface IGridCalc {
 
     int getNumberElements();
 
-    int[][] getReactionEvents();
-    int[][][] getDiffusionEvents();
-    int[][] getStimulationEvents();
+    int[][] getEventStatistics();
 
     public enum EventType {
         REACTION,

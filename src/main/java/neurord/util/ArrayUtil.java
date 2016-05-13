@@ -61,7 +61,8 @@ public class ArrayUtil {
 
     public static int[] _flatten(int[] flat,
                                  int[][] array, long columns, int fill) {
-        assert flat.length == array.length * columns;
+        assert flat.length == array.length * columns:
+                "flat=" + flat.length + " array=" + xJoined(array.length, columns);
         for (int i = 0; i < array.length; i++) {
             System.arraycopy(array[i], 0, flat, i * (int) columns, array[i].length);
             if (array[i].length < columns)
@@ -83,7 +84,7 @@ public class ArrayUtil {
     }
 
     public static int[] _flatten(int[] flat,
-                                    int[][][] array, long columns, int fill) {
+                                 int[][][] array, long columns, int fill) {
         int rows = array.length > 0 ? array[0].length : 0;
         assert flat.length >= array.length * rows * columns:
             "flat[" + flat.length + "] rows=" + rows + " columns=" + columns +
@@ -123,7 +124,7 @@ public class ArrayUtil {
     }
 
     public static int[] flatten(int[] flat,
-                                   int[][][] array, int columns, int fill) {
+                                int[][][] array, int columns, int fill) {
         try {
             return _flatten(flat, array, columns, fill);
         } catch(RuntimeException e) {
