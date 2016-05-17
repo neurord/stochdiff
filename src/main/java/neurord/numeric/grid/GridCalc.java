@@ -97,8 +97,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
-        final double statFrequency = this.sdRun.getStatisticsFrequency();
-        double statTime = time + statFrequency;
+        final double statInterval = this.sdRun.getStatisticsInterval();
+        double statTime = time + statInterval;
 
         double[] writeTimeArray = new double[this.dtsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
@@ -139,10 +139,10 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     writeTimeArray[i] += Double.valueOf(this.dtsOut[i]);
                 }
 
-            if (statFrequency > 0 && time > statTime) {
+            if (statInterval > 0 && time > statTime) {
                 for (ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeEventStatistics(time, this);
-                statTime += statFrequency;
+                statTime += statInterval;
             }
 
             if (time < endtime)
@@ -160,8 +160,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             if (time >= writeTimeArray[i] + Double.valueOf(this.dtsOut[i] / 10))
                 for (ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeOutputScheme(i, time, this);
-        if (statFrequency > 0 && time > statTime + statFrequency / 10 ||
-            statFrequency == 0)
+        if (statInterval > 0 && time > statTime - statInterval / 2 ||
+            statInterval == 0)
             for (ResultWriter resultWriter: this.resultWriters)
                 resultWriter.writeEventStatistics(time, this);
 

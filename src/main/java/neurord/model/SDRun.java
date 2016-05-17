@@ -158,10 +158,10 @@ public class SDRun implements IOutputSet {
         return "none";
     }
 
-    public double getStatisticsFrequency() {
-        if (this.statistics != null && this.statistics.frequency != null) {
-            assert this.statistics.frequency >= 0;
-            return this.statistics.frequency;
+    public double getStatisticsInterval() {
+        if (this.statistics != null && this.statistics.interval != null) {
+            assert this.statistics.interval >= 0;
+            return this.statistics.interval;
         }
         return 0;
     }

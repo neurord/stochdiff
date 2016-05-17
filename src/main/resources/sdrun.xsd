@@ -264,7 +264,7 @@
     <xs:complexType>
       <xs:simpleContent>
         <xs:extension base="statistics" >
-          <xs:attribute name="frequency" type="non-negative-real" />
+          <xs:attribute name="interval" type="non-negative-real" />
         </xs:extension>
       </xs:simpleContent>
     </xs:complexType>

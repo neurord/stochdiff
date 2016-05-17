@@ -389,6 +389,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected final Group sim;
         protected List<PopulationOutput> populations = new ArrayList<>();
         protected H5ScalarDS event_statistics;
+        protected H5ScalarDS statistics_times;
         protected Group events;
         protected List<IGridCalc.Happening> events_cache;
         protected H5ScalarDS
@@ -789,7 +790,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.populations.get(i).writePopulation(time, source);
         }
 
-        protected void initEventStatistics(int events)
+        protected void initEventStatistics(boolean periodic, int events)
             throws Exception
         {
             assert this.event_statistics == null;
@@ -802,6 +803,14 @@ public class ResultWriterHDF5 implements ResultWriter {
                                       "[times × " + type + " × species]",
                                       "count",
                                       CACHE_SIZE1, events, 2);
+
+            if (periodic)
+                this.statistics_times =
+                    createExtensibleArray("statistics_times", this.sim, double_t,
+                                          "times when statistics were written",
+                                          "[times]",
+                                          "ms",
+                                          CACHE_SIZE1);
         }
 
         protected void writeEventStatistics(double time, IGridCalc source)
@@ -812,7 +821,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                 return;
 
             if (this.event_statistics == null)
-                this.initEventStatistics(stats.length);
+                this.initEventStatistics(source.getSource().getStatisticsInterval() > 0,
+                                         stats.length);
 
             log.debug("Writing event statistics at time {}", time);
             {
@@ -821,6 +831,13 @@ public class ResultWriterHDF5 implements ResultWriter {
                 int[] data = (int[]) this.event_statistics.getData();
                 ArrayUtil._flatten(data, stats, 2, 0);
                 this.event_statistics.write(data);
+            }
+
+            if (this.statistics_times != null) {
+                extendExtensibleArray(this.statistics_times, 1);
+                double[] data = (double[]) this.statistics_times.getData();
+                data[0] = time;
+                this.statistics_times.write(data);
             }
         }
 
