@@ -259,8 +259,16 @@
 
   <xs:element name="fixedStepDt" type="non-negative-real" />
   <xs:element name="outputInterval" type="non-negative-real" />
-  <xs:element name="statistics" type="statistics" />
   <xs:element name="tolerance" type="non-negative-real" />
+  <xs:element name="statistics" >
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="statistics" >
+          <xs:attribute name="frequency" type="non-negative-real" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
 
   <xs:element name="calculation" type="calculation" />
 

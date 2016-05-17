@@ -38,11 +38,11 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
     public final void init() {
         super.init();
 
-        SDCalcType calculationType = SDCalcType.valueOf(this.sdRun.calculation);
+        final SDCalcType calculationType = SDCalcType.valueOf(this.sdRun.calculation);
         assert calculationType == SDCalcType.GRID_EXACT ||
                calculationType == SDCalcType.GRID_ADAPTIVE;
-        boolean adaptive = calculationType == SDCalcType.GRID_ADAPTIVE;
-        String statistics = this.sdRun.getStatistics();
+        final boolean adaptive = calculationType == SDCalcType.GRID_ADAPTIVE;
+        final String statistics = this.sdRun.getStatistics();
 
         this.neq = NextEventQueue.create(this.wkA, this.random, null,
                                          this.sdRun.getVolumeGrid(), rtab,
@@ -53,14 +53,9 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                                          this.trial() == 0,
                                          statistics);
 
-        switch (this.sdRun.getStatistics()) {
-        case "by-channel":
-            assert false: "not implemented";
-            break;
-        case "by-event":
-            this.eventStatistics = new int[this.neq.getEvents().size()][2];
-            break;
-        }
+        final int stat_count = this.neq.stat_count(this.sdRun.getStatistics());
+        if (stat_count >= 0)
+            this.eventStatistics = new int[stat_count][2];
 
         this.real_start_time = System.currentTimeMillis();
     }

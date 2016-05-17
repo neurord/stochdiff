@@ -97,6 +97,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         long startTime = System.currentTimeMillis();
         double writeTime = time - 1.e-9;
+        final double statFrequency = this.sdRun.getStatisticsFrequency();
+        double statTime = time + statFrequency;
 
         double[] writeTimeArray = new double[this.dtsOut.length];
         Arrays.fill(writeTimeArray, -1.e-9);
@@ -132,10 +134,16 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
             }
             for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
-                    for(ResultWriter resultWriter: this.resultWriters)
+                    for (ResultWriter resultWriter: this.resultWriters)
                         resultWriter.writeOutputScheme(i, time, this);
                     writeTimeArray[i] += Double.valueOf(this.dtsOut[i]);
                 }
+
+            if (statFrequency > 0 && time > statTime) {
+                for (ResultWriter resultWriter: this.resultWriters)
+                    resultWriter.writeEventStatistics(time, this);
+                statTime += statFrequency;
+            }
 
             if (time < endtime)
                 time += advance(time, time + dt);
@@ -145,13 +153,17 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         if (writeTime < time + this.sdRun.getOutputInterval() / 10) {
             log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
-            for(ResultWriter resultWriter: this.resultWriters)
+            for (ResultWriter resultWriter: this.resultWriters)
                 resultWriter.writeOutputInterval(time, this);
         }
         for (int i = 0; i < this.dtsOut.length; i++)
             if (time >= writeTimeArray[i] + Double.valueOf(this.dtsOut[i] / 10))
-                for(ResultWriter resultWriter: this.resultWriters)
+                for (ResultWriter resultWriter: this.resultWriters)
                     resultWriter.writeOutputScheme(i, time, this);
+        if (statFrequency > 0 && time > statTime + statFrequency / 10 ||
+            statFrequency == 0)
+            for (ResultWriter resultWriter: this.resultWriters)
+                resultWriter.writeEventStatistics(time, this);
 
         log.info("Trial {}: total number of particles at the end: {}",
                  this.trial(), this.getParticleCount());

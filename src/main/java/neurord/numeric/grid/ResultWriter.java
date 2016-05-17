@@ -24,5 +24,7 @@ public interface ResultWriter {
     /* Write the output specified in the second way. */
     void writeOutputScheme(int i, double time, IGridCalc source);
 
+    void writeEventStatistics(double time, IGridCalc source);
+
     void closeTrial(IGridCalc source);
 }

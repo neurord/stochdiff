@@ -360,6 +360,11 @@ public class NextEventQueue {
             return this.event_number;
         }
 
+        @Override
+        public int stat_index() {
+            return this.stat_index;
+        }
+
         public int index() {
             return this.index;
         }
@@ -1812,6 +1817,23 @@ public class NextEventQueue {
         log.info("Created {} stimulation events", ans.size());
 
         return ans;
+    }
+
+    public int stat_count(String statistics) {
+        HashSet<Integer> set = new HashSet<>();
+        for (IGridCalc.Event ev: this.getEvents())
+            set.add(ev.stat_index());
+
+        switch (statistics) {
+        case "by-channel":
+            // assert set.size() == ???
+            return set.size();
+        case "by-event":
+            assert set.size() == this.getEvents().size();
+            return this.getEvents().size();
+        default:
+            return -1;
+        }
     }
 
     public static NextEventQueue create(int[][] particles,

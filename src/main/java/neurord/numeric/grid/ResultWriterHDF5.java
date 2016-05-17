@@ -297,6 +297,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
     }
 
+    @Override
+    synchronized public void writeEventStatistics(double time, IGridCalc source) {
+        try {
+            Trial t = this.getTrial(source.trial());
+            t.writeEventStatistics(time, source);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected class PopulationOutput {
         final H5ScalarDS concs;
         final int[][][] concs_cache;
@@ -730,10 +740,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             this.writePopulation(i, time, source);
-            if (i == 0) {
-                this.writeEventStatistics(time, source);
+            if (i == 0)
                 this.writeEvents(time, source);
-            }
         }
 
         protected boolean initPopulation(int i, IGridCalc source)

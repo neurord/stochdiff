@@ -379,6 +379,9 @@ public class ResultWriterText implements ResultWriter {
         this.writeToSiblingFile(text, "-" + fnamepart + "-conc.txt");
     }
 
+    @Override
+    public void writeEventStatistics(double time, IGridCalc source) {}
+
     // let's park those two here for now
     public static String stringd(double d) {
         if (d == 0.0)

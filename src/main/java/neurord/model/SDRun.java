@@ -86,7 +86,8 @@ public class SDRun implements IOutputSet {
     public double leap_min_jump = 2;
 
     public String calculation;
-    public String statistics;
+
+    public Statistics statistics;
 
     public String distribution;
     public String algorithm;
@@ -142,15 +143,27 @@ public class SDRun implements IOutputSet {
         default:
             repl = "by-event";
         }
+
         log.debug("Overriding statistics gathering: {} → {}",
                   this.getStatistics(), repl);
-        this.statistics = repl;
+
+        if (this.statistics == null)
+            this.statistics = new Statistics();
+        this.statistics.value = repl;
     }
 
     public String getStatistics() {
-        if (this.statistics != null)
-            return this.statistics;
+        if (this.statistics != null && this.statistics.value != null)
+            return this.statistics.value;
         return "none";
+    }
+
+    public double getStatisticsFrequency() {
+        if (this.statistics != null && this.statistics.frequency != null) {
+            assert this.statistics.frequency >= 0;
+            return this.statistics.frequency;
+        }
+        return 0;
     }
 
     public double getFixedStepDt() {
