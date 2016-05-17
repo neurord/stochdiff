@@ -61,6 +61,10 @@ public class NextEventQueue {
                                                              "Print information about this many events at startup",
                                                              99);
 
+    public static final int[] PLUS_ONE = new int[]{ +1 };
+    public static final int[] MINUS_ONE = new int[]{ -1 };
+    public static final int[] MINUS_ONE_PLUS_ONE = new int[]{ -1, +1 };
+
     public static class Numbering {
         int count = 0;
         public int get() {
@@ -239,8 +243,10 @@ public class NextEventQueue {
         public static int[] scoeff_ki(int[] substrates, int[] substrate_stoichiometry,
                                       int[] reactants, int[] reactant_stoichiometry)
         {
-            assert substrates.length == substrate_stoichiometry.length;
-            assert reactants.length == reactant_stoichiometry.length;
+            assert substrates.length == substrate_stoichiometry.length:
+                    Arrays.toString(substrates) + " vs. " + Arrays.toString(substrate_stoichiometry);
+            assert reactants.length == reactant_stoichiometry.length:
+                    Arrays.toString(reactants) + " vs. " + Arrays.toString(reactant_stoichiometry);
 
             int[] ans = new int[substrates.length];
 
@@ -388,7 +394,7 @@ public class NextEventQueue {
         @Override
         public abstract int[] substrate_stoichiometry();
 
-        public abstract Map<Integer, int[]> substrates_by_voxel();
+        public abstract Map<Integer, int[][]> substrates_by_voxel();
 
         public void addReverse(NextEvent other) {
             if (this.reverse != null)
@@ -804,13 +810,13 @@ public class NextEventQueue {
                 return;
             }
 
-            final int[] subs = this.substrates();
-
-            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet()) {
-                int elem = entry.getKey();
+            for (Map.Entry<Integer, int[][]> entry : this.substrates_by_voxel().entrySet()) {
+                final int elem = entry.getKey();
+                final int[] subs = entry.getValue()[0];
+                final int[] stoichio = entry.getValue()[1];
                 if (elem == ev.element()) {
                     ScoeffElem scoeff = ScoeffElem.create(elem,
-                                                          subs, entry.getValue(),
+                                                          subs, stoichio,
                                                           ev.reactants(), ev.reactant_stoichiometry());
                     boolean same = false;
                     for (ScoeffElem other: this.scoeff_ki)
@@ -832,8 +838,12 @@ public class NextEventQueue {
                 }
             }
 
-            for (Map.Entry<Integer, int[]> entry : this.substrates_by_voxel().entrySet())
-                log.info("subs_by_voxel: {} → {}", entry.getKey(), entry.getValue());
+            for (Map.Entry<Integer, int[][]> entry : this.substrates_by_voxel().entrySet()) {
+                int elem = entry.getKey();
+                int[] subs = entry.getValue()[0];
+                int[] stoichio = entry.getValue()[1];
+                log.info("substrates_by_voxel: el.{} → {} × {}", elem, stoichio, subs);
+            }
             log.error("Dependency not found: {} dep. {}", this, ev);
             throw new RuntimeException("wtf?");
         }
@@ -919,12 +929,12 @@ public class NextEventQueue {
 
         @Override
         public int[] substrates() {
-            return new int[]{ this.sp };
+            return new int[]{ this.sp, this.sp };
         }
 
         @Override
         public int[] substrate_stoichiometry() {
-            return new int[]{ -1 };
+            return MINUS_ONE_PLUS_ONE;
         }
 
         @Override
@@ -933,10 +943,10 @@ public class NextEventQueue {
         }
 
         @Override
-        public Map<Integer, int[]> substrates_by_voxel() {
-            HashMap<Integer, int[]> map = new HashMap<>();
-            map.put(this.element(), this.substrate_stoichiometry());
-            map.put(this.element2, new int[]{ +1 });
+        public Map<Integer, int[][]> substrates_by_voxel() {
+            HashMap<Integer, int[][]> map = new HashMap<>();
+            map.put(this.element(), new int[][]{this.reactants(), MINUS_ONE});
+            map.put(this.element2, new int[][]{this.reactants(), PLUS_ONE});
             return map;
         }
 
@@ -1336,9 +1346,10 @@ public class NextEventQueue {
         }
 
         @Override
-        public Map<Integer, int[]> substrates_by_voxel() {
-            HashMap<Integer, int[]> map = new HashMap<>();
-            map.put(this.element(), this.substrate_stoichiometry());
+        public Map<Integer, int[][]> substrates_by_voxel() {
+            HashMap<Integer, int[][]> map = new HashMap<>();
+            map.put(this.element(),
+                    new int[][]{this.substrates(), this.substrate_stoichiometry()});
             return map;
         }
 
@@ -1492,13 +1503,14 @@ public class NextEventQueue {
 
         @Override
         public int[] substrate_stoichiometry() {
-            return new int[]{ 1 };
+            return PLUS_ONE;
         }
 
         @Override
-        public Map<Integer, int[]> substrates_by_voxel() {
-            HashMap<Integer, int[]> map = new HashMap<>();
-            map.put(this.element(), this.substrate_stoichiometry());
+        public Map<Integer, int[][]> substrates_by_voxel() {
+            HashMap<Integer, int[][]> map = new HashMap<>();
+            map.put(this.element(),
+                    new int[][]{this.substrates(), this.substrate_stoichiometry()});
             return map;
         }
 
