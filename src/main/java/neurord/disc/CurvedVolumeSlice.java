@@ -177,13 +177,15 @@ public class CurvedVolumeSlice {
 
                 ve.setPositionIndexes(ir, ia);
 
-                if (na > 1) {
-                    if (ia > 0) {
+                if (na == 2) {
+                    if (ia == 1)
+                        az.get(ia-1).coupleTo(ve, carea * 2);
+                } else if (na > 2) {
+                    if (ia > 0)
                         az.get(ia-1).coupleTo(ve, carea);
-                    }
-                    if (ia == na - 1) {
+
+                    if (na > 2 && ia == na - 1)
                         ve.coupleTo(az.get(0), carea);
-                    }
                 }
 
                 if (ir > 1) {
