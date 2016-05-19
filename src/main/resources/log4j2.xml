@@ -18,5 +18,14 @@
     <root level="notice">
       <appender-ref ref="model-logfile"/>
     </root>
+    <logger name="neurord.StochDiff" />
+    <logger name="neurord.numeric.grid.ResultWriterHDF5" />
+    <logger name="neurord.numeric.grid.ResultWriterText" />
+    <logger name="neurord.numeric.grid.NextEventQueue" />
+    <logger name="neurord.numeric.grid.AdaptiveGridCalc" />
+    <logger name="neurord.numeric.grid.GridCalc" />
+    <logger name="neurord.numeric.model.SDRun" />
+    <logger name="neurord.numeric.morph.VolumeGrid" />
+    <logger name="neurord.numeric.morph.VolumeElement" />
   </loggers>
 </configuration>
