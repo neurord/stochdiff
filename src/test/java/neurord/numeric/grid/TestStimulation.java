@@ -43,7 +43,7 @@ public class TestStimulation {
     NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], true, 0.1, 1);
     NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
-        queue.createStimulations(numbering, null, rtab, stimtab, new int[][]{{0}});
+        queue.createStimulations(numbering, null, rtab, stimtab, "none", null);
 
     @Test
     public void testStim() {
