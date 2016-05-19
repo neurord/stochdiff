@@ -107,6 +107,11 @@ public class StochDiff {
         final int statistics = Settings.optionCount(cmd, argv, "statistics", "s");
 
         argv = cmd.getArgs();
+        if (argv.length == 0) {
+            log.fatal("at least one argument is required");
+            System.exit(1);
+        }
+
         modelFile = new File(argv[0]);
         if (!modelFile.exists()) {
             log.fatal("no such file: {}", modelFile);
