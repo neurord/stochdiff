@@ -135,9 +135,7 @@ public abstract class VolumeElement {
     }
 
     public String getGroupID() {
-        if (this.groupID != null)
-            return this.groupID;
-        return this.getRegion();
+        return this.groupID;
     }
 
     /* connections */
