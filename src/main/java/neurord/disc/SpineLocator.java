@@ -201,7 +201,9 @@ public abstract class SpineLocator {
 
             final String lroot = popid + "[" + idx + "]";
             final String label = lbls[i] != null ? lroot + "." + lbls[i] : null;
-            final String groupID = lbls[i] == null ? lroot : null;
+            final String groupID = lroot;
+            /* log.info("popid={} idx={} lroot={} label={} groupID={}",
+                         popid, idx, lroot, label, groupID); */
             final double deltaZ = 0.5 * (rb[i] + rb[i + 1]);
 
             for (int j = 0; j < pbdry.length; j++)
