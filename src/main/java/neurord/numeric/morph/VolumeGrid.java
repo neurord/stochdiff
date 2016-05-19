@@ -376,13 +376,13 @@ public class VolumeGrid {
     }
 
     public ArrayList<VolumeElement> filterElementsByLabel(String label) {
-        boolean surface = label.endsWith(":surface");
-        if (surface)
-            label = label.substring(0, label.length() - ":surface".length());
+        boolean submembrane = label.endsWith(":submembrane");
+        if (submembrane)
+            label = label.substring(0, label.length() - ":submembrane".length());
 
         if (label.indexOf("[") >= 0) {
-            if (surface)
-                throw new RuntimeException("\":surface\" is not allowed with labelled elements");
+            if (submembrane)
+                throw new RuntimeException("\":submembrane\" is not allowed with labelled elements");
 
             return this.getMatches(label);
         }
@@ -392,7 +392,7 @@ public class VolumeGrid {
         for (VolumeElement el: this.elements)
             if (el.getLabel() != null &&
                 el.getLabel().equals(label) &&
-                (!surface || el.isSubmembrane()))
+                (!submembrane || el.isSubmembrane()))
                 ans.add(el);
         if (!ans.isEmpty())
             return ans;
@@ -400,7 +400,7 @@ public class VolumeGrid {
         for (VolumeElement el: this.elements)
             if (el.getRegion() != null &&
                 el.getRegion().equals(label) &&
-                (!surface || el.isSubmembrane()))
+                (!submembrane || el.isSubmembrane()))
                 ans.add(el);
         if (!ans.isEmpty())
             return ans;
