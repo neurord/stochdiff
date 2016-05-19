@@ -88,7 +88,7 @@ public abstract class Logging {
             ctx.updateLoggers();
     }
 
-    public static void configureLogging(String logfile) {
+    public static void configureConsoleLogging() {
         if (System.console() != null) {
             Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
             org.apache.logging.log4j.core.Logger coreLogger
@@ -97,7 +97,9 @@ public abstract class Logging {
             Configuration configuration = context.getConfiguration();
             coreLogger.addAppender(configuration.getAppender("Console"));
         }
+    }
 
+    public static void configureFileLogging(String logfile) {
         if (!logfile.equals("no"))
             CustomFileAppender.addFileAppender(logfile);
 

@@ -117,6 +117,8 @@ public class StochDiff {
 
         final int statistics = Settings.optionCount(cmd, argv, "statistics", "s");
 
+        Logging.configureConsoleLogging();
+
         argv = cmd.getArgs();
         if (argv.length == 0) {
             log.fatal("at least one argument is required");
@@ -143,7 +145,7 @@ public class StochDiff {
               outputFile = unsuffixed;
 
         final String logfile = cmd.getOptionValue("log", outputFile + ".log");
-        Logging.configureLogging(logfile);
+        Logging.configureFileLogging(logfile);
 
         /* Write out the version, after creating the log appenders. */
         log.info("{}", Settings.getProgramVersion());
