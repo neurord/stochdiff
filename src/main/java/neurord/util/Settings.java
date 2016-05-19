@@ -128,7 +128,7 @@ public class Settings {
             n = Math.max(n, lhs.length());
         }
 
-        out.println("Recognized properties:");
+        out.println("Recognized properties (use as -D<property>=<value>):");
         for (Settings s: all_settings) {
             String lhs = String.format("%s (default: %s)",
                                        s.name,
