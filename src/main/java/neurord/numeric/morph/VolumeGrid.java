@@ -380,8 +380,12 @@ public class VolumeGrid {
         if (surface)
             label = label.substring(0, label.length() - ":surface".length());
 
-        if (label.indexOf("[") >= 0)
+        if (label.indexOf("[") >= 0) {
+            if (surface)
+                throw new RuntimeException("\":surface\" is not allowed with labelled elements");
+
             return this.getMatches(label);
+        }
 
         ArrayList<VolumeElement> ans = new ArrayList<>();
 
