@@ -216,6 +216,12 @@ public class Settings {
     public static final String FALLBACK = "java -jar neurord.jar";
     static public String javaExecutable(Class cls) {
         String path;
+
+        /* allow overriding, which is useful when a wrapper script is provided */
+        path = System.getProperty("neurord.executable_name");
+        if (path != null)
+            return path;
+
         try {
             path = cls.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
         } catch(java.net.URISyntaxException e) {
