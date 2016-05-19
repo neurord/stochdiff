@@ -14,7 +14,7 @@ public abstract class LibUtil {
      * Add a path to java.library.path
      */
     static public void addLibraryPaths(String... paths) {
-        String var = System.getProperty("java.library.path");
+        String var = Settings.getProperty("java.library.path");
 
         for(String path: paths) {
             if (Arrays.asList(var.split(File.pathSeparator)).contains(path))
