@@ -218,8 +218,8 @@ public class ModelReader<T> {
 
     protected HashMap<String, String> propertyOverrides() {
         HashMap<String, String> overrides = new HashMap<>();
-        Properties props = System.getProperties();
-        for (String key : props .stringPropertyNames())
+        Properties props = Settings.getProperties();
+        for (String key : props.stringPropertyNames())
             if (key.startsWith("neurord.sdrun") || key.startsWith("neurord.SDRun"))
                 overrides.put("SDRun" + key.substring(13), props.getProperty(key));
         return overrides;

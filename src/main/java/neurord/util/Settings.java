@@ -23,8 +23,6 @@ public class Settings {
 
     public static ArrayList<Settings> all_settings = new ArrayList<>();
 
-    private static Properties overrides = null;
-
     private Settings(String name, String description, Object fallback) {
         this.name = name;
         this.description = description;
@@ -34,13 +32,7 @@ public class Settings {
     }
 
     static public String getProperty(String name) {
-        if (overrides != null) {
-            String val = overrides.getProperty(name);
-            if (val != null)
-                return val;
-        }
-
-        return System.getProperty(name);
+        return getProperties().getProperty(name);
     }
 
     static public int getProperty(String name, String description, int fallback) {
@@ -252,11 +244,15 @@ public class Settings {
             return "java " + cls.getName();
     }
 
-    public static void augmentProperties(Properties properties) {
-        overrides = properties;
+    public static void augmentProperties(Properties overrides) {
+        properties = (Properties) System.getProperties().clone();
+        properties.putAll(overrides);
     }
 
+    private static Properties properties = null;
     public static Properties getProperties() {
-        return overrides;
+        if (properties == null)
+            return System.getProperties();
+        return properties;
     }
 }

@@ -51,13 +51,16 @@ public abstract class Logging {
         return true;
     }
 
-    private static boolean setLogLevels(LoggerContext ctx, Properties props) {
-        if (props == null)
-            return false;
-
+    /**
+     * Set log4j2 log levels based on properties:
+     * log.&lt;logger-name&gt;=info|debug|warning|...
+     */
+    public static void setLogLevels() {
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         boolean any = false;
 
-        for (String key : props.stringPropertyNames())
+        Properties props = Settings.getProperties();
+        for (String key : props .stringPropertyNames())
             if (key.startsWith("log.")) {
                 String logger = key.substring(4);
                 String value = props.getProperty(key);
@@ -71,19 +74,7 @@ public abstract class Logging {
                     any = true;
             }
 
-        return any;
-    }
-
-    /**
-     * Set log4j2 log levels based on properties:
-     * log.&lt;logger-name&gt;=info|debug|warning|...
-     */
-    public static void setLogLevels() {
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-
-        if (setLogLevels(ctx, System.getProperties()) ||
-            setLogLevels(ctx, Settings.getProperties()))
-
+        if (any)
             /* This causes all Loggers to refetch information from their LoggerConfig. */
             ctx.updateLoggers();
     }
