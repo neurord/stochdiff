@@ -49,7 +49,7 @@ public class StochDiff {
                      20);
         formatter.printHelp(pw,
                             columns,
-                            "neurord.StochDiff <model> [<output>]",
+                            Settings.javaExecutable(StochDiff.class) + " <model> [<output>]",
                             header,
                             options,
                             HelpFormatter.DEFAULT_LEFT_PAD,

@@ -212,4 +212,22 @@ public class Settings {
         }
         return count;
     }
+
+    public static final String FALLBACK = "java -jar neurord.jar";
+    static public String javaExecutable(Class cls) {
+        String path;
+        try {
+            path = cls.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+        } catch(java.net.URISyntaxException e) {
+            return FALLBACK;
+        }
+
+        if (path == null)
+            return FALLBACK;
+
+        if (path.endsWith(".jar"))
+            return "java -jar " + path;
+        else
+            return "java " + cls.getName();
+    }
 }
