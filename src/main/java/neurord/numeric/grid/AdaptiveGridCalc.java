@@ -132,7 +132,8 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
 
     @Override
     protected void resetEventStatistics() {
-        ArrayUtil.fill(this.eventStatistics, 0);
+        if (this.eventStatistics != null)
+            ArrayUtil.fill(this.eventStatistics, 0);
     }
 
     @Override

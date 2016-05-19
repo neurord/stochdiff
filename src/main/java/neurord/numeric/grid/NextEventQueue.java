@@ -864,6 +864,9 @@ public class NextEventQueue {
         public abstract void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose);
 
         protected void updateStatistics(int[] eventStatistics, int firings) {
+            if (eventStatistics == null)
+                return;
+
             eventStatistics[0] += 1;
             eventStatistics[1] += firings;
         }
