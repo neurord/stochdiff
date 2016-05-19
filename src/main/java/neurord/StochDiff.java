@@ -78,7 +78,8 @@ public class StochDiff {
 
         options.addOption(null, "log", true, "log file name (\"no\" to disable)");
         options.addOption("v", "verbose", false, "increase log level");
-        options.addOption("s", "statistics", false, "collect more statistics");
+        options.addOption("s", "statistics", true, "override statistics gathering " +
+                          "(none|by-channel|by-event[:interval])");
 
         Option property = OptionBuilder.withArgName("property=value")
             .hasArgs(2)
@@ -114,8 +115,6 @@ public class StochDiff {
             Level level = verbose == 1 ? Level.INFO : Level.DEBUG;
             Logging.setLogLevel(null, LogManager.ROOT_LOGGER_NAME, level);
         }
-
-        final int statistics = Settings.optionCount(cmd, argv, "statistics", "s");
 
         Logging.configureConsoleLogging();
 
@@ -158,8 +157,18 @@ public class StochDiff {
         final double ic_time = Settings.getOption(cmd, "ic-time", Double.NaN);
 
         final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
-        if (statistics > 0)
-            model.overrideStatistics(statistics);
+
+        String statistics = cmd.getOptionValue("statistics");
+        if (statistics != null) {
+            Double interval = null;
+            String[] parts = statistics.split(":", 2);
+            if (parts.length > 1) {
+                statistics = parts[0];
+                interval = Double.valueOf(parts[1]);
+            }
+
+            model.overrideStatistics(statistics, interval);
+        }
 
         SDCalc calc = new SDCalc(model, outputFile);
         calc.run();

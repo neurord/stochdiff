@@ -133,23 +133,36 @@ public class SDRun implements IOutputSet {
         return this.outputInterval;
     }
 
-    public void overrideStatistics(int override) {
-        String repl;
-        switch (override) {
-        case 0:
-            repl = "none";
-        case 1:
-            repl = "by-channel";
-        default:
-            repl = "by-event";
+    public void overrideStatistics(String statistics, Double interval) {
+        if (statistics != null) {
+            switch (statistics) {
+            case "none":
+            case "by-channel":
+            case "by-event":
+                break;
+            default:
+                throw new RuntimeException("Unknown statistics value: " + statistics);
+            }
+
+            log.debug("Overriding statistics gathering: {} → {}",
+                      this.getStatistics(), statistics);
+
+            if (this.statistics == null)
+                this.statistics = new Statistics();
+            this.statistics.value = statistics;
         }
 
-        log.debug("Overriding statistics gathering: {} → {}",
-                  this.getStatistics(), repl);
+        if (interval != null) {
+            if (!(interval >= 0))
+                throw new RuntimeException("Bad statistics interval: " + interval);
 
-        if (this.statistics == null)
-            this.statistics = new Statistics();
-        this.statistics.value = repl;
+            log.debug("Overriding statistics interval: {} → {}",
+                      this.getStatisticsInterval(), interval);
+
+            if (this.statistics == null)
+                this.statistics = new Statistics();
+            this.statistics.interval = interval;
+        }
     }
 
     public String getStatistics() {
