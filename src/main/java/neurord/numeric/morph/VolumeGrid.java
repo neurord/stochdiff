@@ -162,10 +162,10 @@ public class VolumeGrid {
             }
 
             /*      System.out.println("VE " + i + ": volume " + volumes[i] +
-                 		 " exposedArea " + exposedAreas[i] +
-                 		 " position " + positions[i][0] + " " +
-                 		 positions[i][1] + " " + positions[i][2] +
-                 		 " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
+                         " exposedArea " + exposedAreas[i] +
+                         " position " + positions[i][0] + " " +
+                         positions[i][1] + " " + positions[i][2] +
+                         " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
               */
         }
         regionLabels = rA.toArray(new String[0]);
@@ -376,6 +376,10 @@ public class VolumeGrid {
     }
 
     public ArrayList<VolumeElement> filterElementsByLabel(String label) {
+        boolean surface = label.endsWith(":surface");
+        if (surface)
+            label = label.substring(0, label.length() - ":surface".length());
+
         if (label.indexOf("[") >= 0)
             return this.getMatches(label);
 
@@ -384,7 +388,7 @@ public class VolumeGrid {
         for (VolumeElement el: this.elements)
             if (el.getLabel() != null &&
                 el.getLabel().equals(label) &&
-                el.isSubmembrane())
+                (!surface || el.isSubmembrane()))
                 ans.add(el);
         if (!ans.isEmpty())
             return ans;
@@ -392,7 +396,7 @@ public class VolumeGrid {
         for (VolumeElement el: this.elements)
             if (el.getRegion() != null &&
                 el.getRegion().equals(label) &&
-                el.isSubmembrane())
+                (!surface || el.isSubmembrane()))
                 ans.add(el);
         if (!ans.isEmpty())
             return ans;
