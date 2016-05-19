@@ -129,10 +129,10 @@ public class ResultWriterHDF5 implements ResultWriter {
         try {
             this._init();
         } catch(UnsatisfiedLinkError e) {
-            log.warn("java.library.path: {}", System.getProperty("java.library.path"));
+            log.warn("java.library.path: {}", Settings.getProperty("java.library.path"));
             throw new RuntimeException(e);
         } catch(Exception e) {
-            log.warn("java.library.path: {}", System.getProperty("java.library.path"));
+            log.warn("java.library.path: {}", Settings.getProperty("java.library.path"));
             throw new RuntimeException(e);
         }
     }

@@ -18,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Level;
 
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.CommandLine;
@@ -78,6 +80,13 @@ public class StochDiff {
         options.addOption("v", "verbose", false, "increase log level");
         options.addOption("s", "statistics", false, "collect more statistics");
 
+        Option property = OptionBuilder.withArgName("property=value")
+            .hasArgs(2)
+            .withValueSeparator()
+            .withDescription("set java property")
+            .create("D");
+        options.addOption(property);
+
         return options;
     }
 
@@ -93,6 +102,8 @@ public class StochDiff {
             help_exit(options, !help_requested);
 
         CommandLine cmd = parser.parse(options, argv);
+        Settings.augmentProperties(cmd.getOptionProperties("D"));
+
         if (cmd.hasOption("version")) {
             System.out.println(Settings.getProgramVersion());
             System.exit(0);

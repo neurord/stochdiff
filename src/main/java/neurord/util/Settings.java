@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,8 @@ public class Settings {
 
     public static ArrayList<Settings> all_settings = new ArrayList<>();
 
+    private static Properties overrides = null;
+
     private Settings(String name, String description, Object fallback) {
         this.name = name;
         this.description = description;
@@ -30,10 +33,20 @@ public class Settings {
         all_settings.add(this);
     }
 
+    static public String getProperty(String name) {
+        if (overrides != null) {
+            String val = overrides.getProperty(name);
+            if (val != null)
+                return val;
+        }
+
+        return System.getProperty(name);
+    }
+
     static public int getProperty(String name, String description, int fallback) {
         new Settings(name, description, fallback);
 
-        String val = System.getProperty(name);
+        String val = getProperty(name);
         if (val != null) {
             int ret = Integer.valueOf(val);
             log.debug("Overriding {}: {} → {}", name, fallback, ret);
@@ -45,7 +58,7 @@ public class Settings {
     static public boolean getProperty(String name, String description, boolean fallback) {
         new Settings(name, description, fallback);
 
-        String val = System.getProperty(name);
+        String val = getProperty(name);
         if (val != null) {
             boolean ret = Boolean.valueOf(val);
             log.debug("Overriding {}: {} → {}", name, fallback, ret);
@@ -57,7 +70,7 @@ public class Settings {
     static public double getProperty(String name, String description, double fallback) {
         new Settings(name, description, fallback);
 
-        String val = System.getProperty(name);
+        String val = getProperty(name);
         if (val != null) {
             double ret = Double.valueOf(val);
             log.debug("Overriding {}: {} → {}", name, fallback, ret);
@@ -69,7 +82,7 @@ public class Settings {
     static public String getProperty(String name, String description, String fallback) {
         new Settings(name, description, fallback);
 
-        String val = System.getProperty(name);
+        String val = getProperty(name);
         if (val != null) {
             log.debug("Overriding {}: {} → {}", name, fallback, val);
             return val;
@@ -80,7 +93,7 @@ public class Settings {
     static public String[] getPropertyList(String name, String description, String... fallback) {
         new Settings(name, description, fallback);
 
-        String val = System.getProperty(name);
+        String val = getProperty(name);
         if (val == null)
             return fallback;
 
@@ -217,7 +230,9 @@ public class Settings {
     static public String javaExecutable(Class cls) {
         String path;
 
-        /* allow overriding, which is useful when a wrapper script is provided */
+        /* Allow overriding, which is useful when a wrapper script is provided.
+         * Use Systemd.getProperty because this is supposed to be overriden
+         * from the outside, too early to parse options. */
         path = System.getProperty("neurord.executable_name");
         if (path != null)
             return path;
@@ -235,5 +250,13 @@ public class Settings {
             return "java -jar " + path;
         else
             return "java " + cls.getName();
+    }
+
+    public static void augmentProperties(Properties properties) {
+        overrides = properties;
+    }
+
+    public static Properties getProperties() {
+        return overrides;
     }
 }
