@@ -2,9 +2,11 @@ package neurord.util;
 
 import java.io.Serializable;
 
-import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
+import org.apache.logging.log4j.core.appender.OutputStreamManager;
 import org.apache.logging.log4j.core.config.plugins.*;
 import org.apache.logging.log4j.core.config.*;
 import org.apache.logging.log4j.core.Filter;
@@ -19,8 +21,14 @@ import java.util.ArrayList;
 
 @Plugin(name="CustomFile", category="core", elementType="appender", printObject=true)
 public final class CustomFileAppender extends AbstractAppender {
+    public static final Integer dummy = 0;
 
-    final private List<MemoryMappedFileAppender> appenders = new ArrayList<>();
+    final static boolean mmap_appender = Settings.getProperty("neurord.mmap_appender",
+                                                              "User MemoryMappedFileAppender",
+                                                              false);
+
+    final private List<AbstractOutputStreamAppender<? extends OutputStreamManager>> appenders
+        = new ArrayList<>();
 
     static private CustomFileAppender instance = null;
 
@@ -86,14 +94,26 @@ public final class CustomFileAppender extends AbstractAppender {
             return;
         }
 
-        final MemoryMappedFileAppender appender =
-            MemoryMappedFileAppender.createAppender(filename,
-                                                    "false", filename,
-                                                    "false", "8192", "false",
-                                                    instance.getLayout(),
-                                                    instance.getFilter(),
-                                                    "false", "false",
-                                                    new DefaultConfiguration());
+        final AbstractOutputStreamAppender<? extends OutputStreamManager> appender;
+        if (mmap_appender)
+            appender = MemoryMappedFileAppender.createAppender(filename,
+                                                               "false", filename,
+                                                               "false", "8192", "false",
+                                                               instance.getLayout(),
+                                                               instance.getFilter(),
+                                                               "false", "false",
+                                                               new DefaultConfiguration());
+        else
+            appender = FileAppender.createAppender(filename,
+                                                   "false", "false",
+                                                   filename,
+                                                   "false", "false",
+                                                   "true", "8192",
+                                                   instance.getLayout(),
+                                                   instance.getFilter(),
+                                                   "false", "false",
+                                                   new DefaultConfiguration());
+
         LOGGER.info("registering custom logfile '{}'", appender);
         instance.appenders.add(appender);
     }
