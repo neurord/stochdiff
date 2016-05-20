@@ -102,13 +102,11 @@ public class SDCalc {
 
             log.info("Executing shutdown of pool {}", pool);
             pool.shutdown();
-            while (true)
-                try {
-                    pool.awaitTermination(1, TimeUnit.MINUTES);
-                    break;
-                } catch(InterruptedException e) {
-                    log.info("Waiting: {}", pool);
-                }
+            try {
+                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+            } catch(InterruptedException e) {
+                log.info("Interrupted while waiting for tasks to finish: {}", pool);
+            }
         }
 
         boolean good = true;
