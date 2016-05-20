@@ -334,10 +334,11 @@ public class VolumeGrid {
         String post = sti.substring(icb, sti.length());
 
         String range = sti.substring(iob + 1, icb);
-
         range = range.replace(" ", "");
+
         final int rangemin;
         final int rangemax;
+        final ArrayList<Integer> indices = new ArrayList<>();
         if (range.indexOf(":") >= 0) {
             String rpre = range.substring(0, range.indexOf(":"));
             String rpost = range.substring(range.indexOf(":") + 1, range.length());
@@ -350,12 +351,18 @@ public class VolumeGrid {
                 rangemax = Integer.parseInt(rpost);
             else
                 rangemax = Integer.MAX_VALUE;
-        } else {
-            rangemin = Integer.parseInt(range);
+        } else if (range.equals("*")) {
+            rangemin = 0;
             rangemax = Integer.MAX_VALUE;
+        } else {
+            String[] split = range.split(",");
+            for (String index: split)
+                indices.add(Integer.parseInt(index));
+
+            rangemin = rangemax = -1;
         }
 
-        log.debug("Looking for {}{}:{}{}", pre, rangemin, rangemax, post);
+        log.debug("Looking for {}{}:{} or {}{}", pre, rangemin, rangemax, indices, post);
 
         for (VolumeElement el: this.elements) {
             String s = el.getLabel();
@@ -364,8 +371,7 @@ public class VolumeGrid {
                 String sin = s.substring(pre.length(), s.indexOf(post));
                 int ind = Integer.parseInt(sin);
 
-                if (rangemin <= ind && rangemax >= ind ||
-                    ("," + range + ",").indexOf("," + sin + ",") >= 0)
+                if (rangemin <= ind && rangemax >= ind || indices.contains(ind))
                     matched.add(el);
             }
         }
