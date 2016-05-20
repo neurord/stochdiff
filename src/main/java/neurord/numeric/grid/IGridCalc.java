@@ -65,7 +65,6 @@ public interface IGridCalc {
         int stat_index();
 
         Collection<Event> dependent();
-        long firings();
     }
 
     public interface Happening {

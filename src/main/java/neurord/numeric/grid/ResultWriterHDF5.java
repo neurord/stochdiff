@@ -412,9 +412,6 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.flushEvents(Double.POSITIVE_INFINITY, true);
             for (PopulationOutput output: this.populations)
                 output.flushPopulation(Double.POSITIVE_INFINITY);
-
-            if (source != null)
-                this.writeFiringsSummary(source);
         }
 
         protected void _writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source)
@@ -971,23 +968,6 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             if (this.events_cache.size() > CACHE_SIZE2)
                 this.flushEvents(time, false);
-        }
-
-        protected void writeFiringsSummary(IGridCalc source)
-            throws Exception
-        {
-            Collection<IGridCalc.Event> events = source.getEvents();
-            long array[] = new long[events.size()];
-            int i=0;
-            for (IGridCalc.Event event: events) {
-                log.debug("event {} pos={} number={}/{}", event, i++, event.event_number(), events.size());
-                array[event.event_number()] = event.firings();
-            }
-
-            Dataset ds = writeVector("firings", this.sim, array);
-            setAttribute(ds, "TITLE", "Firings of each reaction");
-            setAttribute(ds, "LAYOUT", "[nevents]");
-            setAttribute(ds, "UNITS", "counts");
         }
     }
 
