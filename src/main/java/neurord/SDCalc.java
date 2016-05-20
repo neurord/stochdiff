@@ -3,6 +3,7 @@ package neurord;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,7 @@ public class SDCalc {
                                                     0);
 
     protected final List<ResultWriter> resultWriters = new ArrayList<>();
+    protected final Hashtable<Integer, Object> results;
 
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;
@@ -69,6 +71,8 @@ public class SDCalc {
             }
             this.resultWriters.add(writer);
         }
+
+        this.results = new Hashtable<>(trials);
     }
 
     protected BaseCalc prepareCalc(int trial) {
@@ -76,10 +80,11 @@ public class SDCalc {
         BaseCalc calc = calculationType.getCalc(trial, this.sdRun);
         for (ResultWriter resultWriter: this.resultWriters)
                 calc.addResultWriter(resultWriter);
+        calc.storeResultIn(this.results);
         return calc;
     }
 
-    public void run() {
+    public int run() {
         log.info("Beginning calculations ({} trials)", this.trials);
 
         if (trials == 1)
@@ -99,10 +104,25 @@ public class SDCalc {
             while (true)
                 try {
                     pool.awaitTermination(1, TimeUnit.MINUTES);
-                    return;
+                    break;
                 } catch(InterruptedException e) {
                     log.info("Waiting: {}", pool);
                 }
         }
+
+        boolean good = true;
+        for (int i = 0; i < trials; i++) {
+            Object result = this.results.get(i);
+            if (result == null) {
+                good = false;
+                log.error("Trial {} did not finish correctly!", i);
+            } else if (result instanceof Throwable) {
+                good = false;
+                log.error("Trial {} failed!", i, result);
+            } else
+                log.debug("Trial {} succeeded", i);
+        }
+
+        return good ? 0 : 1;
     }
 }

@@ -7,6 +7,7 @@
 package neurord.numeric;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Random;
 
@@ -71,6 +72,7 @@ public abstract class BaseCalc implements Runnable {
 
     private final int trial;
     protected SDRun sdRun;
+    protected Hashtable<Integer, Object> results;
 
     public BaseCalc(int trial, SDRun sdRun) {
         this.trial = trial;
@@ -108,16 +110,31 @@ public abstract class BaseCalc implements Runnable {
         this.resultWriters.add(rw);
     }
 
+    public void storeResultIn(Hashtable<Integer, Object> results) {
+        this.results = results;
+    }
+
     protected abstract void _run();
 
     @Override
     public void run() {
+        Object result;
         try {
             this._run();
+            result = 0;
+        } catch(Exception e) {
+            log.error("{}: failed (seed={})", this, seed);
+            if (this.results == null)
+                throw e;
+            result = e;
         } catch(Error e) {
             log.error("{}: failed (seed={})", this, seed);
-            throw e;
+            if (this.results == null)
+                throw e;
+            result = e;
         }
+
+        this.results.put(this.trial, result);
     }
 
     public void close() {
