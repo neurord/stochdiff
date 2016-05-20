@@ -16,6 +16,7 @@ import neurord.numeric.grid.ResultWriterText;
 import neurord.numeric.grid.ResultWriterHDF5;
 
 import neurord.util.Settings;
+import neurord.util.Logging;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,7 @@ public class SDCalc {
         this.sdRun = sdr;
 
         if (trials > 1 && sdr.simulationSeed > 0) {
-            log.warn("Ignoring fixed simulation seed");
+            log.log(Logging.NOTICE, "Ignoring fixed simulation seed");
             sdr.simulationSeed = 0;
         }
 
