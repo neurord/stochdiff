@@ -25,7 +25,7 @@ public final class CustomFileAppender extends AbstractAppender {
 
     final static boolean mmap_appender = Settings.getProperty("neurord.mmap_appender",
                                                               "User MemoryMappedFileAppender",
-                                                              false);
+                                                              true);
 
     final private List<AbstractOutputStreamAppender<? extends OutputStreamManager>> appenders
         = new ArrayList<>();
