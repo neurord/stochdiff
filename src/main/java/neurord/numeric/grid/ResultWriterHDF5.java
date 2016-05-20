@@ -980,7 +980,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             long array[] = new long[events.size()];
             int i=0;
             for (IGridCalc.Event event: events) {
-                log.info("event {} pos={} number={}/{}", event, i++, event.event_number(), events.size());
+                log.debug("event {} pos={} number={}/{}", event, i++, event.event_number(), events.size());
                 array[event.event_number()] = event.firings();
             }
 
