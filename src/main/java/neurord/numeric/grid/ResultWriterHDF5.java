@@ -599,7 +599,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 setAttribute(ds, "UNITS", "transitions/ms");
             }
             {
-                int[] pairs = table.getReversiblePairs();
+                int[] pairs = table.getReversiblePairs().clone();
                 /* pairs has only one index set per pair. Make it symmetrical. */
                 for (int i = 0; i < pairs.length; i++)
                     if (pairs[i] >= 0) {
