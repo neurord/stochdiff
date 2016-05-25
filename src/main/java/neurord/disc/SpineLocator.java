@@ -65,7 +65,7 @@ public abstract class SpineLocator {
 
             double sum = 0.;
             for (int i = 0; i < eltSA.length; i++) {
-                sum += surfA.get(i).doubleValue();
+                sum += surfA.get(i);
                 eltSA[i] = sum;
             }
 
