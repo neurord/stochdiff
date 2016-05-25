@@ -30,7 +30,7 @@ public class SpineAllocation {
         return id;
     }
 
-    public SpinePopulation makePopulation() {
+    public SpinePopulation makePopulation(double depth2D) {
         if (this.r_spineType == null)
             return null;
 
@@ -38,8 +38,8 @@ public class SpineAllocation {
         if (this.areaDensity != null)
             density = this.areaDensity;
         else if (this.lengthDensity != null) {
-            log.warn("'lengthDensity' is deprecated, use 'areaDensity' instead");
-            density = this.lengthDensity;
+            density = this.lengthDensity / depth2D / 2;
+            log.debug("Using areaDensity = {}/{}/2 = {}", this.lengthDensity, depth2D, density);
         } else
             return null;
 

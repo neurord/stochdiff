@@ -27,10 +27,17 @@ public class Morphology {
 
     transient private boolean resolved = false;
     transient private TreePoint[] tree_points;
+    transient private Double depth2D;
 
-    public synchronized void resolve() {
-        if (this.resolved)
+    public synchronized void resolve(double depth2D) {
+        /* we want to pass depth2D to SpineAllocation */
+
+        if (this.resolved) {
+            assert this.depth2D == null || this.depth2D == depth2D;
             return;
+        }
+
+        this.depth2D = depth2D;
 
         final ArrayList<MorphPoint> p_points = new ArrayList<>();
         final HashMap<String, SpineType> spineHM = new HashMap<>();
@@ -106,7 +113,7 @@ public class Morphology {
      */
 
     public synchronized TreePoint[] getTreePoints() {
-        this.resolve();
+        assert this.resolved;
         return this.tree_points;
     }
 
@@ -115,7 +122,7 @@ public class Morphology {
         ArrayList<SpinePopulation> spa = new ArrayList<>();
         if (p_spineAllocations != null)
             for (SpineAllocation sa: p_spineAllocations) {
-                SpinePopulation sp = sa.makePopulation();
+                SpinePopulation sp = sa.makePopulation(this.depth2D);
                 if (sp != null)
                     spa.add(sp);
             }

@@ -236,7 +236,7 @@ public class SDRun implements IOutputSet {
             log.error("<Morphology> element is required");
             throw new RuntimeException("<Morphology> element is required");
         }
-        this.morphology.resolve();
+        this.morphology.resolve(this.depth2D);
         return this.morphology;
     }
 
