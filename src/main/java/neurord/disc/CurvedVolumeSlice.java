@@ -69,7 +69,7 @@ public class CurvedVolumeSlice {
         }
 
 
-        elements = new ArrayList<CurvedVolumeElement>();
+        elements = new ArrayList<>();
 
 
         // center of the box at 0,0
@@ -125,7 +125,7 @@ public class CurvedVolumeSlice {
             }
 
 
-            ArrayList<CurvedVolumeElement> az = new ArrayList<CurvedVolumeElement>();
+            ArrayList<CurvedVolumeElement> az = new ArrayList<>();
             for (int ia = 0; ia < na; ia++) {
 
                 final double theta = ia * eltangle;

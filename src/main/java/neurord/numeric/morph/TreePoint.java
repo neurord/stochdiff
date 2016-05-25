@@ -178,7 +178,7 @@ public class TreePoint implements Position {
     // is available to have them connected from as neighbors
     public void addOffsetChild(TreePoint p) {
         if (offsetChildren == null)
-            offsetChildren = new ArrayList<TreePoint>();
+            offsetChildren = new ArrayList<>();
 
         offsetChildren.add(p);
     }
@@ -215,7 +215,7 @@ public class TreePoint implements Position {
     }
 
     public ArrayList<TreePoint> getNeighbors() {
-        ArrayList<TreePoint> ret = new ArrayList<TreePoint>();
+        ArrayList<TreePoint> ret = new ArrayList<>();
         for (int i = 0; i < nnbr; i++) {
             ret.add(nbr[i]);
         }

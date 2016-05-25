@@ -112,7 +112,7 @@ public class Morphology {
 
     public SpineDistribution getSpineDistribution() {
 
-        ArrayList<SpinePopulation> spa = new ArrayList<SpinePopulation>();
+        ArrayList<SpinePopulation> spa = new ArrayList<>();
         if (p_spineAllocations != null)
             for (SpineAllocation sa: p_spineAllocations) {
                 SpinePopulation sp = sa.makePopulation();

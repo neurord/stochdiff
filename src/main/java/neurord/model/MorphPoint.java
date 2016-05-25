@@ -50,7 +50,7 @@ public class MorphPoint {
 
     protected void addNeighbor(MorphPoint p) {
         if (neighbors == null)
-            neighbors = new ArrayList<MorphPoint>();
+            neighbors = new ArrayList<>();
 
         neighbors.add(p);
     }
@@ -61,7 +61,7 @@ public class MorphPoint {
     // is available to have them connected from as neighbors
     public void addOffsetChild(MorphPoint p) {
         if (offsetNeighbors == null)
-            offsetNeighbors = new ArrayList<MorphPoint>();
+            offsetNeighbors = new ArrayList<>();
 
         offsetNeighbors.add(p);
     }

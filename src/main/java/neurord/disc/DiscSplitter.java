@@ -62,7 +62,7 @@ public class DiscSplitter {
         }
         TreeUtil.parentizeFrom(firstpt, srcPoints);
 
-        gridAL = new ArrayList<CurvedVolumeSlice>();
+        gridAL = new ArrayList<>();
         CurvedVolumeSlice vg0 = null;
         wkpHS.remove(firstpt);
 

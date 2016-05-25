@@ -345,7 +345,7 @@ public class VolumeLine {
     }
 
     public ArrayList<VolumeElement> getElements() {
-        ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
+        ArrayList<VolumeElement> ave = new ArrayList<>();
         for (int i = 0; i < nl; i++) {
             VolumeElement ve = getElement(i);
             if (ve != null) {

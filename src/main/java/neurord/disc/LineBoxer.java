@@ -52,7 +52,7 @@ public class LineBoxer {
 
         TreeUtil.parentizeFrom(firstpt, srcPoints);
 
-        final ArrayList<VolumeLine> volume_lines = new ArrayList<VolumeLine>();
+        final ArrayList<VolumeLine> volume_lines = new ArrayList<>();
         recAdd(surfaceLayers, depth, resolution, working_set, volume_lines, null, firstpt);
 
         VolumeGrid vgr = new VolumeGrid();

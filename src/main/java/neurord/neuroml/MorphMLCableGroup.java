@@ -6,7 +6,7 @@ public class MorphMLCableGroup {
 
     public String name;
 
-    public ArrayList<cable> cables = new ArrayList<cable>();
+    public ArrayList<cable> cables = new ArrayList<>();
 
     public String getName() {
         return name;

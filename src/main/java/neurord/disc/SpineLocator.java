@@ -96,7 +96,7 @@ public abstract class SpineLocator {
                 log.info("spines : although the density is non-zero, random allocation "
                          + "gives no spines for region \"{}\" (avg={})", reg, avgNoSpines);
 
-            ArrayList<Integer> positionA = new ArrayList<Integer>();
+            ArrayList<Integer> positionA = new ArrayList<>();
             while (ndone < nspines) {
                 double abelow = rngen.random() * totalArea;
                 int posInArray = ArrayUtil.findBracket(eltSA, abelow);
@@ -156,7 +156,7 @@ public abstract class SpineLocator {
 
         // E.info("vnomr is " + vnorm);
 
-        ArrayList<VolumeElement> ret = new ArrayList<VolumeElement>();
+        ArrayList<VolumeElement> ret = new ArrayList<>();
 
         Translation trans = Geom.translation(pcen);
 

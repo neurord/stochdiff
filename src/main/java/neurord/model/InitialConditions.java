@@ -86,7 +86,7 @@ public class InitialConditions {
     }
 
     public ArrayList<FloatValued> getFloatValuedElements() {
-        ArrayList<FloatValued> afv = new ArrayList<FloatValued>();
+        ArrayList<FloatValued> afv = new ArrayList<>();
 
         if (concentrationSets != null)
             for (ConcentrationSet cs : concentrationSets)

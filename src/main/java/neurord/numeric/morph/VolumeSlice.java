@@ -219,7 +219,7 @@ public class VolumeSlice {
     }
 
     public ArrayList<VolumeElement> getElements() {
-        ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
+        ArrayList<VolumeElement> ave = new ArrayList<>();
         for (int i = 0; i < this.nx; i++)
             for (int j = 0; j < this.ny; j++) {
                 VolumeElement ve = getElement(i, j);

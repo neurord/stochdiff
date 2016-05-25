@@ -53,7 +53,7 @@ public class DiscBoxer {
         }
         TreeUtil.parentizeFrom(firstpt, srcPoints);
 
-        gridAL = new ArrayList<VolumeSlice>();
+        gridAL = new ArrayList<>();
         VolumeSlice vg0 = null;
         wkpHS.remove(firstpt);
 

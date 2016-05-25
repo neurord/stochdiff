@@ -122,7 +122,7 @@ public class VolumeGrid {
             connections.addAll(ve.getConnections());
         }
 
-        ArrayList<String> rA = new ArrayList<String>();
+        ArrayList<String> rA = new ArrayList<>();
         rA.add("default");
 
         nelement = elements.size();

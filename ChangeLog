@@ -60,7 +60,7 @@ Why are spine numbers now calculated deterministically?
 
 Point 3: FIXED!!!!
 line added to 2.1.3:
-	ArrayList<Integer> positionA = new ArrayList<Integer>();
+	ArrayList<Integer> positionA = new ArrayList<>();
 
 related difference in code:
 

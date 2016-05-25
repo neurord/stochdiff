@@ -51,7 +51,7 @@ public class SegmentMerger {
                 // in either case there is nothing to do;
 
                 TreePoint cprev = cp;
-                ArrayList<TreePoint> vpt = new ArrayList<TreePoint>();
+                ArrayList<TreePoint> vpt = new ArrayList<>();
                 double ltot = 0.;
                 double ldtot = 0.;
                 while (cq.nnbr == 2 && cprev.distanceTo(cq) < maxlen

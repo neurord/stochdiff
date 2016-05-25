@@ -234,7 +234,7 @@ public class SegmentSlicer {
         // new discretization;
 
 
-        ArrayList<TreePoint[]> cns = new ArrayList<TreePoint[]>();
+        ArrayList<TreePoint[]> cns = new ArrayList<>();
 
         for (int i = 0; i < np; i++) {
             TreePoint cpa = srcPoints[i];

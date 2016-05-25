@@ -10,7 +10,7 @@ public class TrianglesSet {
 
 
     public TrianglesSet() {
-        strips = new ArrayList<TriangleStrip>();
+        strips = new ArrayList<>();
     }
 
 
@@ -29,7 +29,7 @@ public class TrianglesSet {
 
 
     public float[][] getPositions() {
-        ArrayList<float[]> af = new ArrayList<float[]>();
+        ArrayList<float[]> af = new ArrayList<>();
         for (TriangleStrip ts : strips) {
             ts.addPositions(af);
         }
@@ -52,7 +52,7 @@ public class TrianglesSet {
 
 
     public float[][] getNormals() {
-        ArrayList<float[]> af = new ArrayList<float[]>();
+        ArrayList<float[]> af = new ArrayList<>();
         for (TriangleStrip ts : strips) {
             ts.addNormals(af);
         }

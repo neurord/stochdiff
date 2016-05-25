@@ -11,7 +11,7 @@ public class TriangleStrip {
 
 
     public TriangleStrip() {
-        wkpts = new ArrayList<double[]>();
+        wkpts = new ArrayList<>();
     }
 
 
@@ -87,7 +87,7 @@ public class TriangleStrip {
 
 
     public void flip() {
-        ArrayList<double[]> wpn = new ArrayList<double[]>();
+        ArrayList<double[]> wpn = new ArrayList<>();
         for (int i = 0; i < wkpts.size(); i+= 2) {
             wpn.add(wkpts.get(i+1));
             wpn.add(wkpts.get(i));

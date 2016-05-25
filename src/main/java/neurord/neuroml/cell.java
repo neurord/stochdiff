@@ -77,7 +77,7 @@ public class cell implements Transitional {
     	boolean gotRoot = false;
 
     	ptHM = new HashMap<String, MorphPoint>();
-    	points = new ArrayList<MorphPoint>();
+    	points = new ArrayList<>();
 
 
     	ArrayList<MorphMLSegment> segs = getSegments();
