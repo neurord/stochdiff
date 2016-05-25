@@ -2,44 +2,27 @@ package neurord.disc;
 
 import java.util.HashMap;
 
-
 import neurord.numeric.morph.TreePoint;
-
 
 public class Resolution {
 
-    double defaultDelta;
+    final double defaultDelta;
+    final HashMap<String, Double> deltaHM;
 
-    HashMap<String, Double> deltaHM;
-
-
-    public Resolution(double d, HashMap<String, Double> resHM) {
-        defaultDelta = d;
-        deltaHM = resHM;
+    public Resolution(double defaultDelta, HashMap<String, Double> deltaHM) {
+        this.defaultDelta = defaultDelta;
+        this.deltaHM = deltaHM;
     }
-
 
     public double getLocalDelta(TreePoint cpa, TreePoint cpb) {
+        String id = cpa.segmentIDWith(cpb);
+        if (id != null && this.deltaHM != null && this.deltaHM.containsKey(id))
+            return this.deltaHM.get(id);
 
+        String region = cpa.regionClassWith(cpb);
+        if (region != null && this.deltaHM != null && this.deltaHM.containsKey(region))
+            return this.deltaHM.get(region);
 
-        double localDelta = defaultDelta;
-        if (deltaHM != null) {
-            String id = cpa.segmentIDWith(cpb);
-            String region = cpa.regionClassWith(cpb);
-
-
-            if (id != null && deltaHM != null && deltaHM.containsKey(id)) {
-                localDelta = deltaHM.get(id).doubleValue();
-
-            } else if (region != null && deltaHM != null && deltaHM.containsKey(region)) {
-                localDelta = deltaHM.get(region).doubleValue();
-            }
-        }
-
-
-        return localDelta;
+        return this.defaultDelta;
     }
-
-
-
 }
