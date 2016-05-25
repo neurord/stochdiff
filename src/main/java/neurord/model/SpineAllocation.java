@@ -31,6 +31,9 @@ public class SpineAllocation {
     }
 
     public SpinePopulation makePopulation() {
+        if (this.r_spineType == null)
+            return null;
+
         final double density;
         if (this.areaDensity != null)
             density = this.areaDensity;
@@ -38,11 +41,8 @@ public class SpineAllocation {
             log.warn("'lengthDensity' is deprecated, use 'areaDensity' instead");
             density = this.lengthDensity;
         } else
-            density = 0;
-
-        if (r_spineType != null && density > 0)
-            return new SpinePopulation(id, r_spineType.getProfile(), region, density);
-        else
             return null;
+
+        return new SpinePopulation(this.id, this.r_spineType.getProfile(), this.region, density);
     }
 }

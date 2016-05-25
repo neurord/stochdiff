@@ -45,7 +45,7 @@ public abstract class VolumeElement {
         this.region = region;
         this.groupID = groupID;
 
-        assert !(surfaceBoundary == null && exposedArea != 0.0);
+        assert surfaceBoundary != null || exposedArea == 0.0;
 
         this.boundary = boundary;
         this.surfaceBoundary = surfaceBoundary;

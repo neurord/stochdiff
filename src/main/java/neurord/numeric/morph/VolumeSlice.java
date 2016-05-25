@@ -14,9 +14,9 @@ public class VolumeSlice {
 
     final int icenter;
     final int jcenter;
-    boolean[][] present;
+    private final boolean[][] present;
 
-    VolumeElement[][] elements;
+    private CuboidVolumeElement[][] elements;
 
     public VolumeSlice(double delta, double r) {
         boxSize = delta;
@@ -32,7 +32,7 @@ public class VolumeSlice {
 
         // work out which squares in the grid are going to be present as elements.
         // for a square section, just set all elements of present to true
-        present = new boolean[this.nx][this.ny];
+        this.present = new boolean[this.nx][this.ny];
         int nt = 0;
         int nf = 0;
         for (int i = 0; i < this.nx; i++) {
@@ -53,8 +53,8 @@ public class VolumeSlice {
     }
 
 
-    public VolumeElement getElement(int i, int j) {
-        return elements[i][j];
+    public CuboidVolumeElement getElement(int i, int j) {
+        return this.elements[i][j];
     }
 
 
@@ -66,7 +66,7 @@ public class VolumeSlice {
         double theta = Geom.zRotationAngle(Geom.unitY(), vab);
         Rotation rot = Geom.aboutZRotation(theta);
 
-        elements = new VolumeElement[this.nx][this.ny];
+        this.elements = new CuboidVolumeElement[this.nx][this.ny];
 
 
         // center of the box at 0,0
@@ -74,10 +74,10 @@ public class VolumeSlice {
         double y0 = -1 * this.jcenter * boxSize;
 
 
-        // this is a little confusing. X and Y axes are used within the slice, but when these are
-        // turned into boxes, the slab of boxes is initially created in the X-Z plane before being rotated
-        // into place
-
+        /* This is a little confusing. X and Y axes are used within the slice, but when
+         * these are turned into boxes, the slab of boxes is initially created in the X-Z
+         * plane before being rotated into place.
+         */
 
         for (int i = 0; i < this.nx; i++) {
             for (int j = 0; j < this.ny; j++) {
@@ -105,7 +105,7 @@ public class VolumeSlice {
                     /* Four different cases here since the boundary points have to go
                      *  in the right order to give the right-hand normal pointing outwards.
                      */
-                    if (i == 0 || !present[i-1][j]) {
+                    if (i == 0 || !this.present[i-1][j]) {
                         double xb = vcx + -0.5 * boxSize;
                         psb = new Position[] {
                             Geom.position(xb, -0.5 * sl, vcy - hb),
@@ -113,7 +113,7 @@ public class VolumeSlice {
                             Geom.position(xb, 0.5 * sl, vcy + hb),
                             Geom.position(xb, 0.5 * sl, vcy - hb)
                         };
-                    } else if (i == this.nx-1 || !present[i+1][j]) {
+                    } else if (i == this.nx-1 || !this.present[i+1][j]) {
                         double xb = vcx + 0.5 * boxSize;
                         psb = new Position[] {
                             Geom.position(xb, -0.5 * sl, vcy + hb),
@@ -121,7 +121,7 @@ public class VolumeSlice {
                             Geom.position(xb, 0.5 * sl, vcy - hb),
                             Geom.position(xb, 0.5 * sl, vcy + hb)
                         };
-                    } else if (j == 0 || !present[i][j-1]) {
+                    } else if (j == 0 || !this.present[i][j-1]) {
                         double yb = vcy - 0.5 * boxSize;
                         psb = new Position[] {
                             Geom.position(vcx + hb, -0.5 * sl, yb),
@@ -129,7 +129,7 @@ public class VolumeSlice {
                             Geom.position(vcx - hb, 0.5 * sl, yb),
                             Geom.position(vcx + hb, 0.5 * sl, yb)
                         };
-                    } else if (j == this.ny - 1 || !present[i][j+1]) {
+                    } else if (j == this.ny - 1 || !this.present[i][j+1]) {
                         double yb = vcy + 0.5 * boxSize;
                         psb = new Position[] {
                             Geom.position(vcx - hb, -0.5 * sl, yb),
@@ -159,58 +159,49 @@ public class VolumeSlice {
                                                                      boxSize * sl,
                                                                      boxSize * boxSize * sl, /* volume */
                                                                      boxSize);               /* deltaZ */
-                    elements[i][j] = ve;
+                    this.elements[i][j] = ve;
                 }
             }
         }
 
-        neighborize();
+        this.neighborize();
     }
 
-    public void neighborize() {
-        for (int i = 0; i < this.nx; i++) {
+    private void neighborize() {
+        for (int i = 0; i < this.nx; i++)
             for (int j = 0; j < this.ny; j++) {
-                CuboidVolumeElement cv = (CuboidVolumeElement)elements[i][j];
+                CuboidVolumeElement cv = this.getElement(i, j);
                 CuboidVolumeElement cvx = null;
                 CuboidVolumeElement cvy = null;
-                if (i+1 < this.nx) {
-                    cvx = (CuboidVolumeElement)elements[i+1][j];
-                }
-                if (j+1 < this.ny) {
-                    cvy = (CuboidVolumeElement)elements[i][j+1];
-                }
+                if (i+1 < this.nx)
+                    cvx = this.getElement(i + 1, j);
+                if (j+1 < this.ny)
+                    cvy = this.getElement(i, j + 1);
 
-                if (cv != null && cvx != null) {
+                if (cv != null && cvx != null)
                     cv.coupleTo(cvx, cv.getAlongArea());
-                }
-                if (cv != null && cvy != null) {
+                if (cv != null && cvy != null)
                     cv.coupleTo(cvy, cv.getTopArea());
-                }
             }
-        }
     }
 
     public void planeConnect(VolumeSlice tgt) {
         if (tgt.nx == this.nx && tgt.ny == this.ny) {
             // the easy case;
-            for (int i = 0; i < this.nx; i++) {
+            for (int i = 0; i < this.nx; i++)
                 for (int j = 0; j < this.ny; j++) {
-                    CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
-                    CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(i, j);
-                    if (va != null && vb != null) {
+                    CuboidVolumeElement va = this.getElement(i, j);
+                    CuboidVolumeElement vb = tgt.getElement(i, j);
+                    if (va != null && vb != null)
                         va.coupleTo(vb, va.getSideArea());
-                    }
                 }
-            }
 
         } else {
-            if (tgt.nx < this.nx) {
+            if (tgt.nx < this.nx)
                 tgt.planeConnectUp(this);
-            } else {
+            else
                 planeConnectUp(tgt);
-            }
         }
-
     }
 
     private void planeConnectUp(VolumeSlice tgt) {
@@ -218,28 +209,24 @@ public class VolumeSlice {
         int io = (tgt.nx - this.nx) / 2;
         int jo = (tgt.ny - this.ny) / 2;
 
-        for (int i = 0; i < this.nx; i++) {
+        for (int i = 0; i < this.nx; i++)
             for (int j = 0; j < this.ny; j++) {
-                CuboidVolumeElement va = (CuboidVolumeElement)getElement(i, j);
-                CuboidVolumeElement vb = (CuboidVolumeElement)tgt.getElement(io + i, jo + j);
-                if (va != null && vb != null) {
+                CuboidVolumeElement va = this.getElement(i, j);
+                CuboidVolumeElement vb = tgt.getElement(io + i, jo + j);
+                if (va != null && vb != null)
                     va.coupleTo(vb, va.getSideArea());
-                }
             }
-        }
     }
-
 
     public ArrayList<VolumeElement> getElements() {
         ArrayList<VolumeElement> ave = new ArrayList<VolumeElement>();
-        for (int i = 0; i < this.nx; i++) {
+        for (int i = 0; i < this.nx; i++)
             for (int j = 0; j < this.ny; j++) {
                 VolumeElement ve = getElement(i, j);
-                if (ve != null) {
+                if (ve != null)
                     ave.add(ve);
-                }
             }
-        }
+
         return ave;
     }
 
@@ -322,54 +309,45 @@ public class VolumeSlice {
 
         double fx = ovlp1D(mex, med, tgtx, tgtd);
         double fy = ovlp1D(mey, med, tgty, tgtd);
-        double ret = fx * fy;
-        return ret;
+        return fx * fy;
     }
 
     private double ovlp1D(double mex, double med, double tgtx, double tgtd) {
         double ret = 0.;
         if (mex <= tgtx) {
-            if (mex + med > tgtx + tgtd) {
+            if (mex + med > tgtx + tgtd)
                 ret = tgtd;
-            } else {
+            else
                 ret = mex + med - tgtx;
-            }
         } else {
-            if (mex + med > tgtx + tgtd) {
+            if (mex + med > tgtx + tgtd)
                 ret = med;
-            } else {
+            else
                 ret = tgtx + tgtd - mex;
-            }
         }
         return ret / med;
     }
 
     public double getX(int i) {
-        double ret = (-this.nx/2. + i) * boxSize;
-        return ret;
+        return (-this.nx/2. + i) * boxSize;
     }
 
 
     public double getY(int j) {
-        double ret = (-this.ny/2. + j) * boxSize;
-        return ret;
+        return (-this.ny/2. + j) * boxSize;
     }
 
     public boolean hasElement(int i, int j) {
-        boolean ret = false;
-        if (i >= 0 && i < this.nx && j >= 0 && j < this.ny) {
-            ret = present[i][j];
-        }
-        return ret;
+        return i >= 0 && i < this.nx &&
+               j >= 0 && j < this.ny &&
+               this.present[i][j];
     }
 
     public int getIBox(double x) {
-        int ret = (int)(x / boxSize + this.nx / 2.);
-        return ret;
+        return (int)(x / boxSize + this.nx / 2.);
     }
 
     public int getJBox(double y) {
-        int ret = (int)(y / boxSize + this.ny / 2.);
-        return ret;
+        return (int)(y / boxSize + this.ny / 2.);
     }
 }
