@@ -51,7 +51,7 @@ public class StochDiff {
                      20);
         formatter.printHelp(pw,
                             columns,
-                            Settings.javaExecutable(StochDiff.class) + " <model> [<output>]",
+                            Settings.javaExecutable(StochDiff.class) + " [option...] <model> [<output>]",
                             header,
                             options,
                             HelpFormatter.DEFAULT_LEFT_PAD,
