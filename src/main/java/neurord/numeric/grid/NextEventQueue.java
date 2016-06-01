@@ -1786,7 +1786,7 @@ public class NextEventQueue {
         for (int n = 0; n < stims.size(); n++) {
             StimulationTable.Stimulation stim = stims.get(n);
             ArrayList<VolumeElement> targets = grid.filterElementsByLabel(stim.site);
-            boolean fractional = grid.siteIsFractional(stim.site);
+            boolean submembrane = stim.site.endsWith(":submembrane");
 
             double sum = 0;
             for (VolumeElement el: targets)
@@ -1801,7 +1801,7 @@ public class NextEventQueue {
 
                 ans.add(new NextStimulation(event_number, stat_index,
                                             el.getNumber(),
-                                            fractional ? el.getExposedArea() / sum : 1.0,
+                                            submembrane ? el.getExposedArea() / sum : 1.0,
                                             stim.species,
                                             species[stim.species],
                                             stim));

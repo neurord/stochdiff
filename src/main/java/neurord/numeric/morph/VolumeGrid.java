@@ -414,15 +414,6 @@ public class VolumeGrid {
         throw new RuntimeException("no elements labeled by \"" + label + "\"");
     }
 
-    public boolean siteIsFractional(String label) {
-        /* FIXME: need a better way */
-        for (VolumeElement el: this.elements)
-            if (el.getRegion() != null &&
-                el.getRegion().equals(label))
-                return true;
-        return false;
-    }
-
     public boolean isCuboid() {
         return hasCuboids && !hasCurveds;
     }
