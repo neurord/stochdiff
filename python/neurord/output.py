@@ -175,8 +175,6 @@ class Model(object):
         what = self._element.species[indices] if indices is not None else self._element.species
         return decode_species_names(what)
 
-    # FIXME: output groups
-
     def grid(self):
         """Voxels of the simulation
 
@@ -223,10 +221,44 @@ class Model(object):
         what = self._element.regions[indices] if indices is not None else self._element.regions
         return [row.decode('utf-8') for row in what]
 
-class OutputGroup(object):
-    def __init__(self, element, model_element):
+    def output_group(self, name='__main__'):
+        return ModelOutputGroup(self._element.output._v_children[name], self)
+
+class ModelOutputGroup(object):
+    def __init__(self, element, model):
         self._element = element
-        self._model_element = model_element
+        self._model = model
+
+    def species(self, indices=None):
+        """List of species in this output group
+
+        Species are ordered the same as in other output tables, so this table can be
+        used to map species indices to actual names.
+
+        >>> output_model = Output('model.h5').model.output_group('__main__')
+        >>> output_model.species()
+        ['A', 'B', 'C', 'D']
+        """
+        what = self._element.species[indices] if indices is not None else self._element.species
+        return decode_species_names(what)
+
+    def elements(self):
+        """List of element indices in this output group
+        """
+        return self._element.elements[:]
+
+    def volumes(self):
+        """Volumes of elements in this output group
+        """
+        elements = self.elements()
+        grid = self._model.grid()
+        volumes = grid[elements].volume
+        return volumes
+
+class OutputGroup(object):
+    def __init__(self, element, output_model):
+        self._element = element
+        self._output_model = output_model
 
     def times(self):
         times = self._element.times[:]
@@ -235,10 +267,10 @@ class OutputGroup(object):
 
     def counts(self):
         data = self._element.population
-        panel= pd.Panel(data.read(),
-                        items=self.times(),
-                        major_axis=range(data.shape[1]),
-                        minor_axis=self.species())
+        panel = pd.Panel(data.read(),
+                         items=self.times(),
+                         major_axis=self._output_model.elements(),
+                         minor_axis=self.species())
         frame = panel.transpose(2, 1, 0).to_frame()
         frame.index.names = ['voxel', 'time']
         return frame
@@ -246,17 +278,18 @@ class OutputGroup(object):
     def concentrations(self):
         "Counts converted to concentrations using voxel volumes"
         counts = self.counts()
-        volumes = self.model.grid().volume
-        ans = counts / volumes / PUVC
+        volumes = self._output_model.volumes()
+        # blow up volumes to match the size of the counts index
+        volumes *= PUVC
+        volumes = np.repeat(volumes, counts.index.size/volumes.size)
+        ans = counts.divide(volumes, axis=0)
         ans.rename(columns={'count':'concentration'}, inplace=1)
         return ans
 
     def species(self):
         """List of specie names present in this output group
         """
-        return decode_species_names(self._model_element.species)
-
-    # FIXME: elements
+        return self._output_model.species()
 
 class Simulation(object):
     """Information about the results of a trial
@@ -284,9 +317,9 @@ class Simulation(object):
         return etree.fromstring(xml.read()[0])
 
     @functools.lru_cache()
-    def output_group(self, name):
+    def output_group(self, name='__main__'):
         return OutputGroup(self._element.output._v_children[name],
-                           self.model._element.output._v_children[name])
+                           self.model.output_group(name))
 
     def times(self, output_group='__main__'):
         return self.output_group(output_group).times()
