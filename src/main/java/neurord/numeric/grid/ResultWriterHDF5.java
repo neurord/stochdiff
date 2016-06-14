@@ -323,21 +323,27 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.ispecout = ispecout;
             this.elements = elements;
 
+            int cache_size = CACHE_SIZE1;
+            while (cache_size * elements.length * ispecout.length * 4 > 512*1024
+                   && cache_size > 1)
+                cache_size /= 2;
+            log.info("Using population cache_size of {}", cache_size);
+
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
             this.concs = createExtensibleArray("population", parent, int_t,
                                                "population of species in voxels over time",
                                                "[snapshot × nel × nspecout]",
                                                "count",
-                                               CACHE_SIZE1, elements.length, ispecout.length);
+                                               cache_size, elements.length, ispecout.length);
 
             this.times = createExtensibleArray("times", parent, double_t,
                                                "times when snapshots were written",
                                                "[times]",
                                                "ms",
-                                               CACHE_SIZE1);
+                                               cache_size);
 
-            this.concs_cache = new int[CACHE_SIZE1][elements.length][ispecout.length];
-            this.times_cache = new double[CACHE_SIZE1];
+            this.concs_cache = new int[cache_size][elements.length][ispecout.length];
+            this.times_cache = new double[cache_size];
         }
 
         public void writePopulation(double time, IGridCalc source)
