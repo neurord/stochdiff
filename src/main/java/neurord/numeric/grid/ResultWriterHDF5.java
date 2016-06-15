@@ -842,6 +842,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                 data[0] = time;
                 this.statistics_times.write(data);
             }
+
+            source.resetEventStatistics();
         }
 
         protected void initEvents()

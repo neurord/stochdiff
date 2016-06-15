@@ -275,7 +275,7 @@ public class DeterministicGridCalc extends GridCalc {
     }
 
     @Override
-    protected void resetEventStatistics() {}
+    public void resetEventStatistics() {}
 
     public Collection<IGridCalc.Event> getEvents() {
         return null;

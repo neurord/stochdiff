@@ -24,6 +24,7 @@ public interface IGridCalc {
     int getNumberElements();
 
     int[][] getEventStatistics();
+    void resetEventStatistics();
 
     public enum EventType {
         REACTION,
