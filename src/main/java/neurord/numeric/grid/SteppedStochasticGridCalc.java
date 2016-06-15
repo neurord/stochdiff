@@ -478,7 +478,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     }
 
     @Override
-    public void resetEventStatistics() {}
+    protected void resetEventStatistics() {}
 
     @Override
     public Collection<IGridCalc.Event> getEvents() {

@@ -130,6 +130,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     resultWriter.writeOutputInterval(time, this);
 
                 writeTime += this.sdRun.getOutputInterval();
+                this.resetEventStatistics();
             }
             for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
@@ -183,6 +184,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     protected void footer() {}
 
     abstract protected long eventCount();
+
+    protected abstract void resetEventStatistics();
 
     @Override
     public int getNumberElements() {
