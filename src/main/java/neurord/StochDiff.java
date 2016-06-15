@@ -72,6 +72,7 @@ public class StochDiff {
 
         options.addOption(null, "version", false, "print version string and exit");
 
+        options.addOption("t", "runtime", true, "override simulation time");
         options.addOption("i", "ic", true, "output file to take the initial conditions from");
         options.addOption(null, "ic-trial", true, "trial to take the seed from (default: 0)");
         options.addOption(null, "ic-time", true, "time to take the ICs from (default: none)");
@@ -157,6 +158,10 @@ public class StochDiff {
         final double ic_time = Settings.getOption(cmd, "ic-time", Double.NaN);
 
         final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
+
+        double runtime = Settings.getOption(cmd, "runtime", Double.NaN);
+        if (!Double.isNaN(runtime))
+            model.overrideRuntime(runtime);
 
         String statistics = cmd.getOptionValue("statistics");
         if (statistics != null) {

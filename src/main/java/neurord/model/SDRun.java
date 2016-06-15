@@ -133,6 +133,15 @@ public class SDRun implements IOutputSet {
         return this.outputInterval;
     }
 
+    public void overrideRuntime(double runtime) {
+        if (runtime < 0)
+            throw new RuntimeException("Runtime must be non-negative: " + runtime);
+
+        log.debug("Overriding runtime: {} → {}",
+                  this.runtime, runtime);
+        this.runtime = runtime;
+    }
+
     public void overrideStatistics(String statistics, Double interval) {
         if (statistics != null) {
             switch (statistics) {

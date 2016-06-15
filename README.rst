@@ -450,7 +450,57 @@ For example, to set /SDRun/discretization/maxElementSide to 3:
 
 .. code-block:: shell
 
-    java -Dneurord.sdrun.discretization.maxElementSide=3
+    java -Dneurord.sdrun.discretization.maxElementSide=3 ...
+
+In addition, some important parameters can be specified with options on the command line.
+For example, to specify the time to simulate:
+
+.. code-block:: shell
+
+    java neurord.StochDiff -t 2000 ...
+
+This is a nicer alterantive to overriding the XML element with `-Dneurord.sdrun.runtime=2000`.
+
+Full list of options can be displayed using `--help`:
+
+.. code-block:: shell
+
+    java neurord.StochDiff --help
+    
+    usage: java neurord.StochDiff [option...] <model> [<output>]
+    
+    where the <model> is an XML specification of the model to run. The optional
+    <output> specifies where the results should be stored (w/o extension). When not
+    supplied, <output> defaults to <model> without the extension.
+    
+     -D <property=value>     set java property
+     -i,--ic <arg>           output file to take the initial conditions from
+        --ic-time <arg>      time to take the ICs from (default: none)
+        --ic-trial <arg>     trial to take the seed from (default: 0)
+        --log <arg>          log file name ("no" to disable)
+     -s,--statistics <arg>   override statistics gathering
+                             (none|by-channel|by-event[:interval])
+     -t,--runtime <arg>      override simulation time
+     -v,--verbose            increase log level
+        --version            print version string and exit
+    
+    Recognized properties (use as -D<property>=<value>):
+    neurord.mmap_appender (default: true)       User MemoryMappedFileAppender
+    neurord.writers (default: [h5])             Write output in those formats
+    neurord.trials (default: 1)                 How many trials to run
+    neurord.threads (default: 0)                How many threads to use (0 == #CPUs)
+    neurord.log_events (default: false)         Log detailed information about every event
+    neurord.curtail_leaps (default: false)      Do not allow leaps to extend past reporting time
+    neurord.neq.update_times (default: true)    Update putative times using Gibson&Bruck
+    neurord.neq.only_init (default: false)      Terminate after initialization is finished
+    neurord.neq.check_updates (default: false)  Perform extensive checks of propensity changes
+    neurord.neq.log_queue (default: false)      Log debug info about queue operations
+    neurord.neq.log_propensity (default: false) Log debug info about propensity calculations
+    neurord.neq.log_reposition (default: false) Log debug info about movements in the queue
+    neurord.neq.log_debug_start (default: NaN)  Turn on debugging at this time in simulation
+    neurord.neq.log_start_events (default: 99)  Print information about this many events at startup
+    neurord.compression (default: 1)            Compression level in HDF5 output
+    neurord.sdrun.* (default: none)             Override values in the XML tree
 
 Logging
 ~~~~~~~
