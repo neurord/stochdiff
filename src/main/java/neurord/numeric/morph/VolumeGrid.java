@@ -78,10 +78,10 @@ public class VolumeGrid {
 
     public void addElements(List<? extends VolumeElement> elements) {
         for (VolumeElement ve : elements)
-            this.addVolumeElement(ve);
+            this.addElement(ve);
     }
 
-    private void addVolumeElement(VolumeElement ve) {
+    public void addElement(VolumeElement ve) {
         ve.setNumber(this.elements.size());
         this.elements.add(ve);
 

@@ -8,6 +8,11 @@ import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.chem.ReactionTable;
 import neurord.numeric.chem.StimulationTable;
 import neurord.numeric.chem.StimulationTable.Stimulation;
+import neurord.numeric.morph.VolumeGrid;
+import neurord.numeric.morph.VolumeElement;
+import neurord.numeric.morph.CuboidVolumeElement;
+import neurord.geom.Position;
+import neurord.geom.GPosition;
 
 import static org.testng.Assert.assertEquals;
 import static neurord.util.TestUtil.assertArrayEquals;
@@ -16,7 +21,7 @@ import org.testng.annotations.*;
 
 public class TestStimulation {
     public final String SPECIES = "A";
-    public final String SITE = "xxx";
+    public final String SITE = "label";
     public final double RATE = 2;
     public final double ONSET = 100;
     public final double DURATION = 10;
@@ -29,6 +34,16 @@ public class TestStimulation {
 
     final InjectionStim stim = new InjectionStim(SPECIES, SITE, RATE, ONSET, DURATION, PERIOD, END);
     final StimulationTable stimtab = new StimulationTable(Arrays.asList(stim), rtab);
+    final VolumeGrid grid = new VolumeGrid();
+    {
+        VolumeElement el = new CuboidVolumeElement("label", "region", "groupID",
+                                                   new Position[]{},
+                                                   new Position[]{},
+                                                   1.0,
+                                                   new GPosition(0.1, 0.2, 0.3),
+                                                   2.0, 3.0, 4.0, 5.0, 0.5);
+        grid.addElement(el);
+    }
 
     static class FakeRandom implements RandomGenerator {
         @Override public float random() { return 0.5f; }
@@ -43,7 +58,7 @@ public class TestStimulation {
     NextEventQueue queue = new NextEventQueue(new FakeRandom(), null, new int[1][1], true, 0.1, 1);
     NextEventQueue.Numbering numbering = new NextEventQueue.Numbering();
     ArrayList<NextEventQueue.NextStimulation> stims =
-        queue.createStimulations(numbering, null, rtab, stimtab, "none", null);
+        queue.createStimulations(numbering, grid, rtab, stimtab, "none", null);
 
     @Test
     public void testStim() {
