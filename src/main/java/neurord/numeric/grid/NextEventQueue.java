@@ -414,7 +414,7 @@ public class NextEventQueue {
          * forward reactions. May be negative for combined forward and
          * backward reactions.)
          */
-        abstract int execute(int[] eventStatistics, int count);
+        abstract int execute(int[][] eventStatistics, int count);
 
         /**
          * Calculate propensity of this event.
@@ -669,8 +669,7 @@ public class NextEventQueue {
                 /* Sometimes we attempt to execute something but the necessary
                  * reactants are already gone. The extent of executed reaction
                  * might be smaller, or even 0. */
-                done = this.execute(eventStatistics != null ? eventStatistics[this.element()] : null,
-                                    this.extent);
+                done = this.execute(eventStatistics, this.extent);
                 if (done != 0) {
                     /* In reactions of the type Da→Da+MaI the propensity does not change
                      * after execution, but there's nothing to warn about, hence false.
@@ -714,8 +713,7 @@ public class NextEventQueue {
 
             /* Execute leaps immediately */
             if (this.leap) {
-                done = this.execute(eventStatistics != null ? eventStatistics[this.element()] : null,
-                                    this.extent);
+                done = this.execute(eventStatistics, this.extent);
                 if (done != 0) {
                     this._update_propensity(false);
                     if (this.reverse != null)
@@ -857,12 +855,15 @@ public class NextEventQueue {
          */
         public abstract void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose);
 
-        protected void updateStatistics(int[] eventStatistics, int firings) {
+        protected void updateStatistics(int[][] eventStatistics, int firings) {
             if (eventStatistics == null)
                 return;
 
-            eventStatistics[0] += 1;
-            eventStatistics[1] += firings;
+            if (this.stat_index < 0)
+                return;
+
+            eventStatistics[this.stat_index][0] += 1;
+            eventStatistics[this.stat_index][1] += firings;
         }
     }
 
@@ -913,7 +914,7 @@ public class NextEventQueue {
         }
 
         @Override
-        int execute(int[] eventStatistics, int count) {
+        int execute(int[][] eventStatistics, int count) {
             int done = updatePopulation(this.element(), this.sp, -count, this);
             updatePopulation(this.element2, this.sp, -done, this);
             this.updateStatistics(eventStatistics, done);
@@ -1297,7 +1298,7 @@ public class NextEventQueue {
         }
 
         @Override
-        int execute(int[] eventStatistics, int count) {
+        int execute(int[][] eventStatistics, int count) {
             for (int i = 0; i < this.reactants().length; i++)
                 if (particles[this.element()][this.reactants()[i]] < this.reactant_stoichiometry()[i] * count) {
 
@@ -1398,7 +1399,7 @@ public class NextEventQueue {
             return IGridCalc.EventType.STIMULATION;
         }
 
-        int execute(int[] eventStatistics, int count) {
+        int execute(int[][] eventStatistics, int count) {
             updatePopulation(this.element(), this.sp, count, this);
 
             this.updateStatistics(eventStatistics, count);
@@ -1795,6 +1796,7 @@ public class NextEventQueue {
             for (VolumeElement el: targets) {
                 int event_number = numbering.get();
                 int stat_index = makeIndex(stat_indices,
+                                           statistics.equals("injections") ? stim.species :
                                            statistics.equals("by-channel") ? n :
                                            statistics.equals("by-event") ? event_number : -1,
                                            stat_numbering);
@@ -1813,12 +1815,17 @@ public class NextEventQueue {
         return ans;
     }
 
-    public int stat_count(String statistics) {
+    public int stat_count(String statistics, String[] species) {
         HashSet<Integer> set = new HashSet<>();
-        for (IGridCalc.Event ev: this.getEvents())
-            set.add(ev.stat_index());
+        for (IGridCalc.Event ev: this.getEvents()) {
+            int stat_index = ev.stat_index();
+            if (stat_index >= 0)
+                set.add(stat_index);
+        }
 
         switch (statistics) {
+        case "injections":
+            return species.length;
         case "by-channel":
             // assert set.size() == ???
             return set.size();

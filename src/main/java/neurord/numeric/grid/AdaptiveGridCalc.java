@@ -53,7 +53,8 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                                          this.trial() == 0,
                                          statistics);
 
-        final int stat_count = this.neq.stat_count(this.sdRun.getStatistics());
+        final int stat_count = this.neq.stat_count(this.sdRun.getStatistics(),
+                                                   this.sdRun.getSpecies());
         if (stat_count >= 0)
             this.eventStatistics = new int[stat_count][2];
 

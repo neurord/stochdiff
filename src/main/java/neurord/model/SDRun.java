@@ -146,6 +146,7 @@ public class SDRun implements IOutputSet {
         if (statistics != null) {
             switch (statistics) {
             case "none":
+            case "injections":
             case "by-channel":
             case "by-event":
                 break;

@@ -802,7 +802,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             String type = "events";
             this.event_statistics =
                 createExtensibleArray("event_statistics", this.sim, int_t,
-                                      "actual stimulation counts since last snapshot",
+                                      "actual event counts since last snapshot",
                                       "[times × " + type + " × species]",
                                       "count",
                                       CACHE_SIZE1, events, 2);
