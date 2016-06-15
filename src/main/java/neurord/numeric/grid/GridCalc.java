@@ -130,7 +130,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     resultWriter.writeOutputInterval(time, this);
 
                 writeTime += this.sdRun.getOutputInterval();
-                this.resetEventStatistics();
+
+                if (this.sdRun.getStatisticsInterval() > 0)
+                    this.resetEventStatistics();
             }
             for (int i = 0; i < this.dtsOut.length; i++)
                 if (time >= writeTimeArray[i]) {
