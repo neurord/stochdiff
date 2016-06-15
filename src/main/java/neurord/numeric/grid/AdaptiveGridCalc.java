@@ -72,6 +72,15 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                  this.neq.leap_extent, this.neq.leaps,
                  (double)this.neq.leap_extent / this.neq.leaps,
                  this.neq.normal_waits);
+        if (this.sdRun.getStatisticsInterval() == 0 &&
+            this.sdRun.getStatistics().equals("injections")) {
+            String[] species = this.sdRun.getSpecies();
+
+            for (int i = 0; i < species.length; i++)
+                if (this.eventStatistics[i][0] > 0)
+                    log.info("Total injections for {}: {} events, {} molecules",
+                             species[i], this.eventStatistics[i][0], this.eventStatistics[i][1]);
+        }
 
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
