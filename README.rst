@@ -479,7 +479,7 @@ Full list of options can be displayed using `--help`:
         --ic-trial <arg>     trial to take the seed from (default: 0)
         --log <arg>          log file name ("no" to disable)
      -s,--statistics <arg>   override statistics gathering
-                             (none|by-channel|by-event[:interval])
+                             ({none|injections|by-channel|by-event}[:interval])
      -t,--runtime <arg>      override simulation time
      -v,--verbose            increase log level
         --version            print version string and exit

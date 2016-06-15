@@ -178,7 +178,7 @@ public class SDRun implements IOutputSet {
     public String getStatistics() {
         if (this.statistics != null && this.statistics.value != null)
             return this.statistics.value;
-        return "none";
+        return "injections";
     }
 
     public double getStatisticsInterval() {

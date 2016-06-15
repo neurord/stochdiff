@@ -80,7 +80,7 @@ public class StochDiff {
         options.addOption(null, "log", true, "log file name (\"no\" to disable)");
         options.addOption("v", "verbose", false, "increase log level");
         options.addOption("s", "statistics", true, "override statistics gathering " +
-                          "(none|by-channel|by-event[:interval])");
+                          "({none|injections|by-channel|by-event}[:interval])");
 
         Option property = OptionBuilder.withArgName("property=value")
             .hasArgs(2)
