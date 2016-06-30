@@ -1663,6 +1663,10 @@ public class NextEventQueue {
         return map.get(ident);
     }
 
+    private static long neighboursToIndex(int el, int el2, int species, int nel, int nspecies) {
+        return ((long) el * nel + el2) * nspecies + species;
+    }
+
     ArrayList<NextDiffusion> createDiffusions(Numbering numbering, VolumeGrid grid, ReactionTable rtab,
                                               String statistics, Numbering stat_numbering) {
         double[] volumes = grid.getElementVolumes();
@@ -1674,7 +1678,8 @@ public class NextEventQueue {
         ArrayList<NextDiffusion> ans = new ArrayList<>(5 * neighbors.length);
 
         int nel = grid.size();
-        NextDiffusion[][][] rev = new NextDiffusion[nel][nel][fdiff.length];
+
+        HashMap<Long, NextDiffusion> rev = new HashMap<>();
 
         HashMap<Integer, Integer> stat_indices = new HashMap<>();
 
@@ -1706,10 +1711,14 @@ public class NextEventQueue {
                             /* Here we take advantage of the fact that either
                              * the "forward" or "backward" diffusion must be added
                              * earlier. */
-                            if (rev[el2][el][sp] != null)
-                                diff.addReverse(rev[el2][el][sp]);
-                            else
-                                rev[el][el2][sp] = diff;
+                            long revnumber = neighboursToIndex(el2, el, sp, nel, species.length);
+                            NextDiffusion revdiff = rev.get(revnumber);
+                            if (revdiff != null)
+                                diff.addReverse(revdiff);
+                            else {
+                                revnumber = neighboursToIndex(el, el2, sp, nel, species.length);
+                                rev.put(revnumber, diff);
+                            }
                         }
             }
         }
