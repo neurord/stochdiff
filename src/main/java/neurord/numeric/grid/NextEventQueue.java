@@ -129,7 +129,7 @@ public class NextEventQueue {
                     return Double.compare(a.time(), b.time());
                 }
             };
-            log.info("Sorting {} nodes", nodes.length);
+            log.debug("Sorting {} nodes", nodes.length);
             Arrays.sort(nodes, c);
 
             for (int i = 0; i < nodes.length; i++)
@@ -1868,7 +1868,7 @@ public class NextEventQueue {
         e.addAll(obj.createStimulations(numbering, grid, rtab, stimtab, statistics, stat_numbering));
         obj.queue.build(e.toArray(new NextEvent[0]));
 
-        log.info("Creating dependency graph");
+        log.debug("Creating dependency graph");
         final HashMap<Integer, ArrayList<NextEvent>> map = new HashMap<>();
         for (NextEvent ev: e) {
             if (verbose)
@@ -1883,7 +1883,7 @@ public class NextEventQueue {
                             verbose && (log_start_events == -1 || i++ < log_start_events));
 
         if (verbose) {
-            log.info("{} events at the beginning:", obj.queue.nodes.length);
+            log.info("{} event channels:", obj.queue.nodes.length);
             i = 0;
 
             for (NextEvent ev: obj.queue.nodes) {
@@ -1903,7 +1903,8 @@ public class NextEventQueue {
                     break;
                 }
             }
-        }
+        } else
+            log.info("{} event channels", obj.queue.nodes.length);
 
         log_dependency_edges(e);
 

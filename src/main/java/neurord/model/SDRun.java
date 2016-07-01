@@ -327,7 +327,7 @@ public class SDRun implements IOutputSet {
             }
 
             d = Math.min(d, ArrayUtil.min(candidate_grid_sizes));
-            log.info("subvolume grid size is: {} (from radii {}, candidates {}, default {})",
+            log.info("Subvolume grid size is: {} (from radii {}, candidates {}, default {})",
                      d, diameters, candidate_grid_sizes, disc.getDefaultMaxElementSide());
 
             if (disc.curvedElements()) {
@@ -345,6 +345,7 @@ public class SDRun implements IOutputSet {
                                 deltaX,
                                 volumeGrid);
             volumeGrid.fix();
+            log.info("{} subvolumes", volumeGrid.size());
         }
 
         return this.volumeGrid;
