@@ -352,7 +352,7 @@
       <!-- just report a count of stimulation, diffusion, and reaction events -->
       <xs:enumeration value="none" />
       <!-- just report a count of injections by species -->
-      <xs:enumeration value="injection" />
+      <xs:enumeration value="injections" />
       <!-- report each event as specified in the model file -->
       <xs:enumeration value="by-channel" />
       <!-- report each event as present in the dependency graph -->
