@@ -281,7 +281,7 @@ public class NextEventQueue {
          * or e.g. shared between all diffusion events for the same species,
          * or negative, to ignore.
          */
-        final int stat_index;
+        final IndexDescription stat_index;
         final private int element;
         final String signature;
         final private int[] reactants;
@@ -330,7 +330,7 @@ public class NextEventQueue {
         public abstract IGridCalc.EventType event_type();
         Happening happening;
 
-        NextEvent(int event_number, int stat_index,
+        NextEvent(int event_number, IndexDescription stat_index,
                   int element, String signature, int[] reactants, int[] reactant_stoichiometry) {
             for (int i: reactant_stoichiometry)
                 assert i > 0;
@@ -361,7 +361,16 @@ public class NextEventQueue {
 
         @Override
         public int stat_index() {
-            return this.stat_index;
+            if (this.stat_index != null)
+                return this.stat_index.position;
+            return -1;
+        }
+
+        @Override
+        public String stat_index_description() {
+            if (this.stat_index != null)
+                return this.stat_index.description;
+            return null;
         }
 
         public int index() {
@@ -859,11 +868,11 @@ public class NextEventQueue {
             if (eventStatistics == null)
                 return;
 
-            if (this.stat_index < 0)
+            if (this.stat_index == null)
                 return;
 
-            eventStatistics[this.stat_index][0] += 1;
-            eventStatistics[this.stat_index][1] += firings;
+            eventStatistics[this.stat_index.position][0] += 1;
+            eventStatistics[this.stat_index.position][1] += firings;
         }
     }
 
@@ -891,7 +900,7 @@ public class NextEventQueue {
          * @param signature string to use in reporting
          * @param fdiff diffusion constant
          */
-        NextDiffusion(int event_number, int stat_index,
+        NextDiffusion(int event_number, IndexDescription stat_index,
                       int element, int element2, int index2,
                       int sp, String signature, double fdiff) {
             super(event_number, stat_index, element, signature,
@@ -1138,7 +1147,7 @@ public class NextEventQueue {
          * @param volume voxel volume
          */
         NextReaction(int event_number,
-                     int stat_index,
+                     IndexDescription stat_index,
                      int index, int element, int[] reactants, int[] products,
                      int[] reactant_stoichiometry, int[] product_stoichiometry,
                      int[] reactant_powers, String signature,
@@ -1379,7 +1388,7 @@ public class NextEventQueue {
          * @param signature description
          * @param stim stimulation parameters
          */
-        NextStimulation(int event_number, int stat_index,
+        NextStimulation(int event_number, IndexDescription stat_index,
                         int element, double fraction, int sp, String signature,
                         Stimulation stim) {
             super(event_number, stat_index, element, signature,
@@ -1652,15 +1661,45 @@ public class NextEventQueue {
     }
 
     /**
-     * Helper function to make it easy to generate stat_indices for each event
-     * type. For each event type we want to map the events into a non-overlapping
+     * Helper function and class to make it easy to generate stat_indices for each
+     * event type. For each event type we want to map the events into a non-overlapping
      * range of numbers. */
-    int makeIndex(HashMap<Integer, Integer> map, int ident, Numbering numbering) {
-        if (ident == -1)
-            return -1;
-        if (!map.containsKey(ident))
-            map.put(ident, numbering.get());
-        return map.get(ident);
+    static class IndexOption {
+        public final String label;
+        public final int ident;
+        public final String description;
+
+        IndexOption(String label, int ident, String description) {
+            this.label = label;
+            this.ident = ident;
+            this.description = description;
+        }
+    }
+
+    static class IndexDescription {
+        public final String description;
+        public final int position;
+
+        IndexDescription(String description, int position) {
+            this.description = description;
+            this.position = position;
+        }
+    }
+
+    static IndexDescription makeIndex(String choice,
+                                      HashMap<Integer, IndexDescription> map, Numbering numbering,
+                                      IndexOption... options) {
+        for (IndexOption opt: options)
+            if (opt.label.equals(choice)) {
+                if (!map.containsKey(opt.ident))
+                    map.put(opt.ident, new IndexDescription(opt.description, numbering.get()));
+                IndexDescription desc = map.get(opt.ident);
+                assert desc.description.equals(opt.description);
+                return desc;
+            }
+
+        /* not matched */
+        return null;
     }
 
     private static long neighboursToIndex(int el, int el2, int species, int nel, int nspecies) {
@@ -1681,7 +1720,7 @@ public class NextEventQueue {
 
         HashMap<Long, NextDiffusion> rev = new HashMap<>();
 
-        HashMap<Integer, Integer> stat_indices = new HashMap<>();
+        HashMap<Integer, IndexDescription> stat_indices = new HashMap<>();
 
         for (int el = 0; el < neighbors.length; el++) {
             log.debug("el.{} neighbors {}", el, neighbors[el]);
@@ -1694,10 +1733,13 @@ public class NextEventQueue {
                             // probability is dt * K_diff * contact_area /
                             // (center_to_center_distance * source_volume)
                             int event_number = numbering.get();
-                            int stat_index = makeIndex(stat_indices,
-                                                       statistics.equals("by-channel") ? sp :
-                                                       statistics.equals("by-event") ? event_number : -1,
-                                                       stat_numbering);
+                            IndexDescription stat_index =
+                                makeIndex(statistics,
+                                          stat_indices, stat_numbering,
+                                          new IndexOption("by-channel", sp,
+                                                          "diffusion of species " + species[sp]),
+                                          new IndexOption("by-event", event_number,
+                                                          "diffusion event " + event_number));
 
                             NextDiffusion diff = new NextDiffusion(event_number, stat_index,
                                                                    el, el2, j, sp, species[sp],
@@ -1746,7 +1788,7 @@ public class NextEventQueue {
         log.debug("reversible_pairs: {}", reversible_pairs);
 
         String[] species = rtab.getSpecies();
-        HashMap<Integer, Integer> stat_indices = new HashMap<>();
+        HashMap<Integer, IndexDescription> stat_indices = new HashMap<>();
 
         ArrayList<NextReaction> ans = new ArrayList<>(RI.length * volumes.length);
 
@@ -1757,10 +1799,13 @@ public class NextEventQueue {
             for (int el = 0; el < volumes.length; el++) {
                 String signature = getReactionSignature(ri, rs, pi, ps, species);
                 int event_number = numbering.get();
-                int stat_index = makeIndex(stat_indices,
-                                           statistics.equals("by-channel") ? r :
-                                           statistics.equals("by-event") ? event_number : -1,
-                                           stat_numbering);
+                IndexDescription stat_index =
+                    makeIndex(statistics,
+                              stat_indices, stat_numbering,
+                              new IndexOption("by-channel", r,
+                                              "reaction no. " + r),
+                              new IndexOption("by-event", r,
+                                              "reaction event " + event_number));
 
                 ans.add(new NextReaction(event_number, stat_index,
                                          r, el, ri, pi, rs, ps, rp,
@@ -1789,7 +1834,7 @@ public class NextEventQueue {
                                                   String statistics,
                                                   Numbering stat_numbering) {
         String[] species = rtab.getSpecies();
-        HashMap<Integer, Integer> stat_indices = new HashMap<>();
+        HashMap<Integer, IndexDescription> stat_indices = new HashMap<>();
         ArrayList<StimulationTable.Stimulation> stims = stimtab.getStimulations();
 
         ArrayList<NextStimulation> ans = new ArrayList<>();
@@ -1804,11 +1849,15 @@ public class NextEventQueue {
 
             for (VolumeElement el: targets) {
                 int event_number = numbering.get();
-                int stat_index = makeIndex(stat_indices,
-                                           statistics.equals("injections") ? stim.species :
-                                           statistics.equals("by-channel") ? n :
-                                           statistics.equals("by-event") ? event_number : -1,
-                                           stat_numbering);
+                IndexDescription stat_index =
+                    makeIndex(statistics,
+                              stat_indices, stat_numbering,
+                              new IndexOption("by-channel", n,
+                                              "stimulation no. " + n),
+                              new IndexOption("by-event", event_number,
+                                              "stimulation event " + event_number),
+                              new IndexOption("injections", stim.species,
+                                              "stimulation of species " + species[stim.species]));
 
                 ans.add(new NextStimulation(event_number, stat_index,
                                             el.getNumber(),

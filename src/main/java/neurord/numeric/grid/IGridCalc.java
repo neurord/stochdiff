@@ -63,6 +63,7 @@ public interface IGridCalc {
         int[] substrate_stoichiometry();
 
         int stat_index();
+        String stat_index_description();
 
         Collection<Event> dependent();
     }
