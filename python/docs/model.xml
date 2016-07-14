@@ -1,0 +1,69 @@
+<SDRun xmlns="http://stochdiff.textensor.org">
+    <ReactionScheme>
+        <Specie name="A"/>
+        <Specie name="B"/>
+        <Specie name="C"/>
+        <Specie name="D"/>
+        <Reaction>
+            <Reactant specieID="A"/>
+            <Reactant specieID="B"/>
+            <Product specieID="C"/>
+            <forwardRate>1.0E-5</forwardRate>
+        </Reaction>
+        <Reaction>
+            <Reactant specieID="C" power="2"/>
+            <Product specieID="D"/>
+            <forwardRate>1.0E-6</forwardRate>
+            <reverseRate>1.0E-5</reverseRate>
+        </Reaction>
+    </ReactionScheme>
+    <StimulationSet>
+        <InjectionStim specieID="B" injectionSite="pointA">
+            <rate>361.4</rate>
+            <onset>800.0</onset>
+            <duration>10.0</duration>
+        </InjectionStim>
+    </StimulationSet>
+    <Morphology>
+        <Segment id="seg1" region="nuc">
+            <start x="0.0" y="0.0" z="0.0" r="1.0"/>
+            <end x="2.0" y="0.0" z="0.0" r="1.0" label="pointA"/>
+        </Segment>
+    </Morphology>
+    <InitialConditions>
+        <ConcentrationSet>
+            <NanoMolarity value="1050.0" specieID="A"/>
+            <NanoMolarity value="1000.0" specieID="B"/>
+            <NanoMolarity value="0.0" specieID="C"/>
+            <NanoMolarity value="0.0" specieID="D"/>
+        </ConcentrationSet>
+    </InitialConditions>
+    <OutputScheme>
+        <OutputSet filename="all" outputInterval="100.0">
+            <OutputSpecie name="A"/>
+            <OutputSpecie name="B"/>
+            <OutputSpecie name="C"/>
+            <OutputSpecie name="D"/>
+        </OutputSet>
+        <OutputSet filename="some" outputInterval="50.0">
+            <OutputSpecie name="C"/>
+            <OutputSpecie name="D"/>
+        </OutputSet>
+    </OutputScheme>
+    <discretization>
+        <defaultMaxElementSide>2.0</defaultMaxElementSide>
+    </discretization>
+    <stateSaveInterval>0.0</stateSaveInterval>
+    <geometry>2D</geometry>
+    <depth2D>0.5</depth2D>
+    <runtime>1000.0</runtime>
+    <spineSeed>123</spineSeed>
+    <simulationSeed>0</simulationSeed>
+    <outputInterval>5.0</outputInterval>
+    <outputQuantity>NUMBER</outputQuantity>
+    <tolerance>0.001</tolerance>
+    <leap_min_jump>2.0</leap_min_jump>
+    <calculation>GRID_ADAPTIVE</calculation>
+    <distribution>BINOMIAL</distribution>
+    <algorithm>INDEPENDENT</algorithm>
+</SDRun>
