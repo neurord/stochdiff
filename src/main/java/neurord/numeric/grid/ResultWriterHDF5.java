@@ -793,7 +793,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.populations.get(i).writePopulation(time, source);
         }
 
-        protected void initEventStatistics(boolean periodic, int events)
+        protected void initEventStatistics(boolean periodic, IGridCalc source, int expected)
             throws Exception
         {
             assert this.event_statistics == null;
@@ -805,7 +805,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                                       "actual event counts since last snapshot",
                                       "[times × " + type + " × species]",
                                       "count",
-                                      CACHE_SIZE1, events, 2);
+                                      CACHE_SIZE1, expected, 2);
 
             if (periodic)
                 this.statistics_times =
@@ -814,6 +814,22 @@ public class ResultWriterHDF5 implements ResultWriter {
                                           "[times]",
                                           "ms",
                                           CACHE_SIZE1);
+
+            String[] descriptions = new String[expected];
+            for (IGridCalc.Event ev: source.getEvents()) {
+                int stat_index = ev.stat_index();
+                if (stat_index >= 0)
+                    descriptions[stat_index] = ev.stat_index_description();
+            }
+            for (int i = 0; i < descriptions.length; i++)
+                if (descriptions[i] == null)
+                    descriptions[i] = "";
+
+            log.info("descriptions: {}", descriptions);
+            Dataset ds = writeVector("event_statistics_d", this.sim, descriptions);
+            setAttribute(ds, "TITLE", "descriptions of statistics rows");
+            setAttribute(ds, "LAYOUT", "[nstatistics]");
+            setAttribute(ds, "UNITS", "text");
         }
 
         protected void writeEventStatistics(double time, IGridCalc source)
@@ -825,6 +841,7 @@ public class ResultWriterHDF5 implements ResultWriter {
 
             if (this.event_statistics == null)
                 this.initEventStatistics(source.getSource().getStatisticsInterval() > 0,
+                                         source,
                                          stats.length);
 
             log.debug("Writing event statistics at time {}", time);
