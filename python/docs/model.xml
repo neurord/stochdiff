@@ -38,7 +38,7 @@
             <NanoMolarity value="0.0" specieID="D"/>
         </ConcentrationSet>
     </InitialConditions>
-    <OutputScheme>
+    <OutputScheme dependencies="true">
         <OutputSet filename="all" outputInterval="100.0">
             <OutputSpecie name="A"/>
             <OutputSpecie name="B"/>

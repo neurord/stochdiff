@@ -59,11 +59,11 @@ class Dependencies(object):
     ...                         deps.elements(),
     ...                         deps.descriptions(),
     ...                         deps.dependent()):
-    ...     print('type {} in voxel {} "{}" dependent: {}'.format(t, e, d, dep))
-    type 0 in voxel 0 "NextReaction el.0 A+B→C" dependent: [1]
-    type 0 in voxel 0 "NextReaction el.0 2×C→D" dependent: [2]
-    type 0 in voxel 0 "NextReaction el.0 D→2×C" dependent: [1]
-    type 2 in voxel 0 "NextStimulation el.0 B" dependent: [0]
+    ...     print('type {} in voxel {} "{}" dependent: {}'.format(t, e[0], d, dep))
+    type 0 in voxel 0 "Reaction el.0 A+B→C" dependent: [1]
+    type 0 in voxel 0 "Reaction el.0 2×C→D" dependent: [2]
+    type 0 in voxel 0 "Reaction el.0 D→2×C" dependent: [1]
+    type 2 in voxel 0 "Stimulation el.0 B" dependent: [0]
     """
     def __init__(self, element):
         self._element = element
@@ -157,7 +157,7 @@ class Model(object):
     def __init__(self, element):
         self._element = element
         try:
-            self.dependencies = Dependencies(self._element.dependencies)
+            self.dependencies = Dependencies(self._element.events)
         except tables.exceptions.NoSuchNodeError as e:
             self.dependencies = None
         self.reactions = Reactions(self._element.reactions)
