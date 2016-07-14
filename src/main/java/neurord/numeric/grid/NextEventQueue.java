@@ -1667,22 +1667,26 @@ public class NextEventQueue {
     static class IndexOption {
         public final String label;
         public final int ident;
-        public final String description;
 
-        IndexOption(String label, int ident, String description) {
+        IndexOption(String label, int ident) {
             this.label = label;
             this.ident = ident;
-            this.description = description;
         }
     }
 
     static class IndexDescription {
-        public final String description;
         public final int position;
+        public String description;
 
-        IndexDescription(String description, int position) {
-            this.description = description;
+        IndexDescription(int position) {
             this.position = position;
+        }
+
+        public void setDescription(String description) {
+            assert this.description == null ||
+                this.description.equals(description):
+                    this.description + " vs. " + description;
+            this.description = description;
         }
     }
 
@@ -1692,10 +1696,8 @@ public class NextEventQueue {
         for (IndexOption opt: options)
             if (opt.label.equals(choice)) {
                 if (!map.containsKey(opt.ident))
-                    map.put(opt.ident, new IndexDescription(opt.description, numbering.get()));
+                    map.put(opt.ident, new IndexDescription(numbering.get()));
                 IndexDescription desc = map.get(opt.ident);
-                assert desc.description.equals(opt.description):
-                    desc.description + " vs. " + opt.description;
                 return desc;
             }
 
@@ -1737,10 +1739,8 @@ public class NextEventQueue {
                             IndexDescription stat_index =
                                 makeIndex(statistics,
                                           stat_indices, stat_numbering,
-                                          new IndexOption("by-channel", sp,
-                                                          "diffusion of species " + species[sp]),
-                                          new IndexOption("by-event", event_number,
-                                                          "diffusion event " + event_number));
+                                          new IndexOption("by-channel", sp),
+                                          new IndexOption("by-event", event_number));
 
                             NextDiffusion diff = new NextDiffusion(event_number, stat_index,
                                                                    el, el2, j, sp, species[sp],
@@ -1762,6 +1762,11 @@ public class NextEventQueue {
                                 revnumber = neighboursToIndex(el, el2, sp, nel, species.length);
                                 rev.put(revnumber, diff);
                             }
+
+                            if (statistics.equals("by-channel"))
+                                stat_index.setDescription("Diffusion of " + species[sp]);
+                            else if (statistics.equals("by-event"))
+                                stat_index.setDescription(diff.toString());
                         }
             }
         }
@@ -1803,15 +1808,19 @@ public class NextEventQueue {
                 IndexDescription stat_index =
                     makeIndex(statistics,
                               stat_indices, stat_numbering,
-                              new IndexOption("by-channel", r,
-                                              "reaction no. " + r),
-                              new IndexOption("by-event", event_number,
-                                              "reaction event " + event_number));
+                              new IndexOption("by-channel", r),
+                              new IndexOption("by-event", event_number));
 
-                ans.add(new NextReaction(event_number, stat_index,
-                                         r, el, ri, pi, rs, ps, rp,
-                                         signature,
-                                         rate, volumes[el]));
+                NextReaction ev = new NextReaction(event_number, stat_index,
+                                                   r, el, ri, pi, rs, ps, rp,
+                                                   signature,
+                                                   rate, volumes[el]);
+                ans.add(ev);
+
+                if (statistics.equals("by-channel"))
+                    stat_index.setDescription("Reaction " + signature);
+                else if (statistics.equals("by-event"))
+                    stat_index.setDescription(ev.toString());
             }
         }
 
@@ -1853,19 +1862,26 @@ public class NextEventQueue {
                 IndexDescription stat_index =
                     makeIndex(statistics,
                               stat_indices, stat_numbering,
-                              new IndexOption("by-channel", n,
-                                              "stimulation no. " + n),
-                              new IndexOption("by-event", event_number,
-                                              "stimulation event " + event_number),
-                              new IndexOption("injections", stim.species,
-                                              "stimulation of species " + species[stim.species]));
+                              new IndexOption("by-channel", n),
+                              new IndexOption("by-event", event_number),
+                              new IndexOption("injections", stim.species));
 
-                ans.add(new NextStimulation(event_number, stat_index,
-                                            el.getNumber(),
-                                            submembrane ? el.getExposedArea() / sum : 1.0,
-                                            stim.species,
-                                            species[stim.species],
-                                            stim));
+                NextStimulation ev = new NextStimulation(event_number, stat_index,
+                                                         el.getNumber(),
+                                                         submembrane ? el.getExposedArea() / sum : 1.0,
+                                                         stim.species,
+                                                         species[stim.species],
+                                                         stim);
+                ans.add(ev);
+
+                if (statistics.equals("by-channel"))
+                    stat_index.setDescription(String.format("Stimulation %s→%s",
+                                                            species[stim.species],
+                                                            stim.site));
+                else if (statistics.equals("by-event"))
+                    stat_index.setDescription(ev.toString());
+                else if (statistics.equals("injections"))
+                    stat_index.setDescription("stimulation of species " + species[stim.species]);
             }
         }
 
