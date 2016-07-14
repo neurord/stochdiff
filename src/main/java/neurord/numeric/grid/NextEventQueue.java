@@ -1694,7 +1694,8 @@ public class NextEventQueue {
                 if (!map.containsKey(opt.ident))
                     map.put(opt.ident, new IndexDescription(opt.description, numbering.get()));
                 IndexDescription desc = map.get(opt.ident);
-                assert desc.description.equals(opt.description);
+                assert desc.description.equals(opt.description):
+                    desc.description + " vs. " + opt.description;
                 return desc;
             }
 
@@ -1804,7 +1805,7 @@ public class NextEventQueue {
                               stat_indices, stat_numbering,
                               new IndexOption("by-channel", r,
                                               "reaction no. " + r),
-                              new IndexOption("by-event", r,
+                              new IndexOption("by-event", event_number,
                                               "reaction event " + event_number));
 
                 ans.add(new NextReaction(event_number, stat_index,
