@@ -138,7 +138,12 @@ public class StochDiff {
             unsuffixed = new File(argv[0]);
 
         if (argv.length > 1) {
-            outputFile = new File(argv[1]);
+            if (argv[1].endsWith(".h5") ||
+                argv[1].endsWith(".txt") ||
+                argv[1].endsWith(".log"))
+                outputFile = new File(argv[1].substring(0, argv[1].lastIndexOf(".")));
+            else
+                outputFile = new File(argv[1]);
             if (outputFile.isDirectory())
                 outputFile = new File(outputFile, unsuffixed.getName());
         } else
