@@ -392,7 +392,7 @@ class Output(object):
         >>> counts.head(1)
                                  count
         voxel time specie trial       
-        0     0    A      0       1265
+        0     0.0  A      0       1265
 
         Calculate average over trials
 
@@ -400,7 +400,7 @@ class Output(object):
         >>> gb.mean().head(1)
                              count
         voxel time specie         
-        0     0    A       1264.67
+        0     0.0  A       1264.68
 
         Calculate mean and standard deviation
 
@@ -409,8 +409,8 @@ class Output(object):
                              count          
                               mean       std
         voxel time specie                   
-        0     0    A       1264.67  0.472582
-                   B       1204.47  0.501614
+        0     0.0  A       1264.68  0.468826
+                   B       1204.40  0.492366
                    C          0.00  0.000000
         """
         sims = self.simulations()
@@ -430,11 +430,11 @@ class Output(object):
         >>> out.counts().head(1)
                                  count
         voxel time specie trial       
-        0     0    A      0       1265
+        0     0.0  A      0       1265
         >>> out.concentrations().head(1)
                                  concentration
         voxel time specie trial               
-        0     0    A      0         1050.29078
+        0     0.0  A      0         1050.29078
         """
         counts = self.counts(output_group)
         volumes = self.model.grid().volume
