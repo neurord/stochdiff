@@ -58,7 +58,7 @@
     <depth2D>0.5</depth2D>
     <runtime>1000.0</runtime>
     <spineSeed>123</spineSeed>
-    <simulationSeed>0</simulationSeed>
+    <simulationSeed>666</simulationSeed>
     <outputInterval>5.0</outputInterval>
     <outputQuantity>NUMBER</outputQuantity>
     <tolerance>0.001</tolerance>
