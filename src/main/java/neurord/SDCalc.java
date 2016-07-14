@@ -42,11 +42,6 @@ public class SDCalc {
     public SDCalc(SDRun sdr, File output) {
         this.sdRun = sdr;
 
-        if (trials > 1 && sdr.simulationSeed > 0) {
-            log.log(Logging.NOTICE, "Ignoring fixed simulation seed");
-            sdr.simulationSeed = 0;
-        }
-
         for (String type: writers) {
             final ResultWriter writer;
             final VolumeGrid grid = sdr.getVolumeGrid();

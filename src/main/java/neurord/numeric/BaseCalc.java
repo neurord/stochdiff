@@ -97,7 +97,7 @@ public abstract class BaseCalc implements Runnable {
     public long getSimulationSeed() {
         if (this.seed == -1) {
             if (this.sdRun.simulationSeed > 0)
-                seed = this.sdRun.simulationSeed;
+                seed = this.sdRun.simulationSeed + this.trial;
             else
                 seed = Math.abs(new Random().nextInt());
             log.info("Trial {}: running with simulationSeed {}", this.trial(), seed);
