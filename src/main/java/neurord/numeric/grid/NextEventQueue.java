@@ -1674,12 +1674,15 @@ public class NextEventQueue {
         }
     }
 
-    static class IndexDescription {
+    final HashMap<Integer, IndexDescription> stat_descriptions = new HashMap<>();
+
+    class IndexDescription {
         public final int position;
         public String description;
 
         IndexDescription(int position) {
             this.position = position;
+            stat_descriptions.put(position, this);
         }
 
         public void setDescription(String description) {
@@ -1690,9 +1693,9 @@ public class NextEventQueue {
         }
     }
 
-    static IndexDescription makeIndex(String choice,
-                                      HashMap<Integer, IndexDescription> map, Numbering numbering,
-                                      IndexOption... options) {
+    IndexDescription makeIndex(String choice,
+                               HashMap<Integer, IndexDescription> map, Numbering numbering,
+                               IndexOption... options) {
         for (IndexOption opt: options)
             if (opt.label.equals(choice)) {
                 if (!map.containsKey(opt.ident))
@@ -1881,7 +1884,7 @@ public class NextEventQueue {
                 else if (statistics.equals("by-event"))
                     stat_index.setDescription(ev.toString());
                 else if (statistics.equals("injections"))
-                    stat_index.setDescription("stimulation of species " + species[stim.species]);
+                    stat_index.setDescription("Stimulation of species " + species[stim.species]);
             }
         }
 
@@ -1900,9 +1903,7 @@ public class NextEventQueue {
 
         switch (statistics) {
         case "injections":
-            return species.length;
         case "by-channel":
-            // assert set.size() == ???
             return set.size();
         case "by-event":
             assert set.size() == this.getEvents().size();

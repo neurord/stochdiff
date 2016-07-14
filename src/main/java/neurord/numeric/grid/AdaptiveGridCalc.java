@@ -73,14 +73,18 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                  (double)this.neq.leap_extent / this.neq.leaps,
                  this.neq.normal_waits);
         if (this.sdRun.getStatisticsInterval() == 0 &&
-            this.sdRun.getStatistics().equals("injections")) {
-            String[] species = this.sdRun.getSpecies();
+            (this.sdRun.getStatistics().equals("injections") ||
+             this.sdRun.getStatistics().equals("by-channel")))
+            for (int i = 0; i < this.eventStatistics.length; i++) {
+                /* We only want to report injections, and only when we have
+                 * the aggregate numbers of the simulation and species. */
 
-            for (int i = 0; i < species.length; i++)
-                if (this.eventStatistics[i][0] > 0)
-                    log.info("Total injections for {}: {} events, {} molecules",
-                             species[i], this.eventStatistics[i][0], this.eventStatistics[i][1]);
-        }
+                NextEventQueue.IndexDescription desc = this.neq.stat_descriptions.get(i);
+                if (desc.description.startsWith("Stim"))
+                    log.info("{}: {} events, {} molecules",
+                             desc.description,
+                             this.eventStatistics[i][0], this.eventStatistics[i][1]);
+            }
 
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
