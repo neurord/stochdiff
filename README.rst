@@ -18,7 +18,7 @@ In all files, lines beginning "<!--" are XML comments and can be left out of rea
 
 Units
 ~~~~~
-Times are expressed in milliseconds and distances in microns. Concentrations are in nanoMoles per litre, but the same quantities may alternatively be set by specifying a number density in particles per square micron (which is almost equivalent - a 1 nM solution averages about 0.6 particles per square micron). Reaction rates are in transitions per millisecond and mobilities are in mu2/s.
+Times are expressed in milliseconds and distances in microns. Concentrations are in nanoMoles per litre, but the same quantities may alternatively be set by specifying a number density in particles per square micron (which is almost equivalent - a 1 nM solution averages about 0.6 particles per square micron). Reaction rates are in transitions per millisecond per concentration raise to the order or the reaction, and mobilities are in µm²/s.
 
 Reactions Scheme File
 ---------------------
@@ -27,21 +27,21 @@ The reaction file has two parts. The first part is a listing of all molecule spe
 
 .. code-block:: xml
 
-     <Specie name="name" id="id" kdiff="constant" kdiffunit="mu2/s" />
+     <Specie name="name" id="id" kdiff="constant" kdiffunit="µm²/s" />
 
 Two examples follow:
 
-1.  example for diffusing molecule specification:
+1.  example for two diffusing molecule specification:
 
 .. code-block:: xml
 
-     <Specie name="IP3"   kdiff="100"   kdiffunit = "mu2/s"/>
+     <Specie name="IP3"   kdiff="100"   kdiffunit = "µm²/s"/>
 
 2.  examples for non-diffusing molecule specification:
 
 .. code-block:: xml
 
-     <Specie name="PIP2"  kdiff="0"     kdiffunit = "mu2/s"/>
+     <Specie name="PIP2"  kdiff="0" />
 
 Reactions
 ~~~~~~~~~

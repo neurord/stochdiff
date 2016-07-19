@@ -9,7 +9,7 @@
   <!-- last rxn of Ip35p1p2 was wrong reactant:fixed on Aug,8th,2008
        Chosen katp=1 sec(not 10 sec) is enough   -->
 
-  <Specie name="cAMP" id="cAMP" kdiff="300" kdiffunit = "mu2/s"/>
+  <Specie name="cAMP" id="cAMP" kdiff="300" kdiffunit = "µm²/s"/>
 
 
 

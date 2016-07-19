@@ -44,16 +44,16 @@ public class Specie {
     private double getFactor(String su) {
         // output units are microns^2/ms
 
-        if (su == null || su.equals("mu2/s"))
+        if (su == null || su.equals("µm²/s") || su.equals("mu2/s"))
             return 0.001;
 
         if (su.equals("m2/s"))
             return 1.e9;
 
-        if (su.equals("cm2/s"))
+        if (su.equals("cm²/s") || su.equals("cm2/s"))
             return 1.e5;
 
-        if (su.equals("mu2/ms"))
+        if (su.equals("µm²/ms") || su.equals("mu2/ms"))
             return 1.;
 
         log.error("Unknown units '{}'", su);

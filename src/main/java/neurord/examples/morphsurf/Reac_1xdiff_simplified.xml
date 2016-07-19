@@ -9,17 +9,17 @@
        Chosen katp=1 sec (not 10 sec) is enough.  -->
   <!-- Suggested by Avrama Ca kdiff=600 for helping fast decay on Feb 24th 2009 -->
 
-  <Specie name="Ca" id="Ca" kdiff="174.3" kdiffunit="mu2/s"/>
-  <Specie name="CaOut" id="CaOut" kdiff="174.3" kdiffunit="mu2/s"/>
-  <Specie name="CaOutLeak" id="CaOutLeak" kdiff="0" kdiffunit="mu2/s"/>
-  <Specie name="Leak" id="Leak" kdiff="0" kdiffunit="mu2/s"/>
-  <Specie name="Calbin" id="Calbin" kdiff="9.3" kdiffunit="mu2/s"/>
-  <Specie name="CalbinC" id="CalbinC" kdiff="9.3" kdiffunit="mu2/s"/>
+  <Specie name="Ca" id="Ca" kdiff="174.3" kdiffunit="µm²/s"/>
+  <Specie name="CaOut" id="CaOut" kdiff="174.3" kdiffunit="µm²/s"/>
+  <Specie name="CaOutLeak" id="CaOutLeak" kdiff="0" kdiffunit="µm²/s"/>
+  <Specie name="Leak" id="Leak" kdiff="0" kdiffunit="µm²/s"/>
+  <Specie name="Calbin" id="Calbin" kdiff="9.3" kdiffunit="µm²/s"/>
+  <Specie name="CalbinC" id="CalbinC" kdiff="9.3" kdiffunit="µm²/s"/>
 
-  <Specie name="pmca" id="pmca" kdiff="0" kdiffunit="mu2/s"/>
-  <Specie name="ncx" id="ncx" kdiff="0" kdiffunit="mu2/s"/>
-  <Specie name="pmcaCa" id="pmcaCa" kdiff="0" kdiffunit="mu2/s"/>
-  <Specie name="ncxCa" id="ncxCa" kdiff="0" kdiffunit="mu2/s"/>
+  <Specie name="pmca" id="pmca" kdiff="0" kdiffunit="µm²/s"/>
+  <Specie name="ncx" id="ncx" kdiff="0" kdiffunit="µm²/s"/>
+  <Specie name="pmcaCa" id="pmcaCa" kdiff="0" kdiffunit="µm²/s"/>
+  <Specie name="ncxCa" id="ncxCa" kdiff="0" kdiffunit="µm²/s"/>
 
   <!-- Ca pump high affinity -    Ca + pmca <-> pmcaCa -->
   <Reaction name = "Ca_pump1a" id="Ca_pump1a">

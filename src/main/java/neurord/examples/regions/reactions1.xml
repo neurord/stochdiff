@@ -4,10 +4,10 @@
 	   specified they are assumed to be micron^2/second, (microns written "mu" here)
 	   it should understand microns, mm, and m for distances and seconds and ms for times --> 
 
-  <Specie name="SpecieA" id="a" kdiff="20" kdiffunit = "mu2/s"/>
-  <Specie name="SpecieB" id="b" kdiff="20" kdiffunit = "mu2/s"/>
-  <Specie name="SpecieC" id="c" kdiff="0.000" kdiffunit = "mu2/ms"/>
-  <Specie name="SpecieD" id="d" kdiff="0.000" kdiffunit = "mu2/ms"/>
+  <Specie name="SpecieA" id="a" kdiff="20" kdiffunit = "µm²/s"/>
+  <Specie name="SpecieB" id="b" kdiff="20" kdiffunit = "µm²/s"/>
+  <Specie name="SpecieC" id="c" kdiff="0.000" kdiffunit = "µm²/ms"/>
+  <Specie name="SpecieD" id="d" kdiff="0.000" kdiffunit = "µm²/ms"/>
 
   <Reaction name = "Reaction 1" id="r1">
 	<Reactant specieID="a"/>
