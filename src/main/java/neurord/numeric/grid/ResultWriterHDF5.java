@@ -815,6 +815,10 @@ public class ResultWriterHDF5 implements ResultWriter {
                                           "ms",
                                           CACHE_SIZE1);
 
+            /* Only write stuff for the first trial to save money and time */
+            if (source.trial() > 0)
+                return;
+
             String[] descriptions = new String[expected];
             for (IGridCalc.Event ev: source.getEvents()) {
                 int stat_index = ev.stat_index();
@@ -825,8 +829,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 if (descriptions[i] == null)
                     descriptions[i] = "";
 
-            log.info("descriptions: {}", descriptions);
-            Dataset ds = writeVector("event_statistics_d", this.sim, descriptions);
+            Dataset ds = writeVector("event_statistics", model(), descriptions);
             setAttribute(ds, "TITLE", "descriptions of statistics rows");
             setAttribute(ds, "LAYOUT", "[nstatistics]");
             setAttribute(ds, "UNITS", "text");
