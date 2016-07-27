@@ -272,7 +272,7 @@ public class SDRun implements IOutputSet {
     }
 
     private transient InitialConditions _empty_initalConditions;
-    public InitialConditions getInitialConditions() {
+    public synchronized InitialConditions getInitialConditions() {
         if (this.initialConditions != null)
             return this.initialConditions;
         else {
