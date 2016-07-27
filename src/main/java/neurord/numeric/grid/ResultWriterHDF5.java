@@ -230,7 +230,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     @Override
-    public void closeTrial(IGridCalc source) {
+    public synchronized void closeTrial(IGridCalc source) {
         try {
             this.closeTrial(source.trial(), source);
         } catch(Exception e) {
@@ -239,7 +239,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     };
 
     @Override
-    synchronized public void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source) {
+    public synchronized void writeGrid(VolumeGrid vgrid, double startTime, IGridCalc source) {
         try {
             this._writeGrid(vgrid, startTime, source);
         } catch(Exception e) {
@@ -317,7 +317,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         final int[] ispecout;
         final int[] elements;
 
-        public PopulationOutput(Group parent, String name, int[] elements, int[] ispecout)
+        protected PopulationOutput(Group parent, String name, int[] elements, int[] ispecout)
             throws Exception
         {
             this.ispecout = ispecout;
@@ -346,7 +346,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.times_cache = new double[cache_size];
         }
 
-        public void writePopulation(double time, IGridCalc source)
+        protected void writePopulation(double time, IGridCalc source)
             throws Exception
         {
             getGridNumbers(this.concs_cache[this.concs_times_count],
@@ -358,7 +358,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 this.flushPopulation(time);
         }
 
-        public void flushPopulation(double time)
+        protected void flushPopulation(double time)
             throws Exception
         {
             if (this.concs_times_count == 0)
@@ -402,7 +402,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             events_event, events_kind,
             events_extent, events_time, events_waited, events_original;
 
-        public Trial(Group group)
+        protected Trial(Group group)
             throws Exception
         {
             this.group = group;
@@ -740,7 +740,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 }
         }
 
-        public void _writeOutput(int i, double time, IGridCalc source)
+        protected void _writeOutput(int i, double time, IGridCalc source)
             throws Exception
         {
             this.writePopulation(i, time, source);
