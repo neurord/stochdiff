@@ -210,7 +210,7 @@ public class SDRun implements IOutputSet {
     }
 
     transient private boolean _reactionSchemeResolved = false;
-    public ReactionScheme getReactionScheme() {
+    public synchronized ReactionScheme getReactionScheme() {
         if (!this._reactionSchemeResolved) {
             if (this.reactionScheme == null) {
                 log.error("<ReactionScheme> element is required");
@@ -223,14 +223,14 @@ public class SDRun implements IOutputSet {
     }
 
     transient private ReactionTable reactionTable;
-    public ReactionTable getReactionTable() {
+    public synchronized ReactionTable getReactionTable() {
         if (this.reactionTable == null)
             this.reactionTable = this.getReactionScheme().makeReactionTable();
         return this.reactionTable;
     }
 
     transient private StimulationTable stimulationTable;
-    public StimulationTable getStimulationTable() {
+    public synchronized StimulationTable getStimulationTable() {
         if (this.stimulationTable == null) {
             List<InjectionStim> stimulations = null;
             if (this.stimulationSet != null)
@@ -272,14 +272,16 @@ public class SDRun implements IOutputSet {
     }
 
     private transient InitialConditions _empty_initalConditions;
-    public synchronized InitialConditions getInitialConditions() {
+    public InitialConditions getInitialConditions() {
         if (this.initialConditions != null)
             return this.initialConditions;
-        else {
+
+        synchronized (this) {
             if (this._empty_initalConditions == null)
                 this._empty_initalConditions = new InitialConditions();
-            return this._empty_initalConditions;
-        }
+        };
+
+        return this._empty_initalConditions;
     }
 
     public double getStartTime() {

@@ -36,7 +36,7 @@ public class InitialConditions {
         return this.concSetHM;
     }
 
-    private ConcentrationSet getDefaultConcentrations() {
+    private synchronized ConcentrationSet getDefaultConcentrations() {
         if (this.defaultConcs == null) {
             if (this.concentrationSets != null)
                 for (ConcentrationSet set: this.concentrationSets)
