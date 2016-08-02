@@ -20,11 +20,11 @@ public class SurfaceDensitySet implements Regional {
 
     transient HashMap<String, PicoSD> sdHM;
 
-    public HashMap<String, PicoSD> getSurfaceDensityHM() {
-        if (sdHM == null) {
-            sdHM = new HashMap<>();
+    public synchronized HashMap<String, PicoSD> getSurfaceDensityHM() {
+        if (this.sdHM == null) {
+            this.sdHM = new HashMap<>();
             if (sds != null)
-                for (PicoSD sd : sds)
+                for (PicoSD sd: sds)
                     sdHM.put(sd.specieID, sd);
         }
         return sdHM;

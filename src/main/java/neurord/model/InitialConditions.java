@@ -114,8 +114,8 @@ public class InitialConditions {
 
 
     public String[] getTotalPreserved() {
-        if (fitConstraints != null)
-            return fitConstraints.getTotalPreserved();
+        if (this.fitConstraints != null)
+            return this.fitConstraints.getTotalPreserved();
         else
             return new String[0];
     }
