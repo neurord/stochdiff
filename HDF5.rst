@@ -4,6 +4,8 @@ NeuroRD HDF5 output structure
 The file contains one ``manifest`` and one ``model`` top-level groups, and one or more ``trialXXX``
 groups, each one corresponding to a different execution. Each table has metadata fields which describe the table.
 
+.. contents::
+
 /manifest
 ---------
 
@@ -15,11 +17,11 @@ Example
 .. code-block::
    
     /manifest (Group) 'information about the program'
+
     /manifest/build_time (Array(1,)) ''
-      Data dump:
     [0] 2015-11-18 01:14:16
+
     /manifest/git_version (Array(1,)) ''
-      Data dump:
     [0] v2.1.10-549-gc812a37fcf+
 
 /model
@@ -30,7 +32,7 @@ This group contains the input model, the grid structure created from the morphol
 /model/species
 --------------
 
-A simple table with the names of all species.
+A simple table with the names of all species, ordered the same as ``<Specie>`` elements under ``<ReactionScheme>``.
 
 /model/neighbors and /model/couplings
 -------------------------------------
