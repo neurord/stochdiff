@@ -58,8 +58,8 @@ The second part of the reaction file is a list of all reactions. There are sever
         <Q10> value </Q10>
     </Reaction>
 
-The attribute `specieID=` refers to one of the species declared above, and must match either the
-`id` or the `name` of one of the species.
+The attribute ``specieID=`` refers to one of the species declared above, and must match either the
+``id`` or the ``name`` of one of the species.
 Enzyme reactions are specified as two bimolecular reactions, with the enzyme regenerated in the second step. An example of an enzyme reaction follows:
 
 .. code-block:: xml
@@ -83,8 +83,7 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
 Stoichiometry
 ~~~~~~~~~~~~~
 
-The stoichiometry of reactions is specified through two attributes: `power="p"` and `n="n"`.
-Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
+The stoichiometry of reactions is specified through two attributes: ``power="p"`` and ``n="n"``. Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
 determines how the number of molecules influences reaction rate. The rate is proportional
 to
 
@@ -98,7 +97,7 @@ Power *p* defaults to 1. Stoichiometry *n* defaults to *p*. If *p* is not specif
 
    <Reactant specieID="cAMP" n="2"/>
 
-which uses the optional `n="2"` attribute to specify that two cAMP molecules participate in the reaction. In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
+which uses the optional ``n="2"`` attribute to specify that two cAMP molecules participate in the reaction. In this case, the concentration used to calculate rate or propensity is the concentration of cAMP, not the square of that concentration, but for each reaction two cAMP molecules are consumed.
 
 Example
 ^^^^^^^
@@ -286,7 +285,7 @@ Injection to spines is also possible by specifying a spine as follows:
 
 The square brackets can contain:
 
-* a number `i` - matches just the specified point in the i-th spine
+* a number ``i`` - matches just the specified point in the i-th spine
 * a comma-separated list of numbers - matches the points on those spines
 * a range specified with a colon, such as [1:4]. If the lower or upper limit is missing it is taken to be 0 or the population size respectively.
 * an asterisk, [*] to match the whole population.
@@ -413,24 +412,24 @@ To run a simulation from the command line the following command should be issued
 
    java -jar NeuroRD.jar model.xml [output]
 
-where `NeuroRD.jar` file contains the NeuroRD executable byte-code and `model.xml` is the model file (“master” file that contains the `<SDRun>` XML tag). The optional argument `output` specifies the base name of output files; their names will be created by suffix appending to the main output file name: `output.out`, `output.h5`, `output.log`, ...
-If the last argument is ommitted, the output name is the input file name without the `.xml` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the `.xml` suffix.
+where ``NeuroRD.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file (“master” file that contains the ``<SDRun>`` XML tag). The optional argument ``output`` specifies the base name of output files; their names will be created by suffix appending to the main output file name: ``output.out``, ``output.h5``, ``output.log``, ...
+If the last argument is ommitted, the output name is the input file name without the ``.xml`` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the ``.xml`` suffix.
 
-A number of messages will be printed at execution time. The same set of messages is printed to standard output and to the log file (`output.log`). Creation of the log file may be disabled, see below.
+A number of messages will be printed at execution time. The same set of messages is printed to standard output and to the log file (``output.log``). Creation of the log file may be disabled, see below.
 
-1) The `java` executable is in the `PATH` for the current user in UNIX.
-2) `NeuroRD.jar` and `model.xml` are located in the same directory from where the command is issued or the full paths for these files have to be included as well.
-3) `output` is in the same directory from where the command is issued or the full path for the output file has to be included as well.
+1) The ``java`` executable is in the ``PATH`` for the current user in UNIX.
+2) ``NeuroRD.jar`` and ``model.xml`` are located in the same directory from where the command is issued or the full paths for these files have to be included as well.
+3) ``output`` is in the same directory from where the command is issued or the full path for the output file has to be included as well.
 
-With the default options, output is written as a set of text files and three (or more) output files are generated.  One is the `model.out` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the `IO.xml` file.
+With the default options, output is written as a set of text files and three (or more) output files are generated.  One is the ``model.out`` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the ``IO.xml`` file.
 
-The option `-Dneurord.writers=h5` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the `.h5` extension.
+The option ``-Dneurord.writers=h5`` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the ``.h5`` extension.
 
-It is also possible to use an HDF5 file as a source of the model and/or exact population. The `.h5` file contains the serialized XML which was used to create the model. If a file with the `.h5` extension is given as the first argument (instead of an `.xml` file), model description will be extracted from it.
+It is also possible to use an HDF5 file as a source of the model and/or exact population. The ``.h5`` file contains the serialized XML which was used to create the model. If a file with the ``.h5`` extension is given as the first argument (instead of an ``.xml`` file), model description will be extracted from it.
 
-The random seed is also extracted from the `.h5` file, which means that by using the HDF5 file as input, we can rerun the exact same simulation. In case the source `.h5` file contains multiple trials, `-Dneurord.source_trial=N` can be used to specify which trial's seed should be used. It is also possible to override the seed as usual with `-Dneurord.sdrun.simulationSeed=X`. If the current simulation includes multiple trials, the seed is ignored; this is the case always when multiple trials are simulated. In effect, if an `.h5` file is used as model source, the seed may be the seed specified by the original model, the seed used for the original simulation, the seed specifed through Java properties, or the randomized value if multiple trials are executed.
+The random seed is also extracted from the ``.h5`` file, which means that by using the HDF5 file as input, we can rerun the exact same simulation. In case the source ``.h5`` file contains multiple trials, ``-Dneurord.source_trial=N`` can be used to specify which trial's seed should be used. It is also possible to override the seed as usual with ``-Dneurord.sdrun.simulationSeed=X``. If the current simulation includes multiple trials, the seed is ignored; this is the case always when multiple trials are simulated. In effect, if an ``.h5`` file is used as model source, the seed may be the seed specified by the original model, the seed used for the original simulation, the seed specifed through Java properties, or the randomized value if multiple trials are executed.
 
-When an `.h5` file is used as model input, the initial population can be taken from the results of that simulation. This is achieved by specifying `-Dneurord.source_time=T`, where `T` is a timestamp of some saved state (`T` >= 0). It is also possible to specify `-Dneurord.source_time=-1`, which uses the last `T` found in the file. As with the random seed, `-Dneurord.source_trial=N` can be used to pick a specific trial.
+When an ``.h5`` file is used as model input, the initial population can be taken from the results of that simulation. This is achieved by specifying ``-Dneurord.source_time=T``, where ``T`` is a timestamp of some saved state (``T`` >= 0). It is also possible to specify ``-Dneurord.source_time=-1``, which uses the last ``T`` found in the file. As with the random seed, ``-Dneurord.source_trial=N`` can be used to pick a specific trial.
 
 Please note: the list of species in the file containing the input state must match exactly. This is checked by the program. The list of reactions *doesn't* have to match, but be aware that if the list of reactions (or their constants) is changed, if the input state was a steady state, it might not be anymore with the new set of reactions.
 
@@ -456,9 +455,9 @@ For example, to specify the time to simulate:
 
     java neurord.StochDiff -t 2000 ...
 
-This is a nicer alterantive to overriding the XML element with `-Dneurord.sdrun.runtime=2000`.
+This is a nicer alterantive to overriding the XML element with ``-Dneurord.sdrun.runtime=2000``.
 
-Full list of options can be displayed using `--help`:
+Full list of options can be displayed using ``--help``:
 
 .. code-block:: shell
 
@@ -508,13 +507,13 @@ Log4j2 is used for manage logging. It may be configured in the usual ways: https
 
     java -Dlog.<logger-name>=<level> ...
 
-where level can be one of `ALL`, `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, `OFF`. For example:
+where level can be one of ``ALL``, ``TRACE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL``, ``OFF``. For example:
 
 .. code-block:: shell
 
     java -Dlog.neurord.numeric.grid.NextEventQueue=debug ...
 
-By default, the same output is printed to the console and to the log file (named after the model file, but with “.log” at the end). The name of the log file can be specified with `--log=...`. If the command is not run from the terminal (standard input is not attached to a tty), only the log file is written.
+By default, the same output is printed to the console and to the log file (named after the model file, but with “.log” at the end). The name of the log file can be specified with ``--log=...``. If the command is not run from the terminal (standard input is not attached to a tty), only the log file is written.
 
 For long simulations the log file can get pretty big. To disable the log file altogether, use:
 
