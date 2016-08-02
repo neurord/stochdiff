@@ -46,15 +46,15 @@ Two examples follow:
 Reactions
 ~~~~~~~~~
 
-The second part of the reaction file is a list of all reactions. There are several statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. The name also doesn't have to be specified: a string of the form A+2×B→C will be used by default. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products can be specified, but at least one reactant is required. The format is:
+The second part of the reaction file is a list of all reactions. There are several statements for each reaction. In the first, the reaction is given a name and an id. The reaction names can have spaces in them, but the id cannot. The id usually does not have to be specified, the name with spaces and slashes replaced with underscores will be used by default. The name also doesn't have to be specified: a string of the form A+2×B→C will be used by default. Subsequent statements identify reactants, products, forward reaction rate, reverse reaction rate, and Q10 value. Note, the Q10 is currently not used. Zero or more products and reactants can be specified, but at least one reactant or product is required. The format is:
 
 .. code-block:: xml
 
     <Reaction name="name" id="id">
         <Reactant specieID="id"/>
         <Product specieID="id"/>
-        <forwardRate> rate </forwardRate>
-        <reverseRate> rate </reverseRate>
+        <forwardRate> r₁ </forwardRate>
+        <reverseRate> r₂ </reverseRate>
         <Q10> value </Q10>
     </Reaction>
 
@@ -70,7 +70,6 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
         <Product  specieID="PLCPIP2"                      />
         <forwardRate> 0.83e-06              </forwardRate>
         <reverseRate> 0.1e-03              </reverseRate>
-        <Q10>                   0.2                     </Q10>
     </Reaction>
 
     <Reaction>
@@ -78,15 +77,13 @@ Enzyme reactions are specified as two bimolecular reactions, with the enzyme reg
         <Product  specieID="PLCaG"                         />
         <Product  specieID="IP3"                      />
         <forwardRate> 0.58e-03               </forwardRate>
-        <reverseRate> 0              </reverseRate>
-        <Q10>                   0.2                     </Q10>
     </Reaction>
 
 
-Stochiometry
-~~~~~~~~~~~~
+Stoichiometry
+~~~~~~~~~~~~~
 
-The stochiometry of reactions is specified through two attributes: `power="p"` and `n="n"`.
+The stoichiometry of reactions is specified through two attributes: `power="p"` and `n="n"`.
 Number *n* specifies how many molecules are consumed or produced in the reaction. Power *p*
 determines how the number of molecules influences reaction rate. The rate is proportional
 to
@@ -95,7 +92,7 @@ to
 
 where *N* is the number of molecules of given species.
 
-Power *p* defaults to 1. Stochiometry *n* defaults to *p*. If *p* is not specified but *n* is, the reaction is a “psuedo” higher order reaction in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
+Power *p* defaults to 1. Stoichiometry *n* defaults to *p*. If *p* is not specified but *n* is, the reaction is a “psuedo” higher order reaction in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
 .. code-block:: xml
 
