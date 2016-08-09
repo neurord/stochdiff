@@ -842,10 +842,13 @@ public class ResultWriterHDF5 implements ResultWriter {
             if (stats == null)
                 return;
 
-            if (this.event_statistics == null)
+            if (this.event_statistics == null) {
                 this.initEventStatistics(source.getSource().getStatisticsInterval() > 0,
                                          source,
                                          stats.length);
+                if (this.event_statistics == null)
+                    return;
+            }
 
             log.debug("Writing event statistics at time {}", time);
             {
@@ -1277,6 +1280,11 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         /* avoid too small chunks */
         chunks[0] = 1;
+        if (ArrayUtil.product(chunks) == 0) {
+            log.error("Empty chunks: {}", chunks, new Throwable());
+            return null;
+        }
+
         while (ArrayUtil.product(chunks) < 1024)
             chunks[0] *= 2;
 
