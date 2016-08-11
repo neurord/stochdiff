@@ -89,7 +89,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
         log.log(Logging.NOTICE,
-                "Real simulation took {} = {} ms, {} ms/s",
+                "Real simulation took {} ({} ms, {} ms/s)",
                 TimeUtil.formatTimespan(time), time, speed);
     }
 
