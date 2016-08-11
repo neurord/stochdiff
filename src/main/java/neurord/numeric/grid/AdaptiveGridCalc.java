@@ -55,7 +55,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
 
         final int stat_count = this.neq.stat_count(this.sdRun.getStatistics(),
                                                    this.sdRun.getSpecies());
-        if (stat_count >= 0)
+        if (stat_count > 0)
             this.eventStatistics = new int[stat_count][2];
 
         this.real_start_time = System.currentTimeMillis();
@@ -74,7 +74,9 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                  this.neq.normal_waits);
         if (this.sdRun.getStatisticsInterval() == 0 &&
             (this.sdRun.getStatistics().equals("injections") ||
-             this.sdRun.getStatistics().equals("by-channel")))
+             this.sdRun.getStatistics().equals("by-channel")) &&
+            this.eventStatistics != null)
+
             for (int i = 0; i < this.eventStatistics.length; i++) {
                 /* We only want to report injections, and only when we have
                  * the aggregate numbers of the simulation and species. */
