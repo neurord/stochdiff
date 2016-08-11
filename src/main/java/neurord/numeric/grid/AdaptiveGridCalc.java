@@ -2,14 +2,14 @@ package neurord.numeric.grid;
 
 import java.util.List;
 import java.util.Collection;
+import java.util.ArrayList;
 
 import neurord.SDCalcType;
 import neurord.model.SDRun;
 import neurord.util.Settings;
 import neurord.util.ArrayUtil;
+import neurord.util.TimeUtil;
 import neurord.util.Logging;
-
-import java.util.ArrayList;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -89,7 +89,8 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         long time = System.currentTimeMillis() - this.real_start_time;
         double speed = 1000*(this.sdRun.getEndTime() - this.sdRun.getStartTime())/time;
         log.log(Logging.NOTICE,
-                "Real simulation took {} ms, {} ms/s", time, speed);
+                "Real simulation took {} = {} ms, {} ms/s",
+                TimeUtil.formatTimespan(time), time, speed);
     }
 
     @Override

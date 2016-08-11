@@ -27,5 +27,6 @@
     <logger name="neurord.numeric.model.SDRun" />
     <logger name="neurord.numeric.morph.VolumeGrid" />
     <logger name="neurord.numeric.morph.VolumeElement" />
+    <logger name="neurord.util.TimeUtil" />
   </loggers>
 </configuration>
