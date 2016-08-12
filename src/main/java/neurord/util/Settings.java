@@ -52,7 +52,7 @@ public class Settings {
 
         String val = getProperty(name);
         if (val != null) {
-            boolean ret = Boolean.valueOf(val);
+            boolean ret = parseBool(val);
             log.debug("Overriding {} with \"{}\": {} → {}", name, val, fallback, ret);
             return ret;
         } else
@@ -256,5 +256,19 @@ public class Settings {
         if (properties == null)
             return System.getProperties();
         return properties;
+    }
+
+    private static boolean parseBool(String value) {
+        switch(value.toLowerCase()) {
+        case "1":
+        case "yes":
+        case "true":
+            return true;
+        case "0":
+        case "no":
+        case "false":
+            return false;
+        }
+        throw new RuntimeException("Cannot parse boolean \"" + value + "\"");
     }
 }
