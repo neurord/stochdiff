@@ -41,7 +41,7 @@ public class Settings {
         String val = getProperty(name);
         if (val != null) {
             int ret = Integer.valueOf(val);
-            log.debug("Overriding {}: {} → {}", name, fallback, ret);
+            log.debug("Overriding {} with \"{}\": {} → {}", name, val, fallback, ret);
             return ret;
         } else
             return fallback;
@@ -53,7 +53,7 @@ public class Settings {
         String val = getProperty(name);
         if (val != null) {
             boolean ret = Boolean.valueOf(val);
-            log.debug("Overriding {}: {} → {}", name, fallback, ret);
+            log.debug("Overriding {} with \"{}\": {} → {}", name, val, fallback, ret);
             return ret;
         } else
             return fallback;
@@ -65,7 +65,7 @@ public class Settings {
         String val = getProperty(name);
         if (val != null) {
             double ret = Double.valueOf(val);
-            log.debug("Overriding {}: {} → {}", name, fallback, ret);
+            log.debug("Overriding {} with \"{}\": {} → {}", name, val, fallback, ret);
             return ret;
         } else
             return fallback;

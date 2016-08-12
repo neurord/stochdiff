@@ -28,5 +28,6 @@
     <logger name="neurord.numeric.morph.VolumeGrid" />
     <logger name="neurord.numeric.morph.VolumeElement" />
     <logger name="neurord.util.TimeUtil" />
+    <logger name="neurord.util.Settings" />
   </loggers>
 </configuration>
