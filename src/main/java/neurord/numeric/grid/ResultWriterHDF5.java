@@ -1107,6 +1107,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (!Double.isNaN(pop_from_time))
             pop = loadPopulationFromTime(h5, trial, "__main__", pop_from_time);
 
+        /* Make sure file is closed so that we can overwrite it. */
+        h5.close();
+
         return new LoadModelResult(xml, seed, species, pop);
     }
 
