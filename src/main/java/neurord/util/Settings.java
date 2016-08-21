@@ -145,6 +145,14 @@ public class Settings {
                                       repeat(" ", n - lhs.length()),
                                       s.description));
         }
+
+        out.println();
+        out.println("Manifest main attributes:");
+        try {
+            Manifest manifest = getManifest();
+            for (Object key: manifest.getMainAttributes().keySet())
+                out.println("" + key + " = " + manifest.getMainAttributes().get(key));
+        } catch(IOException e) {}
     }
 
     public static Manifest getManifest() throws IOException {
