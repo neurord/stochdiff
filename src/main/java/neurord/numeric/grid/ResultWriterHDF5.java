@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import ncsa.hdf.hdf5lib.H5;
+import ncsa.hdf.hdf5lib.HDF5Constants;
 import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.object.Datatype;
@@ -1310,11 +1312,28 @@ public class ResultWriterHDF5 implements ResultWriter {
         /* do not write any data in the beginning */
         dims[0] = 0;
 
-        H5ScalarDS ds = (H5ScalarDS)
-            this.output.createScalarDS(name, parent, type,
-                                       dims, maxdims, chunks,
-                                       compression_level, null);
+        /* Create dataspace */
+        int filespace_id = H5.H5Screate_simple(dims.length, dims, maxdims);
+
+        /* Create the dataset creation property list, add the shuffle filter
+         * and the gzip compression filter. The order in which the filters
+         * are added here is significant — we will see much greater results
+         * when the shuffle is applied first. The order in which the filters
+         * are added to the property list is the order in which they will be
+         * invoked when writing data. */
+        int dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
+        H5.H5Pset_shuffle(dcpl_id);
+        H5.H5Pset_deflate(dcpl_id, compression_level);
+        H5.H5Pset_chunk(dcpl_id, dims.length, chunks);
+
+        /* Create the dataset */
+        final String path = parent.getFullName() + "/" + name;
+        H5.H5Dcreate(this.output.getFID(), path,
+                     type.toNative(), filespace_id,
+                     HDF5Constants.H5P_DEFAULT, dcpl_id, HDF5Constants.H5P_DEFAULT);
+        Dataset ds = new H5ScalarDS(this.output, path, "/");
         ds.init();
+
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), xJoined(maxdims), xJoined(chunks));
 
@@ -1322,7 +1341,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         setAttribute(ds, "LAYOUT", LAYOUT);
         setAttribute(ds, "UNITS", UNITS);
 
-        return ds;
+        return (H5ScalarDS) ds;
     }
 
     protected static void extendExtensibleArray(H5ScalarDS ds, long howmuch)
