@@ -155,11 +155,7 @@ Example
 
 The number of trials is specified with ``-Dneurord.trials=N``. Each trial results in one top-level group with names ``trial0``, ``trial``, ..., ``trial<N-1>``.
 
-
-/trialXXX/simulation_seed
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This specifies the simulation seed that was used for this trial. Even if the input XML file species a simulation seed, it is ignored for trials with numbers above 0.
+Attribute ``simulation_seed`` contains the simulation seed that was used for this trial. Even if the input XML file species a simulation seed, it is ignored for trials with numbers above 0.
 
 /trialXXX/output
 ~~~~~~~~~~~~~~~~

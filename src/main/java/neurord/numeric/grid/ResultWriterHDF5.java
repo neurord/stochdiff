@@ -509,15 +509,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         protected void writeSimulationData(IGridCalc source)
             throws Exception
         {
-            log.debug("Writing simulation configuration for trial {}", source.trial());
-
-            {
-                long seed = source.getSimulationSeed();
-                Dataset ds = writeVector("simulation_seed", this.group, seed);
-                setAttribute(ds, "TITLE", "the calculation seed");
-                setAttribute(ds, "LAYOUT", "seed");
-                setAttribute(ds, "UNITS", "number");
-            }
+            long seed = source.getSimulationSeed();
+            log.debug("Writing simulation seed ({}) for trial {}", source.trial());
+            setAttribute(this.group, "simulation_seed", seed);
         }
 
         protected void writeRegionLabels(Group parent, IGridCalc source)
@@ -1095,8 +1089,11 @@ public class ResultWriterHDF5 implements ResultWriter {
             xml = data[0];
         }
 
-        final long seed;
-        {
+        long seed;
+        try {
+            long[] data = getAttribute(h5, "/trial" + trial, "simulation_seed");
+            seed = data[0];
+        } catch(Exception e) {
             long[] data = getSomething(h5, "/trial" + trial + "/simulation_seed");
             seed = data[0];
         }
@@ -1147,6 +1144,31 @@ public class ResultWriterHDF5 implements ResultWriter {
                                        new long[] {}, new String[] {value});
         obj.writeMetadata(attr);
         log.debug("Wrote metadata on {} {}={}", obj, name, value);
+    }
+
+    protected static void setAttribute(HObject obj, String name, long value)
+        throws Exception
+    {
+        Attribute attr = new Attribute(name, long_t,
+                                       new long[] {}, new long[] {value});
+        obj.writeMetadata(attr);
+        log.debug("Wrote metadata on {} {}={}", obj, name, value);
+    }
+
+    protected static <T> T getAttribute(H5File h5, String path, String name)
+        throws Exception
+    {
+        HObject obj = h5.get(path);
+        if (obj == null) {
+            log.error("Failed to retrieve \"{}\"", path);
+            throw new Exception("Path \"" + path + "\" not found");
+        }
+        List<Attribute> list = obj.getMetadata();
+        for (Attribute attr: list)
+            if (name.equals(attr.getName()))
+                return (T) attr.getValue();
+
+        throw new Exception("Atribute \"" + name + "\" not found on \"" + path + "\"");
     }
 
     protected Dataset writeArray(String name, Group parent, double[][] items)
