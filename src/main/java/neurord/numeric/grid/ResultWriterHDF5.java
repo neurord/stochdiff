@@ -185,7 +185,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         throws Exception
     {
         Manifest manifest = Settings.getManifest();
-        writeMap("manifest", this.root, manifest.getMainAttributes().entrySet(), "information about the program");
+        writeMap(this.root, manifest.getMainAttributes().entrySet());
     }
 
     protected Group model() throws Exception {
@@ -1198,22 +1198,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         return ds;
     }
 
-    protected Group writeMap(String name, Group parent, Set<Map.Entry<Object,Object>> set, String title)
+    protected void writeMap(Group element, Set<Map.Entry<Object,Object>> set)
         throws Exception
     {
-        Group group = this.output.createGroup(name, parent);
-        setAttribute(group, "TITLE", title);
-
         for (Map.Entry<Object,Object> entry: set) {
-            /* Manifest keys allow ascii characters, numbers, dashes and underscores.
-             * Convert dashes to underscores so keys are valid python attributes. */
-            String key = entry.getKey().toString().toLowerCase().replace("-", "_");
+            /* Manifest keys allow ascii characters, numbers, dashes and underscores. */
+            String key = entry.getKey().toString();
             String value = (String) entry.getValue();
 
-            writeVector(key, group, value);
+            setAttribute(element, key, value);
         }
-
-        return group;
     }
 
     protected Dataset writeVector(String name, Group parent, double... items)

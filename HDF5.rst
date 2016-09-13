@@ -1,28 +1,24 @@
 NeuroRD HDF5 output structure
 =============================
 
-The file contains one ``manifest`` and one ``model`` top-level groups, and one or more ``trialXXX``
-groups, each one corresponding to a different execution. Each table has metadata fields which describe the table.
+The file contains one ``model`` top-level group, and one or more ``trialXXX`` groups, each one corresponding to a different execution. Each table has metadata fields which describe the table.
 
 .. contents::
 
-/manifest
----------
+The root group /
+----------------
 
-This group contains information about NeuroRD version that was used to create this output file.
+The attributes on this group contain information about NeuroRD version that was used to create this output file.
 
 Example
 ~~~~~~~
 
 .. code-block::
    
-    /manifest (Group) 'information about the program'
-
-    /manifest/build_time (Array(1,)) ''
-    [0] 2015-11-18 01:14:16
-
-    /manifest/git_version (Array(1,)) ''
-    [0] v2.1.10-549-gc812a37fcf+
+    / (RootGroup) ''
+      /._v_attrs (AttributeSet), 2 attributes:
+       [build-time := b'2016-09-13 11:43:54',
+        git-version := b'v3.1.4-6-g5308d22815+']
 
 /model
 ------
