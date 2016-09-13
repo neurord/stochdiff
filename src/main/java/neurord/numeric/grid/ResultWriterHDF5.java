@@ -1157,9 +1157,9 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         double[] flat = ArrayUtil.flatten(items, maxlength);
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                double_t, dims, null, null,
-                                                0, flat);
+        Dataset ds = this.output.createScalarDS(name, parent, double_t,
+                                                dims, dims.clone(), dims.clone(),
+                                                compression_level, flat);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
@@ -1173,9 +1173,9 @@ public class ResultWriterHDF5 implements ResultWriter {
 
         int[] flat = ArrayUtil.flatten(items, maxlength, fill);
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                int_t, dims, null, null,
-                                                0, flat);
+        Dataset ds = this.output.createScalarDS(name, parent, int_t,
+                                                dims, dims.clone(), dims.clone(),
+                                                compression_level, flat);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
@@ -1190,9 +1190,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
                                              Datatype.NATIVE, Datatype.NATIVE);
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                string_t, dims, null, null,
-                                                0, items);
+        Dataset ds = this.output.createScalarDS(name, parent, string_t,
+                                                dims, dims.clone(), dims.clone(),
+                                                compression_level, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
@@ -1221,9 +1221,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         long[] dims = {items.length};
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                double_t, dims, null, null,
-                                                0, items);
+        Dataset ds = this.output.createScalarDS(name, parent, double_t,
+                                                dims, dims.clone(), dims.clone(),
+                                                compression_level, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
@@ -1234,9 +1234,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         long[] dims = {items.length};
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                int_t, dims, null, null,
-                                                0, items);
+        Dataset ds = this.output.createScalarDS(name, parent, int_t,
+                                                dims, dims.clone(), dims.clone(),
+                                                compression_level, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
         return ds;
@@ -1247,8 +1247,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         long[] dims = {items.length};
 
-        Dataset ds = this.output.createScalarDS(name, parent,
-                                                long_t, dims, null, null,
+        Dataset ds = this.output.createScalarDS(name, parent, long_t,
+                                                dims, dims.clone(), dims.clone(),
                                                 0, items);
         log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                  name, xJoined(dims), "", "");
