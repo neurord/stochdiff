@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 tag=$(git describe)
 version=${tag#v}
