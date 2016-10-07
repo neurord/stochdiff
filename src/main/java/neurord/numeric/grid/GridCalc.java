@@ -74,7 +74,8 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
         surfaceAreas = grid.getExposedAreas();
 
-        this.dt = this.sdRun.stepSize();
+        double dt = this.sdRun.stepSize();
+        this.dt = Math.min(dt, ArrayUtil.min(this.dtsOut));
     }
 
     protected double endtime() {
@@ -106,7 +107,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         long old_events = 0;
         long old_wall_time = System.currentTimeMillis();
 
-        log.info("dt={} dtsOut={}", dt, this.dtsOut);
+        log.info("main outputInterval={} outputIntervals={}", this.dt, this.dtsOut);
 
         while (time <= endtime) {
 
