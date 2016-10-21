@@ -327,11 +327,11 @@ The Model file is the “master file”, and serves to identify the files for ot
 
 .. code-block:: xml
 
-     <reactionSchemeFile> Purkreactions      </reactionSchemeFile>
-     <morphologyFile>     Purkmorph2         </morphologyFile>
-     <stimulationFile>    Purksmlstim        </stimulationFile>
-     <initialConditionsFile>  Purkic         </initialConditionsFile>
-     <outputSchemeFile>     Purkdifio        </outputSchemeFile>
+     <xi:include href="Purkreactions.xml" />
+     <xi:include href="Purkmorph2.xml" />
+     <xi:include href="Purksmlstim.xml" />
+     <xi:include href="Purkic.xml" />
+     <xi:include href="Purkdifio.xml" />
 
 The reactions, morphology, and initial conditions represent the model.  The stimulation and output files are not part of the model, but are part of the simulation experiment.
 
