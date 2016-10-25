@@ -82,6 +82,7 @@ parser.add_argument('--style', default='r-')
 parser.add_argument('--time', type=time_slice)
 parser.add_argument('--trial', type=int, default=0)
 parser.add_argument('--config', type=str, nargs='?', const='')
+parser.add_argument('--diff', type=str)
 parser.add_argument('--output-group', '-g', default='__main__')
 
 def filename_for_saving(opts, descr):
@@ -674,13 +675,11 @@ def plot_leaps(output, leaps):
     else:
         pyplot.show(block=True)
 
-def print_config(output):
+def print_config(output, config_spec):
     tree = output.simulation(0).config()
-    if opts.config:
-#        snippets = tree.xpath(opts.config,
-#                              namespaces=dict(ns2="http://stochdiff.textensor.org"))
+    if config_spec:
         expr = '//*[local-name() = $name]'
-        snippets = tree.xpath(expr, name=opts.config)
+        snippets = tree.xpath(expr, name=config_spec)
     else:
         snippets = [tree]
     for i, what in enumerate(snippets):
@@ -692,6 +691,18 @@ def print_config(output):
             print(highlight(text, XmlLexer(), formatter))
         else:
             print(text)
+
+def print_diff(this, other_filename):
+    other = output.Output(other_filename)
+    tree1 = this.simulation(0).config()
+    tree2 = other.simulation(0).config()
+    file1 = tempfile.NamedTemporaryFile(prefix=this.file.filename, suffix='.xml')
+    file2 = tempfile.NamedTemporaryFile(prefix=other.file.filename, suffix='.xml')
+    file1.write(etree.tostring(tree1))
+    file2.write(etree.tostring(tree2))
+    file1.flush()
+    file2.flush()
+    subprocess.run(['git', 'diff', '--no-index', file1.name, file2.name])
 
 if __name__ == '__main__':
     opts = parser.parse_args()
@@ -714,7 +725,9 @@ if __name__ == '__main__':
     elif opts.describe_leaps is not None:
         describe_leaps(opts.file)
     elif opts.config is not None:
-        print_config(opts.file)
+        print_config(opts.file, opts.config)
+    elif opts.diff is not None:
+        print_diff(opts.file, opts.diff)
     else:
         if not opts.save:
             animate_drawing(opts)
