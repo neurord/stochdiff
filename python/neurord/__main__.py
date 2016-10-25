@@ -6,6 +6,7 @@ import sys
 import os
 import math
 import glob, fnmatch
+import pathlib
 import re
 import collections
 import itertools
@@ -692,17 +693,31 @@ def print_config(output, config_spec):
         else:
             print(text)
 
-def print_diff(this, other_filename):
-    other = output.Output(other_filename)
-    tree1 = this.simulation(0).config()
-    tree2 = other.simulation(0).config()
-    file1 = tempfile.NamedTemporaryFile(prefix=this.file.filename, suffix='.xml')
-    file2 = tempfile.NamedTemporaryFile(prefix=other.file.filename, suffix='.xml')
-    file1.write(etree.tostring(tree1))
-    file2.write(etree.tostring(tree2))
-    file1.flush()
-    file2.flush()
-    subprocess.run(['git', 'diff', '--no-index', file1.name, file2.name])
+def temporary_config_file(what):
+    if isinstance(what, str) and not what.endswith('.h5'):
+        # assume a real file, process for xi::include
+        tree = etree.parse(what)
+        tree.xinclude()
+        parser = etree.XMLParser(remove_blank_text=True, remove_comments=True)
+        tree = etree.fromstring(etree.tostring(tree), parser)
+        prefix = pathlib.Path(what).stem + '-'
+        file = tempfile.NamedTemporaryFile(prefix=prefix, suffix='.xml')
+    else:
+        if not isinstance(what, output.Output):
+            what = output.Output(what)
+        tree = what.simulation(0).config()
+        file = tempfile.NamedTemporaryFile(prefix=what.file.filename + '-', suffix='.xml')
+    text = etree.tostring(tree, pretty_print=True)
+    if isinstance(what, str):
+        text = text.replace(b'  ', 4*b' ')
+    file.write(text)
+    file.flush()
+    return file
+
+def print_diff(this, other):
+    file1 = temporary_config_file(this)
+    file2 = temporary_config_file(other)
+    subprocess.run(['git', 'diff', '--no-index', '--ignore-all-space', file1.name, file2.name])
 
 if __name__ == '__main__':
     opts = parser.parse_args()
