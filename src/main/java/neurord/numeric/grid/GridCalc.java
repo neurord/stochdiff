@@ -86,7 +86,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
     protected void _run() {
         init();
 
-        double time = this.sdRun.getStartTime();
+        double begintime = this.sdRun.getStartTime(), time = begintime;
         double endtime = this.endtime();
 
         for(ResultWriter resultWriter: this.resultWriters)
@@ -118,8 +118,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
                     long events = this.eventCount();
                     double speed = (double)(events - old_events)
                         / (wall_time - old_wall_time);
-                    log.info("Trial {}: time {} dt={} events={} {}/ms",
+                    log.info("Trial {}: time {} dt={} ({}%) events={} {}/ms",
                              this.trial(), time, dt,
+                             (int) ((time - begintime) / (endtime - begintime) * 100),
                              events - old_events, (int) speed);
 
                     old_events = events;
@@ -155,7 +156,7 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         }
 
         if (writeTime < time + this.sdRun.getOutputInterval() / 10) {
-            log.info("Trial {}: time {} dt={}", this.trial(), time, dt);
+            log.info("Trial {}: time {} dt={} (100%)", this.trial(), time, dt);
             for (ResultWriter resultWriter: this.resultWriters)
                 resultWriter.writeOutputInterval(time, this);
         }
