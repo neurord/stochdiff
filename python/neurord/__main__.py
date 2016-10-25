@@ -5,7 +5,7 @@ from __future__ import print_function, division, unicode_literals
 import sys
 import os
 import math
-import glob
+import glob, fnmatch
 import re
 import collections
 import itertools
@@ -541,11 +541,26 @@ def find_regions(regions, region_names, spec):
     else:
         yield from sorted(regions)
 
+def find_species(output, specie_spec):
+    if specie_spec is None:
+        return output.model.species()
+
+    have_globs = any(glob.escape(pat) != pat for pat in specie_spec)
+    if not have_globs:
+        # preserve the specified order
+        return specie_spec
+
+    # use the order in the file (globs can match more than once, so glob order is not useful)
+    matches = [sp for sp in output.model.species()
+               if any(fnmatch.fnmatchcase(sp, pat)
+                      for pat in specie_spec)]
+    if not matches:
+        raise ValueError('no species matched by {}'.format(specie_spec))
+    return matches
+
 def plot_history(output, species):
     model = output.model
     simul = output.simulation(opts.trial)
-    if not species:
-        species = model.species()
     # filter time. level 0 is voxel, level 1 is time
     counts = simul.counts(opts.output_group)
     if opts.time is not None:
@@ -692,7 +707,8 @@ if __name__ == '__main__':
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history is not None:
-        plot_history(opts.file, opts.history)
+        species = find_species(opts.file, opts.history)
+        plot_history(opts.file, species)
     elif opts.leaps is not None:
         plot_leaps(opts.file, opts.leaps)
     elif opts.describe_leaps is not None:
