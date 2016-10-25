@@ -62,9 +62,9 @@ public class ReactionScheme {
     public ReactionTable makeReactionTable() {
         int n  = 0;
         for (Reaction r: reactions) {
-            /* There's always a forward reaction, but if a
-             * reaction has no products, there's no reverse reaction.
-             * If a reaction has 0 rate, we can skip that too. */
+            /* We create a forward reaction if forwardRate > 0 (this is the usual case).
+             * We create a reverse reaction if the reverseRate is nonzero.
+             */
             if (r.getForwardRate() > 0)
                 n++;
             if (r.getReverseRate() > 0)
@@ -79,12 +79,14 @@ public class ReactionScheme {
         for (Reaction r: reactions) {
             int[][] reactants = r.getReactantIndices();
             int[][] products = r.getProductIndices();
+            boolean have_forward = r.getForwardRate() > 0;
 
-            if (r.getForwardRate() > 0)
+            if (have_forward)
                 rtab.setReactionData(i++, reactants, products, r.getForwardRate(), false);
 
             if (r.getReverseRate() > 0)
-                rtab.setReactionData(i++, products, reactants, r.getReverseRate(), true);
+                /* We need to guard against reactions which have forwardRate==0 */
+                rtab.setReactionData(i++, products, reactants, r.getReverseRate(), have_forward);
         }
 
         assert i == n: "ir=" + i + " n=" + n;
