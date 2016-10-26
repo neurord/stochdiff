@@ -544,7 +544,7 @@ def find_regions(regions, region_names, spec):
         yield from sorted(regions)
 
 def find_species(output, specie_spec):
-    if specie_spec is None:
+    if not specie_spec:
         return output.model.species()
 
     have_globs = any(glob.escape(pat) != pat for pat in specie_spec)
