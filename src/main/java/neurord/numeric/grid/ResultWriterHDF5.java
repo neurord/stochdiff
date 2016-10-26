@@ -1253,12 +1253,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     {
         long[] dims = {items.length};
 
-        Dataset ds = this.output.createScalarDS(name, parent, int_t,
-                                                dims, dims.clone(), dims.clone(),
-                                                compression_level, items);
-        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                 name, xJoined(dims), "", "");
-        return ds;
+        return _writeArray(name, parent, int_t, dims, items);
     }
 
     protected Dataset writeVector(String name, Group parent, long... items)
