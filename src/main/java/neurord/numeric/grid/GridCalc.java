@@ -75,7 +75,9 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         surfaceAreas = grid.getExposedAreas();
 
         double dt = this.sdRun.stepSize();
-        this.dt = Math.min(dt, ArrayUtil.min(this.dtsOut));
+        double other = this.dtsOut.length > 0 ? ArrayUtil.min(this.dtsOut) : Double.POSITIVE_INFINITY;
+        this.dt = Math.min(dt, other);
+        assert this.dt > 0: this.dt;
     }
 
     protected double endtime() {
