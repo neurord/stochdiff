@@ -64,7 +64,10 @@ public class StimulationTable {
                 // NB, assumes dt smaller than interpulse interval
                 int ipulse = (int)((start - this.onset) / this.period + 0.5);
                 double pons = this.onset + ipulse * this.period;
-                return pulseOverlap(start, dt, pons, this.duration);
+                double duration = this.duration;
+                if (!Double.isNaN(this.end))
+                    duration = Math.min(duration, this.end - pons);
+                return pulseOverlap(start, dt, pons, duration);
             }
         }
 
