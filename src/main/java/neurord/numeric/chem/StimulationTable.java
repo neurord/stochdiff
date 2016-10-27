@@ -66,7 +66,7 @@ public class StimulationTable {
                 double pons = this.onset + ipulse * this.period;
                 double duration = this.duration;
                 if (!Double.isNaN(this.end))
-                    duration = Math.min(duration, this.end - pons);
+                    duration = Math.max(Math.min(duration, this.end - pons), 0);
                 return pulseOverlap(start, dt, pons, duration);
             }
         }
