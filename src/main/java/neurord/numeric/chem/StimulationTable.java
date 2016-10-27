@@ -71,21 +71,21 @@ public class StimulationTable {
             }
         }
 
-        private static double pulseOverlap(double t, double dt, double ons, double dur) {
-            if (t + dt < ons || t > ons + dur)
+        private static double pulseOverlap(double t, double dt, double onset, double duration) {
+            if (t + dt < onset || t > onset + duration)
                 return 0;
-            else if (t >= ons && t + dt <= ons + dur)
+            else if (t >= onset && t + dt <= onset + duration)
                 // fully inside;
                 return 1;
-            else if (t <= ons && t + dt >= ons + dur)
+            else if (t <= onset && t + dt >= onset + duration)
                 // spans whole pulse;
-                return dur / dt;
-            else if (t <= ons)
+                return duration / dt;
+            else if (t <= onset)
                 // straddles start
-                return (t + dt - ons) / dt;
+                return (t + dt - onset) / dt;
             else
                 // straddles end;
-                return (ons + dur - t) / dt;
+                return (onset + duration - t) / dt;
         }
 
         public static void addTo(ArrayList<Stimulation> stims, int species, InjectionStim stim) {
