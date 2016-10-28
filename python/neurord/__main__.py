@@ -484,7 +484,7 @@ def _history(simul, species, region_indices, region_labels,
         matplotlib.use('Agg')
     from matplotlib import pyplot
 
-    quantity = 'concentration' if opts.concentrations else 'particle numbers'
+    quantity = 'concentration / nM' if opts.concentrations else 'particle numbers'
     full_title = '{}, {} of species {}'.format(title, quantity, ', '.join(species))
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
@@ -529,7 +529,7 @@ def _history_data(simul, species, region_indices, region_labels,
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
     df = pd.DataFrame(d, index=xx[0])
-    quantity = 'concentration' if opts.concentrations else 'particle numbers'
+    quantity = 'concentration / nM' if opts.concentrations else 'particle numbers'
     fname = filename_for_saving(opts, quantity)
     if opts.format == 'pickle':
         df.to_pickle(fname)
