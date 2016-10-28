@@ -126,17 +126,18 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         double ans = rate * vol / NM_PER_PARTICLE_PUV;
 
         for (int i = 0; i < ri.length; i++) {
+            final int n = nstart[ri[i]];
             /* Special case for pseudo-higher-order reactions to make
                sure that the population doesn't go negative.
                Stoichiometry is only used for this check. */
-            if (nstart[ri[i]] < rs[i])
+            if (n < rs[i])
                 return 0;
 
             /* Reactants must have non-zero stoichiometry, but can have nil power.
                Reactants with nil power do not appear in the propensity formula, except
                for the stoichiometry check above. */
             for (int p = 0; p < rp[i]; p++)
-                ans *= (nstart[ri[i]] - p) * NM_PER_PARTICLE_PUV / vol;
+                ans *= (n - p) * NM_PER_PARTICLE_PUV / vol;
         }
 
         return ans;
