@@ -107,6 +107,9 @@ public abstract class StepGenerator {
         final String msg;
         final int ngo;
 
+        if (p > 1)
+            p = 1;
+
         switch(mode) {
         case BINOMIAL:
             if (n * p < NP) {
