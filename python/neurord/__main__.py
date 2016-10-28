@@ -69,6 +69,7 @@ parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
+parser.add_argument('--function')
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
 parser.add_argument('--sum-all', action='store_true')
@@ -508,6 +509,9 @@ def _history(simul, species, region_indices, region_labels,
         colors = itertools.cycle('rgbkcmy')
         for x, y, name, label in data:
             ax.plot(x, y, opts.style, color=next(colors), label=label)
+            if opts.function:
+                yy = eval(opts.function, sys.modules, dict(x=x, y=y))
+                ax.plot(x, yy, label=opts.function)
         ax.legend(loc='best', fontsize=7)
     ax.set_xlabel('t / ms')
     if opts.save:
