@@ -69,6 +69,7 @@ parser.add_argument('--diffusion', action='store_true')
 parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
+parser.add_argument('--concentrations', action='store_true')
 parser.add_argument('--function')
 parser.add_argument('--regions', type=str_list, nargs='?')
 parser.add_argument('--sum-regions', action='store_true')
@@ -483,8 +484,8 @@ def _history(simul, species, region_indices, region_labels,
         matplotlib.use('Agg')
     from matplotlib import pyplot
 
-    full_title = '{}, particle numbers of species {}'.format(title,
-                                                             ', '.join(species))
+    quantity = 'concentration' if opts.concentrations else 'particle numbers'
+    full_title = '{}, {} of species {}'.format(title, quantity, ', '.join(species))
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
@@ -505,7 +506,7 @@ def _history(simul, species, region_indices, region_labels,
                 sharex = ax
     else:
         ax = f.gca(yscale=opts.yscale)
-        ax.set_ylabel('particle numbers')
+        ax.set_ylabel(quantity)
         colors = itertools.cycle('rgbkcmy')
         for x, y, name, label in data:
             ax.plot(x, y, opts.style, color=next(colors), label=label)
@@ -528,7 +529,8 @@ def _history_data(simul, species, region_indices, region_labels,
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
     df = pd.DataFrame(d, index=xx[0])
-    fname = filename_for_saving(opts, 'particle numbers')
+    quantity = 'concentration' if opts.concentrations else 'particle numbers'
+    fname = filename_for_saving(opts, quantity)
     if opts.format == 'pickle':
         df.to_pickle(fname)
     elif opts.format == 'plain':
@@ -568,7 +570,10 @@ def plot_history(output, species):
     model = output.model
     simul = output.simulation(opts.trial)
     # filter time. level 0 is voxel, level 1 is time
-    values = simul.counts(opts.output_group)
+    if opts.concentrations:
+        values = simul.concentrations(opts.output_group)
+    else:
+        values = simul.counts(opts.output_group)
     if opts.time is not None:
         values = values.loc[(slice(None), opts.time), :]
 

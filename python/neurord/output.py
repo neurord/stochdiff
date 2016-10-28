@@ -297,9 +297,8 @@ class OutputGroup(object):
     def concentrations(self):
         "Counts converted to concentrations using voxel volumes"
         counts = self.counts()
-        volumes = self._output_model.volumes()
+        volumes = self._output_model.volumes() * PUVC
         # blow up volumes to match the size of the counts index
-        volumes *= PUVC
         volumes = np.repeat(volumes, counts.index.size/volumes.size)
         ans = counts.divide(volumes, axis=0)
         ans.rename(columns={'count':'concentration'}, inplace=1)
