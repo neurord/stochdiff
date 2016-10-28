@@ -123,7 +123,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
                                              int[] rp,
                                              double rate, double vol,
                                              int[] nstart) {
-        double ans = rate * vol;
+        double ans = rate * vol / NM_PER_PARTICLE_PUV;
 
         for (int i = 0; i < ri.length; i++) {
             /* Special case for pseudo-higher-order reactions to make

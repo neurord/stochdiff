@@ -460,9 +460,12 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
             if (nks < ns)
                 ns = nks;
 
-            if (p >= 1)
+            if (p >= 1) {
                 /* FIXME: use falling factorial */
-                lnp += p * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
+                lnp += intlog(n) - lnvol;
+                if (p > 1)
+                    lnp += (p - 1) * (intlog(n) - lnvol - LN_PARTICLES_PUVC);
+            }
         }
 
         if (ns > 0)
