@@ -512,7 +512,7 @@ def _history(simul, species, region_indices, region_labels,
             ax.plot(x, y, opts.style, color=next(colors), label=label)
             if opts.function:
                 yy = eval(opts.function, sys.modules, dict(x=x, y=y))
-                ax.plot(x, yy, label=opts.function)
+                ax.plot(x, yy, label=opts.function, ls='--')
         ax.legend(loc='best', fontsize=7)
     ax.set_xlabel('t / ms')
     if opts.save:
