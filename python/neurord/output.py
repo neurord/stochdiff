@@ -222,7 +222,19 @@ class Model(object):
         return [row.decode('utf-8') for row in what]
 
     def output_group(self, name='__main__'):
-        return ModelOutputGroup(self._element.output._v_children[name], self)
+        if name == '__main__':
+            try:
+                group = self._element.output
+            except tables.exceptions.NoSuchNodeError:
+                # fall back to old tree
+                element = self._element
+            else:
+                element = group._v_children[name]
+        else:
+            # no fallback
+            element = self._element.output._v_children[name]
+
+        return ModelOutputGroup(element, self)
 
 class ModelOutputGroup(object):
     def __init__(self, element, model):
@@ -245,7 +257,10 @@ class ModelOutputGroup(object):
     def elements(self):
         """List of element indices in this output group
         """
-        return self._element.elements[:]
+        try:
+            return self._element.elements[:]
+        except tables.exceptions.NoSuchNodeError:
+            return self._element.dependencies.elements[:]
 
     def volumes(self):
         """Volumes of elements in this output group
@@ -266,7 +281,11 @@ class OutputGroup(object):
         return np.round(times, decimals=max(-math.floor(math.log10(diff)), 0))
 
     def counts(self):
-        data = self._element.population
+        try:
+            data = self._element.population
+        except tables.exceptions.NoSuchNodeError:
+            # fall back to old tree
+            data = self._element.concentrations
         panel = pd.Panel(data.read(),
                          items=self.times(),
                          major_axis=self._output_model.elements(),
@@ -318,8 +337,18 @@ class Simulation(object):
 
     @functools.lru_cache()
     def output_group(self, name='__main__'):
-        return OutputGroup(self._element.output._v_children[name],
-                           self.model.output_group(name))
+        if name == '__main__':
+            try:
+                group = self._element.output
+            except tables.exceptions.NoSuchNodeError:
+                # fall back to old tree
+                element = self._element.simulation
+            else:
+                element = group._v_children[name]
+        else:
+            # no fallback
+            element = self._element.output._v_children[name]
+        return OutputGroup(element, self.model.output_group(name))
 
     def times(self, output_group='__main__'):
         return self.output_group(output_group).times()
@@ -354,7 +383,11 @@ class Output(object):
     """
     def __init__(self, filename):
         self.file = tables.openFile(filename)
-        self.model = Model(self.file.root.model)
+        try:
+            element = self.file.root.model
+        except tables.exceptions.NoSuchNodeError:
+            element = self.file.root.trial0.model
+        self.model = Model(element)
 
     def __enter__(self):
         return self
