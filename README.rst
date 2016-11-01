@@ -280,7 +280,7 @@ Injection to spines is also possible by specifying a spine as follows:
     <InjectionStim specieID="a" injectionSite="sa1[3,4,5].pointA">
          <onset>5.0</onset>
          <duration>10.0</duration>
-         <rate>200</rate>
+         <rate>210</rate>
     </InjectionStim>
 
 The square brackets can contain:
@@ -290,11 +290,13 @@ The square brackets can contain:
 * a range specified with a colon, such as [1:4]. If the lower or upper limit is missing it is taken to be 0 or the population size respectively.
 * an asterisk, [*] to match the whole population.
 
+The rate specified with ``<rate>`` is understood to be the *total* injection rate. In this example, we are injecting into three spines, so the rate will be 70 particles/ms for each of the spines, for a total of 210 particles/ms.
+
 .. note::
 
     Injecting into a non-existent spine will fail.
 
-See Purksmlstim.xml, Purkstim.xml, and Purkdifstim.xml for examples
+See Purksmlstim.xml, Purkstim.xml, and Purkdifstim.xml for examples.
 
 Output scheme File
 ------------------

@@ -1869,9 +1869,12 @@ public class NextEventQueue {
                               new IndexOption("by-event", event_number),
                               new IndexOption("injections", stim.species));
 
+                double fraction = submembrane ? el.getExposedArea() / sum :
+                                                1. / targets.size();
+
                 NextStimulation ev = new NextStimulation(event_number, stat_index,
                                                          el.getNumber(),
-                                                         submembrane ? el.getExposedArea() / sum : 1.0,
+                                                         fraction,
                                                          stim.species,
                                                          species[stim.species],
                                                          stim);
