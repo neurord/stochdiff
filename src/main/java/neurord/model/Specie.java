@@ -5,8 +5,10 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.xml.bind.annotation.*;
 
+import neurord.util.Settings;
+
 public class Specie {
-    static final Logger log = LogManager.getLogger();
+    static public final Logger log = LogManager.getLogger();
 
     @XmlAttribute private String name;
     @XmlAttribute private String id;
@@ -14,6 +16,9 @@ public class Specie {
     @XmlAttribute private String kdiffunit;
 
     transient private int index;
+    static final boolean diffusion = Settings.getProperty("neurord.diffusion",
+                                                          "Allow diffusion to happen",
+                                                          true);
 
     public String getID() {
         return id != null ? id : generateID(name);
@@ -36,12 +41,14 @@ public class Specie {
     }
 
     public double getDiffusionConstant() {
-        if (kdiff == null)
+        if (!diffusion)
             return 0;
-        return kdiff * getFactor(kdiffunit);
+        if (this.kdiff == null)
+            return 0;
+        return this.kdiff * getFactor(this.kdiffunit);
     }
 
-    private double getFactor(String su) {
+    private static double getFactor(String su) {
         // output units are microns^2/ms
 
         if (su == null || su.equals("µm²/s") || su.equals("mu2/s"))

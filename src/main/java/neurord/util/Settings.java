@@ -106,6 +106,9 @@ public class Settings {
         log = neurord.numeric.grid.ResultWriterHDF5.log;
         log = neurord.numeric.grid.StochasticGridCalc.log;
         log = neurord.xml.ModelReader.log;
+        log = neurord.model.Specie.log;
+        log = neurord.model.Reaction.log;
+        log = neurord.model.InjectionStim.log;
 
         Integer dummy = neurord.util.CustomFileAppender.dummy;
     }

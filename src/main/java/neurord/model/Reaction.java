@@ -9,12 +9,13 @@ import javax.xml.bind.annotation.*;
 
 import neurord.numeric.chem.ReactionTable;
 import static neurord.model.Specie.generateID;
+import neurord.util.Settings;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 public class Reaction {
-    static final Logger log = LogManager.getLogger();
+    static public final Logger log = LogManager.getLogger();
 
     @XmlAttribute
     public String name;
@@ -33,6 +34,9 @@ public class Reaction {
 
     public Double Q10;
 
+    static final boolean reactions = Settings.getProperty("neurord.reactions",
+                                                          "Allow reactions to happen",
+                                                          true);
     transient private ArrayList<Specie> r_reactants;
     transient private ArrayList<Specie> r_products;
 
@@ -65,10 +69,16 @@ public class Reaction {
     }
 
     public double getForwardRate() {
+        if (!reactions)
+            return 0;
+
         return this.forwardRate != null ? this.forwardRate : 0;
     }
 
     public double getReverseRate() {
+        if (!reactions)
+            return 0;
+
         return this.reverseRate != null ? this.reverseRate : 0;
     }
 

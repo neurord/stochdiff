@@ -8,13 +8,18 @@ import java.util.List;
 import neurord.xml.DoubleListAdapter;
 import neurord.xml.DoubleMatrixAdapter;
 import neurord.numeric.BaseCalc.distribution_t;
+import neurord.util.Settings;
 
 import org.jblas.DoubleMatrix;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.*;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class InjectionStim {
+    static public final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String specieID;
 
@@ -36,6 +41,10 @@ public class InjectionStim {
 
     @XmlJavaTypeAdapter(DoubleMatrixAdapter.class)
     private DoubleMatrix rates;
+
+    static final boolean injections = Settings.getProperty("neurord.injections",
+                                                           "Allow injections to happen",
+                                                           true);
 
     private InjectionStim() {};
 
@@ -70,6 +79,9 @@ public class InjectionStim {
     }
 
     public double getRate() {
+        if (!injections)
+            return 0;
+
         return this.rate != null ? this.rate : Double.NaN;
     }
 
@@ -98,6 +110,9 @@ public class InjectionStim {
     }
 
     public double[][] getRates() {
+        if (!injections)
+            return null;
+
         if (this.rates != null) {
             assert this.rate == null;
             assert this.onset == null;
