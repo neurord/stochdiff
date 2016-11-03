@@ -453,7 +453,7 @@ def generate_region_histories(species, region_indices, region_labels, values):
             series = values.loc[rindi][name]
             times = series.index.values
             ans[rlabel] += series.values
-        for rlabel, y in ans.items():
+        for rlabel, y in sorted(ans.items(), key=lambda pair: region_labels.index(pair[0])):
             label = fmt.format(name=name, region=rlabel)
             yield times, y, name, label
 
