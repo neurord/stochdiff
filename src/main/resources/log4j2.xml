@@ -24,10 +24,13 @@
     <logger name="neurord.numeric.grid.NextEventQueue" />
     <logger name="neurord.numeric.grid.AdaptiveGridCalc" />
     <logger name="neurord.numeric.grid.GridCalc" />
+    <logger name="neurord.numeric.grid.StochasticGridCalc" />
     <logger name="neurord.numeric.grid.SteppedStochasticGridCalc" />
-    <logger name="neurord.numeric.model.SDRun" />
     <logger name="neurord.numeric.morph.VolumeGrid" />
     <logger name="neurord.numeric.morph.VolumeElement" />
+    <logger name="neurord.model.SDRun" />
+    <logger name="neurord.model.SurfaceDensitySet" />
+    <logger name="neurord.model.InitialConditions" />
     <logger name="neurord.util.TimeUtil" />
     <logger name="neurord.util.Settings" />
   </loggers>
