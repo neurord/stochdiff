@@ -20,7 +20,7 @@ public class SurfaceDensitySet implements Regional {
 
     transient HashMap<String, PicoSD> sdHM;
 
-    public synchronized HashMap<String, PicoSD> getSurfaceDensityHM() {
+    private synchronized HashMap<String, PicoSD> getSurfaceDensities() {
         if (this.sdHM == null) {
             this.sdHM = new HashMap<>();
             if (sds != null)
@@ -30,18 +30,12 @@ public class SurfaceDensitySet implements Regional {
         return sdHM;
     }
 
-    public double[] getPicoSurfaceDensities(String[] ids) {
-        double[] ret = new double[ids.length];
-        HashMap<String, PicoSD> chm = getSurfaceDensityHM();
-
-        for (int i = 0; i < ids.length; i++)
-            if (chm.containsKey(ids[i]))
-                ret[i] = chm.get(ids[i]).getPicoMoleSurfaceDensity();
-            else
-                ret[i] = Double.NaN;
-
-        log.debug("pico surface densities: {} → {}", ids, ret);
-        return ret;
+    public Double getSurfaceDensity(String species) {
+        PicoSD sd = this.getSurfaceDensities().get(species);
+        if (sd == null)
+            return null;
+        else
+            return sd.getValue();
     }
 
     public boolean hasRegion() {

@@ -9,10 +9,6 @@ public class PicoSD implements FloatValued {
     @XmlAttribute public String specieID;
     @XmlAttribute public double value;
 
-    public double getPicoMoleSurfaceDensity() {
-        return value;
-    }
-
     public double getValue() {
         return value;
     }
