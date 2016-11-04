@@ -430,26 +430,26 @@ def specie_indices(items, species):
     species = list(species)
     return np.array([species.index(i) for i in items])
 
-def generate_element_histories(species, region_indices, region_labels, values):
+def generate_element_histories(species, element_indices, region_labels, values):
     fmt = '{name} el.{element}'
     if len(set(region_labels)) > 1:
         fmt += ' {region}'
 
     for name in species:
-        for rlabel, rindi in zip(region_labels, region_indices):
+        for rlabel, rindi in zip(region_labels, element_indices):
             series = values.loc[rindi][name]
             times = series.index.values
             y = series.values
             label = fmt.format(name=name, element=rindi, region=rlabel)
             yield times, y, name, label
 
-def generate_region_histories(species, region_indices, region_labels, values):
+def generate_region_histories(species, element_indices, region_labels, values):
     fmt = '{name}'
     if len(set(region_labels)) > 1:
         fmt += ' {region}'
     for name in species:
         ans = collections.defaultdict(lambda: 0)
-        for rlabel, rindi in zip(region_labels, region_indices):
+        for rlabel, rindi in zip(region_labels, element_indices):
             series = values.loc[rindi][name]
             times = series.index.values
             ans[rlabel] += series.values
@@ -457,26 +457,25 @@ def generate_region_histories(species, region_indices, region_labels, values):
             label = fmt.format(name=name, region=rlabel)
             yield times, y, name, label
 
-def generate_total_histories(species, region_indices, region_labels, values):
+def generate_total_histories(species, element_indices, region_labels, values):
     for name in species:
         ans = 0
-        for rlabel, rindi in zip(region_labels, region_indices):
+        for rlabel, rindi in zip(region_labels, element_indices):
             series = values.loc[rindi][name]
             times = series.index.values
             ans += series.values
         yield times, ans, name, name
 
-def generate_histories(species, region_indices, region_labels,
-                       values, opts):
+def generate_histories(species, element_indices, region_labels, values, opts):
     if opts.sum_regions:
         func = generate_region_histories
     elif opts.sum_all:
         func = generate_total_histories
     else:
         func = generate_element_histories
-    return func(species, region_indices, region_labels, values)
+    return func(species, element_indices, region_labels, values)
 
-def _history(simul, species, region_indices, region_labels,
+def _history(simul, species, element_indices, region_labels,
              values, title, opts):
 
     import matplotlib
@@ -489,7 +488,7 @@ def _history(simul, species, region_indices, region_labels,
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
-    data = list(generate_histories(species, region_indices, region_labels,
+    data = list(generate_histories(species, element_indices, region_labels,
                                    values, opts))
     sharex = None
     if opts.multiplot:
@@ -522,9 +521,9 @@ def _history(simul, species, region_indices, region_labels,
     else:
         pyplot.show(block=True)
 
-def _history_data(simul, species, region_indices, region_labels,
+def _history_data(simul, species, element_indices, region_labels,
                   values, title, opts):
-    data = generate_histories(species, region_indices, region_labels,
+    data = generate_histories(species, element_indices, region_labels,
                               values, opts)
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
@@ -579,17 +578,17 @@ def plot_history(output, species):
 
     regions = model.grid().region
     region_numbers = list(find_regions(regions, model.region_names(), opts.regions))
-    region_indices = np.arange(len(regions))[(regions[:, None] == region_numbers).any(axis=1)]
+    element_indices = np.arange(len(regions))[(regions[:, None] == region_numbers).any(axis=1)]
     region_labels = model.region_names(region_numbers)
 
     if opts.save_data:
         _history_data(simul, species,
-                      region_indices, region_labels,
+                      element_indices, region_labels,
                       values,
                       title=output.file.filename, opts=opts)
     else:
         _history(simul, species,
-                 region_indices, region_labels,
+                 element_indices, region_labels,
                  values,
                  title=output.file.filename, opts=opts)
 
