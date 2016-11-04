@@ -436,11 +436,11 @@ def generate_element_histories(species, element_indices, region_labels, values):
         fmt += ' {region}'
 
     for name in species:
-        for rlabel, rindi in zip(region_labels, element_indices):
-            series = values.loc[rindi][name]
+        for rlabel, elem in zip(region_labels, element_indices):
+            series = values.loc[elem][name]
             times = series.index.values
             y = series.values
-            label = fmt.format(name=name, element=rindi, region=rlabel)
+            label = fmt.format(name=name, element=elem, region=rlabel)
             yield times, y, name, label
 
 def generate_region_histories(species, element_indices, region_labels, values):
@@ -449,8 +449,8 @@ def generate_region_histories(species, element_indices, region_labels, values):
         fmt += ' {region}'
     for name in species:
         ans = collections.defaultdict(lambda: 0)
-        for rlabel, rindi in zip(region_labels, element_indices):
-            series = values.loc[rindi][name]
+        for rlabel, elem in zip(region_labels, element_indices):
+            series = values.loc[elem][name]
             times = series.index.values
             ans[rlabel] += series.values
         for rlabel, y in sorted(ans.items(), key=lambda pair: region_labels.index(pair[0])):
@@ -460,8 +460,8 @@ def generate_region_histories(species, element_indices, region_labels, values):
 def generate_total_histories(species, element_indices, region_labels, values):
     for name in species:
         ans = 0
-        for rlabel, rindi in zip(region_labels, element_indices):
-            series = values.loc[rindi][name]
+        for rlabel, elem in zip(region_labels, element_indices):
+            series = values.loc[elem][name]
             times = series.index.values
             ans += series.values
         yield times, ans, name, name
