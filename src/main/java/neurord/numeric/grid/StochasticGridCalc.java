@@ -64,8 +64,8 @@ public abstract class StochasticGridCalc extends GridCalc {
 
             for (int j = 0; j < nspec; j++) {
                 wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
-                log.debug("{} el.{}: {} × {} × {} → {}",
-                          species[j], i,
+                log.debug("el.{} {}: {} × {} × {} → {}",
+                          i, species[j],
                           v, rcs[j], PARTICLES_PUVC, wkA[i][j]);
             }
         }
