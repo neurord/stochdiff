@@ -3,6 +3,7 @@ package neurord.numeric.grid;
 import neurord.model.SDRun;
 import neurord.numeric.math.RandomGenerator;
 import neurord.numeric.math.MersenneTwister;
+import neurord.numeric.morph.VolumeGrid;
 import neurord.util.ArrayUtil;
 import neurord.util.Settings;
 import neurord.util.Logging;
@@ -34,9 +35,9 @@ public abstract class StochasticGridCalc extends GridCalc {
         this.random = new MersenneTwister(getSimulationSeed());
 
         // workspace for the calculation
-        assert(nel > 0);
-        assert(nspec > 0);
-        this.wkA = new int[nel][nspec];
+        assert(this.nel > 0);
+        assert(this.nspec > 0);
+        this.wkA = new int[this.nel][this.nspec];
 
         int[][] pop = this.sdRun.getPopulation();
         if (pop != null) {
@@ -56,13 +57,14 @@ public abstract class StochasticGridCalc extends GridCalc {
     protected void initPopulation(int[][] counts, SDRun sdrun) {
         log.debug("Initializing population based on volume and surface concentrations");
         final String[] species = sdrun.getSpecies();
+        final VolumeGrid grid = sdrun.getVolumeGrid();
 
         /* volume concentrations */
-        for (int i = 0; i < nel; i++) {
+        for (int i = 0; i < this.nel; i++) {
             double v = volumes[i];
-            double[] rcs = sdrun.getRegionConcentration(this.eltregions[i]);
+            double[] rcs = sdrun.getRegionConcentration(grid.getElementRegion(i));
 
-            for (int j = 0; j < nspec; j++) {
+            for (int j = 0; j < this.nspec; j++) {
                 wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
                 log.debug("el.{} {}: {} × {} × {} → {}",
                           i, species[j],
@@ -73,17 +75,16 @@ public abstract class StochasticGridCalc extends GridCalc {
         log.debug("volume only:\n{}", wkA);
 
         /* surface concentrations */
-        double[][] regsds = this.sdRun.getRegionSurfaceDensities();
-
-        // apply initial conditions over the grid
-        for (int i = 0; i < nel; i++) {
+        for (int i = 0; i < this.nel; i++) {
             double a = this.surfaceAreas[i];
-            double[] sds = regsds[this.eltregions[i]];
-            if (a > 0 && sds != null)
-                for (int j = 0; j < nspec; j++)
+            if (a > 0) {
+                double[] sds = sdrun.getRegionSurfaceDensity(grid.getElementRegion(i));
+
+                for (int j = 0; j < this.nspec; j++)
                     if (!Double.isNaN(sds[j]))
-                        // nan means not specified by the user;
+                        // nan means not specified by the user
                         wkA[i][j] = this.random.round(a * sds[j] * PARTICLES_PUASD);
+            }
         }
 
         log.debug("with surface:\n{}", wkA);

@@ -97,9 +97,6 @@ public class ResultWriterHDF5 implements ResultWriter {
             this.ispecout2 = new int[outputSets.size()][];
             this.elementsout2 = new int[outputSets.size()][];
 
-            final String[] regionLabels = grid.getRegionLabels();
-            final int[] elementRegions = grid.getRegionIndexes();
-
             for (int i = 0; i < this.ispecout2.length; i++) {
                 this.ispecout2[i] = outputSets.get(i).getIndicesOfOutputSpecies(species);
 
@@ -107,8 +104,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                 if (region != null) {
                     /* Find elements which match specified regions */
                     ArrayList<Integer> list = new ArrayList<>();
-                    for (int j = 0; j < elementRegions.length; j++)
-                        if (region.equals(regionLabels[elementRegions[j]]))
+                    for (int j = 0; j < this.nel; j++)
+                        if (region.equals(grid.getElementRegion(j)))
                             list.add(j);
 
                     this.elementsout2[i] = ArrayUtil.toIntArray(list);
@@ -436,15 +433,16 @@ public class ResultWriterHDF5 implements ResultWriter {
                                      "x3", "y3", "z3",
                                      "volume", "deltaZ",
                                      "label",
-                                     "region", "type", "group" };
+                                     "region_name", "region", "type", "group" };
 
             Datatype[] memberTypes = new Datatype[memberNames.length];
             Arrays.fill(memberTypes, double_t);
             memberTypes[14] = short_str_t;
-            memberTypes[15] = int_t;
-            memberTypes[16] = short_str_t;
+            memberTypes[15] = short_str_t;
+            memberTypes[16] = int_t;
             memberTypes[17] = short_str_t;
-            assert memberTypes.length == 18;
+            memberTypes[18] = short_str_t;
+            assert memberTypes.length == 19;
 
             Vector<Object> data = vgrid.gridData();
 
@@ -459,9 +457,16 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             {
-                int[] indexes = vgrid.getRegionIndexes();
-                assert indexes.length == nel;
-                data.add(indexes);
+                String[] region_names = vgrid.getElementRegions();
+                assert region_names.length == nel;
+                data.add(region_names);
+
+                List<String> regions = Arrays.asList(vgrid.getRegionLabels());
+                int[] region_indices = new int[region_names.length];
+                for (int i = 0; i < region_indices.length; i++)
+                    region_indices[i] = regions.indexOf(region_names[i]);
+                assert region_indices.length == nel;
+                data.add(region_indices);
             }
 
             {

@@ -272,14 +272,12 @@ public class SDRun implements IOutputSet {
     }
 
     private transient InitialConditions _empty_initalConditions;
-    public InitialConditions getInitialConditions() {
+    public synchronized InitialConditions getInitialConditions() {
         if (this.initialConditions != null)
             return this.initialConditions;
 
-        synchronized (this) {
-            if (this._empty_initalConditions == null)
-                this._empty_initalConditions = new InitialConditions();
-        };
+        if (this._empty_initalConditions == null)
+            this._empty_initalConditions = new InitialConditions();
 
         return this._empty_initalConditions;
     }
@@ -359,16 +357,17 @@ public class SDRun implements IOutputSet {
         return grid.getAreaIndexes(targets);
     }
 
-    public double[] getRegionConcentration(int region) {
-        String[] allregions = this.getVolumeGrid().getRegionLabels();
-        String[] regions = new String[]{ allregions[region] };
-
-        return this.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies())[0];
+    public double[] getRegionConcentration(String region) {
+        return this.getInitialConditions().getRegionConcentration(region, this.getSpecies());
     }
 
     public double[][] getRegionConcentrations() {
         String[] regions = this.getVolumeGrid().getRegionLabels();
         return this.getInitialConditions().makeRegionConcentrations(regions, this.getSpecies());
+    }
+
+    public double[] getRegionSurfaceDensity(String region) {
+        return this.getInitialConditions().getRegionSurfaceDensity(region, this.getSpecies());
     }
 
     public double[][] getRegionSurfaceDensities() {

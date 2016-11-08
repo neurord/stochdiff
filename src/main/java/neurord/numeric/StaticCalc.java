@@ -61,7 +61,6 @@ public class StaticCalc extends BaseCalc {
         submembranes = vgrid.getSubmembranes();
         regionLabels = vgrid.getRegionLabels();
 
-        eltregions = vgrid.getRegionIndexes();
         surfaceAreas = vgrid.getExposedAreas();
 
         wkA = new double[nel][nspec];
@@ -71,18 +70,17 @@ public class StaticCalc extends BaseCalc {
 
 
     public void reinit() {
-        double[][] regcon = this.sdRun.getRegionConcentrations();
-        double[][] regsd = this.sdRun.getRegionSurfaceDensities();
+        VolumeGrid grid = this.sdRun.getVolumeGrid();
 
         for (int i = 0; i < nel; i++) {
-            double[] rcs = regcon[eltregions[i]];
+            double[] rcs = this.sdRun.getRegionConcentration(grid.getElementRegion(i));
             for (int j = 0; j < nspec; j++) {
                 wkA[i][j] = rcs[j];
             }
 
             double a = surfaceAreas[i];
-            double[] scs = regsd[eltregions[i]];
-            if (a > 0 && scs != null) {
+            if (a > 0) {
+                double[] scs = this.sdRun.getRegionSurfaceDensity(grid.getElementRegion(i));
                 double concfac = a / volumes[i];
 
                 for (int j = 0; j < nspec; j++) {

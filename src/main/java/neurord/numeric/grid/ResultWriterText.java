@@ -304,9 +304,7 @@ public class ResultWriterText implements ResultWriter {
 
     private String getGridConcsPlainText_dumb(IOutputSet output, double time, IGridCalc source) {
         final String[] species = source.getSource().getSpecies();
-
-        final String[] regionLabels = source.getSource().getVolumeGrid().getRegionLabels();
-        final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
+        final VolumeGrid grid = source.getSource().getVolumeGrid();
 
         final String region = output.getRegion();
         final int[] indices = output.getIndicesOfOutputSpecies(species);
@@ -316,7 +314,7 @@ public class ResultWriterText implements ResultWriter {
 
         for (int specie: indices)
             for (int i = 0; i < this.nel; i++)
-                if (region == null || region.equals(regionLabels[eltRegions[i]]))
+                if (region == null || region.equals(grid.getElementRegion(i)))
                     sb.append(this.formatNumber(i, specie, source));
 
         sb.append("\n");
@@ -327,7 +325,7 @@ public class ResultWriterText implements ResultWriter {
         final String[] species = source.getSource().getSpecies();
         final boolean[] submembranes = vgrid.getSubmembranes();
         final String[] regionLabels = vgrid.getRegionLabels();
-        final int[] eltRegions = source.getSource().getVolumeGrid().getRegionIndexes();
+        final VolumeGrid grid = source.getSource().getVolumeGrid();
 
         StringBuffer sb = new StringBuffer();
         sb.append("time");
@@ -337,9 +335,9 @@ public class ResultWriterText implements ResultWriter {
 
         for (int specie: indices)
             for (int i = 0; i < this.nel; i++)
-                if (region == null || region.equals(regionLabels[eltRegions[i]])) {
+                if (region == null || region.equals(grid.getElementRegion(i))) {
                     sb.append(" Vol_" + i);
-                    sb.append("_" + regionLabels[eltRegions[i]]);
+                    sb.append("_" + grid.getElementRegion(i));
 
                     String tempLabel = vgrid.getLabel(i);
 

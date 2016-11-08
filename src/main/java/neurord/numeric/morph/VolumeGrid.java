@@ -37,8 +37,6 @@ public class VolumeGrid {
     String[] eltLabels;
     String[] eltGroupIDs;
     String[] regionLabels;
-    int[] eltRegions;
-
 
     double[] volumes;
     double[][] positions;
@@ -131,7 +129,6 @@ public class VolumeGrid {
         positions = new double[nelement][3];
         eltLabels = new String[nelement];
         eltGroupIDs = new String[nelement];
-        eltRegions = new int[nelement];
         submembranes = new boolean[nelement];
 
         for (int i = 0; i < nelement; i++) {
@@ -148,25 +145,8 @@ public class VolumeGrid {
             eltGroupIDs[i] = ve.getGroupID();
             submembranes[i] = ve.isSubmembrane();
 
-            String sr = ve.getRegion();
-            if (sr == null || sr.length() == 0) {
-                eltRegions[i] = 0;
-
-            } else if (rA.contains(sr)) {
-                eltRegions[i] = rA.indexOf(sr);
-
-            } else {
-                int nn = rA.size();
-                eltRegions[i] = nn;
-                rA.add(sr);
-            }
-
-            /*      System.out.println("VE " + i + ": volume " + volumes[i] +
-                         " exposedArea " + exposedAreas[i] +
-                         " position " + positions[i][0] + " " +
-                         positions[i][1] + " " + positions[i][2] +
-                         " ELTLable " + eltLabels[i] + " SR " + sr + " SUBMEMBRANE " + ve.isSubmembrane());
-              */
+            if (!rA.contains(ve.getRegion()))
+                rA.add(ve.getRegion());
         }
         regionLabels = rA.toArray(new String[0]);
 
@@ -213,11 +193,6 @@ public class VolumeGrid {
         }
     }
 
-
-    public int[] getRegionIndexes() {
-        return eltRegions;
-    }
-
     public int size() {
         assert volumes != null: "volumes not fixed";
         return nelement;
@@ -244,9 +219,19 @@ public class VolumeGrid {
         return eltNbrG;
     }
 
+    public String getElementRegion(int element) {
+        return this.elements.get(element).getRegion();
+    }
+
+    public String[] getElementRegions() {
+        String[] ans = new String[this.elements.size()];
+        for (int i = 0; i < ans.length; i++)
+            ans[i] = this.getElementRegion(i);
+        return ans;
+    }
 
     public String[] getRegionLabels() {
-        return regionLabels;
+        return this.regionLabels;
     }
 
     public String getAsText() {

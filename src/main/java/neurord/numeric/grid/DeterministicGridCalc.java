@@ -47,10 +47,10 @@ public class DeterministicGridCalc extends GridCalc {
 
     final double[][] couplingConstants;
 
-    public DeterministicGridCalc(int trial, SDRun sdm) {
-        super(trial, sdm);
+    public DeterministicGridCalc(int trial, SDRun sdrun) {
+        super(trial, sdrun);
 
-        VolumeGrid grid = this.sdRun.getVolumeGrid();
+        VolumeGrid grid = sdrun.getVolumeGrid();
         this.couplingConstants = grid.getPerElementCouplingConstants();
     }
 
@@ -91,11 +91,10 @@ public class DeterministicGridCalc extends GridCalc {
         wktm1 = new double[nel][nspec];
         wkC = new double[nel][nspec];
 
-        double[][] regcon = this.sdRun.getRegionConcentrations();
-        double[][] regsd = this.sdRun.getRegionSurfaceDensities();
+        VolumeGrid grid = this.sdRun.getVolumeGrid();
 
         for (int i = 0; i < nel; i++) {
-            double[] rcs = regcon[eltregions[i]];
+            double[] rcs = this.sdRun.getRegionConcentration(grid.getElementRegion(i));
             for (int j = 0; j < nspec; j++) {
                 wkA[i][j] = rcs[j];
                 //AB 2012-apr 3 change wkB to wk[time-1]
@@ -104,8 +103,8 @@ public class DeterministicGridCalc extends GridCalc {
             }
 
             double a = surfaceAreas[i];
-            double[] scs = regsd[eltregions[i]];
-            if (a > 0 && scs != null) {
+            if (a > 0) {
+                double[] scs = this.sdRun.getRegionSurfaceDensity(grid.getElementRegion(i));
 
                 // the actual concentration in the surface elements depends how
                 // deep they are

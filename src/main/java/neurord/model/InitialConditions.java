@@ -51,56 +51,57 @@ public class InitialConditions {
     }
 
     public double[][] makeRegionConcentrations(String[] regions, String[] species) {
-        ConcentrationSet defaults = this.getDefaultConcentrations();
-        double[][] ret = new double[regions.length][species.length];
-        for (int i = 0; i < regions.length; i++) {
-            ConcentrationSet set = this.getConcentrationSets().get(regions[i]);
+        double[][] ret = new double[regions.length][];
+        for (int i = 0; i < regions.length; i++)
+            ret[i] = getRegionConcentration(regions[i], species);
 
-            for (int j = 0; j < species.length; j++) {
-                Double val = null;
-                if (set != null)
-                    val = set.getNanoMolarConcentration(species[j]);
-                if (val == null)
-                    val = defaults.getNanoMolarConcentration(species[j]);
-                if (val != null)
-                    ret[i][j] = val;
-            }
-        }
         return ret;
     }
 
-    transient private SurfaceDensitySet defaultSurfaceDensities;
-    private synchronized SurfaceDensitySet getDefaultSurfaceDensities() {
-        if (this.defaultSurfaceDensities == null) {
-            if (this.sdSets != null)
-                for (SurfaceDensitySet set: this.sdSets)
-                    if (!set.hasRegion()) {
-                        this.defaultSurfaceDensities = set;
-                        break;
-                    }
-            if (this.defaultSurfaceDensities == null)
-                this.defaultSurfaceDensities = new SurfaceDensitySet();
+    public double[] getRegionConcentration(String region, String[] species) {
+        double[] ans = new double[species.length];
+
+        ConcentrationSet set = this.getConcentrationSets().get(region);
+        if (set == null)
+            set = this.getDefaultConcentrations();
+
+        for (int i = 0; i < species.length; i++) {
+            Double c = set.getNanoMolarConcentration(species[i]);
+            if (c != null)
+                ans[i] = c;
         }
 
-        return this.defaultSurfaceDensities;
+        return ans;
     }
 
-    public double[][] makeRegionSurfaceDensities(String[] sra, String[] species) {
-        SurfaceDensitySet defaults = this.getDefaultSurfaceDensities();
-        double[][] ret = new double[sra.length][species.length];
-        for (int i = 0; i < sra.length; i++) {
-            SurfaceDensitySet set = this.getSurfaceDensitySets().get(sra[i]);
+    private SurfaceDensitySet getDefaultSurfaceDensities() {
+        if (this.sdSets != null)
+            for (SurfaceDensitySet set: this.sdSets)
+                if (!set.hasRegion())
+                    return set;
+        return null;
+    }
 
-            for (int j = 0; j < species.length; j++) {
-                Double val = null;
-                if (set != null)
-                    val = set.getSurfaceDensity(species[j]);
-                if (val == null)
-                    val = defaults.getSurfaceDensity(species[j]);
+    public double[][] makeRegionSurfaceDensities(String[] regions, String[] species) {
+        double[][] ret = new double[regions.length][];
+        for (int i = 0; i < regions.length; i++)
+            ret[i] = this.getRegionSurfaceDensity(regions[i], species);
+        return ret;
+    }
 
-                /* NaN means "no value" */
-                ret[i][j] = val != null ? val : Double.NaN;
-            }
+    public double[] getRegionSurfaceDensity(String region, String[] species) {
+        double[] ret = new double[species.length];
+
+        SurfaceDensitySet set = this.getSurfaceDensitySets().get(region);
+        if (set == null)
+            set = this.getDefaultSurfaceDensities();
+
+        for (int j = 0; j < species.length; j++) {
+            Double val = null;
+            if (set != null)
+                val = set.getSurfaceDensity(species[j]);
+            /* NaN means "no value" */
+            ret[j] = val != null ? val : Double.NaN;
         }
         return ret;
     }

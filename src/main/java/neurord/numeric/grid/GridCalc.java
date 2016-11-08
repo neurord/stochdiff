@@ -32,8 +32,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
 
     int[][] neighbors;
 
-    public int[] eltregions;
-
     double[] surfaceAreas;
 
     final double[] dtsOut;
@@ -67,8 +65,6 @@ public abstract class GridCalc extends BaseCalc implements IGridCalc {
         nspec = rtab.getNSpecies();
 
         neighbors = grid.getPerElementNeighbors();
-
-        eltregions = grid.getRegionIndexes();
 
         fdiff = rtab.getDiffusionConstants();
 
