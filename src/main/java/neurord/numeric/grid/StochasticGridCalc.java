@@ -64,7 +64,8 @@ public abstract class StochasticGridCalc extends GridCalc {
         /* volume concentrations */
         for (int i = 0; i < this.nel; i++) {
             double v = volumes[i];
-            double[] rcs = sdrun.getRegionConcentration(grid.getElementRegion(i));
+            String region = grid.getElementRegion(i);
+            double[] rcs = sdrun.getRegionConcentration(region);
 
             for (int j = 0; j < this.nspec; j++) {
                 wkA[i][j] = this.random.round(v * rcs[j] * PARTICLES_PUVC);
@@ -75,7 +76,9 @@ public abstract class StochasticGridCalc extends GridCalc {
 
             double[] rcs2 = sdrun.getRegionConcentration(grid.getElementRegion(i));
             if (!Arrays.equals(rcs, rcs2)) {
-                log.error("RegionConcentrations are not equal:\n{}\n{}", rcs, rcs2);
+                log.error("RegionConcentrations are not equal for {} {} {}:\n{}\n{}",
+                          i, region, grid.getElementRegion(i),
+                          rcs, rcs2);
                 throw new RuntimeException("RegionConcentrations are not equal");
             }
         }
