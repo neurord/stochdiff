@@ -8,6 +8,8 @@ import neurord.util.ArrayUtil;
 import neurord.util.Settings;
 import neurord.util.Logging;
 
+import java.util.Arrays;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -70,6 +72,12 @@ public abstract class StochasticGridCalc extends GridCalc {
                           i, species[j],
                           v, rcs[j], PARTICLES_PUVC, wkA[i][j]);
             }
+
+            double[] rcs2 = sdrun.getRegionConcentration(grid.getElementRegion(i));
+            if (!Arrays.equals(rcs, rcs2)) {
+                log.error("RegionConcentrations are not equal:\n{}\n{}", rcs, rcs2);
+                throw new RuntimeException("RegionConcentrations are not equal");
+            }
         }
 
         log.debug("volume only:\n{}", wkA);
@@ -84,6 +92,12 @@ public abstract class StochasticGridCalc extends GridCalc {
                     if (!Double.isNaN(sds[j]))
                         // nan means not specified by the user
                         wkA[i][j] = this.random.round(a * sds[j] * PARTICLES_PUASD);
+
+                double[] sds2 = sdrun.getRegionSurfaceDensity(grid.getElementRegion(i));
+                if (!Arrays.equals(sds, sds2)) {
+                    log.error("RegionSurfaceDensities are not equal:\n{}\n{}", sds, sds2);
+                    throw new RuntimeException("RegionSurfaceDensities are not equal");
+                }
             }
         }
 
