@@ -320,10 +320,10 @@ public class ReactionTable {
     }
 
     public int getSpecieIndex(String specieID) {
-        String[] sa = getSpecies();
+        String[] species = this.getSpecies();
 
         for (int i = 0; i < this.species.length; i++)
-            if (sa[i].equals(specieID))
+            if (species[i].equals(specieID))
                 return i;
         log.error("Cannot find specie {}", specieID);
         throw new RuntimeException("Cannot find specie " + specieID);

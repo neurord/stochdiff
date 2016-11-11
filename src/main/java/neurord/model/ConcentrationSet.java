@@ -18,12 +18,11 @@ public class ConcentrationSet implements Regional {
     public ArrayList<Concentration> concentrations;
 
     transient HashMap<String, Concentration> concHM;
-
-    public HashMap<String, Concentration> getConcHM() {
+    private synchronized HashMap<String, Concentration> getConcHM() {
         if (concHM == null) {
-            concHM = new HashMap<String, Concentration>();
+            concHM = new HashMap<>();
             if (concentrations != null)
-                for (Concentration c : concentrations)
+                for (Concentration c: concentrations)
                     concHM.put(c.specieID, c);
         }
         return concHM;
