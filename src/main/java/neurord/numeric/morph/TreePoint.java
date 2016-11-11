@@ -44,10 +44,9 @@ public class TreePoint implements Position {
 
 
     public TreePoint() {
-        nbr = new TreePoint[6];
-        nnbr = 0;
-        dead = false;
-
+        this.nbr = new TreePoint[6];
+        this.nnbr = 0;
+        this.dead = false;
     }
 
     public TreePoint(double x, double y, double z, double r) {
@@ -56,7 +55,6 @@ public class TreePoint implements Position {
         this.y = y;
         this.z = z;
         this.r = r;
-
     }
 
     public double getRadius() {
@@ -240,27 +238,27 @@ public class TreePoint implements Position {
         label = s;
     }
 
-    public void setIDWith(TreePoint point, String s) {
-        if (segidHM == null)
-            segidHM = new HashMap<TreePoint, String>();
+    public synchronized void setIDWith(TreePoint point, String s) {
+        if (this.segidHM == null)
+            this.segidHM = new HashMap<>();
 
         //  E.info("tp set region id to " + point + " as " + s);
-        segidHM.put(point, s);
+        this.segidHM.put(point, s);
     }
 
-    public void setRegionWith(TreePoint point, String s) {
-        if (regionHM == null) {
-            regionHM = new HashMap<TreePoint, String>();
-            firstRegion = s;
+    public synchronized void setRegionWith(TreePoint point, String s) {
+        if (this.regionHM == null) {
+            this.regionHM = new HashMap<>();
+            this.firstRegion = s;
         }
-        regionHM.put(point, s);
+        this.regionHM.put(point, s);
     }
 
 
     public String regionClassWith(TreePoint tp) {
         String ret = null;
-        if (regionHM != null && regionHM.containsKey(tp))
-            ret = regionHM.get(tp);
+        if (this.regionHM != null)
+            ret = this.regionHM.get(tp);
 
         // June 2009: this could change a lot of things: previously
         // we required both ends to be in the same region. Now it is
@@ -274,19 +272,17 @@ public class TreePoint implements Position {
     }
 
     public String soleRegion() {
-        String ret = null;
-        if (regionHM != null && regionHM.size() == 1)
-            ret = firstRegion;
+        if (this.regionHM != null && this.regionHM.size() == 1)
+            return this.firstRegion;
 
-        return ret;
+        return null;
     }
 
     public String segmentIDWith(TreePoint tp) {
-        String ret = null;
-        if (segidHM != null && segidHM.containsKey(tp))
-            ret = segidHM.get(tp);
+        if (this.segidHM != null)
+            return this.segidHM.get(tp);
 
-        return ret;
+        return null;
     }
 
     public void setSubAreaOf(TreePoint cpa) {
