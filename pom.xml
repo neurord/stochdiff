@@ -124,7 +124,7 @@
                     </condition>
 
                     <tstamp>
-                      <format property="last.updated" pattern="yyyy-MM-dd hh:mm:ss"/>
+                      <format property="last.updated" pattern="yyyy-MM-dd hh:mm:ss z"/>
                     </tstamp>
 
                     <echo message="git.version=${git.version}" />
