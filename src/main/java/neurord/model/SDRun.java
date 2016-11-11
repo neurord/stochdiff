@@ -209,15 +209,10 @@ public class SDRun implements IOutputSet {
         return this.outputScheme.dependencies;
     }
 
-    transient private boolean _reactionSchemeResolved = false;
-    public synchronized ReactionScheme getReactionScheme() {
-        if (!this._reactionSchemeResolved) {
-            if (this.reactionScheme == null) {
-                log.error("<ReactionScheme> element is required");
-                throw new RuntimeException("<ReactionScheme> element is required");
-            }
-            this.reactionScheme.resolve();
-            this._reactionSchemeResolved =true;
+    private ReactionScheme getReactionScheme() {
+        if (this.reactionScheme == null) {
+            log.error("<ReactionScheme> element is required");
+            throw new RuntimeException("<ReactionScheme> element is required");
         }
         return this.reactionScheme;
     }

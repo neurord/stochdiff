@@ -134,10 +134,10 @@ public class InitialConditions {
     }
 
     public static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
-        HashMap<String, T> hm = new HashMap<>();
+        final HashMap<String, T> hm = new HashMap<>();
 
         if (list != null)
-            for(T item: list)
+            for (T item: list)
                 if (item.hasRegion()) {
                     T old = hm.put(item.getRegion(), item);
                     if (old != null) {

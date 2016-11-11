@@ -41,12 +41,8 @@ public class VolumeGrid {
     double[] volumes;
     double[][] positions;
     double[] exposedAreas;
-
-    //<--WK
     boolean[] submembranes;
-    //WK-->
 
-    int nconnection;
     int[][] conI;
     double[] conG;
 
@@ -91,9 +87,9 @@ public class VolumeGrid {
 
         log.debug("Processing VolumeElement {} from region {}", ve.getAsText(), region);
 
-        if (regionHM.containsKey(region)) {
+        if (regionHM.containsKey(region))
             regionHM.get(region).add(ve);
-        } else {
+        else {
             ArrayList<VolumeElement> ave = new ArrayList<>();
             ave.add(ve);
             regionHM.put(region, ave);
@@ -115,12 +111,24 @@ public class VolumeGrid {
 
     // switch from collections to arrays for the calculation
     public void fix() {
-        ArrayList<ElementConnection> connections = new ArrayList<>();
-        for (VolumeElement ve : elements) {
-            connections.addAll(ve.getConnections());
-        }
+        assert this.nelement == 0;
+        assert this.eltLabels == null;
+        assert this.eltGroupIDs == null;
+        assert this.regionLabels == null;
+        assert this.volumes == null;
+        assert this.positions == null;
+        assert this.exposedAreas == null;
+        assert this.submembranes == null;
+        assert this.conI == null;
+        assert this.conG == null;
+        assert this.eltNbrs == null;
+        assert this.eltNbrG == null;
 
-        ArrayList<String> rA = new ArrayList<>();
+        final ArrayList<ElementConnection> connections = new ArrayList<>();
+        for (VolumeElement ve : elements)
+            connections.addAll(ve.getConnections());
+
+        final ArrayList<String> rA = new ArrayList<>();
         rA.add("default");
 
         nelement = elements.size();
@@ -150,10 +158,9 @@ public class VolumeGrid {
         }
         regionLabels = rA.toArray(new String[0]);
 
-        nconnection = connections.size();
-        conI = new int[nconnection][2];
-        conG = new double[nconnection];
-        for (int i = 0; i < nconnection; i++) {
+        conI = new int[connections.size()][2];
+        conG = new double[connections.size()];
+        for (int i = 0; i < connections.size(); i++) {
             ElementConnection ec = connections.get(i);
             int ia = ec.getElementA().getNumber();
             int ib = ec.getElementB().getNumber();
@@ -167,7 +174,7 @@ public class VolumeGrid {
 
         int[] nnbr = new int[nelement];
 
-        for (int i = 0; i < nconnection; i++) {
+        for (int i = 0; i < connections.size(); i++) {
             nnbr[conI[i][0]] += 1;
             nnbr[conI[i][1]] += 1;
         }
@@ -180,7 +187,7 @@ public class VolumeGrid {
             eltNbrG[i] = new double[nnbr[i]];
         }
         int[] inbr = new int[nelement];
-        for (int i = 0; i < nconnection; i++) {
+        for (int i = 0; i < connections.size(); i++) {
             int i0 = conI[i][0];
             int i1 = conI[i][1];
             eltNbrs[i0][inbr[i0]] = i1;

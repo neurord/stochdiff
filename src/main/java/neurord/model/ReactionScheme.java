@@ -26,40 +26,46 @@ public class ReactionScheme {
             throw new RuntimeException("overwriting key " + key + " with new value");
     }
 
-    public void resolve() {
-        HashMap<String, Specie> hm = new HashMap<>();
+    transient private String[] species_array;
+    private void resolve() {
+        final HashMap<String, Specie> hm = new HashMap<>();
         int index = 0;
+
+        this.species_array = new String[this.species.size()];
 
         for (Specie sp: this.species) {
             sp.setIndex(index++);
             hmPut(hm, sp.getID(), sp);
+
+            // FIXME: remove this duplicity
             if (!sp.getName().equals(sp.getID()))
                 hmPut(hm, sp.getName(), sp);
+
+            this.species_array[sp.getIndex()] = sp.getID();
         }
 
         for (Reaction r : reactions)
             r.resolve(hm);
     }
 
-    protected String[] getSpecies() {
-        String[] ret = new String[species.size()];
-        int ict = 0;
-        for (Specie sp : species)
-            ret[ict++] = sp.getID();
+    public synchronized String[] getSpecies() {
+        if (this.species_array == null)
+            this.resolve();
 
+        return this.species_array;
+    }
+
+    private double[] getDiffusionConstants() {
+        double[] ret = new double[this.species.size()];
+        for (Specie sp: this.species)
+            ret[sp.getIndex()] = sp.getDiffusionConstant();
         return ret;
     }
 
-    protected double[] getDiffusionConstants() {
-        double[] ret = new double[species.size()];
-        int ict = 0;
-        for (Specie sp : species)
-            ret[ict++] = sp.getDiffusionConstant();
+    public synchronized ReactionTable makeReactionTable() {
+        if (this.species_array == null)
+            this.resolve();
 
-        return ret;
-    }
-
-    public ReactionTable makeReactionTable() {
         int n  = 0;
         for (Reaction r: reactions) {
             /* We create a forward reaction if forwardRate > 0 (this is the usual case).
