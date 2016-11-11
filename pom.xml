@@ -5,7 +5,7 @@
   <groupId>neurord</groupId>
   <artifactId>neurord</artifactId>
   <packaging>jar</packaging>
-  <version>3.2</version>
+  <version>3.2.1</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
