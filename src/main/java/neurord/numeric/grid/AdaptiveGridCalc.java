@@ -68,7 +68,7 @@ public class AdaptiveGridCalc extends StochasticGridCalc {
         log.log(Logging.NOTICE,
                 "Accuracy control parameter ε={}", this.neq.tolerance);
         log.log(Logging.NOTICE,
-                "Leapt {} ({} events, {} e/l average), waited {} times",
+                "Leapt {} ({} firings, {} f/l average), waited {} times",
                  this.neq.leap_extent, this.neq.leaps,
                  (double)this.neq.leap_extent / this.neq.leaps,
                  this.neq.normal_waits);
