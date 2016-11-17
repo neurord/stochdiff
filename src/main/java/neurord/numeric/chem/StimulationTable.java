@@ -28,6 +28,11 @@ public class StimulationTable {
                            double iti,
                            double period,
                            double end) {
+            if (Double.isNaN(rate) || Double.isNaN(onset))
+                throw new RuntimeException("rate and onset cannot be NaN");
+            if (Double.isNaN(duration) && Double.isNaN(end))
+                throw new RuntimeException("duration and end cannot be both NaN");
+
             this.species = species;
             this.site = site;
             this.distribution = distribution;
