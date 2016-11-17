@@ -25,6 +25,7 @@ import neurord.numeric.morph.VolumeElement;
 import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.numeric.stochastic.InterpolatingStepGenerator;
+import neurord.numeric.BaseCalc.distribution_t;
 import static neurord.numeric.BaseCalc.distribution_t.*;
 
 import org.apache.logging.log4j.Logger;
@@ -60,6 +61,9 @@ public class NextEventQueue {
     final static int log_start_events = Settings.getProperty("neurord.neq.log_start_events",
                                                              "Print information about this many events at startup",
                                                              99);
+    final static String stepper_distribution = Settings.getProperty("neq.stepper",
+                                                                    "Distribution type (poisson, binomial)",
+                                                                    "binomial");
 
     public static final int[] PLUS_ONE = new int[]{ +1 };
     public static final int[] MINUS_ONE = new int[]{ -1 };
@@ -1487,7 +1491,7 @@ public class NextEventQueue {
                 time = super._new_time(0);
                 break;
             case EXACT:
-                /* One event every in every 1/propensity interval */
+                /* One event in every 1/propensity interval */
                 time = 1 / this.propensity;
                 break;
             default:
@@ -1640,9 +1644,12 @@ public class NextEventQueue {
                           boolean adaptive,
                           double tolerance,
                           double leap_min_jump) {
+        final distribution_t distribution = stepper_distribution == null ? BINOMIAL :
+            distribution_t.valueOf(stepper_distribution);
+
         this.random = random != null ? random : new MersenneTwister();
         this.stepper = stepper != null ? stepper :
-            new InterpolatingStepGenerator(BINOMIAL, this.random);
+            new InterpolatingStepGenerator(distribution, this.random);
         this.particles = particles;
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
