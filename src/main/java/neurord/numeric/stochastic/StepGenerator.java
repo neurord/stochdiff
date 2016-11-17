@@ -1,10 +1,13 @@
 package neurord.numeric.stochastic;
 
+import neurord.numeric.math.MersenneTwister;
 import neurord.numeric.math.RandomGenerator;
 import static neurord.numeric.BaseCalc.distribution_t;
+import neurord.util.Logging;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
 
 public abstract class StepGenerator {
     static final Logger log = LogManager.getLogger();
@@ -131,5 +134,25 @@ public abstract class StepGenerator {
         log.warn("{} with {}: ngo is NEGATIVE (ngo={}, n={}, p={})",
                  where, msg, ngo, n, p);
         return 0;
+    }
+
+    public static void main(String... args) {
+        Logging.setLogLevel(null, LogManager.ROOT_LOGGER_NAME, Level.DEBUG);
+        Logging.configureConsoleLogging();
+
+        String distribution = args[0];
+        int N = Integer.valueOf(args[1]);
+        int n = Integer.valueOf(args[2]);
+        double p = Double.valueOf(args[3]);
+
+        distribution_t distrib = distribution_t.valueOf(distribution);
+
+        StepGenerator stepper = new InterpolatingStepGenerator(distrib, new MersenneTwister());
+        log.info("NMAX_STOCHASTIC={}, NP={}", NMAX_STOCHASTIC, NP);
+
+        for (int i = 0; i < N; i++) {
+            int x = stepper.versatile_ngo("test", n, p);
+            // System.out.println("" + x);
+        }
     }
 }
