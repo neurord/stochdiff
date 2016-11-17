@@ -216,7 +216,7 @@ public class MersenneTwister implements RandomGenerator {
         long t1 = System.currentTimeMillis();
 
 
-        int nran = 100000;
+        int nran = 10000000;
         double pavg = 1300.;
 
 
