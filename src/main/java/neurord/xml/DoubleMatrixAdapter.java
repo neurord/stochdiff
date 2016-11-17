@@ -12,7 +12,7 @@ public class DoubleMatrixAdapter extends XmlAdapter<String, DoubleMatrix> {
     @Override
     public DoubleMatrix unmarshal(final String string) {
         /* DoubleMatrix expects semicolon separated rows */
-        String text = string.trim().replace('\n', ';');
+        String text = string.trim().replaceAll("(?m)^[ \t]*\r?\n", "").replace('\n', ';');
         return DoubleMatrix.valueOf(text);
     }
 
