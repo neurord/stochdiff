@@ -12,19 +12,20 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.MalformedURLException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.UnmarshallerHandler;
+import javax.xml.bind.helpers.DefaultValidationEventHandler;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Schema;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBException;
+import javax.xml.validation.SchemaFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
@@ -246,6 +247,7 @@ public class ModelReader<T> {
         Unmarshaller u = jc.createUnmarshaller();
         UnmarshallerHandler uh = u.getUnmarshallerHandler();
         u.setSchema(schema);
+        u.setEventHandler(new DefaultValidationEventHandler());
 
         filter.setContentHandler(uh);
         filter.parse(xml);
