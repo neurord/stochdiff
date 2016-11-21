@@ -117,14 +117,17 @@ public abstract class StepGenerator {
         switch(mode) {
         case BINOMIAL:
             if (n * p < NP) {
+                /*true poisson random number (mean = np = var)*/
                 ngo = this.random.poisson(n * p);
                 msg = "n*p < " + NP;
             } else {
+                /* gaussian random number using mean=np and var from binomial = np*(1-p) */
                 ngo = this.gaussianStep(n, p);
                 msg = "n*p >= " + NP;
             }
             break;
         default:
+            /* gaussian random number using mean=np=var */
             ngo = this.poissonStep(n * p);
             msg = "not using binomial";
         }
