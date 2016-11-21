@@ -63,7 +63,7 @@ public class NextEventQueue {
                                                              99);
     final static String stepper_distribution = Settings.getProperty("neq.stepper",
                                                                     "Distribution type (poisson, binomial)",
-                                                                    "binomial");
+                                                                    "BINOMIAL");
 
     public static final int[] PLUS_ONE = new int[]{ +1 };
     public static final int[] MINUS_ONE = new int[]{ -1 };
