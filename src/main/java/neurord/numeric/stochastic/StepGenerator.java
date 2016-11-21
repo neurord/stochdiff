@@ -62,7 +62,8 @@ public abstract class StepGenerator {
     private static int poissonStep(double np, double grv, double urv) {
         double rngo = np + grv * Math.sqrt(np);
         int ngo = (int)rngo;
-        ngo += (rngo - ngo > urv ? 1 : 0);
+        if (rngo - ngo > urv)
+            ngo += 1;
         if (ngo >= 0)
             return ngo;
 
