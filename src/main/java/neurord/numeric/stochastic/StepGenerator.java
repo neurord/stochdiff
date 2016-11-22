@@ -1,7 +1,12 @@
 package neurord.numeric.stochastic;
 
+import java.io.PrintStream;
+
 import neurord.numeric.math.MersenneTwister;
 import neurord.numeric.math.RandomGenerator;
+import neurord.numeric.math.Binomial;
+import neurord.numeric.math.BinomialLike;
+import neurord.numeric.math.Poisson;
 import static neurord.numeric.BaseCalc.distribution_t;
 import neurord.util.Logging;
 
@@ -104,6 +109,8 @@ public abstract class StepGenerator {
         } else
             ngo = this._calculate_ngo(descr, n, p);
 
+        log.info("{} n={} p={} → {}", descr, n, p, ngo);
+
         return ngo;
     }
 
@@ -140,23 +147,53 @@ public abstract class StepGenerator {
         return 0;
     }
 
-    public static void main(String... args) {
+    public static void main(String... args)
+        throws Exception
+    {
         Logging.setLogLevel(null, LogManager.ROOT_LOGGER_NAME, Level.DEBUG);
         Logging.configureConsoleLogging();
+
+        boolean print = true;
 
         String distribution = args[0];
         int N = Integer.valueOf(args[1]);
         int n = Integer.valueOf(args[2]);
         double p = Double.valueOf(args[3]);
 
+        PrintStream out;
+        if (args.length <= 4)
+            out = System.out;
+        else
+            out = new PrintStream(args[4]);
+
+        if (args.length >= 6 && args[5].equals("-n"))
+            print = false;
+
         distribution_t distrib = distribution_t.valueOf(distribution);
 
-        StepGenerator stepper = new InterpolatingStepGenerator(distrib, new MersenneTwister());
-        log.info("NMAX_STOCHASTIC={}, NP={}", NMAX_STOCHASTIC, NP);
+        switch(distrib) {
+        case NEW_BINOMIAL:
+        case NEW_POISSON:
+            BinomialLike generator;
+            if (distrib == distribution_t.NEW_BINOMIAL)
+                generator = new Binomial(new MersenneTwister());
+            else
+                generator = new Poisson(new MersenneTwister());
 
-        for (int i = 0; i < N; i++) {
-            int x = stepper.versatile_ngo("test", n, p);
-            // System.out.println("" + x);
+            for (int i = 0; i < N; i++) {
+                int x = generator.nextInt(n, p);
+                out.println("" + x);
+            }
+            break;
+        default:
+            StepGenerator stepper = new InterpolatingStepGenerator(distrib, new MersenneTwister());
+            log.info("NMAX_STOCHASTIC={}, NP={}", NMAX_STOCHASTIC, NP);
+
+            for (int i = 0; i < N; i++) {
+                int x = stepper.versatile_ngo("test", n, p);
+                if (print)
+                    out.println("" + x);
+            }
         }
     }
 }

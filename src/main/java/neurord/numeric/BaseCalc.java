@@ -52,6 +52,8 @@ public abstract class BaseCalc implements Runnable {
         BINOMIAL,
         POISSON,
         EXACT,
+        NEW_BINOMIAL,
+        NEW_POISSON,
     }
 
     public enum algorithm_t {
