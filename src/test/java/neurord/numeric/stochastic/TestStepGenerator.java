@@ -68,34 +68,14 @@ public class TestStepGenerator {
 
         final double p = mean / ntot;
 
-        final StepGenerator stepper = new InterpolatingStepGenerator(distribution_t.BINOMIAL, random);
+        final StepGenerator stepper = new StepGenerator(random);
         for (int i = 0; i < ntrials; i++)
-            nsp += stepper.gaussianStep(ntot, p);
+            nsp += stepper.versatile_ngo(ntot, p);
 
         double sigma = Math.sqrt(mean / ntrials * (ntrials - mean) / ntrials * ntrials);
-        log.info("gaussian step: mean={} σ={} expect={} actual={}({}σ)",
+        log.info("versatile_ngo: mean={} σ={} expect={} actual={}({}σ)",
                  mean, sigma, ntrials * mean, nsp, (ntrials*mean - nsp) / sigma);
         assertApproxEquals(nsp, ntrials * mean, 0.01, Math.max(10 * sigma, 1));
-    }
-
-    @DataProvider
-    public static Object[][] simple() {
-        return TestUtil.multiply
-            (   new Object[]{ new InterpolatingStepGenerator(distribution_t.BINOMIAL, new MersenneTwister(0)),
-                              new InterpolatingStepGenerator(distribution_t.POISSON, new MersenneTwister(0)) },
-                new Object[]{
-                    new Object[]{ 1, 0., 0., 0 }, // fails now because only n>=2 is supported
-                    new Object[]{ 2, 0., 0., 0 },
-                    new Object[]{ 2, 0., 0.5, 0 },
-                    new Object[]{ 2, 0., 0., 0 },
-                    new Object[]{ 2, 0., 1., 0 },
-                });
-    }
-
-    @Test(dataProvider="simple")
-    public static void interpolated_nGo(InterpolatingStepGenerator gen,
-                                        int n, double p, double r, int expected) {
-        assertEquals(gen.nGo(n, Math.log(p), r), expected);
     }
 
     private static double[] rs(Random gen, int count) {
@@ -110,8 +90,8 @@ public class TestStepGenerator {
         Random r = new Random();
 
         return TestUtil.multiply
-            (   new Object[]{ new InterpolatingStepGenerator(distribution_t.BINOMIAL, new MersenneTwister(0)),
-                              new InterpolatingStepGenerator(distribution_t.POISSON, new MersenneTwister(0)) },
+            (   new Object[]{ new StepGenerator(new MersenneTwister(2222304)),
+                              new StepGenerator(new MersenneTwister(0)) },
                 new Object[]{   /* n, lnp, rs, expected */
                     new Object[]{ 2 + r.nextInt(119), Double.NEGATIVE_INFINITY,
                                   rs(r, 1000000), 0 },
@@ -139,12 +119,12 @@ public class TestStepGenerator {
     }
 
     @Test(dataProvider="randomized")
-    public static void mean_nGo(InterpolatingStepGenerator gen,
+    public static void mean_nGo(StepGenerator gen,
                                 int n, double lnp, double[] rs, int expected) {
         long ngo = 0;
         double p = Math.exp(lnp);
         for (double r: rs)
-            ngo += gen.nGo(n, lnp, r);
+            ngo += gen.nGo(n, lnp);
         double sigma = Math.sqrt(n * p * (1-p)) * Math.sqrt(rs.length);
         double expect = n * p * rs.length;
         log.info("interpolated nGo: p={} σ={} expect={} actual={}({}σ)",
