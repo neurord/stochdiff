@@ -29,7 +29,6 @@ import java.util.Collection;
 import neurord.model.SDRun;
 import neurord.numeric.BaseCalc;
 import neurord.numeric.morph.VolumeGrid;
-import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import neurord.numeric.stochastic.StepGenerator;
 import neurord.util.ArrayUtil;
 import neurord.util.Logging;
@@ -82,7 +81,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
     double lndt;
 
-    InterpolatingStepGenerator stepper;
+    StepGenerator stepper;
     int nngowarn = 0;         //added in v2.1.1 by BHK to keep track of a different type of warning
 
     double[][] pSharedOut;
@@ -124,7 +123,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
         // final things we need is something to generate particle numbers
         // for steps of given n, p
-        stepper = new InterpolatingStepGenerator(distID, random);
+        stepper = new StepGenerator(distID, random);
 
         log.info("Using {} destination allocation", algoID);
         // FIXME: is independent supported

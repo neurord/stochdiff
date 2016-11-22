@@ -11,25 +11,10 @@ import java.util.Random;
 
 
 public class TimeTests {
-
-
-
-
-
-
     public static void main(String[] argv) {
         randomNumberTimes();
         // interpTest();
     }
-
-
-
-    public static void interpTest() {
-        InterpolatingStepGenerator stepper = new InterpolatingStepGenerator(distribution_t.BINOMIAL,
-                                                                            new MersenneTwister());
-        stepper.timeTest();
-    }
-
 
     private static void randomNumberTimes() {
         int nrep = 3;
@@ -70,6 +55,4 @@ public class TimeTests {
             System.out.println("MT t = " + (t1 - t0));
         }
     }
-
-
 }

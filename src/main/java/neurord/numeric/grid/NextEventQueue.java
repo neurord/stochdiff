@@ -24,7 +24,6 @@ import neurord.numeric.morph.VolumeGrid;
 import neurord.numeric.morph.VolumeElement;
 import static neurord.numeric.grid.GridCalc.intlog;
 import neurord.numeric.stochastic.StepGenerator;
-import neurord.numeric.stochastic.InterpolatingStepGenerator;
 import neurord.numeric.BaseCalc.distribution_t;
 import static neurord.numeric.BaseCalc.distribution_t.*;
 
@@ -1649,7 +1648,7 @@ public class NextEventQueue {
 
         this.random = random != null ? random : new MersenneTwister();
         this.stepper = stepper != null ? stepper :
-            new InterpolatingStepGenerator(distribution, this.random);
+            new StepGenerator(distribution, this.random);
         this.particles = particles;
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
