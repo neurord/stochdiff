@@ -96,12 +96,6 @@ public class SDRun implements IOutputSet {
 
     // just getters from here on;
 
-    public distribution_t getDistribution() {
-        if (this.distribution == null)
-            return distribution_t.BINOMIAL;
-        return distribution_t.valueOf(this.distribution);
-    }
-
     public algorithm_t getAlgorithm() {
         if (this.algorithm == null)
             return algorithm_t.INDEPENDENT;

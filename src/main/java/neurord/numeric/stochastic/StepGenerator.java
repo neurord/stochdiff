@@ -17,19 +17,12 @@ import org.apache.logging.log4j.Level;
 public class StepGenerator {
     static final Logger log = LogManager.getLogger();
 
-    protected final BinomialLike generator;
+    protected final Binomial binomial;
+    protected final Poisson poisson;
 
-    public StepGenerator(distribution_t mode, RandomGenerator random) {
-        switch(mode) {
-        case BINOMIAL:
-            this.generator = new Binomial(random);
-            break;
-        case POISSON:
-            this.generator = new Poisson(random);
-            break;
-        default:
-            throw new RuntimeException("unsupported distribution mode " + mode);
-        }
+    public StepGenerator(RandomGenerator random) {
+        this.binomial = new Binomial(random);
+        this.poisson = new Poisson(random);
     }
 
     /*
@@ -41,7 +34,7 @@ public class StepGenerator {
      * @returns: number of successes
      */
     public int nGo(int n, double lnp) {
-        return this.versatile_ngo("nGo", n, Math.exp(lnp));
+        return this.versatile_ngo(1, Math.exp(lnp));
     }
 
     /**
@@ -49,10 +42,15 @@ public class StepGenerator {
      * first-order reactions (binomial or poisson) depending on the
      * distribution_t mode specified when this object was created.
      */
-    public int versatile_ngo(String descr, int n, double p) {
+    public int versatile_ngo(int n, double p) {
         assert n >= 0;
 
-        return this.generator.nextInt(n, p);
+        return this.binomial.nextInt(n, p);
+        /* FIXME: support higher orders better */
+    }
+
+    public int poisson(double mean) {
+        return this.poisson.nextInt(mean);
     }
 
     public static void main(String... args)
@@ -63,7 +61,7 @@ public class StepGenerator {
 
         boolean print = true;
 
-        String distribution = args[0];
+        distribution_t distrib = distribution_t.valueOf(args[0]);
         int N = Integer.valueOf(args[1]);
         int n = Integer.valueOf(args[2]);
         double p = Double.valueOf(args[3]);
@@ -77,12 +75,14 @@ public class StepGenerator {
         if (args.length >= 6 && args[5].equals("-n"))
             print = false;
 
-        distribution_t distrib = distribution_t.valueOf(distribution);
-
-        StepGenerator stepper = new StepGenerator(distrib, new MersenneTwister());
+        StepGenerator stepper = new StepGenerator(new MersenneTwister());
 
         for (int i = 0; i < N; i++) {
-            int x = stepper.versatile_ngo("test", n, p);
+            int x;
+            if (distrib == distribution_t.POISSON)
+                x = stepper.poisson(n * p);
+            else
+                x = stepper.versatile_ngo(n, p);
             if (print)
                 out.println("" + x);
         }

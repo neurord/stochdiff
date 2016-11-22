@@ -123,7 +123,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
 
         // final things we need is something to generate particle numbers
         // for steps of given n, p
-        stepper = new StepGenerator(distID, random);
+        stepper = new StepGenerator(random);
 
         log.info("Using {} destination allocation", algoID);
         // FIXME: is independent supported
@@ -311,7 +311,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         }
 
         if (n > 0) {
-            int ngo = this.stepper.versatile_ngo("advance(reaction)", n, Math.exp(lnp));
+            int ngo = this.stepper.versatile_ngo(n, Math.exp(lnp));
 
             if (rtab.getRates()[ireac] == 0 && ngo > 0)
                 log.warn("n={} -> ngo={} (lnp={})", n, ngo, lnp);
@@ -362,7 +362,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
         int inbr[] = neighbors[iel];
         double[] fshare = fSharedExit[iel][k];
 
-        int ngo = this.stepper.versatile_ngo("parallelAndSharedDiffusionStep", np0, pSharedOut[iel][k]);
+        int ngo = this.stepper.versatile_ngo(np0, pSharedOut[iel][k]);
         assert ngo >= 0;
 
         /* if (ngo < (# of neighbors)*SHARED_DIFF_PARTICLES) then do
@@ -391,8 +391,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
                               / (fSharedExit[iel][k][inbr.length-1] - prev);
                 prev = fSharedExit[iel][k][j];
 
-                int ngo2 = stepper.versatile_ngo("parallelAndSharedDiffusionStep multinomial",
-                                                 ngo, pgoTmp);
+                int ngo2 = stepper.versatile_ngo(ngo, pgoTmp);
 
                 assert ngo2 >= 0;
 

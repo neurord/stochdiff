@@ -1057,14 +1057,14 @@ public class NextEventQueue {
             final double r1 = this.fdiff;
 
             if (!bidirectional)
-                return stepper.versatile_ngo("neq diffusion", X1, time * r1);
+                return stepper.versatile_ngo(X1, time * r1);
 
             final double r2 = ((NextDiffusion) this.reverse).fdiff;
             final double r12 = r1 + r2;
             final int X2 = particles[this.element2][this.sp];
             final double mult = -Math.expm1(-r12 * time) / r12;
-            final int n1 = stepper.versatile_ngo("neq f.diffusion", X1, r1*mult);
-            final int n2 = stepper.versatile_ngo("neq r.diffusion", X2, r2*mult);
+            final int n1 = stepper.versatile_ngo(X1, r1*mult);
+            final int n2 = stepper.versatile_ngo(X2, r2*mult);
             return n1 - n2;
         }
 
@@ -1270,7 +1270,7 @@ public class NextEventQueue {
             for (int i = 0; i < this.reactants().length; i++)
                 n = Math.min(n, X[this.reactants()[i]] / this.reactant_stoichiometry()[i]);
 
-            return stepper.versatile_ngo("neq 1st order", n, this.propensity * time / n);
+            return stepper.versatile_ngo(n, this.propensity * time / n);
         }
 
         @Override
@@ -1568,7 +1568,7 @@ public class NextEventQueue {
             assert !bidirectional;
             switch (this.stim.distribution) {
             case POISSON:
-                return random.poisson(this.propensity * time);
+                return stepper.poisson(this.propensity * time);
             case EXACT:
                 return random.round(this.propensity * time);
             default:
@@ -1642,8 +1642,7 @@ public class NextEventQueue {
                           double leap_min_jump) {
 
         this.random = random != null ? random : new MersenneTwister();
-        this.stepper = stepper != null ? stepper :
-            new StepGenerator(distribution_t.BINOMIAL, this.random);
+        this.stepper = stepper != null ? stepper : new StepGenerator(this.random);
         this.particles = particles;
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;

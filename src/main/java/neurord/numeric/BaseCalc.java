@@ -65,7 +65,6 @@ public abstract class BaseCalc implements Runnable {
         CONCENTRATION,
     }
 
-    protected final distribution_t distID;
     protected final algorithm_t algoID;
 
     final public boolean writeConcentration;
@@ -78,7 +77,6 @@ public abstract class BaseCalc implements Runnable {
         this.trial = trial;
         this.sdRun = sdRun;
 
-        this.distID = sdRun.getDistribution();
         this.algoID = sdRun.getAlgorithm();
         this.writeConcentration =
             output_t.valueOf(sdRun.outputQuantity) == output_t.CONCENTRATION;
