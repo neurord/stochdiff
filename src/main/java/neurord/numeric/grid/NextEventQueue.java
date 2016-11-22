@@ -60,9 +60,6 @@ public class NextEventQueue {
     final static int log_start_events = Settings.getProperty("neurord.neq.log_start_events",
                                                              "Print information about this many events at startup",
                                                              99);
-    final static String stepper_distribution = Settings.getProperty("neq.stepper",
-                                                                    "Distribution type (poisson, binomial)",
-                                                                    "BINOMIAL");
 
     public static final int[] PLUS_ONE = new int[]{ +1 };
     public static final int[] MINUS_ONE = new int[]{ -1 };
@@ -1643,12 +1640,10 @@ public class NextEventQueue {
                           boolean adaptive,
                           double tolerance,
                           double leap_min_jump) {
-        final distribution_t distribution = stepper_distribution == null ? BINOMIAL :
-            distribution_t.valueOf(stepper_distribution);
 
         this.random = random != null ? random : new MersenneTwister();
         this.stepper = stepper != null ? stepper :
-            new StepGenerator(distribution, this.random);
+            new StepGenerator(distribution_t.BINOMIAL, this.random);
         this.particles = particles;
 
         assert 0 <= tolerance && tolerance <= 1: tolerance;
