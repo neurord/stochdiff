@@ -56,8 +56,6 @@ public class TestStepGenerator {
         assertApproxEquals(nrp, ntrials * mean, 0, Math.max(10 * sigma, 1));
     }
 
-    // FIXME: The test is valid, but the generator gives bogus numbers for low
-    //        probabilities. This should be fixed at some point.
     @Test(dataProvider="means", threadPoolSize = 4, invocationCount = 5, enabled = false)
     public static void gaussianStep(double mean, long seed) {
         int nsp = 0;
@@ -83,52 +81,5 @@ public class TestStepGenerator {
         for (int i = 0; i < count; i++)
             a[i] = gen.nextDouble();
         return a;
-    }
-
-    @DataProvider
-    public static Object[][] randomized() {
-        Random r = new Random();
-
-        return TestUtil.multiply
-            (   new Object[]{ new StepGenerator(new MersenneTwister(2222304)),
-                              new StepGenerator(new MersenneTwister(0)) },
-                new Object[]{   /* n, lnp, rs, expected */
-                    new Object[]{ 2 + r.nextInt(119), Double.NEGATIVE_INFINITY,
-                                  rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -20., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -19., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -18., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -17., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -16., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -15., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -14., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -13., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -12., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -11., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -10., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -9., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -8., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -7., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -6., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -5., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -4., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -3., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -2., rs(r, 1000000), 0 },
-                    new Object[]{ 2 + r.nextInt(119), -1., rs(r, 1000000), 0 },
-                });
-    }
-
-    @Test(dataProvider="randomized")
-    public static void mean_nGo(StepGenerator gen,
-                                int n, double lnp, double[] rs, int expected) {
-        long ngo = 0;
-        double p = Math.exp(lnp);
-        for (double r: rs)
-            ngo += gen.nGo(n, lnp);
-        double sigma = Math.sqrt(n * p * (1-p)) * Math.sqrt(rs.length);
-        double expect = n * p * rs.length;
-        log.info("interpolated nGo: p={} σ={} expect={} actual={}({}σ)",
-                 p, sigma, expect, ngo, (expect - ngo) / sigma);
-        assertApproxEquals(ngo, expect, 0, Math.max(10 * sigma, 1));
     }
 }
