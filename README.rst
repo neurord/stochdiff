@@ -185,27 +185,42 @@ See purkmorph.xml, purkmoprhsml.xml and purkmorph2.xml for 1 and 2 compartment m
 Initial conditions File
 -----------------------
 
-The initial conditions file specifies the initial  concentrations or densities of molecules. The file must contain one general concentration set, which applies to everything unless overridden. Each statement names the species and provides a value for its concentration, entered in nanoMoles per litre. An example follows:
+The initial conditions file specifies the initial concentrations or densities of molecules. One default concentration set, which applies to all regions unless overridden, may be specified. Each statement provides a value for initial concentration of one species, in nanoMoles per litre. For example:
 
 .. code-block:: xml
 
      <ConcentrationSet>
-         <NanoMolarity specieID="glu"     value="0"  />
+         <NanoMolarity specieID="glu"     value="20"  />
          <NanoMolarity specieID="calcium" value="50"  />
      </ConcentrationSet>
 
-In addition, further sets can be defined with a "region" attributed added after the "ConcentrationSet" . This should correspond to a specified region from the morphology file and indicates the parts of the structure to which the conditions apply. This only makes sense for non-diffusing molecules.
-
-For membrane localized molecules, it is possible to specify initial conditions as a density (picomoles per square meter) which places these molecules only in the submembrane voxels of the morphology.  The value attribute for a PicoSD element is the number of picomoles per square metre. For comparison with the volume concentrations, a surface density of 1 picomole/m^2, if spread over a layer 1 micron deep, gives a 1 nanoMolar solution. To average one particle per square micron, you need a PicoSD value of about 1.6.  If a region is specified, then that initial condition applies only to that region.  If no region is specified, then the initial condition applies to all submembrane voxels.  The following example includes the optional ``region="dendrite"`` to show its use:
+In addition, further sets can be defined with a "region" attribute corresponding to a region defined in the morphology file.
 
 .. code-block:: xml
 
-     <SurfaceDensitySet region="dendrite">
+     <ConcentrationSet region="dendrite">
+         <NanoMolarity specieID="calcium" value="80"  />
+         <NanoMolarity specieID="dopamine" value="30"  />
+     </ConcentrationSet>
+
+For membrane localized molecules, it is possible to specify initial conditions as a density (picomoles per square meter), which places these molecules only in the submembrane voxels. The value attribute for a PicoSD element is the number of picomoles per square metre. For example, a surface density of 1 picomole/m², if spread over a layer 1 micron deep, gives a 1 nanoMolar solution. To average one particle per square micron, you need a PicoSD value of about 1.6.  If a region is specified, then that SurfaceDensitySet applies only to that region. If no region is specified, then the SurfaceDensitySet applies to all submembrane voxels in regions without a SurfaceDensitySet. The following example includes the optional ``region="dendrite"`` to show its use:
+
+.. code-block:: xml
+
+     <SurfaceDensitySet>
           <PicoSD  specieID="GaGTP"  value="003.729"    />
-          <PicoSD  specieID="PLC"    value="2.521e+04"  />
      </SurfaceDensitySet>
 
-Note that the initial conditions file should contain somewhere within it a statement for each species listed in the reactions file. See Purkic.xml for a complete initial condition file.
+     <SurfaceDensitySet region="dendrite">
+          <PicoSD  specieID="dopamine"  value="5"    />
+          <PicoSD  specieID="PLC"    value="2500"  />
+     </SurfaceDensitySet>
+
+For a given species, in a given region, if the voxel is submembrane voxel, and a SurfaceDensitySet for that region is present and specifies a concetration for that species, this concentration will be used. Otherwise, if the voxel is submembrane voxel, and a default SurfaceDensitySet is present and it specifies a concentration for that species, this concentration will be used. Otherwise, if a ConcentrationSet for that region is present, and specifies a concentration for that species, this concentration will be used. Otherwise, if the default ConcentrationSet specifies a concentration for that species, this concentration will be used. Otherwise, that species has an initial concentration of zero in that region.
+
+When all four ConcentrationSets and SurfaceDensitySets specified in this section are combined, assuming a 1 µm depth of the submembrane, glu will have an initial concentration of 20 nM in all voxels, calcium will have an initial concentration of 80 nM in the denrite and 50 nM elsewhere, dopamine will have a concentration of 5 nM in the submembrane voxels of the dendrite and 30 nM elsewhere, GaGTP will have a concentration of 3.729 nM in all submembrane voxels and 0 nM elsewhere, and PLC will have a concentration of 2.5 µM in the submembrane voxels of the dendrite and 0 nM elsewhere.
+
+See Purkic.xml for a complete initial conditions file.
 
 Stimulation File
 ----------------

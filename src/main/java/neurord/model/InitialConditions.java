@@ -59,14 +59,18 @@ public class InitialConditions {
     }
 
     public double[] getRegionConcentration(String region, String[] species) {
-        double[] ans = new double[species.length];
+        final double[] ans = new double[species.length];
 
-        ConcentrationSet set = this.getConcentrationSets().get(region);
-        if (set == null)
-            set = this.getDefaultConcentrations();
+        final ConcentrationSet set = this.getConcentrationSets().get(region);
+        final ConcentrationSet def = this.getDefaultConcentrations();
 
         for (int i = 0; i < species.length; i++) {
-            Double c = set.getNanoMolarConcentration(species[i]);
+            Double c = null;
+
+            if (set != null)
+                c = set.getNanoMolarConcentration(species[i]);
+            if (c == null)
+                c = def.getNanoMolarConcentration(species[i]);
             if (c != null)
                 ans[i] = c;
         }
