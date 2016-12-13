@@ -261,14 +261,24 @@ public class SDRun implements IOutputSet {
     }
 
     private transient InitialConditions _empty_initalConditions;
+    private transient boolean _initialConditions_checked = false;
     public synchronized InitialConditions getInitialConditions() {
+        final InitialConditions c;
+
         if (this.initialConditions != null)
-            return this.initialConditions;
+            c = this.initialConditions;
+        else {
+            if (this._empty_initalConditions == null)
+                this._empty_initalConditions = new InitialConditions();
+            c = this._empty_initalConditions;
+        }
 
-        if (this._empty_initalConditions == null)
-            this._empty_initalConditions = new InitialConditions();
+        if (!_initialConditions_checked) {
+            c.verify(this.getVolumeGrid().getRegionLabels(), this.getSpecies());
+            _initialConditions_checked = true;
+        }
 
-        return this._empty_initalConditions;
+        return c;
     }
 
     public double getStartTime() {

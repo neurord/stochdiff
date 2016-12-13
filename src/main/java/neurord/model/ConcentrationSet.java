@@ -1,13 +1,18 @@
 package neurord.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import neurord.inter.FloatValued;
 
 public class ConcentrationSet implements Regional {
+    static final Logger log = LogManager.getLogger();
 
     @XmlAttribute public String region;
 
@@ -46,5 +51,15 @@ public class ConcentrationSet implements Regional {
 
     public void addFloatValued(ArrayList<FloatValued> afv) {
         afv.addAll(concentrations);
+    }
+
+    public void verify(String[] regions, String[] species) {
+        if (this.hasRegion() && !Arrays.asList(regions).contains(this.region)) {
+            log.error("ConcentrationSet has region \"{}\", not in {}",
+                      this.region, regions);
+            throw new RuntimeException("ConcentrationSet with bad region: " + this.region);
+        }
+        for (Concentration conc: this.concentrations)
+            conc.verify(regions, species);
     }
 }

@@ -1,6 +1,7 @@
 package neurord.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.*;
@@ -48,5 +49,15 @@ public class SurfaceDensitySet implements Regional {
 
     public void addFloatValued(ArrayList<FloatValued> afv) {
         afv.addAll(sds);
+    }
+
+    public void verify(String[] regions, String[] species) {
+        if (this.hasRegion() && !Arrays.asList(regions).contains(this.region)) {
+            log.error("SurfaceDensitySet has region \"{}\", not in {}",
+                      this.region, regions);
+            throw new RuntimeException("SurfaceDensitySet with bad region: " + this.region);
+        }
+        for (PicoSD conc: this.sds)
+            conc.verify(regions, species);
     }
 }
