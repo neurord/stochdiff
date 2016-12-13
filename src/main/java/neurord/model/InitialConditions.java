@@ -146,7 +146,7 @@ public class InitialConditions {
             return new String[0];
     }
 
-    public static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
+    private static <T extends Regional> HashMap<String, T> listToRegionMap(List<T> list) {
         final HashMap<String, T> hm = new HashMap<>();
 
         if (list != null)
