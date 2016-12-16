@@ -175,7 +175,7 @@ public class ModelReader<T> {
                 path = id;
             }
 
-            log.error("{}:line {}:column {}: {}: {}",
+            log.error("{}:{}:{}: {}: {}",
                       path, e.getLineNumber(), e.getColumnNumber(),
                       this.location(false),
                       e.getMessage());
