@@ -53,10 +53,14 @@ public class InitialConditions {
     public void verify(String[] regions, String[] species) {
         this.getConcentrationSets();
         this.getSurfaceDensitySets();
-        for (ConcentrationSet set: this.concentrationSets)
-            set.verify(regions, species);
-        for (SurfaceDensitySet set: this.sdSets)
-            set.verify(regions, species);
+
+        if (this.concentrationSets != null)
+            for (ConcentrationSet set: this.concentrationSets)
+                set.verify(regions, species);
+
+        if (this.sdSets != null)
+            for (SurfaceDensitySet set: this.sdSets)
+                set.verify(regions, species);
     }
 
     public double[][] makeRegionConcentrations(String[] regions, String[] species) {
