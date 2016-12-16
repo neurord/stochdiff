@@ -201,6 +201,13 @@ public class ModelReader<T> {
 
             super.error(e);
         }
+
+        public boolean failed() {
+            if (this.exception != null)
+                log_error(this.exception);
+
+            return this.failed || this.exception != null;
+        }
     }
 
     JAXBContext jc;
@@ -253,7 +260,7 @@ public class ModelReader<T> {
         filter.parse(xml);
 
         T result = (T) uh.getResult();
-        if (result == null || filter.failed)
+        if (result == null || filter.failed())
             throw new RuntimeException("Unmarshalling failed");
 
         if (filter.conversion_hint)
