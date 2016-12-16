@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import neurord.model.SDRun;
+import neurord.xml.ModelReader.XMLUnmarshallingFailure;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -162,7 +163,12 @@ public class StochDiff {
         final int ic_trial = Settings.getOption(cmd, "ic-trial", 0);
         final double ic_time = Settings.getOption(cmd, "ic-time", Double.NaN);
 
-        final SDRun model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
+        SDRun model = null;
+        try {
+            model = SDRun.loadFromFile(modelFile, ic_file, ic_trial, ic_time);
+        } catch(XMLUnmarshallingFailure e) {
+            System.exit(2);
+        }
 
         double runtime = Settings.getOption(cmd, "runtime", Double.NaN);
         if (!Double.isNaN(runtime))

@@ -412,6 +412,8 @@ public class SDRun implements IOutputSet {
         log.info("Loading model from \"{}\" with seed {}", filename, seed);
         try {
             return loader.unmarshall(filename, overrides);
+        } catch(ModelReader.XMLUnmarshallingFailure e) {
+            throw e;
         } catch(Exception e) {
             throw new RuntimeException(e);
         }

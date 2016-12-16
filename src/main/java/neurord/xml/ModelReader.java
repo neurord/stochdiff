@@ -52,6 +52,9 @@ public class ModelReader<T> {
 
     public static final String NEURORD_NS = "http://stochdiff.textensor.org";
 
+    public static class XMLUnmarshallingFailure extends RuntimeException {
+    }
+
     public static class NamespaceFiller extends XMLFilterImpl {
         boolean sdrun_seen = false;
         boolean ns_warning = false;
@@ -261,12 +264,12 @@ public class ModelReader<T> {
             filter.parse(xml);
         } catch(SAXParseException e) {
             filter.log_error(e);
-            throw new RuntimeException("Unmarshalling failed");
+            throw new XMLUnmarshallingFailure();
         }
 
         T result = (T) uh.getResult();
         if (result == null || filter.failed())
-            throw new RuntimeException("Unmarshalling failed");
+            throw new XMLUnmarshallingFailure();
 
         if (filter.conversion_hint)
             log.log(Logging.NOTICE,
