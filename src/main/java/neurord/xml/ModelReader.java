@@ -257,7 +257,12 @@ public class ModelReader<T> {
         u.setEventHandler(new DefaultValidationEventHandler());
 
         filter.setContentHandler(uh);
-        filter.parse(xml);
+        try {
+            filter.parse(xml);
+        } catch(SAXParseException e) {
+            filter.log_error(e);
+            throw new RuntimeException("Unmarshalling failed");
+        }
 
         T result = (T) uh.getResult();
         if (result == null || filter.failed())
