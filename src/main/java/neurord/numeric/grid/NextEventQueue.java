@@ -139,7 +139,11 @@ public class NextEventQueue {
         }
 
         T first() {
-            return this.nodes[0];
+            if (this.nodes.length == 0)
+                return null;
+            T node = this.nodes[0];
+            assert node != null;
+            return node;
         }
 
         void reposition(String prefix, T node) {
@@ -1993,12 +1997,20 @@ public class NextEventQueue {
      *
      * @returns Time of soonest event.
      */
+    private static boolean _warned_empty = false;
     public double advance(double time, double tstop, double timelimit,
                           int[][] eventStatistics,
                           List<IGridCalc.Happening> events) {
-        NextEvent ev = this.queue.first();
-        assert ev != null;
-        double now = ev.time;
+        final NextEvent ev = this.queue.first();
+        final double now;
+        if (ev == null) {
+            if (!_warned_empty) {
+                log.warn("Event queue is empty — no diffusion, reaction, or stimulation events");
+                _warned_empty = true;
+            }
+            now = Double.POSITIVE_INFINITY;
+        } else
+            now = ev.time;
         assert now >= time: ev;
 
         if (now > tstop) {
