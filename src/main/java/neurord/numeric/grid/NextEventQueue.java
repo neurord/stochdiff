@@ -863,8 +863,8 @@ public class NextEventQueue {
          * voxel. Subsequently, if this event should look at events attached to any voxel it
          * modifies, and maybe add them as its relation.
          *
-         * @param species: species names by index
-         * @param verbose: print status info
+         * @param species species names by index
+         * @param verbose print status info
          */
         public abstract void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose);
 
@@ -991,7 +991,7 @@ public class NextEventQueue {
          *  ρ = r2/r1
          *  t ≤ - log (1-p1 (1+ρ)) / (r1 + r2)
          *
-         * @returns time step relative to @current.
+         * @return time step relative to @current.
          */
         @Override
         public double leap_time(double current) {
@@ -1093,7 +1093,7 @@ public class NextEventQueue {
 
     /**
      * Calculates a joint array of stoichiometries from reactants @ri, @rs and products @pi, @ps.
-     * @returns a pair of arrays: the indices and the stoichiometries.
+     * @return a pair of arrays: the indices and the stoichiometries.
      */
     public static int[][] stoichiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
         ArrayList<Integer>
@@ -1193,8 +1193,8 @@ public class NextEventQueue {
          * Make sure that the propensity of *this* reaction does not change
          * too much. Based on the equation:
          *   da/dX_i / a = n_i / X_i
-         * @returns the leap length that would change propensity by 1
-         *          in the linear approximation
+         * @return the leap length that would change propensity by 1
+         *         in the linear approximation
          *
          * a = r A^nA B B^nB ...
          * Δa = a y nA / A + a y nB / B + ...
@@ -1995,7 +1995,7 @@ public class NextEventQueue {
      * @param eventStatistics is an array to store event counts in as {firings, extent}.
      * @param events will be used to store all Hapennings, unless null.
      *
-     * @returns Time of soonest event.
+     * @return Time of soonest event.
      */
     private static boolean _warned_empty = false;
     public double advance(double time, double tstop, double timelimit,
