@@ -25,6 +25,9 @@ import pandas as pd
 from . import output, ks
 from .output import EventKind
 
+def printf(fmt, *args, file=None, **kwargs):
+    print(fmt.format(*args, **kwargs), file=file)
+
 # TODO: support --time in animations
 
 def geometry(g):
@@ -66,7 +69,7 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
-parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle'))
+parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle', 'sif'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--concentrations', action='store_true')
@@ -416,10 +419,18 @@ def _productions_plain(dst, species, reactants, r_stoichio, products, p_stoichio
     for react in _plain_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
         print('  ' + react)
 
+def _productions_sif(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    for reaction, lhs_rhs in enumerate(zip(reactants, products)):
+        lhs, rhs = lhs_rhs
+        for i in lhs:
+            printf('{} Compound-Reaction reaction{}', species[i], reaction, file=dst)
+        for i in rhs:
+            printf('reaction{} Reaction-Compound {}', reaction, species[i], file=dst)
+
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
-    func = {'dot':_productions_dot, 'tex':_productions_tex, 'plain':_productions_plain}[opts.format]
+    func = {'dot':_productions_dot, 'tex':_productions_tex, 'plain':_productions_plain, 'sif':_productions_sif}[opts.format]
     with save_or_dot('reactions') as file:
         func(file, model.species(),
              reactions.reactants(), reactions.reactant_stoichiometry(),
