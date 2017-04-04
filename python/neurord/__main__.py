@@ -563,9 +563,10 @@ def find_regions(regions, region_names, spec):
     else:
         yield from sorted(set(regions))
 
-def find_species(output, specie_spec):
+def find_species(output, output_group, specie_spec):
+    all_species = output.model.output_group(output_group).species()
     if not specie_spec:
-        return output.model.species()
+        return all_species
 
     have_globs = any(glob.escape(pat) != pat for pat in specie_spec)
     if not have_globs:
@@ -573,7 +574,7 @@ def find_species(output, specie_spec):
         return specie_spec
 
     # use the order in the file (globs can match more than once, so glob order is not useful)
-    matches = [sp for sp in output.model.species()
+    matches = [sp for sp in all_species
                if any(fnmatch.fnmatchcase(sp, pat)
                       for pat in specie_spec)]
     if not matches:
@@ -756,7 +757,7 @@ if __name__ == '__main__':
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history is not None:
-        species = find_species(opts.file, opts.history)
+        species = find_species(opts.file, opts.output_group, opts.history)
         plot_history(opts.file, species)
     elif opts.leaps is not None:
         plot_leaps(opts.file, opts.leaps)
