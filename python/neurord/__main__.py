@@ -306,7 +306,8 @@ def _dependencies(dst, model):
     print('}', file=dst)
 
 def dot_dependencies(output):
-    _dependencies(sys.stdout, output.model)
+    with save_or_dot('dependencies') as file:
+        _dependencies(file, output.model)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
