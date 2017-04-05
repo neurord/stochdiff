@@ -293,7 +293,7 @@ def _dependencies(dst, model):
                                     elements,
                                     deps.dependent()):
         fillcolor = TYPE_COLORDICT.get(t, 'grey')
-        desc = descriptions[i][4:]
+        desc = descriptions[i]
         if opts.num_elements is not None and elem >= opts.num_elements:
             continue
         print('\t"{}" {};'.format(desc, dot_opts(fillcolor=fillcolor)), file=dst)
@@ -301,7 +301,7 @@ def _dependencies(dst, model):
             elem = elements[j]
             if opts.num_elements is not None and elem >= opts.num_elements:
                 continue
-            _conn(dst, desc, descriptions[j][4:])
+            _conn(dst, desc, descriptions[j])
 
     print('}', file=dst)
 
