@@ -789,6 +789,8 @@ public class NextEventQueue {
         List<NextEvent>
             dependent = new ArrayList<>(),
             dependon = new ArrayList<>();
+        List<NextStimulation>
+            stimulations = null;
 
         @Override
         public Collection<IGridCalc.Event> dependent() {
@@ -856,6 +858,17 @@ public class NextEventQueue {
             }
             log.error("Dependency not found: {} dep. {}", this, ev);
             throw new RuntimeException("wtf?");
+        }
+
+        void addStimulation(NextStimulation ev) {
+            /* We treat injections specially. Even though the propensity of an injection
+             * does not depend on any other reaction or diffusion event, we want to limit
+             * leaps "over" an injection. The propensity of an injection is not constant,
+             * so our standard dependency mechanism does not cover them well. */
+            if (this.stimulations == null)
+                this.stimulations = new ArrayList<>();
+            this.stimulations.add((NextStimulation) ev);
+            log.debug("{}: adding dependency on stimulation {}", this, ev);
         }
 
         /**
@@ -1023,7 +1036,7 @@ public class NextEventQueue {
                       this.propensity - this.reverse.propensity);
 
             final double arg = 1 - limit * limit * (r1+r2)/(r1*X1 + r2*X2);
-            final double ans;
+            double ans;
             if (arg > 0) {
                 final double t2 = Math.log(arg) / -(r1+r2);
                 ans = Math.min(t1, t2);
@@ -1034,6 +1047,22 @@ public class NextEventQueue {
                 log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→inf) → {}",
                           X1, X2, limit1, Xm, t1, ans);
             }
+
+            if (this.stimulations != null) {
+                NextStimulation first = null;
+
+                for (NextStimulation stim : this.stimulations)
+                    if (stim.time < current + ans && (first == null || stim.time < first.time))
+                        first = stim;
+
+                if (first != null) {
+                    /* make sure we're at least a bit later */
+                    double oldans = ans;
+                    ans = first.time - current + 1e-12;
+                    log.debug("leap time: curtailing {} by next {} to {} (from {})", this, first, ans, oldans);
+                }
+            }
+
             return ans;
             /*
              static const int[] ONE = new int[]{ 1 };
@@ -1077,11 +1106,16 @@ public class NextEventQueue {
             final HashSet<NextEvent> set = new HashSet<>(map.get(this.element()));
             set.addAll(map.get(this.element2));
 
-            for (NextEvent e: set) {
-                assert e.element() == this.element() || e.element() == this.element2;
-                if (e != this && ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.addDependent(e, species, verbose);
-            }
+            for (NextEvent e: set)
+                if (e != this) {
+                    assert e.element() == this.element() || e.element() == this.element2;
+
+                    if (ArrayUtil.intersect(e.reactants(), this.sp))
+                        this.addDependent(e, species, verbose);
+                    else if (e instanceof NextStimulation &&
+                             ArrayUtil.intersect(e.substrates(), this.sp))
+                        this.addStimulation((NextStimulation) e);
+                }
         }
 
         @Override
@@ -1263,6 +1297,21 @@ public class NextEventQueue {
                       limit1, limit2, limit3 == -1 ? "-" : limit3,
                       time);
 
+            if (this.stimulations != null) {
+                NextStimulation first = null;
+
+                for (NextStimulation stim : this.stimulations)
+                    if (stim.time < current + time && (first == null || stim.time < first.time))
+                        first = stim;
+
+                if (first != null) {
+                    /* make sure we're at least a bit later */
+                    double oldans = time;
+                    time = first.time - current + 1e-12;
+                    log.debug("leap time: curtailing {} by next {} to {} (from {})", this, first, time, oldans);
+                }
+            }
+
             /* Make sure time is NaN or >= 0. */
             assert !(time < 0): time;
 
@@ -1305,8 +1354,13 @@ public class NextEventQueue {
         public void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose) {
             for (NextEvent e: map.get(this.element())) {
                 assert e.element() == this.element();
-                if (e != this)
+                if (e != this) {
                     this.maybeAddRelation(e, species, verbose);
+
+                    if (e instanceof NextStimulation &&
+                        ArrayUtil.intersect(e.substrates(), this.substrates()))
+                        this.addStimulation((NextStimulation) e);
+                }
             }
         }
 
