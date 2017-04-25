@@ -1112,8 +1112,7 @@ public class NextEventQueue {
 
                     if (ArrayUtil.intersect(e.reactants(), this.sp))
                         this.addDependent(e, species, verbose);
-                    else if (e instanceof NextStimulation &&
-                             ArrayUtil.intersect(e.substrates(), this.sp))
+                    else if (e instanceof NextStimulation)
                         this.addStimulation((NextStimulation) e);
                 }
         }
@@ -1357,8 +1356,7 @@ public class NextEventQueue {
                 if (e != this) {
                     this.maybeAddRelation(e, species, verbose);
 
-                    if (e instanceof NextStimulation &&
-                        ArrayUtil.intersect(e.substrates(), this.substrates()))
+                    if (e instanceof NextStimulation)
                         this.addStimulation((NextStimulation) e);
                 }
             }
