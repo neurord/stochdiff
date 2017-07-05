@@ -160,7 +160,8 @@ Spines
 
 The ``SpineType`` and ``SpineAllocation`` statements allow a spine profile to be defined once and then applied to the surface of a structure.  This allows for random placement of spine templates according to a specified density in a constrained region/segment of the defined morphology. Multiple spine types can be defined, e.g. randomly distributed long, thin spines among short, stubby spines.
 
-The ``SpineType`` statement assigns an ``id`` to a spine type. It is followed by several ``Section`` statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an ``at=`` variable indicating the distance from the dendrite at which that radius begins to apply, an optional ``regionClass=`` designation, and an optional ``label``. An example follows:
+The ``SpineType`` statement assigns an ``id`` to a spine type. It is followed by several ``Section`` statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an ``at=`` variable indicating the distance from the dendrite at which that radius begins to apply, an optional ``regionClass=`` designation, and an optional ``label``. ``regionClass``
+specifies the regions to which the voxels of the spine will belong to, which is useful for setting initial conditions and when calculating concentrations by region. The ``label`` gives a designation to a specific voxel and can be used as injection site. An example:
 
 .. code-block:: xml
 
