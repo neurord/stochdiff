@@ -153,8 +153,11 @@ public class VolumeGrid {
             eltGroupIDs[i] = ve.getGroupID();
             submembranes[i] = ve.isSubmembrane();
 
-            if (!rA.contains(ve.getRegion()))
-                rA.add(ve.getRegion());
+            final String region = ve.getRegion();
+            assert region != null: ve;
+
+            if (!rA.contains(region))
+                rA.add(region);
         }
         regionLabels = rA.toArray(new String[0]);
 

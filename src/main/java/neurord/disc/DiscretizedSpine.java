@@ -2,18 +2,18 @@ package neurord.disc;
 
 public class DiscretizedSpine {
 
-    double[] boundaries;
-    double[] widths;
-    String[] labels;
-    String[] regions;
+    private final double[] boundaries;
+    private final double[] widths;
+    private final String[] labels;
+    private final String[] regions;
 
-    public DiscretizedSpine(double[] xbd, double[] wv, String[] lbls, String[] rgns) {
-        boundaries = xbd;
-        widths = wv;
-        labels = lbls;
-        regions = rgns;
+    public DiscretizedSpine(double[] boundaries, double[] widths, String[] labels, String[] regions) {
+
+        this.boundaries = boundaries;
+        this.widths = widths;
+        this.labels = labels;
+        this.regions = regions;
     }
-
 
     public double[] getBoundaries() {
         return boundaries;

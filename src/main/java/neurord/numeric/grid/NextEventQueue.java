@@ -789,6 +789,8 @@ public class NextEventQueue {
         List<NextEvent>
             dependent = new ArrayList<>(),
             dependon = new ArrayList<>();
+        List<NextStimulation>
+            stimulations = null;
 
         @Override
         public Collection<IGridCalc.Event> dependent() {
@@ -858,13 +860,24 @@ public class NextEventQueue {
             throw new RuntimeException("wtf?");
         }
 
+        void addStimulation(NextStimulation ev) {
+            /* We treat injections specially. Even though the propensity of an injection
+             * does not depend on any other reaction or diffusion event, we want to limit
+             * leaps "over" an injection. The propensity of an injection is not constant,
+             * so our standard dependency mechanism does not cover them well. */
+            if (this.stimulations == null)
+                this.stimulations = new ArrayList<>();
+            this.stimulations.add((NextStimulation) ev);
+            log.debug("{}: adding dependency on stimulation {}", this, ev);
+        }
+
         /**
          * @param map contains, for every voxel, a list of events which depend on the state of that
          * voxel. Subsequently, if this event should look at events attached to any voxel it
          * modifies, and maybe add them as its relation.
          *
-         * @param species: species names by index
-         * @param verbose: print status info
+         * @param species species names by index
+         * @param verbose print status info
          */
         public abstract void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose);
 
@@ -991,7 +1004,7 @@ public class NextEventQueue {
          *  ρ = r2/r1
          *  t ≤ - log (1-p1 (1+ρ)) / (r1 + r2)
          *
-         * @returns time step relative to @current.
+         * @return time step relative to @current.
          */
         @Override
         public double leap_time(double current) {
@@ -1023,7 +1036,7 @@ public class NextEventQueue {
                       this.propensity - this.reverse.propensity);
 
             final double arg = 1 - limit * limit * (r1+r2)/(r1*X1 + r2*X2);
-            final double ans;
+            double ans;
             if (arg > 0) {
                 final double t2 = Math.log(arg) / -(r1+r2);
                 ans = Math.min(t1, t2);
@@ -1034,6 +1047,22 @@ public class NextEventQueue {
                 log.debug("leap time: min({}, {}, limit {}, {}: E→{}, V→inf) → {}",
                           X1, X2, limit1, Xm, t1, ans);
             }
+
+            if (this.stimulations != null) {
+                NextStimulation first = null;
+
+                for (NextStimulation stim : this.stimulations)
+                    if (stim.time < current + ans && (first == null || stim.time < first.time))
+                        first = stim;
+
+                if (first != null) {
+                    /* make sure we're at least a bit later */
+                    double oldans = ans;
+                    ans = first.time - current + 1e-12;
+                    log.debug("leap time: curtailing {} by next {} to {} (from {})", this, first, ans, oldans);
+                }
+            }
+
             return ans;
             /*
              static const int[] ONE = new int[]{ 1 };
@@ -1077,11 +1106,15 @@ public class NextEventQueue {
             final HashSet<NextEvent> set = new HashSet<>(map.get(this.element()));
             set.addAll(map.get(this.element2));
 
-            for (NextEvent e: set) {
-                assert e.element() == this.element() || e.element() == this.element2;
-                if (e != this && ArrayUtil.intersect(e.reactants(), this.sp))
-                    this.addDependent(e, species, verbose);
-            }
+            for (NextEvent e: set)
+                if (e != this) {
+                    assert e.element() == this.element() || e.element() == this.element2;
+
+                    if (ArrayUtil.intersect(e.reactants(), this.sp))
+                        this.addDependent(e, species, verbose);
+                    else if (e instanceof NextStimulation)
+                        this.addStimulation((NextStimulation) e);
+                }
         }
 
         @Override
@@ -1093,7 +1126,7 @@ public class NextEventQueue {
 
     /**
      * Calculates a joint array of stoichiometries from reactants @ri, @rs and products @pi, @ps.
-     * @returns a pair of arrays: the indices and the stoichiometries.
+     * @return a pair of arrays: the indices and the stoichiometries.
      */
     public static int[][] stoichiometry(int[] ri, int[] rs, int[] pi, int[] ps) {
         ArrayList<Integer>
@@ -1193,8 +1226,8 @@ public class NextEventQueue {
          * Make sure that the propensity of *this* reaction does not change
          * too much. Based on the equation:
          *   da/dX_i / a = n_i / X_i
-         * @returns the leap length that would change propensity by 1
-         *          in the linear approximation
+         * @return the leap length that would change propensity by 1
+         *         in the linear approximation
          *
          * a = r A^nA B B^nB ...
          * Δa = a y nA / A + a y nB / B + ...
@@ -1263,6 +1296,21 @@ public class NextEventQueue {
                       limit1, limit2, limit3 == -1 ? "-" : limit3,
                       time);
 
+            if (this.stimulations != null) {
+                NextStimulation first = null;
+
+                for (NextStimulation stim : this.stimulations)
+                    if (stim.time < current + time && (first == null || stim.time < first.time))
+                        first = stim;
+
+                if (first != null) {
+                    /* make sure we're at least a bit later */
+                    double oldans = time;
+                    time = first.time - current + 1e-12;
+                    log.debug("leap time: curtailing {} by next {} to {} (from {})", this, first, time, oldans);
+                }
+            }
+
             /* Make sure time is NaN or >= 0. */
             assert !(time < 0): time;
 
@@ -1305,8 +1353,12 @@ public class NextEventQueue {
         public void addRelations(HashMap<Integer, ArrayList<NextEvent>> map, String[] species, boolean verbose) {
             for (NextEvent e: map.get(this.element())) {
                 assert e.element() == this.element();
-                if (e != this)
+                if (e != this) {
                     this.maybeAddRelation(e, species, verbose);
+
+                    if (e instanceof NextStimulation)
+                        this.addStimulation((NextStimulation) e);
+                }
             }
         }
 
@@ -1995,7 +2047,7 @@ public class NextEventQueue {
      * @param eventStatistics is an array to store event counts in as {firings, extent}.
      * @param events will be used to store all Hapennings, unless null.
      *
-     * @returns Time of soonest event.
+     * @return Time of soonest event.
      */
     private static boolean _warned_empty = false;
     public double advance(double time, double tstop, double timelimit,

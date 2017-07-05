@@ -3,33 +3,31 @@ package neurord.numeric.morph;
 
 public class SpineProfile {
 
-    String id;
+    private final String id;
 
-    double[] lpoints;
-    double[] widths;
+    private final double[] lpoints;
+    private final double[] widths;
 
-    String[] labels;
-    String[] regions;
+    private final String[] labels;
+    private final String[] regions;
 
-    public SpineProfile(String sid, double[] vl, double[] vw,
-                        String[] lbls, String[] rgs) {
-        id = sid;
-        lpoints = vl;
-        widths = vw;
+    public SpineProfile(String id, double[] lpoints, double[] widths,
+                        String[] labels, String[] regions) {
+        this.id = id;
+        this.lpoints = lpoints;
+        this.widths = widths;
 
-        labels = lbls;
-        regions = rgs;
+        this.labels = labels;
+        this.regions = regions;
     }
 
     public String getID() {
         return id;
     }
 
-
     public double[] getXPts() {
         return lpoints;
     }
-
 
     public double[] getWidths() {
         return widths;

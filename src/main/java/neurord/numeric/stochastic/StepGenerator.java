@@ -29,9 +29,9 @@ public class StepGenerator {
      * Return the number of successes in n trials, with probability of success
      * in a single trial p.
      *
-     * @param n: number of trials
-     * @param p: probabilify of a success in one trial
-     * @returns: number of successes
+     * @param n number of trials
+     * @param p probabilify of a success in one trial
+     * @return number of successes
      */
     public int nGo(int n, double lnp) {
         return this.versatile_ngo(1, Math.exp(lnp));

@@ -440,7 +440,7 @@ public class SteppedStochasticGridCalc extends StochasticGridCalc {
     /* Total number of possible reactions is the smallest number of
      * particles divided by stoichiometry.
      *
-     * @returns propensity and maximum reaction extent
+     * @return propensity and maximum reaction extent
      */
     public static Object[] calculatePropensity(int[] ri, int[] pi,
                                                int[] rs, int[] ps,

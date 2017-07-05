@@ -25,6 +25,9 @@ import pandas as pd
 from . import output, ks
 from .output import EventKind
 
+def printf(fmt, *args, file=None, **kwargs):
+    print(fmt.format(*args, **kwargs), file=file)
+
 # TODO: support --time in animations
 
 def geometry(g):
@@ -66,7 +69,7 @@ parser.add_argument('--particles', action='store_true')
 parser.add_argument('--stimulation', action='store_true')
 parser.add_argument('--reaction', action='store_true')
 parser.add_argument('--diffusion', action='store_true')
-parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle'))
+parser.add_argument('--format', default='dot', choices=('dot', 'tex', 'plain', 'pickle', 'sif'))
 parser.add_argument('--geometry', type=geometry, default=(12, 9))
 parser.add_argument('--history', type=str_list, nargs='?', const=())
 parser.add_argument('--concentrations', action='store_true')
@@ -290,7 +293,7 @@ def _dependencies(dst, model):
                                     elements,
                                     deps.dependent()):
         fillcolor = TYPE_COLORDICT.get(t, 'grey')
-        desc = descriptions[i][4:]
+        desc = descriptions[i]
         if opts.num_elements is not None and elem >= opts.num_elements:
             continue
         print('\t"{}" {};'.format(desc, dot_opts(fillcolor=fillcolor)), file=dst)
@@ -298,12 +301,13 @@ def _dependencies(dst, model):
             elem = elements[j]
             if opts.num_elements is not None and elem >= opts.num_elements:
                 continue
-            _conn(dst, desc, descriptions[j][4:])
+            _conn(dst, desc, descriptions[j])
 
     print('}', file=dst)
 
 def dot_dependencies(output):
-    _dependencies(sys.stdout, output.model)
+    with save_or_dot('dependencies') as file:
+        _dependencies(file, output.model)
 
 def _reaction_name(rr, rr_s, pp, pp_s, species):
     return ' ⇌ '.join(
@@ -416,10 +420,18 @@ def _productions_plain(dst, species, reactants, r_stoichio, products, p_stoichio
     for react in _plain_names(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
         print('  ' + react)
 
+def _productions_sif(dst, species, reactants, r_stoichio, products, p_stoichio, rates, reversibles):
+    for reaction, lhs_rhs in enumerate(zip(reactants, products)):
+        lhs, rhs = lhs_rhs
+        for i in lhs:
+            printf('{} Compound-Reaction reaction{}', species[i], reaction, file=dst)
+        for i in rhs:
+            printf('reaction{} Reaction-Compound {}', reaction, species[i], file=dst)
+
 def dot_productions(output):
     model = output.model
     reactions = model.reactions
-    func = {'dot':_productions_dot, 'tex':_productions_tex, 'plain':_productions_plain}[opts.format]
+    func = {'dot':_productions_dot, 'tex':_productions_tex, 'plain':_productions_plain, 'sif':_productions_sif}[opts.format]
     with save_or_dot('reactions') as file:
         func(file, model.species(),
              reactions.reactants(), reactions.reactant_stoichiometry(),
@@ -430,52 +442,55 @@ def specie_indices(items, species):
     species = list(species)
     return np.array([species.index(i) for i in items])
 
-def generate_element_histories(species, element_indices, region_labels, values):
+def generate_element_histories(model, species, element_indices, element_regions, values):
     fmt = '{name} el.{element}'
-    if len(set(region_labels)) > 1:
+    if len(set(element_regions)) > 1:
         fmt += ' {region}'
 
     for name in species:
-        for rlabel, elem in zip(region_labels, element_indices):
+        for rlabel, elem in zip(element_regions, element_indices):
             series = values.loc[elem][name]
             times = series.index.values
             y = series.values
             label = fmt.format(name=name, element=elem, region=rlabel)
             yield times, y, name, label
 
-def generate_region_histories(species, element_indices, region_labels, values):
+def generate_region_histories(model, species, element_indices, element_regions, values):
     fmt = '{name}'
-    if len(set(region_labels)) > 1:
+    if len(set(element_regions)) > 1:
         fmt += ' {region}'
     for name in species:
         ans = collections.defaultdict(lambda: 0)
-        for rlabel, elem in zip(region_labels, element_indices):
+        assert len(element_regions) == len(element_indices)
+        for rlabel, elem in zip(element_regions, element_indices):
             series = values.loc[elem][name]
             times = series.index.values
             ans[rlabel] += series.values
-        for rlabel, y in sorted(ans.items(), key=lambda pair: region_labels.index(pair[0])):
+        for rlabel, y in sorted(ans.items(),
+                                key=lambda pair: model.region_names().index(pair[0])):
             label = fmt.format(name=name, region=rlabel)
             yield times, y, name, label
 
-def generate_total_histories(species, element_indices, region_labels, values):
+def generate_total_histories(model, species, element_indices, element_regions, values):
+    assert len(element_regions) == len(element_indices)
     for name in species:
         ans = 0
-        for rlabel, elem in zip(region_labels, element_indices):
+        for rlabel, elem in zip(element_regions, element_indices):
             series = values.loc[elem][name]
             times = series.index.values
             ans += series.values
         yield times, ans, name, name
 
-def generate_histories(species, element_indices, region_labels, values, opts):
+def generate_histories(model, species, element_indices, element_regions, values, opts):
     if opts.sum_regions:
         func = generate_region_histories
     elif opts.sum_all:
         func = generate_total_histories
     else:
         func = generate_element_histories
-    return func(species, element_indices, region_labels, values)
+    return func(model, species, element_indices, element_regions, values)
 
-def _history(simul, species, element_indices, region_labels,
+def _history(model, simul, species, element_indices, element_regions,
              values, title, opts):
 
     import matplotlib
@@ -488,8 +503,9 @@ def _history(simul, species, element_indices, region_labels,
     f = pyplot.figure(figsize=opts.geometry)
     f.canvas.set_window_title(full_title)
 
-    data = list(generate_histories(species, element_indices, region_labels,
+    data = list(generate_histories(model, species, element_indices, element_regions,
                                    values, opts))
+
     sharex = None
     if opts.multiplot:
         i = 1
@@ -521,9 +537,9 @@ def _history(simul, species, element_indices, region_labels,
     else:
         pyplot.show(block=True)
 
-def _history_data(simul, species, element_indices, region_labels,
+def _history_data(model, simul, species, element_indices, element_regions,
                   values, title, opts):
-    data = generate_histories(species, element_indices, region_labels,
+    data = generate_histories(model, species, element_indices, element_regions,
                               values, opts)
     xx, yy, names, rlabels = zip(*data)
     d = {(n, r):y for n, r, y in zip(names, rlabels, yy)}
@@ -546,11 +562,12 @@ def find_regions(regions, region_names, spec):
             except ValueError:
                 yield region_names.index(item)
     else:
-        yield from sorted(regions)
+        yield from sorted(set(regions))
 
-def find_species(output, specie_spec):
+def find_species(output, output_group, specie_spec):
+    all_species = output.model.output_group(output_group).species()
     if not specie_spec:
-        return output.model.species()
+        return all_species
 
     have_globs = any(glob.escape(pat) != pat for pat in specie_spec)
     if not have_globs:
@@ -558,7 +575,7 @@ def find_species(output, specie_spec):
         return specie_spec
 
     # use the order in the file (globs can match more than once, so glob order is not useful)
-    matches = [sp for sp in output.model.species()
+    matches = [sp for sp in all_species
                if any(fnmatch.fnmatchcase(sp, pat)
                       for pat in specie_spec)]
     if not matches:
@@ -579,16 +596,16 @@ def plot_history(output, species):
     regions = model.grid().region
     region_numbers = list(find_regions(regions, model.region_names(), opts.regions))
     element_indices = np.arange(len(regions))[(regions[:, None] == region_numbers).any(axis=1)]
-    region_labels = model.region_names(region_numbers)
+    element_regions = model.element_regions()[element_indices]
 
     if opts.save_data:
-        _history_data(simul, species,
-                      element_indices, region_labels,
+        _history_data(model, simul, species,
+                      element_indices, element_regions,
                       values,
                       title=output.file.filename, opts=opts)
     else:
-        _history(simul, species,
-                 element_indices, region_labels,
+        _history(model, simul, species,
+                 element_indices, element_regions,
                  values,
                  title=output.file.filename, opts=opts)
 
@@ -741,7 +758,7 @@ if __name__ == '__main__':
     elif opts.reactions:
         dot_productions(opts.file)
     elif opts.history is not None:
-        species = find_species(opts.file, opts.history)
+        species = find_species(opts.file, opts.output_group, opts.history)
         plot_history(opts.file, species)
     elif opts.leaps is not None:
         plot_leaps(opts.file, opts.leaps)

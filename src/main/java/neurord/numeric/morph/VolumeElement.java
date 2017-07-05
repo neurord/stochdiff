@@ -68,7 +68,7 @@ public abstract class VolumeElement {
                              " exposedArea=%g, center=%s, along %g, side %g, top %g, volume=%g, Δz=%g, " +
                              " number=%d)",
                              getClass().getSimpleName(),
-                             label, region, groupID,
+                             label, this.getRegion(), groupID,
                              Arrays.toString(boundary),
                              Arrays.toString(surfaceBoundary),
                              exposedArea,
@@ -111,7 +111,7 @@ public abstract class VolumeElement {
     }
 
     public String getRegion() {
-        return region;
+        return this.region != null ? this.region : "default";
     }
 
     public double getVolume() {
