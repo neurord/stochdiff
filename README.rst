@@ -158,9 +158,9 @@ Branching segments are allowed.  Branches are made by creating two segments begi
 Spines
 ~~~~~~
 
-The SpineType and SpineAllocation statements allow a spine profile to be defined once and then applied to the surface of a structure.  This allows for random placement of spine templates according to a specified density in a constrained region/segment of the defined morphology. Multiple spine types can be defined, e.g. to randomly distributed long, thin spines among short, stubby spines.
+The ``SpineType`` and ``SpineAllocation`` statements allow a spine profile to be defined once and then applied to the surface of a structure.  This allows for random placement of spine templates according to a specified density in a constrained region/segment of the defined morphology. Multiple spine types can be defined, e.g. randomly distributed long, thin spines among short, stubby spines.
 
-The SpineType statement assigns an id to a spine type. It is followed by several Section statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an at variable indicating the distance from the dendrite at which that radius begins to apply, an optional regionClass designation, and an optional label. An example follows:
+The ``SpineType`` statement assigns an ``id`` to a spine type. It is followed by several ``Section`` statements that define the spine morphology. Each section statement has a width variable providing the radius of that section, an ``at=`` variable indicating the distance from the dendrite at which that radius begins to apply, an optional ``regionClass=`` designation, and an optional ``label``. An example follows:
 
 .. code-block:: xml
 
@@ -172,13 +172,13 @@ The SpineType statement assigns an id to a spine type. It is followed by several
         <Section width="0.1" at="1.3" label="pointA" />
     </SpineType>
 
-The SpineAllocation statement assigns an id, specifies a spine type, specifies the region to which spines will be added, and the density of spines in that region. The LengthDensity is the average number of spines per micron of dendrite length. Alternatively you can specify areaDensity, which is the number per unit area. An example follows:
+The ``SpineAllocation`` statement assigns an ``id``, specifies a spine type, specifies the region to which spines will be added, and the density of spines in that region. The ``lengthDensity`` is the average number of spines per micron of dendrite length. Alternatively you can specify ``areaDensity``, which is the number per unit area. An example follows:
 
 .. code-block:: xml
 
     <SpineAllocation id="sa1" spineType="spineA" region="region1" lengthDensity="1.1" />
 
-Each spine constructed this way gets a label of the form allocation_id[index].point_label. Where allocation_id is the id from SpineAllocation statement, index is the number of the spine within the population of spines generated from that SpineAllocation statement and point_label is the label from the original spine type statement. This gives rise to spines with labels "sa1[0].pointA", "sa1[1].pointA", "sa1[2].pointA", etc up to the number of spines resulting from the allocation rule, all attached to region1. These labels can be used to specify injection sites for stimulation. Regions defined for segments or spines can be used to specify initial conditions.
+Each spine constructed this way gets a label of the form ``allocation_id[index].point_label``, where ``allocation_id`` is the ``id`` from ``SpineAllocation`` statement, ``index`` is the number of the spine within the population of spines generated from that ``SpineAllocation`` statement, and ``point_label`` is the ``label`` from the original spine type statement. This gives rise to spines with labels "sa1[0].pointA", "sa1[1].pointA", "sa1[2].pointA", etc up to the number of spines resulting from the allocation rule, all attached to region1. These labels can be used to specify injection sites for stimulation. Regions defined for segments or spines can be used to specify initial conditions.
 
 See purkmorph.xml, purkmoprhsml.xml and purkmorph2.xml for 1 and 2 compartment morphologies.  Examples of branching are in morph1.xml and morph2.xml.  Example of a spine allocation is in spines.xml.
 
