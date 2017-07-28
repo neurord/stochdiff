@@ -1,0 +1,15 @@
+<ReactionScheme>
+<!-- Glutamate binding to buffer to become null-->
+    <Specie name="glu"   id="glu"        kdiff="10"    kdiffunit = "mu2/s"/>
+    <Specie name="buf"   id="buf"        kdiff="10"    kdiffunit = "mu2/s"/>
+
+    <!-- PULSE: glu    + gluBuf            <->  NULL  -->
+      <Reaction name = "glu-glubuf reac" id="glu--glubuf_id">
+        <Reactant specieID="glu"              />
+        <Reactant specieID="buf"              />
+
+        <forwardRate> 40e-6      </forwardRate>
+        <reverseRate> 0.0e-3      </reverseRate>
+        <Q10>         0.2          </Q10>
+    </Reaction>
+</ReactionScheme>

@@ -1,0 +1,6 @@
+<InitialConditions>
+    <ConcentrationSet>
+        <NanoMolarity specieID="glu"         value="0"     />
+        <NanoMolarity specieID="buf"         value="0"     />
+    </ConcentrationSet>
+</InitialConditions>

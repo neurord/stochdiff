@@ -1,0 +1,5 @@
+<OutputScheme>
+    <OutputSet filename = "all"  dt="1.0">
+        <OutputSpecie       name="glu"             />
+    </OutputSet>
+</OutputScheme>

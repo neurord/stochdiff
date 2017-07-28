@@ -1,0 +1,25 @@
+<Morphology>
+
+   <!-- spine morphologies: width for sections along the spine -->
+
+    <SpineType id="spineA">
+	<Section width="0.2" at="0.0" regionClass="neck"/>
+	<Section width="0.2" at="0.2" regionClass="neck"/>
+	<Section width="0.2" at="0.3" regionClass="head"/>
+	<Section width="0.6" at="0.4" regionClass="head"/>  
+	<Section width="0.6" at="0.5" regionClass="PSD"/>
+	<Section width="0.2" at="0.6" label="pointA"/>
+    </SpineType>
+
+     <!-- regionClass labels can apply to sections or segments and label regions for applying initial conditaions etc -->
+
+    <!-- lengthDensity means you set the number per micron along the segment -->
+    <SpineAllocation id="sa1" spineType="spineA" region="dend" lengthDensity="0.5"/>
+    
+    <Segment   id="seg1"    region="dend">
+        <start x="1.0"    y="1.5"   z="0.0"  r="0.45" label="pointB"/>
+        <end   x="3.0"    y="1.5"   z="0.0"  r="0.45" label="pointC"/>
+    </Segment>
+
+
+</Morphology>

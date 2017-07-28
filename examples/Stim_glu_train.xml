@@ -1,0 +1,23 @@
+ <StimulationSet>
+    <InjectionStim specieID="glu"  injectionSite="sa1[:].pointA">
+        <onset>               1000        </onset>
+        <duration>            30        </duration>
+        <rate>                40     </rate>
+        <period>              100        </period> 
+        <end>                2000        </end>
+        <interTrainInterval>  4000       </interTrainInterval>
+        <numTrains>           2           </numTrains> 
+    </InjectionStim>
+
+    <InjectionStim specieID="buf"  injectionSite="dend:submembrane">
+        <onset>               1050        </onset>
+        <duration>            30        </duration>
+        <rate>                40      </rate>
+        <period>              100        </period> 
+        <end>                2000        </end>
+        <interTrainInterval>  4000       </interTrainInterval>
+        <numTrains>           2           </numTrains> 
+    </InjectionStim>
+
+</StimulationSet>
+	

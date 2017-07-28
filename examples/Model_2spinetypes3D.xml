@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SDRun xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://stochdiff.textensor.org">
+
+    <!-- this file defines a single run of the calculation, using morphology and
+         reaction data brought in from other files -->
+
+    <!-- this file defines a single run of the calculation, using morphology and
+         reaction data brought in from other files -->
+
+    <xi:include href="Rxn_glubuf.xml" />
+    <xi:include href="Morph20um_2spinetypes.xml" />
+    <xi:include href="IC_glubuf.xml" />
+    <xi:include href="Out_glu.xml" />
+
+    <!--2D means the morphology is interpreted like a flatworm, 3D for
+roundworms. The 2D case is good for testing as it is easy to visualize the
+results (also, 3D may not work yet...)  -->
+    <geometry>          3D           </geometry>
+    <distribution>      BINOMIAL     </distribution>
+    <algorithm>         INDEPENDENT  </algorithm>
+    <simulationSeed>    971263          </simulationSeed>
+
+
+    <!-- run time for the calculation, milliseconds -->
+    <runtime>          0       </runtime>
+    <!-- set the seed to get the same spines each time testing -->
+    <spineSeed>        9897623       </spineSeed>
+
+    <discretization>
+        <!-- default largest size for elements in bulk volumes (dendrites), microns -->
+        <!-- Recent modifications to 2D grid size (max-element-side is now calculated to be
+        at most, not equal to, the defaultMaxElementSide).-->
+        <defaultMaxElementSide> 0.3  </defaultMaxElementSide>
+
+        <!-- axial discretization for spines, microns -->
+        <spineDeltaX>           0.1  </spineDeltaX>
+
+        <!-- override the default for a particular region. -->
+        <!-- Matches against id or regionClass in the morphology file -->
+        <!--MaxElementSide region="soma">0.6</MaxElementSide-->
+
+        <elementShape>Curved</elementShape>
+        <maxAspectRatio>2.5</maxAspectRatio>
+    </discretization>
+
+    <!-- timestep used in fixed step calculations, in milliseconds -->
+    <fixedStepDt>         0.01       </fixedStepDt>
+
+
+    <outputInterval>      200.0   </outputInterval>
+
+    <!-- the tolerace is used for adaptive sims -->
+    <tolerance>           0.01       </tolerance>
+    <!-- calculation types include
+     GRID_STEPPED_STOCHASTIC (old fixedStep tau-leap),
+     GRID_STEPPED_CONTINUOUS (deterministic), and
+     GRID_ADAPTIVE (new adaptive (asynchronous tau-leap).-->
+    <calculation>GRID_ADAPTIVE</calculation>
+
+</SDRun>

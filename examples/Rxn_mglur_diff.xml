@@ -1,0 +1,110 @@
+<ReactionScheme>
+<!-- Purkinje Cell Reactions: metabotropic glutamate receptor leading to Ip3 production
+parameters from param.g
+-->
+    <Specie name="glu"         id="glu"        kdiff="100"    kdiffunit = "mu2/s"/>
+    <Specie name="buf"         id="buf"        kdiff="100"    kdiffunit = "mu2/s"/>
+    <Specie name="mGluR"       id="mGluR"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="Gqabg"       id="Gqabg"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="glu-mGluR"   id="glu-mGluR"  kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="Gglu-mGluR"  id="Gglu-mGluR" kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="GaqGTP"       id="GaqGTP"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="GaqGDP"       id="GaqGDP"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="Plc"          id="Plc"        kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PlcGaq"       id="PlcGaq"      kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="Pip2"         id="Pip2"       kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="PlcGaqPip2"   id="PlcGaqPip2"    kdiff="0"    kdiffunit = "mu2/s"/>
+    <Specie name="Ip3"         id="Ip3"        kdiff="100"  kdiffunit = "mu2/s"/>
+    <Specie name="Ip3deg"      id="Ip3deg"     kdiff="0"    kdiffunit = "mu2/s"/>
+
+    <!-- PULSE: glu    + gluBuf            <->  null  -->
+      <Reaction name = "glubuf reac" >
+        <Reactant specieID="glu"              />
+        <Reactant specieID="buf"              />
+
+        <forwardRate> 40e-6      </forwardRate>
+        <reverseRate> 0.0e-3      </reverseRate>
+        <Q10>         0.2          </Q10>
+    </Reaction>
+    <!-- glu + mGluR        <-> glu-mGluR       -->
+      <Reaction name = "glu+mGluR--glu-mGluR reac" id="glu+mGluR--glumGluR_id">
+        <Reactant specieID="glu"               />
+        <Reactant specieID="mGluR"               />
+        <Product  specieID="glu-mGluR"              />
+
+        <forwardRate> 5e-06 </forwardRate>
+        <reverseRate> 50e-03        </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+
+    <!-- glu-mGluR + G       <-> Gglu-mGluR     -->
+      <Reaction name = "glu-mGluR+G--Gglu-mGluR reac" id="glu-mGluR+G--Gglu-mGluR_id">
+        <Reactant specieID="glu-mGluR"              />
+        <Reactant specieID="Gqabg"               />
+        <Product  specieID="Gglu-mGluR"             />
+
+        <forwardRate> 15e-06 </forwardRate>
+        <reverseRate> 7.2e-03  </reverseRate>
+        <Q10>         0.2        </Q10>
+    </Reaction>
+      <Reaction name = "Gglu-mGluR--glu-mGluR+GaqGTP reac" id="Gglu-mGluR--glu-mGluR+GaqGTP_id">
+        <Reactant specieID="Gglu-mGluR"            />
+        <Product  specieID="glu-mGluR"          />
+        <Product  specieID="GaqGTP"          />
+
+        <forwardRate> 1.8e-03        </forwardRate>
+        <reverseRate> 0.0           </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+
+    <!-- GaqGTP       <-> GaqGDP            (in xpp: k4=10), Kd=? -->
+      <Reaction name = "GaqGTP--GaqGDP reac" id="GaqGTP--GaqGDP_id">
+        <Reactant specieID="GaqGTP"          />
+        <Product  specieID="GaqGDP"          />
+
+        <forwardRate> 9e-03        </forwardRate>
+        <reverseRate> 0.0           </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+
+    <!-- GaqGTP + Plc    <->   PlcGaq  -->
+    <Reaction name = "GaqGTP+Plc--PlcGaq reac" id="GaqGTP+Plc--PlcGaq_id">
+        <Reactant specieID="GaqGTP"           />
+        <Reactant specieID="Plc"              />
+        <Product  specieID="PlcGaq"               />
+
+        <forwardRate> 0.0007e-03   </forwardRate>
+        <reverseRate> 0.7e-03        </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+ 
+   <!-- PlcGaq + Pip2    <-> PlcGaqPip2    -->
+    <Reaction name = "PlcGaq+Pip2--PlcPip2 reac" id="PlcGaq+Pip2--PlcPip2_id">
+        <Reactant specieID="PlcGaq"               />
+        <Reactant specieID="Pip2"             />
+        <Product  specieID="PlcGaqPip2"            />
+
+        <forwardRate> 0.01e-06    </forwardRate>
+        <reverseRate> 0.36e-03    </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+    <!-- PlcGaqPip2       <-> PlcGaq + CAMP  (in xpp: k8=28.46    k_8=259200e-9) -->
+    <Reaction name = "PlcPip2--PlcGaq+Ip3 reac" id="PlcPip2--PlcGaq+Ip3_id">
+        <Reactant specieID="PlcGaqPip2"            />
+        <Product  specieID="PlcGaq"               />
+        <Product  specieID="Ip3"            />
+
+        <forwardRate> 0.09e-03     </forwardRate>
+        <reverseRate> 0e-03    </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+    <!--  Ip3    <-> Ip3deg          -->
+    <Reaction name = "Ip3--Ip3deg" id="Ip3--Ip3deg_id">
+         <Reactant specieID="Ip3"            />
+        <Product  specieID="Ip3deg"        />
+
+        <forwardRate> 1e-03      </forwardRate>
+        <reverseRate> 0.0e-03      </reverseRate>
+        <Q10>         0.2           </Q10>
+    </Reaction>
+</ReactionScheme>

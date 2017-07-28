@@ -1,0 +1,41 @@
+<OutputScheme>
+<!--
+     Each file will have a set of concentrations in compartments
+     sampled according to a specific dt
+-->
+
+<!--
+    Every Output block must have in its definition one (and only)
+    instance of:
+     * filename
+    And might have one (and only) instance of:
+     * region or
+     * dt
+    If "region" is ommited then the concs for the whole system will be
+    saved.
+    If "dt" is ommited than the concs will be written at each time step.
+    So the "io file" will be dependent on information stated in the
+    "morph" (regions) and "model" (dt).
+-->
+
+  <OutputSet filename = "all"  dt="1.0">
+
+    <OutputSpecie name="Ca"/>
+    <OutputSpecie name="buf"/>
+    <OutputSpecie name="GaqGTP"/>
+    <OutputSpecie name="mGluR"/>
+    <OutputSpecie name="Gqabg"/>
+    
+    <OutputSpecie name="Plc"/>
+    <OutputSpecie name="PlcCa"/>
+    <OutputSpecie name="PlcCaGaq"/>
+    <OutputSpecie name="PlcGaq"/>
+    <OutputSpecie name="Pip2"/>
+    <OutputSpecie name="PlcCaPip2"/>
+    <OutputSpecie name="PlcCaGaqPip2"/>
+    <OutputSpecie name="Ip3"/>
+    <OutputSpecie name="Dag"/>
+
+  </OutputSet>
+
+</OutputScheme>

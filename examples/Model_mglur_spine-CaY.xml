@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SDRun xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://stochdiff.textensor.org">
+    <!-- this file defines a single run of the calculation, using morphology and 
+	 reaction data brought in from other files --> 
+
+          <xi:include href="Rxn_Ca_mglur.xml" />
+	  <xi:include href="Morph_1sp2umDend.xml" />  
+          <xi:include href="IC_mglur_Ca_spine.xml" />
+          <xi:include href="Out_Ca_mglur.xml" />
+	  <xi:include href="Stim_mglur_Ca_spine.xml" />      
+
+    <!--2D means the morphology is interpreted like a flatworm, 3D for
+	roundworms. The 2D case is good for testing as it is easy to visualize the
+results  -->
+    <geometry>          2D           </geometry>
+    <depth2D>           0.6          </depth2D>
+    <distribution>      BINOMIAL     </distribution>
+    <algorithm>         INDEPENDENT  </algorithm>
+    <simulationSeed>    23       </simulationSeed>
+    <outputQuantity>NUMBER</outputQuantity>
+
+
+    <!-- run time for the calculation, milliseconds -->
+    <runtime>          10000         </runtime>
+<!-- 100001 -->
+    <!-- set the seed to get the same spines each time testing -->
+    <spineSeed>          5          </spineSeed>
+
+    <discretization>
+	<!-- default largest size for elements in bulk volumes (dendrites), microns -->	
+       <defaultMaxElementSide>0.3</defaultMaxElementSide> 
+        
+	<!-- discretization for spines, microns -->
+	<spineDeltaX>   0.1           </spineDeltaX>
+
+	<!-- This specifies the surface layers, first implemented in v.2.1.7 -->
+	<surfaceLayers>0.1, 0.2</surfaceLayers>
+
+	<!-- override the default for a particular region. -->
+	<!-- Matches against id or regionClass in the morphology file -->
+
+        <MaxElementSide region="PSD">0.1</MaxElementSide>
+
+    </discretization>
+
+    <!-- timestep used in fixed step calculations, in milliseconds -->
+    <fixedStepDt>         0.005       </fixedStepDt>
+
+    <!-- interval at which stuff should be saved to the output file(s) -->
+    <outputInterval>      200   </outputInterval>
+
+    <!-- the tolerace is used for adaptive sims -->
+    <tolerance>           0.01       </tolerance>
+    <!-- calculation types include
+	 GRID_STEPPED_STOCHASTIC (old fixedStep tau-leap),
+	 GRID_STEPPED_CONTINUOUS (deterministic), and
+	 GRID_ADAPTIVE (new adaptive (asynchronous tau-leap).-->
+    <calculation>GRID_ADAPTIVE</calculation>
+
+</SDRun>
