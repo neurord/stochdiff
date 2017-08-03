@@ -381,7 +381,7 @@ class Output(object):
     >>> out = Output('model.h5')
     """
     def __init__(self, filename):
-        self.file = tables.openFile(filename)
+        self.file = tables.open_file(filename)
         try:
             element = self.file.root.model
         except tables.exceptions.NoSuchNodeError:
