@@ -390,6 +390,10 @@ The discretization statement indicates how to subdivide the segments, i.e. the s
 
 The actual size of the elements depends on the total radius or length of the compartment, and also the constraint that there are an odd number of voxels across the radius of the structure. The maxElementSize is approximately the maximum that you will achieve.  I.e., with a maxElemetSide of 0.4, you may generate subvolumes of size 0.33, depending on the size of the compartment. It calculates the length of compartment, divided by maxElementSide.  Then, it determines the number of subvolumes along the length by rounding the results.  Then, it divides length by number of compartments to yield the actual element size.  Thus, you can end up with a value slightly larger than max element size.
 
+How to create a single compartment model: Make sure that defaultMaxElementSide is larger than the entier morphology.
+
+How to easily change the total volume of your model (e.g. to explore effects of stochasticitiy) without affecting your initial conditions: increase depth2D
+
 .. warning::
 
     If maxElementSize is large enough to create only a single voxel in the height dimension
@@ -428,10 +432,38 @@ To run a simulation from the command line the following command should be issued
 
 .. code-block:: bash
 
-   java -jar NeuroRD.jar model.xml [output]
+   java -jar path/to/neurord-3.x.x-all-deps.jar path/to/model/model.xml [output]
 
-where ``NeuroRD.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file (“master” file that contains the ``<SDRun>`` XML tag). The optional argument ``output`` specifies the base name of output files; their names will be created by suffix appending to the main output file name: ``output.out``, ``output.h5``, ``output.log``, ...
-If the last argument is ommitted, the output name is the input file name without the ``.xml`` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the ``.xml`` suffix.
+where ``neurord-3.x.x-all-deps.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file (“master” file that contains the ``<SDRun>`` XML tag). The optional argument ``output`` specifies the base name of output files; their names will be created by suffix appending to the main output file name: ``output.out``, ``output.h5``, ``output.log``, ...
+If the last argument is ommitted, the output name is the input file name without the ``.xml`` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the ``.xml`` suffix. If neurord and your model are in the same directory, you can omit the path specification.
+
+MAC USERS: if you get the following error:
+
+.. code-block:: shell
+
+     Exception in thread "main" java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException
+
+use the following syntax:
+
+.. code-block:: shell
+
+     java --add-modules java.se.ee -jar path/to/neurord-3.x.x-all-deps.jar path/to/model/model.xml 
+
+MAC AND WINDOWS USERS: if you see either of the the following errors:
+
+.. code-block:: shell
+
+     java.lang.UnsatisfiedLinkError: no jhdf5 in java.library.path
+     
+     Exception in thread "main" java.lang.RuntimeException: java.lang.UnsatisfiedLinkError: hdf5
+
+That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  If you cannot fix the problem, you can run neurord using 
+
+.. code-block:: shell
+
+     java -jar path/to/neurord-3.2.3-all-deps.jar -Dneurord.writers=text path/to/model/model.xml
+
+and get text output.
 
 A number of messages will be printed at execution time. The same set of messages is printed to standard output and to the log file (``output.log``). Creation of the log file may be disabled, see below.
 
