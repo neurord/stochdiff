@@ -91,6 +91,12 @@ to
 
 where *N* is the number of molecules of given species.
 
+In the following specification, the rate would be proportional to N*(N-1):
+
+.. code-block:: xml
+
+     <Reactant specieID="CKCamCa4" power="2"/>
+
 Power *p* defaults to 1. Stoichiometry *n* defaults to *p*. If *p* is not specified but *n* is, the reaction is a “psuedo” higher order reaction in which multiple molecules bind with 1st order kinectics. E.g. if 2 molecules of cAMP bind to PKA, but the reaction rate is proportional to cAMP (not cAMP²), then specify the cAMP reactant as:
 
 .. code-block:: xml
