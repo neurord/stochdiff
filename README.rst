@@ -597,9 +597,8 @@ Converting from NeuroRDv2 to NeuroRDv3
 
 The first two changes are absolutely required; whereas the third change is recommended for the model file.  The fourth change is required if you have this type of reaction in your v2 reaction file.  The fifth change is also recommended if you have been using "fake" spines to inject molecules into the dendrites.
 
-1. In top level Model file:
+1. In top level Model file, change
 
-   1. Change
 .. code-block:: xml
 
       <SDRun>
@@ -610,7 +609,8 @@ The first two changes are absolutely required; whereas the third change is recom
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <SDRun xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://stochdiff.textensor.org">
 
-   2. n top level Model file, change specification of additional xml files, e.g. from
+2. In top level Model file, change specification of additional xml files, e.g. from
+
 .. code-block:: xml
 
       <reactionSchemeFile>Rxn_glubuf</reactionSchemeFile>
@@ -624,7 +624,7 @@ The first two changes are absolutely required; whereas the third change is recom
       <xi:include href="Morph1.5um.xml" />
       <xi:include href="IC_glubuf.xml" />
 
-   3. Change numerical method to the more efficient GRID_ADAPTIVE (not required, but recommended), i.e., from
+3. In top level Model file, change numerical method to the more efficient GRID_ADAPTIVE (not required, but recommended), i.e., from
 
 .. code-block:: xml
                 
@@ -636,7 +636,7 @@ The first two changes are absolutely required; whereas the third change is recom
 
    <calculation>GRID_ADAPTIVE</calculation>
 
-   4. Version 3 allows higher order reactions.  It no longer allows specification of the same reactant (or product) more than once in a reaction.  Instead, you would specify the reactant once, with a "power" value.  E.g., if you have a reaction block like this:
+4. Version 3 allows higher order reactions.  It no longer allows specification of the same reactant (or product) more than once in a reaction.  Instead, you would specify the reactant once, with a "power" value.  E.g., if you have a reaction block like this:
    
 .. code-block:: xml
       
@@ -661,7 +661,7 @@ change it to this:
 	<Q10>2</Q10>
     </Reaction>
 
-   5. In version 2, it was not possible to inject at arbitrary locations along a dendrite.  One approach around this was to  create tiny little spines, and stimulate into them.  To eliminate these, it is necessary to change the morphology file: eliminate the fake spines by deleting this line:
+5. In version 2, it was not possible to inject at arbitrary locations along a dendrite.  One approach around this was to  create tiny little spines, and stimulate into them.  To eliminate these, it is necessary to change the morphology file: eliminate the fake spines by deleting this line:
 
 .. code-block:: xml
                 
