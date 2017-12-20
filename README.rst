@@ -3,6 +3,21 @@
 
 .. contents::
 
+Quick Start Guide
+-----------------
+
+The model file consists of an xml file that specifies molecule species, reactions, initial concentrations, morphology, stimulation, and output frequency. Though not recommended, all of this information can be provided in a single file.  The recommended method of model specification is to have separate files for reactions, morphology, initial conditions and stimulation.
+
+Given a model file, the simulation is run with the following syntax:
+
+.. code-block:: bash
+
+   java -jar path/to/neurord-3.x.x-all-deps.jar path/to/model/model.xml 
+
+where ``neurord-3.x.x-all-deps.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file.
+
+Model_simple.xml in the examples directory shows how to specifiy a model with 2 species and 1 reaction.  Additional examples of increasing complexity are in the examples directory, along with some output figures.
+
 Model specification format
 --------------------------
 
@@ -440,8 +455,14 @@ To run a simulation from the command line the following command should be issued
 
    java -jar path/to/neurord-3.x.x-all-deps.jar path/to/model/model.xml [output]
 
-where ``neurord-3.x.x-all-deps.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file (“master” file that contains the ``<SDRun>`` XML tag). The optional argument ``output`` specifies the base name of output files; their names will be created by suffix appending to the main output file name: ``output.out``, ``output.h5``, ``output.log``, ...
-If the last argument is ommitted, the output name is the input file name without the ``.xml`` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the ``.xml`` suffix. If neurord and your model are in the same directory, you can omit the path specification.
+where ``neurord-3.x.x-all-deps.jar`` file contains the NeuroRD executable byte-code and ``model.xml`` is the model file (“master” file that contains the ``<SDRun>`` XML tag).
+
+A number of messages will be printed at execution time. The same set of messages is printed to standard output and to the log file (``output.log``). Creation of the log file may be disabled, see below.  A few constraints to note:
+
+1) The ``java`` executable is in the ``PATH`` for the current user in UNIX.
+2) ``NeuroRD.jar`` and ``model.xml`` are located in the same directory from where the command is issued or the full paths for these files have to be included as well. In other words, if neurord and your model are in the same directory, you can omit the path specification.
+3) ``output`` is in the same directory from where the command is issued or the full path for the output file has to be included as well. In other words, the optional argument ``output`` specifies the base name of output files, and /or specifies the directory in which to place output files; their names will be created by suffix appending to the main output file name: ``output.out``, ``output.h5``, ``output.log``, ...
+If the last argument is ommitted, the output name is the input file name without the ``.xml`` suffix. If the output name is a path to an existing directory, the output will be created in this directory using the input file name without the ``.xml`` suffix. 
 
 MAC USERS: if you get the following error:
 
@@ -470,12 +491,6 @@ That means that either you do not have the java hdf5 libraries installed, or jav
      java -jar path/to/neurord-3.2.3-all-deps.jar -Dneurord.writers=text path/to/model/model.xml
 
 and get text output.
-
-A number of messages will be printed at execution time. The same set of messages is printed to standard output and to the log file (``output.log``). Creation of the log file may be disabled, see below.
-
-1) The ``java`` executable is in the ``PATH`` for the current user in UNIX.
-2) ``NeuroRD.jar`` and ``model.xml`` are located in the same directory from where the command is issued or the full paths for these files have to be included as well.
-3) ``output`` is in the same directory from where the command is issued or the full path for the output file has to be included as well.
 
 With the default options, output is written as a set of text files and three (or more) output files are generated.  One is the ``model.out`` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the ``IO.xml`` file.
 
@@ -576,6 +591,99 @@ For long simulations the log file can get pretty big. To disable the log file al
 .. code-block:: shell
 
     java --log=no ...
+
+Converting from NeuroRDv2 to NeuroRDv3
+--------------------------------------
+
+The first two changes are absolutely required; whereas the third change is recommended for the model file.  The fourth change is required if you have this type of reaction in your v2 reaction file.  The fifth change is also recommended if you have been using "fake" spines to inject molecules into the dendrites.
+
+1. In top level Model file:
+   a. Change
+.. code-block:: xml
+
+      <SDRun>
+
+     to
+.. code-block:: xml
+
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+      <SDRun xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://stochdiff.textensor.org">
+
+   b. Change specification of additional xml files, e.g. from:
+.. code-block:: xml
+
+      <reactionSchemeFile>Rxn_glubuf</reactionSchemeFile>
+      <morphologyFile>Morph1.5um</morphologyFile>
+      <initialConditionsFile>IC_glubuf</initialConditionsFile>
+      
+      to
+.. code-block:: xml
+
+      <xi:include href="Rxn_glubuf.xml" />
+      <xi:include href="Morph1.5um.xml" />
+      <xi:include href="IC_glubuf.xml" />
+
+      c. change numerical method to the more efficient GRID_ADAPTIVE (not required, but recommended), i.e., from
+
+.. code-block:: xml
+                
+   <calculation>GRID_STEPPED_STOCHASTIC</calculation>
+
+   to
+.. code-block:: xml
+                
+
+   <calculation>GRID_ADAPTIVE</calculation>
+
+   d. Version 3 allows higher order reactions.  It no longer allows specification of the same reactant (or product) more than once in a reaction.  Instead, you would specify the reactant once, with a "power" value.  E.g., if you have a reactionn block like this:
+.. code-block:: xml
+      
+    <Reaction name = "CKCam_bind" id="CKCam_bind">
+	<Reactant specieID="CKCaMCa4"/>
+    <Reactant specieID="CKCaMCa4"/>
+	<Product specieID="Complex"/>
+
+	<forwardRate>0.0001e-3</forwardRate>
+    <reverseRate>10e-3</reverseRate>
+	<Q10>2</Q10>
+    </Reaction>
+
+change it to:
+.. code-block:: xml
+
+    <Reaction name = "CKCam_bind" id="CKCam_bind">
+	<Reactant specieID="CKCaMCa4" power="2"/>
+	<Product specieID="Complex"/>
+
+	<forwardRate>0.0001e-3</forwardRate>
+    <reverseRate>10e-3</reverseRate>
+	<Q10>2</Q10>
+    </Reaction>
+
+    e. In version 2, it was not possible to inject at arbitrary locations along a dendrite.  One approach around this was to  create tiny little spines, and stimulate into them.  To eliminate these, it is necessary to change the morphology file: eliminate the fake spines by deleting this line:
+
+.. code-block:: xml
+                
+   <SpineAllocation id="fake" spineType="spineTiny" region="dendrite"  lengthDensity="2."/>
+
+       change the Stimulation file to inject into the dendrite.  I.e., change from:
+.. code-block:: xml
+                
+       <InjectionStim specieID="L" injectionSite="fake[:].pointI">
+        <onset>3000</onset>
+	    <duration>10000</duration>
+	    <rate>130</rate>
+        </InjectionStim>
+
+        to (assuming your dendrite segment is called "dend"):
+.. code-block:: xml
+                
+       <InjectionStim specieID="L" injectionSite=dend:submembrane">
+        <onset>3000</onset>
+	    <duration>10000</duration>
+	    <rate>130</rate>
+        </InjectionStim>
+
 
 License
 -------
