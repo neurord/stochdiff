@@ -598,7 +598,8 @@ Converting from NeuroRDv2 to NeuroRDv3
 The first two changes are absolutely required; whereas the third change is recommended for the model file.  The fourth change is required if you have this type of reaction in your v2 reaction file.  The fifth change is also recommended if you have been using "fake" spines to inject molecules into the dendrites.
 
 1. In top level Model file:
-   a. Change
+
+   1. Change
 .. code-block:: xml
 
       <SDRun>
@@ -609,7 +610,7 @@ The first two changes are absolutely required; whereas the third change is recom
       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <SDRun xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://stochdiff.textensor.org">
 
-   b. Change specification of additional xml files, e.g. from:
+   2. n top level Model file, change specification of additional xml files, e.g. from
 .. code-block:: xml
 
       <reactionSchemeFile>Rxn_glubuf</reactionSchemeFile>
@@ -623,7 +624,7 @@ The first two changes are absolutely required; whereas the third change is recom
       <xi:include href="Morph1.5um.xml" />
       <xi:include href="IC_glubuf.xml" />
 
-      c. change numerical method to the more efficient GRID_ADAPTIVE (not required, but recommended), i.e., from
+   3. Change numerical method to the more efficient GRID_ADAPTIVE (not required, but recommended), i.e., from
 
 .. code-block:: xml
                 
@@ -635,53 +636,53 @@ The first two changes are absolutely required; whereas the third change is recom
 
    <calculation>GRID_ADAPTIVE</calculation>
 
-   d. Version 3 allows higher order reactions.  It no longer allows specification of the same reactant (or product) more than once in a reaction.  Instead, you would specify the reactant once, with a "power" value.  E.g., if you have a reactionn block like this:
+   4. Version 3 allows higher order reactions.  It no longer allows specification of the same reactant (or product) more than once in a reaction.  Instead, you would specify the reactant once, with a "power" value.  E.g., if you have a reaction block like this:
+   
 .. code-block:: xml
       
     <Reaction name = "CKCam_bind" id="CKCam_bind">
 	<Reactant specieID="CKCaMCa4"/>
-    <Reactant specieID="CKCaMCa4"/>
+        <Reactant specieID="CKCaMCa4"/>
 	<Product specieID="Complex"/>
-
 	<forwardRate>0.0001e-3</forwardRate>
-    <reverseRate>10e-3</reverseRate>
+        <reverseRate>10e-3</reverseRate>
 	<Q10>2</Q10>
     </Reaction>
 
-change it to:
+change it to this:
+
 .. code-block:: xml
 
     <Reaction name = "CKCam_bind" id="CKCam_bind">
 	<Reactant specieID="CKCaMCa4" power="2"/>
 	<Product specieID="Complex"/>
-
 	<forwardRate>0.0001e-3</forwardRate>
-    <reverseRate>10e-3</reverseRate>
+        <reverseRate>10e-3</reverseRate>
 	<Q10>2</Q10>
     </Reaction>
 
-    e. In version 2, it was not possible to inject at arbitrary locations along a dendrite.  One approach around this was to  create tiny little spines, and stimulate into them.  To eliminate these, it is necessary to change the morphology file: eliminate the fake spines by deleting this line:
+   5. In version 2, it was not possible to inject at arbitrary locations along a dendrite.  One approach around this was to  create tiny little spines, and stimulate into them.  To eliminate these, it is necessary to change the morphology file: eliminate the fake spines by deleting this line:
 
 .. code-block:: xml
                 
    <SpineAllocation id="fake" spineType="spineTiny" region="dendrite"  lengthDensity="2."/>
 
-       change the Stimulation file to inject into the dendrite.  I.e., change from:
+       and change the Stimulation file to inject into the dendrite.  I.e., change from:
 .. code-block:: xml
                 
        <InjectionStim specieID="L" injectionSite="fake[:].pointI">
-        <onset>3000</onset>
-	    <duration>10000</duration>
-	    <rate>130</rate>
+          <onset>3000</onset>
+	  <duration>10000</duration>
+	  <rate>130</rate>
         </InjectionStim>
 
         to (assuming your dendrite segment is called "dend"):
 .. code-block:: xml
                 
        <InjectionStim specieID="L" injectionSite=dend:submembrane">
-        <onset>3000</onset>
-	    <duration>10000</duration>
-	    <rate>130</rate>
+          <onset>3000</onset>
+	  <duration>10000</duration>
+	  <rate>130</rate>
         </InjectionStim>
 
 
