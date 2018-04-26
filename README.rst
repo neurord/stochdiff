@@ -475,6 +475,24 @@ use the following syntax:
 .. code-block:: shell
 
      java --add-modules java.se.ee -jar path/to/neurord-3.x.x-all-deps.jar path/to/model/model.xml 
+     
+.. code-block:: shell
+
+UBUNTU (and possiby other UNIX) USERS: if you see the the following error:
+
+.. code-block:: shell
+
+	 java.lang.UnsatisfiedLinkError: no jhdf5 in java.library.path
+ 
+         at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1867)
+ 
+         at java.lang.Runtime.loadLibrary0(Runtime.java:870)
+
+That means that you do not have the java hdf5 libraries installed (or java doesn't know how to find them). Install the java hdf5 library, libjhdf5.so.  On UBUNTU the following command works:
+
+.. code-block:: shell
+
+	sudo apt install libjhdf5-jni
 
 MAC AND WINDOWS USERS: if you see either of the the following errors:
 
