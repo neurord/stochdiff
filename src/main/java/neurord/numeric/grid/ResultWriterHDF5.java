@@ -12,18 +12,18 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import ncsa.hdf.hdf5lib.H5;
-import ncsa.hdf.hdf5lib.HDF5Constants;
-import static ncsa.hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
-import ncsa.hdf.object.Attribute;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.HObject;
-import ncsa.hdf.object.h5.H5File;
-import ncsa.hdf.object.h5.H5Datatype;
-import ncsa.hdf.object.h5.H5ScalarDS;
+import hdf.hdf5lib.H5;
+import hdf.hdf5lib.HDF5Constants;
+import static hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
+import hdf.object.Attribute;
+import hdf.object.Datatype;
+import hdf.object.Dataset;
+import hdf.object.Group;
+import hdf.object.FileFormat;
+import hdf.object.HObject;
+import hdf.object.h5.H5File;
+import hdf.object.h5.H5Datatype;
+import hdf.object.h5.H5ScalarDS;
 
 import neurord.numeric.morph.VolumeGrid;
 import neurord.numeric.chem.StimulationTable;
@@ -45,7 +45,8 @@ public class ResultWriterHDF5 implements ResultWriter {
         LibUtil.addLibraryPaths("/usr/lib64/jhdf",
                                 "/usr/lib64/jhdf5",
                                 "/usr/lib/jhdf",
-                                "/usr/lib/jhdf5");
+                                "/usr/lib/jhdf5"
+                                );
     }
 
     final static int compression_level = Settings.getProperty("neurord.compression",
@@ -153,8 +154,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.error("Failed to open results file {}", this.outputFile);
             throw e;
         }
-
         this.root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
+        /* HDFview3.0: this.root = (Group)( this.output.getRootObject());*/
         this.writeManifest();
     }
 
@@ -1309,14 +1310,15 @@ public class ResultWriterHDF5 implements ResultWriter {
         dims[0] = 0;
 
         /* Create dataspace */
+         /*HDFView3.0: long filespace_id = H5.H5Screate_simple(dims.length, dims, maxdims);*/
         int filespace_id = H5.H5Screate_simple(dims.length, dims, maxdims);
-
         /* Create the dataset creation property list, add the shuffle filter
          * and the gzip compression filter. The order in which the filters
          * are added here is significant — we will see much greater results
          * when the shuffle is applied first. The order in which the filters
          * are added to the property list is the order in which they will be
          * invoked when writing data. */
+        /*HDFView3.0: long dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);*/
         int dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
         H5.H5Pset_shuffle(dcpl_id);
         H5.H5Pset_deflate(dcpl_id, compression_level);
