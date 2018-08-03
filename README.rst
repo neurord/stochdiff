@@ -502,7 +502,19 @@ MAC AND WINDOWS USERS: if you see either of the the following errors:
      
      Exception in thread "main" java.lang.RuntimeException: java.lang.UnsatisfiedLinkError: hdf5
 
-That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  If you cannot fix the problem, you can run neurord using 
+That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  To fix the problem,
+install the java hdf5 libraries by installing HDFView+Object 2.14 (do not install version 3), which includes jarhdf.jar, jarhdf5.jar and hdfobject.jar (and slf4j*.jar).  In windows, if you are running neurord from the command line, install the windows 32bit version, obtained from 
+https://support.hdfgroup.org/products/java/release/download.html
+Extract the zip archive, run the installer.
+Then, execute neurord (version 3.2.4) using the following syntax:
+
+.. code-block:: shell
+
+	java -Djava.library.path='C:/users/your_name/Appdata/Local/HDF_group/HDFView/2.14.0/lib -jar neurord-3.2.4-all-deps.jar Modelxxx.xml
+
+If that doesn't work, possibly your jhdf5 libraries are installed elsewhere.  Right click on the HDFview icon put on your desktop, select properties, and see what the Target is - copy that text string (except replace hdfview.bat with lib) as your java.library.path.
+
+If you still cannot fix the problem, you can run neurord using 
 
 .. code-block:: shell
 
@@ -510,9 +522,9 @@ That means that either you do not have the java hdf5 libraries installed, or jav
 
 and get text output.
 
-With the default options, output is written as a set of text files and three (or more) output files are generated.  One is the ``model.out`` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the ``IO.xml`` file.
+With the default option output is written as an [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the ``.h5`` extension.
 
-The option ``-Dneurord.writers=h5`` can be used to specify [HDF5] output. In that case one output file is created, plus the log file. The format of the HDF5 output file uses the ``.h5`` extension.
+The option ``-Dneurord.writers=text``specifies that output is written as a set of text files and three (or more) output files are generated.  One is the ``model.out`` file, which contains every molecule in every subvolume at a time interval specified by output interval.  A second is the mesh file, which lists four xyz coordinates, depth and volume of every mesh element in the system.  This can be used to check the morphology, and to convert from molecule quantity to concentration.  The third file (or files) are those specified in the ``IO.xml`` file.
 
 It is also possible to use an HDF5 file as a source of the model and/or exact population. The ``.h5`` file contains the serialized XML which was used to create the model. If a file with the ``.h5`` extension is given as the first argument (instead of an ``.xml`` file), model description will be extracted from it.
 
