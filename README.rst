@@ -503,16 +503,16 @@ MAC AND WINDOWS USERS: if you see either of the the following errors:
      Exception in thread "main" java.lang.RuntimeException: java.lang.UnsatisfiedLinkError: hdf5
 
 That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  To fix the problem,
-install the java hdf5 libraries by installing HDFView+Object 2.14 (do not install version 3), which includes jarhdf.jar, jarhdf5.jar and hdfobject.jar (and slf4j*.jar).  In windows, if you are running neurord from the command line, install the windows 32bit version, obtained from 
+install the java hdf5 libraries by installing HDFView+Object 2.14 (do not install version 3), which includes jarhdf.jar, jarhdf5.jar and hdfobject.jar (and slf4j*.jar) as well as .dll files.  In windows, if you are running neurord from the command line, install the windows 32bit version, obtained from 
 https://support.hdfgroup.org/products/java/release/download.html
 Extract the zip archive, run the installer.
 Then, execute neurord (version 3.2.4) using the following syntax:
 
 .. code-block:: shell
 
-	java -Djava.library.path='C:/users/your_name/Appdata/Local/HDF_group/HDFView/2.14.0/lib -jar neurord-3.2.4-all-deps.jar Modelxxx.xml
+	java -Djava.library.path="C:/users/your_name/Appdata/Local/Apps/HDF_group/HDFView/2.14.0/lib" -jar neurord-3.2.4-all-deps.jar Modelxxx.xml
 
-If that doesn't work, possibly your jhdf5 libraries are installed elsewhere.  Right click on the HDFview icon put on your desktop, select properties, and see what the Target is - copy that text string (except replace hdfview.bat with lib) as your java.library.path.
+If that doesn't work, possibly your jhdf5 libraries are installed elsewhere.  Right click on the HDFview icon put on your desktop, select properties, and see what the Target is - copy that text string (except replace ending hdfview.bat with lib) as your java.library.path. You must use double quotes, a single quote won't work either.
 
 If you still cannot fix the problem, you can run neurord using 
 
