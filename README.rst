@@ -493,6 +493,12 @@ That means that you do not have the java hdf5 libraries installed (or java doesn
 .. code-block:: shell
 
 	sudo apt install libjhdf5-jni
+	
+in Fedora, use the following command:
+
+.. code-block:: shell
+
+	sudo dnf install jhdf5
 
 MAC AND WINDOWS USERS: if you see either of the the following errors:
 
