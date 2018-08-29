@@ -488,7 +488,7 @@ UBUNTU (and possiby other UNIX) USERS: if you see the the following error:
  
          at java.lang.Runtime.loadLibrary0(Runtime.java:870)
 
-That means that you do not have the java hdf5 libraries installed (or java doesn't know how to find them). Install the java hdf5 library, libjhdf5.so.  On UBUNTU the following command works:
+That means that you do not have the java hdf5 libraries installed (or java doesn't know how to find them). Install the java hdf5 library, libjhdf5.so or jarhdf*-3.3.2.jar.  On UBUNTU the following command works:
 
 .. code-block:: shell
 
