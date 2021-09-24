@@ -464,7 +464,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             throws Exception
         {
             long seed = source.getSimulationSeed();
-            log.debug("Writing simulation seed ({}) for trial {}", source.trial());
+            log.debug("Writing simulation seed ({}) for trial {}", seed, source.trial());
             this.group.setAttribute("simulation_seed", seed);
         }
 
