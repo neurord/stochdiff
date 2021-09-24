@@ -246,7 +246,7 @@ public class H5File {
                      size != null ? xJoined(size) : "",
                      chunks != null ? xJoined(chunks) : "");
 
-            return new Dataset(path, id, type, dims);
+            return new Dataset(path, id, type, dims, chunks);
         }
 
         protected Dataset _createArray(String name,
@@ -328,7 +328,7 @@ public class H5File {
             return this._createArray(name, HDF5Constants.H5T_INTEL_I32, dims, flat);
         }
 
-        protected void writeMap(Set<Map.Entry<Object,Object>> set)
+        public void writeMap(Set<Map.Entry<Object,Object>> set)
             throws Exception
         {
             for (Map.Entry<Object,Object> entry: set) {
@@ -379,14 +379,15 @@ public class H5File {
     }
 
     public class Dataset extends HObject {
-        final long[] dimensions;
+        final long[] dimensions, chunks;
         final long type;
 
-        public Dataset(String path, long id, long type, long[] dimensions)
+        public Dataset(String path, long id, long type, long[] dimensions, long[] chunks)
             throws Exception
         {
             super(path, id);
             this.dimensions = dimensions;
+            this.chunks = chunks;
             this.type = type;
         }
 

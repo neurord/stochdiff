@@ -12,19 +12,6 @@ import java.util.Set;
 import java.util.jar.Manifest;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import hdf.hdf5lib.H5;
-import hdf.hdf5lib.HDF5Constants;
-import static hdf.hdf5lib.HDF5Constants.H5F_UNLIMITED;
-import hdf.object.Attribute;
-import hdf.object.Datatype;
-import hdf.object.Dataset;
-import hdf.object.Group;
-import hdf.object.FileFormat;
-import hdf.object.HObject;
-import hdf.object.h5.H5File;
-import hdf.object.h5.H5Datatype;
-import hdf.object.h5.H5ScalarDS;
-
 import neurord.numeric.morph.VolumeGrid;
 import neurord.numeric.chem.StimulationTable;
 import neurord.numeric.chem.ReactionTable;
@@ -41,31 +28,9 @@ import org.apache.logging.log4j.Level;
 public class ResultWriterHDF5 implements ResultWriter {
     public static final Logger log = LogManager.getLogger();
 
-    static {
-        LibUtil.addLibraryPaths("/usr/lib64/jhdf",
-                                "/usr/lib64/jhdf5",
-                                "/usr/lib/jhdf",
-                                "/usr/lib/jhdf5"
-                                );
-    }
-
-    final static int compression_level = Settings.getProperty("neurord.compression",
-                                                              "Compression level in HDF5 output",
-                                                              1);
-
     final protected File outputFile;
     protected H5File output;
-    protected Group root;
     final protected Map<Integer, Trial> trials = new HashMap<>();
-
-    public static final H5Datatype double_t =
-        new H5Datatype(Datatype.CLASS_FLOAT, 8, Datatype.NATIVE, Datatype.NATIVE);
-    public static final H5Datatype int_t =
-        new H5Datatype(Datatype.CLASS_INTEGER, 4, Datatype.NATIVE, Datatype.NATIVE);
-    public static final H5Datatype long_t =
-        new H5Datatype(Datatype.CLASS_INTEGER, 8, Datatype.NATIVE, Datatype.NATIVE);
-    public static final H5Datatype short_str_t =
-        new H5Datatype(Datatype.CLASS_STRING, 100, Datatype.NATIVE, Datatype.NATIVE);
 
     static final int CACHE_SIZE1 = 1024;
     static final int CACHE_SIZE2 = 8*1024;
@@ -78,7 +43,7 @@ public class ResultWriterHDF5 implements ResultWriter {
     final IOutputSet outputSet;
     final List<? extends IOutputSet> outputSets;
 
-    protected Group model;
+    protected H5File.Group model;
 
     public ResultWriterHDF5(File output,
                             IOutputSet primary,
@@ -140,22 +105,8 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected void _init()
         throws Exception
     {
-        FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
-        if (fileFormat == null)
-            throw new UnsatisfiedLinkError("hdf5");
+        this.output = new H5File(this.outputFile);
 
-        log.debug("Opening output file {}", this.outputFile);
-        this.output = (H5File) fileFormat.create(this.outputFile.toString());
-        assert this.output != null;
-
-        try {
-            this.output.open();
-        } catch(Exception e) {
-            log.error("Failed to open results file {}", this.outputFile);
-            throw e;
-        }
-        this.root = (Group)((DefaultMutableTreeNode) this.output.getRootNode()).getUserObject();
-        /* HDFview3.0: this.root = (Group)( this.output.getRootObject());*/
         this.writeManifest();
     }
 
@@ -185,13 +136,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         throws Exception
     {
         Manifest manifest = Settings.getManifest();
-        writeMap(this.root, manifest.getMainAttributes().entrySet());
+        this.output.createGroup("/manifest").writeMap(manifest.getMainAttributes().entrySet());
     }
 
-    protected Group model() throws Exception {
+    protected H5File.Group model() throws Exception {
         if (this.model == null) {
-            this.model = output.createGroup("model", this.root);
-            setAttribute(this.model, "TITLE", "model parameters");
+            this.model = output.createGroup("/model");
+            this.model.setAttribute("TITLE", "model parameters");
         }
 
         return this.model;
@@ -212,9 +163,9 @@ public class ResultWriterHDF5 implements ResultWriter {
     protected Trial createTrial(int trial)
         throws Exception
     {
-        String name = "trial" + trial;
-        Group group = this.output.createGroup(name, this.root);
-        setAttribute(group, "TITLE", "trial " + trial);
+        String name = "/trial" + trial;
+        H5File.Group group = this.output.createGroup(name);
+        group.setAttribute("TITLE", "trial " + trial);
         return new Trial(group);
     }
 
@@ -257,7 +208,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (source.trial() > 0)
             return;
 
-        Group model = this.model();
+        final H5File.Group model = this.model();
 
         t._writeGrid(vgrid, startTime, source);
 
@@ -269,16 +220,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         t.writeEventData(model, source);
 
         {
-            Group output_info = this.output.createGroup("output", model);
-            setAttribute(output_info, "TITLE", "output species");
+            H5File.Group output_info = model.createSubGroup("output");
+            output_info.setAttribute("TITLE", "output species");
             t.writeOutputInfo(output_info);
         }
 
         {
             String s = source.getSource().serialize();
-            Dataset ds = writeVector("serialized_config", model, s);
-            setAttribute(ds, "TITLE", "serialized config");
-            setAttribute(ds, "LAYOUT", "XML");
+            H5File.Dataset ds = model.writeVector("serialized_config", s);
+            ds.setAttribute("TITLE", "serialized config");
+            ds.setAttribute("LAYOUT", "XML");
         }
     }
 
@@ -308,16 +259,16 @@ public class ResultWriterHDF5 implements ResultWriter {
     }
 
     protected class PopulationOutput {
-        final H5ScalarDS concs;
+        final H5File.Dataset concs;
         final int[][][] concs_cache;
-        final H5ScalarDS times;
+        final H5File.Dataset times;
         final double[] times_cache;
         protected int concs_times_count;
 
         final int[] ispecout;
         final int[] elements;
 
-        protected PopulationOutput(Group parent, String name, int[] elements, int[] ispecout)
+        protected PopulationOutput(H5File.Group parent, String name, int[] elements, int[] ispecout)
             throws Exception
         {
             this.ispecout = ispecout;
@@ -330,17 +281,17 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.info("Using population cache_size of {}", cache_size);
 
             /* times × nel × nspecout, but we write only for only time 'time' at one time */
-            this.concs = createExtensibleArray("population", parent, int_t,
-                                               "population of species in voxels over time",
-                                               "[snapshot × nel × nspecout]",
-                                               "count",
-                                               cache_size, elements.length, ispecout.length);
+            this.concs = parent.createExtensibleArray("population", int.class,
+                                                      "population of species in voxels over time",
+                                                      "[snapshot × nel × nspecout]",
+                                                      "count",
+                                                      cache_size, elements.length, ispecout.length);
 
-            this.times = createExtensibleArray("times", parent, double_t,
-                                               "times when snapshots were written",
-                                               "[times]",
-                                               "ms",
-                                               cache_size);
+            this.times = parent.createExtensibleArray("times", double.class,
+                                                      "times when snapshots were written",
+                                                      "[times]",
+                                                      "ms",
+                                                      cache_size);
 
             this.concs_cache = new int[cache_size][elements.length][ispecout.length];
             this.times_cache = new double[cache_size];
@@ -366,49 +317,40 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.debug("Writing {} pop entries at time {}", this.concs_times_count, time);
 
             {
-                extendExtensibleArray(this.concs, this.concs_times_count);
-                int[] data = (int[]) this.concs.getData();
-
                 int[][][] cache;
                 if (this.concs_times_count == this.times_cache.length)
                     cache = this.concs_cache;
                 else
                     cache = Arrays.copyOfRange(this.concs_cache, 0, this.concs_times_count);
 
-                ArrayUtil._flatten(data, cache, cache[0][0].length, 0);
-                this.concs.write(data);
+                this.concs.extend(this.concs_times_count, cache);
             }
 
-            {
-                extendExtensibleArray(this.times, this.concs_times_count);
-                double[] data = (double[]) this.times.getData();
-                System.arraycopy(this.times_cache, 0, data, 0, this.concs_times_count);
-                this.times.write(data);
-            }
+            this.times.extend(this.concs_times_count, this.times_cache);
 
             this.concs_times_count = 0;
         }
     }
 
     protected class Trial {
-        protected final Group group;
-        protected final Group sim;
+        protected final H5File.Group group;
+        protected final H5File.Group sim;
         protected List<PopulationOutput> populations = new ArrayList<>();
-        protected H5ScalarDS event_statistics;
-        protected H5ScalarDS statistics_times;
-        protected Group events;
+        protected H5File.Dataset event_statistics;
+        protected H5File.Dataset statistics_times;
+        protected H5File.Group events;
         protected List<IGridCalc.Happening> events_cache;
-        protected H5ScalarDS
+        protected H5File.Dataset
             events_event, events_kind,
             events_extent, events_time, events_waited, events_original;
 
-        protected Trial(Group group)
+        protected Trial(H5File.Group group)
             throws Exception
         {
             this.group = group;
 
-            this.sim = output.createGroup("output", group);
-            setAttribute(this.sim, "TITLE", "results of the simulation");
+            this.sim = group.createSubGroup("output");
+            this.sim.setAttribute("TITLE", "results of the simulation");
         }
 
         protected void close(IGridCalc source)
@@ -436,14 +378,15 @@ public class ResultWriterHDF5 implements ResultWriter {
                                      "label",
                                      "region_name", "region", "type", "group" };
 
-            Datatype[] memberTypes = new Datatype[memberNames.length];
-            Arrays.fill(memberTypes, double_t);
-            memberTypes[14] = short_str_t;
-            memberTypes[15] = short_str_t;
-            memberTypes[16] = int_t;
-            memberTypes[17] = short_str_t;
-            memberTypes[18] = short_str_t;
-            assert memberTypes.length == 19;
+            Class[] memberTypes = { double.class, double.class, double.class,
+                                    double.class, double.class, double.class,
+                                    double.class, double.class, double.class,
+                                    double.class, double.class, double.class,
+                                    double.class, double.class,
+                                    String.class,
+                                    String.class, int.class, String.class, String.class };
+            assert memberNames.length == 19;
+            assert memberNames.length == memberTypes.length;
 
             Vector<Object> data = vgrid.gridData();
 
@@ -489,28 +432,31 @@ public class ResultWriterHDF5 implements ResultWriter {
                 data.add(labels);
             }
 
-            Dataset grid =
+            H5File.Dataset grid = null;
+            /*
                 output.createCompoundDS("grid", model(), dims, null, chunks, compression_level,
                                         memberNames, memberTypes, null, data);
+
             log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
                      "grid", xJoined(dims), "", xJoined(chunks));
-            setAttribute(grid, "TITLE", "voxels");
-            setAttribute(grid, "LAYOUT",
-                         "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
+            grid.setAttribute("TITLE", "voxels");
+            grid.setAttribute("LAYOUT",
+                              "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
+            */
 
             {
-                Dataset ds =
-                    writeArray("neighbors", model(), vgrid.getPerElementNeighbors(), -1);
-                setAttribute(ds, "TITLE", "adjacency mapping between voxels");
-                setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds =
+                    model().writeArray("neighbors", vgrid.getPerElementNeighbors(), -1);
+                ds.setAttribute("TITLE", "adjacency mapping between voxels");
+                ds.setAttribute("LAYOUT", "[nel × neighbors*]");
+                ds.setAttribute("UNITS", "indices");
             }
             {
-                Dataset ds =
-                    writeArray("couplings", model(), vgrid.getPerElementCouplingConstants());
-                setAttribute(ds, "TITLE", "coupling rate between voxels");
-                setAttribute(ds, "LAYOUT", "[nel × neighbors*]");
-                setAttribute(ds, "UNITS", "nm^2 / nm ?");
+                H5File.Dataset ds =
+                    model().writeArray("couplings", vgrid.getPerElementCouplingConstants());
+                ds.setAttribute("TITLE", "coupling rate between voxels");
+                ds.setAttribute("LAYOUT", "[nel × neighbors*]");
+                ds.setAttribute("UNITS", "nm^2 / nm ?");
             }
         }
 
@@ -519,26 +465,26 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             long seed = source.getSimulationSeed();
             log.debug("Writing simulation seed ({}) for trial {}", source.trial());
-            setAttribute(this.group, "simulation_seed", seed);
+            this.group.setAttribute("simulation_seed", seed);
         }
 
-        protected void writeRegionLabels(Group parent, IGridCalc source)
+        protected void writeRegionLabels(H5File.Group parent, IGridCalc source)
             throws Exception
         {
             String[] regions = source.getSource().getVolumeGrid().getRegionLabels();
-            Dataset ds = writeVector("regions", parent, regions);
-            setAttribute(ds, "TITLE", "names of regions");
-            setAttribute(ds, "LAYOUT", "[nregions]");
-            setAttribute(ds, "UNITS", "text");
+            H5File.Dataset ds = parent.writeVector("regions", regions);
+            ds.setAttribute("TITLE", "names of regions");
+            ds.setAttribute("LAYOUT", "[nregions]");
+            ds.setAttribute("UNITS", "text");
         }
 
-        protected void writeStimulationData(Group parent, IGridCalc source)
+        protected void writeStimulationData(H5File.Group parent, IGridCalc source)
             throws Exception
         {
             StimulationTable table = source.getSource().getStimulationTable();
 
-            Group group = output.createGroup("stimulation", parent);
-            setAttribute(group, "TITLE", "stimulation parameters");
+            H5File.Group group = parent.createSubGroup("stimulation");
+            group.setAttribute("TITLE", "stimulation parameters");
 
             {
                 String[] targets = table.getTargetIDs();
@@ -547,64 +493,64 @@ public class ResultWriterHDF5 implements ResultWriter {
                     return;
                 }
 
-                Dataset ds = writeVector("target_names", group, targets);
-                setAttribute(ds, "TITLE", "names of stimulation targets");
-                setAttribute(ds, "LAYOUT", "[nstimulations]");
-                setAttribute(ds, "UNITS", "text");
+                H5File.Dataset ds = group.writeVector("target_names", targets);
+                ds.setAttribute("TITLE", "names of stimulation targets");
+                ds.setAttribute("LAYOUT", "[nstimulations]");
+                ds.setAttribute("UNITS", "text");
             }
 
             {
                 int[][] targets = source.getSource().getStimulationTargets();
-                Dataset ds = writeArray("targets", group, targets, -1);
-                setAttribute(ds, "TITLE", "stimulated voxels");
-                setAttribute(ds, "LAYOUT", "[??? × ???]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeArray("targets", targets, -1);
+                ds.setAttribute("TITLE", "stimulated voxels");
+                ds.setAttribute("LAYOUT", "[??? × ???]");
+                ds.setAttribute("UNITS", "indices");
             }
         }
 
-        protected void writeReactionData(Group parent, IGridCalc source)
+        protected void writeReactionData(H5File.Group parent, IGridCalc source)
             throws Exception
         {
             ReactionTable table = source.getSource().getReactionTable();
 
-            Group group = output.createGroup("reactions", parent);
-            setAttribute(group, "TITLE", "reaction scheme");
+            H5File.Group group = parent.createSubGroup("reactions");
+            group.setAttribute("TITLE", "reaction scheme");
 
             {
                 int[][] indices = table.getReactantIndices();
-                Dataset ds = writeArray("reactants", group, indices, -1);
-                setAttribute(ds, "TITLE", "reactant indices");
-                setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeArray("reactants", indices, -1);
+                ds.setAttribute("TITLE", "reactant indices");
+                ds.setAttribute("LAYOUT", "[nreact × nreactants*]");
+                ds.setAttribute("UNITS", "indices");
             }
             {
                 int[][] indices = table.getProductIndices();
-                Dataset ds = writeArray("products", group, indices, -1);
-                setAttribute(ds, "TITLE", "product indices");
-                setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeArray("products", indices, -1);
+                ds.setAttribute("TITLE", "product indices");
+                ds.setAttribute("LAYOUT", "[nreact × nproducts*]");
+                ds.setAttribute("UNITS", "indices");
             }
             {
                 int[][] stoichio = table.getReactantStoichiometry();
-                Dataset ds = writeArray("reactant_stoichiometry", group, stoichio, -1);
-                setAttribute(ds, "TITLE", "reactant stoichiometry");
-                setAttribute(ds, "LAYOUT", "[nreact × nreactants*]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeArray("reactant_stoichiometry", stoichio, -1);
+                ds.setAttribute("TITLE", "reactant stoichiometry");
+                ds.setAttribute("LAYOUT", "[nreact × nreactants*]");
+                ds.setAttribute("UNITS", "indices");
             }
             {
                 int[][] stoichio = table.getProductStoichiometry();
-                Dataset ds = writeArray("product_stoichiometry", group, stoichio, -1);
-                setAttribute(ds, "TITLE", "product stoichiometry");
-                setAttribute(ds, "LAYOUT", "[nreact × nproducts*]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeArray("product_stoichiometry", stoichio, -1);
+                ds.setAttribute("TITLE", "product stoichiometry");
+                ds.setAttribute("LAYOUT", "[nreact × nproducts*]");
+                ds.setAttribute("UNITS", "indices");
             }
 
             {
                 double[] rates = table.getRates();
-                Dataset ds = writeVector("rates", group, rates);
-                setAttribute(ds, "TITLE", "reaction rates");
-                setAttribute(ds, "LAYOUT", "[nreact]");
-                setAttribute(ds, "UNITS", "transitions/ms");
+                H5File.Dataset ds = group.writeVector("rates", rates);
+                ds.setAttribute("TITLE", "reaction rates");
+                ds.setAttribute("LAYOUT", "[nreact]");
+                ds.setAttribute("UNITS", "transitions/ms");
             }
             {
                 int[] pairs = table.getReversiblePairs().clone();
@@ -615,14 +561,14 @@ public class ResultWriterHDF5 implements ResultWriter {
                         pairs[pairs[i]] = i;
                     }
 
-                Dataset ds = writeVector("reversible_pairs", group, pairs);
-                setAttribute(ds, "TITLE", "indices of reverse reaction");
-                setAttribute(ds, "LAYOUT", "[nreact]");
-                setAttribute(ds, "UNITS", "indices");
+                H5File.Dataset ds = group.writeVector("reversible_pairs", pairs);
+                ds.setAttribute("TITLE", "indices of reverse reaction");
+                ds.setAttribute("LAYOUT", "[nreact]");
+                ds.setAttribute("UNITS", "indices");
             }
         }
 
-        protected void writeEventData(Group parent, IGridCalc source)
+        protected void writeEventData(H5File.Group parent, IGridCalc source)
             throws Exception
         {
             // FIXME: maybe make stoichiometry writing a separate switch?
@@ -633,8 +579,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                     return;
             }
 
-            Group group = output.createGroup("events", parent);
-            setAttribute(group, "TITLE", "description of all event types");
+            H5File.Group group = parent.createSubGroup("events");
+            group.setAttribute("TITLE", "description of all event types");
 
             {
                 String[] descriptions = new String[events.size()];
@@ -668,64 +614,64 @@ public class ResultWriterHDF5 implements ResultWriter {
                 }
 
                 {
-                    Dataset ds = writeVector("descriptions", group, descriptions);
-                    setAttribute(ds, "TITLE", "signatures of reaction channels");
-                    setAttribute(ds, "LAYOUT", "[nchannel]");
-                    setAttribute(ds, "UNITS", "text");
+                    H5File.Dataset ds = group.writeVector("descriptions", descriptions);
+                    ds.setAttribute("TITLE", "signatures of reaction channels");
+                    ds.setAttribute("LAYOUT", "[nchannel]");
+                    ds.setAttribute("UNITS", "text");
                 }
 
                 {
-                    Dataset ds = writeArray("elements", group, elements, -1);
-                    setAttribute(ds, "TITLE", "voxel numbers of reaction channels");
-                    setAttribute(ds, "LAYOUT", "[nchannel x {source,target}]");
-                    setAttribute(ds, "UNITS", "index");
+                    H5File.Dataset ds = group.writeArray("elements", elements, -1);
+                    ds.setAttribute("TITLE", "voxel numbers of reaction channels");
+                    ds.setAttribute("LAYOUT", "[nchannel x {source,target}]");
+                    ds.setAttribute("UNITS", "index");
                 }
 
                 {
-                    Dataset ds = writeVector("types", group, types);
-                    setAttribute(ds, "TITLE", "types of reaction channels");
-                    setAttribute(ds, "LAYOUT", "[nchannel]");
-                    setAttribute(ds, "UNITS", "enumeration");
+                    H5File.Dataset ds = group.writeVector("types", types);
+                    ds.setAttribute("TITLE", "types of reaction channels");
+                    ds.setAttribute("LAYOUT", "[nchannel]");
+                    ds.setAttribute("UNITS", "enumeration");
                 }
 
                 {
-                    Dataset ds = writeArray("substrates", group, substrates, -1);
-                    setAttribute(ds, "TITLE", "event substrates");
-                    setAttribute(ds, "LAYOUT", "[nchannel x nspecies*]");
-                    setAttribute(ds, "UNITS", "indices");
+                    H5File.Dataset ds = group.writeArray("substrates", substrates, -1);
+                    ds.setAttribute("TITLE", "event substrates");
+                    ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
+                    ds.setAttribute("UNITS", "indices");
                 }
 
                 {
-                    Dataset ds = writeArray("stoichiometries", group, stoichiometries, 0);
-                    setAttribute(ds, "TITLE", "substrate stoichiometries");
-                    setAttribute(ds, "LAYOUT", "[nchannel x nspecies*]");
-                    setAttribute(ds, "UNITS", "indices");
+                    H5File.Dataset ds = group.writeArray("stoichiometries", stoichiometries, 0);
+                    ds.setAttribute("TITLE", "substrate stoichiometries");
+                    ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
+                    ds.setAttribute("UNITS", "indices");
                 }
 
                 if (dependent != null) {
-                    Dataset ds = writeArray("dependent", group, dependent, -1);
-                    setAttribute(ds, "TITLE", "dependent reaction channels");
-                    setAttribute(ds, "LAYOUT", "[nchannel x ndependent*]");
-                    setAttribute(ds, "UNITS", "indices");
+                    H5File.Dataset ds = group.writeArray("dependent", dependent, -1);
+                    ds.setAttribute("TITLE", "dependent reaction channels");
+                    ds.setAttribute("LAYOUT", "[nchannel x ndependent*]");
+                    ds.setAttribute("UNITS", "indices");
                 }
             }
         }
 
-        protected void writeOutputInfo(Group parent, String identifier,
+        protected void writeOutputInfo(H5File.Group parent, String identifier,
                                         int[] which, int[] elements)
             throws Exception
         {
-            Group group = output.createGroup(identifier, parent);
+            H5File.Group group = parent.createSubGroup(identifier);
 
             writeSpeciesVector("species", "names of output species", group, species, which);
 
-            Dataset ds = writeVector("elements", group, elements);
-            setAttribute(ds, "TITLE", "indices of output elements");
-            setAttribute(ds, "LAYOUT", "[nelements]");
-            setAttribute(ds, "UNITS", "indices");
+            H5File.Dataset ds = group.writeVector("elements", elements);
+            ds.setAttribute("TITLE", "indices of output elements");
+            ds.setAttribute("LAYOUT", "[nelements]");
+            ds.setAttribute("UNITS", "indices");
         }
 
-        protected void writeOutputInfo(Group parent)
+        protected void writeOutputInfo(H5File.Group parent)
             throws Exception
         {
             /* We cannot use getNamesOfOutputSpecies() because it has various special
@@ -778,7 +724,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     ident = set.getIdentifier();
                 }
 
-                Group group = output.createGroup(ident, this.sim);
+                H5File.Group group = this.sim.createSubGroup(ident);
                 PopulationOutput conc = new PopulationOutput(group, ident, elements, ispecout);
                 this.populations.add(i, conc);
             }
@@ -803,19 +749,19 @@ public class ResultWriterHDF5 implements ResultWriter {
             /* times × events × 2 or times × channels × 2 */
             String type = "events";
             this.event_statistics =
-                createExtensibleArray("event_statistics", this.sim, int_t,
-                                      "actual event counts since last snapshot",
-                                      "[times × " + type + " × species]",
-                                      "count",
-                                      CACHE_SIZE1, expected, 2);
+                this.sim.createExtensibleArray("event_statistics", int.class,
+                                               "actual event counts since last snapshot",
+                                               "[times × " + type + " × species]",
+                                               "count",
+                                               CACHE_SIZE1, expected, 2);
 
             if (periodic)
                 this.statistics_times =
-                    createExtensibleArray("statistics_times", this.sim, double_t,
-                                          "times when statistics were written",
-                                          "[times]",
-                                          "ms",
-                                          CACHE_SIZE1);
+                    this.sim.createExtensibleArray("statistics_times", double.class,
+                                                   "times when statistics were written",
+                                                   "[times]",
+                                                   "ms",
+                                                   CACHE_SIZE1);
 
             /* Only write stuff for the first trial to save money and time */
             if (source.trial() > 0)
@@ -831,10 +777,10 @@ public class ResultWriterHDF5 implements ResultWriter {
                 if (descriptions[i] == null)
                     descriptions[i] = "";
 
-            Dataset ds = writeVector("event_statistics", model(), descriptions);
-            setAttribute(ds, "TITLE", "descriptions of statistics rows");
-            setAttribute(ds, "LAYOUT", "[nstatistics]");
-            setAttribute(ds, "UNITS", "text");
+            H5File.Dataset ds = model().writeVector("event_statistics", descriptions);
+            ds.setAttribute("TITLE", "descriptions of statistics rows");
+            ds.setAttribute("LAYOUT", "[nstatistics]");
+            ds.setAttribute("UNITS", "text");
         }
 
         protected void writeEventStatistics(double time, IGridCalc source)
@@ -855,20 +801,10 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             log.debug("Writing event statistics at time {}", time);
-            {
-                extendExtensibleArray(this.event_statistics, 1);
-                long[] dims = this.event_statistics.getDims();
-                int[] data = (int[]) this.event_statistics.getData();
-                ArrayUtil._flatten(data, stats, 2, 0);
-                this.event_statistics.write(data);
-            }
+            this.event_statistics.extend(stats.length, this.event_statistics);
 
-            if (this.statistics_times != null) {
-                extendExtensibleArray(this.statistics_times, 1);
-                double[] data = (double[]) this.statistics_times.getData();
-                data[0] = time;
-                this.statistics_times.write(data);
-            }
+            if (this.statistics_times != null)
+                this.statistics_times.extend(1, new double[]{ time });
         }
 
         protected void initEvents()
@@ -876,40 +812,46 @@ public class ResultWriterHDF5 implements ResultWriter {
         {
             assert this.events == null;
 
-            this.events = output.createGroup("events", this.sim);
+            this.events = this.sim.createSubGroup("events");
 
-            this.events_time = createExtensibleArray("times", this.events, double_t,
-                                                     "at what time the event happened",
-                                                     "[time]",
-                                                     "ms",
-                                                     CACHE_SIZE2);
-            this.events_waited = createExtensibleArray("waited", this.events, double_t,
-                                                       "time since the previous instance of this event",
-                                                       "[waited]",
-                                                       "ms",
-                                                       CACHE_SIZE2);
-            this.events_original = createExtensibleArray("original_wait", this.events, double_t,
-                                                       "time originally schedule to wait",
-                                                       "[original_wait]",
-                                                       "ms",
-                                                       CACHE_SIZE2);
-            this.events_event = createExtensibleArray("events", this.events, int_t,
-                                                      "index of the event that happened",
-                                                      "[event#]",
-                                                      "",
-                                                      CACHE_SIZE2);
-            this.events_kind = createExtensibleArray("kinds", this.events, int_t,
-                                                     "mechanism of the event that happened",
-                                                     "[kind]",
-                                                     "",
-                                                     CACHE_SIZE2);
-            this.events_extent = createExtensibleArray("extents", this.events, int_t,
-                                                       "the extent of the reaction or event",
-                                                       "[extent]",
-                                                       "count",
-                                                       CACHE_SIZE2);
+            this.events_time = this.events.createExtensibleArray(
+                    "times", double.class,
+                    "at what time the event happened",
+                    "[time]",
+                    "ms",
+                    CACHE_SIZE2);
+            this.events_waited = this.events.createExtensibleArray(
+                    "waited", double.class,
+                    "time since the previous instance of this event",
+                    "[waited]",
+                    "ms",
+                    CACHE_SIZE2);
+            this.events_original = this.events.createExtensibleArray(
+                    "original_wait", double.class,
+                    "time originally schedule to wait",
+                    "[original_wait]",
+                    "ms",
+                    CACHE_SIZE2);
+            this.events_event = this.events.createExtensibleArray(
+                    "events", int.class,
+                    "index of the event that happened",
+                    "[event#]",
+                    "",
+                    CACHE_SIZE2);
+            this.events_kind = this.events.createExtensibleArray(
+                    "kinds", int.class,
+                    "mechanism of the event that happened",
+                    "[kind]",
+                    "",
+                    CACHE_SIZE2);
+            this.events_extent = this.events.createExtensibleArray(
+                    "extents", int.class,
+                    "the extent of the reaction or event",
+                    "[extent]",
+                    "count",
+                    CACHE_SIZE2);
 
-            long chunk_size = this.events_event.getChunkSize()[0];
+            long chunk_size = this.events_event.chunks[0];
             this.events_cache = new ArrayList<>((int)chunk_size);
         }
 
@@ -926,53 +868,43 @@ public class ResultWriterHDF5 implements ResultWriter {
             for (m = 0; m < n; m += howmuch) {
                 howmuch = Math.min(n - m, CACHE_SIZE2);
                 log.debug("Writing {} events at time {}", howmuch, time);
+                int[] ints = new int[howmuch];
+                double[] doubles = new double[howmuch];
 
                 {
-                    extendExtensibleArray(this.events_time, howmuch);
-                    double[] data = (double[]) this.events_time.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).time();
-                    this.events_time.write(data);
+                        doubles[i] = this.events_cache.get(m + i).time();
+                    this.events_time.extend(howmuch, doubles);
                 }
 
                 {
-                    extendExtensibleArray(this.events_waited, howmuch);
-                    double[] data = (double[]) this.events_waited.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).waited();
-                    this.events_waited.write(data);
+                        doubles[i] = this.events_cache.get(m + i).waited();
+                    this.events_waited.extend(howmuch, doubles);
                 }
 
                 {
-                    extendExtensibleArray(this.events_original, howmuch);
-                    double[] data = (double[]) this.events_original.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).original_wait();
-                    this.events_original.write(data);
+                        doubles[i] = this.events_cache.get(m + i).original_wait();
+                    this.events_original.extend(howmuch, doubles);
                 }
 
                 {
-                    extendExtensibleArray(this.events_event, howmuch);
-                    int[] data = (int[]) this.events_event.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).event_number();
-                    this.events_event.write(data);
+                        ints[i] = this.events_cache.get(m + i).event_number();
+                    this.events_original.extend(howmuch, ints);
                 }
 
                 {
-                    extendExtensibleArray(this.events_kind, howmuch);
-                    int[] data = (int[]) this.events_kind.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).kind().ordinal();
-                    this.events_kind.write(data);
+                        ints[i] = this.events_cache.get(m + i).kind().ordinal();
+                    this.events_original.extend(howmuch, ints);
                 }
 
                 {
-                    extendExtensibleArray(this.events_extent, howmuch);
-                    int[] data = (int[]) this.events_extent.getData();
                     for (int i = 0; i < howmuch; i++)
-                        data[i] = this.events_cache.get(m + i).extent();
-                    this.events_extent.write(data);
+                        ints[i] = this.events_cache.get(m + i).extent();
+                    this.events_original.extend(howmuch, ints);
                 }
             }
 
@@ -1011,13 +943,16 @@ public class ResultWriterHDF5 implements ResultWriter {
     private static <T> T getSomething(H5File h5, String path)
         throws Exception
     {
-        Dataset obj = (Dataset) h5.get(path);
+        throw new RuntimeException();
+        /*
+        H5File.Dataset obj = (H5File.Dataset) h5.get(path);
         if (obj == null) {
             log.error("Failed to retrieve \"{}\"", path);
             throw new Exception("Path \"" + path + "\" not found");
         }
 
         return (T) obj.getData();
+        */
     }
 
     private static int[][] loadPopulationFromTime(H5File h5,
@@ -1044,13 +979,14 @@ public class ResultWriterHDF5 implements ResultWriter {
         }
 
         String poppath = path + "/population";
-        Dataset obj = (Dataset) h5.get(poppath);
+        H5File.Dataset obj = null; // (H5File.Dataset) h5.get(poppath);
         if (obj == null) {
             log.error("Failed to retrieve \"{}\"", path);
             throw new Exception("Path \"" + path + "\" not found");
         }
 
         /* This is necessary to retrieve dimensions */
+/*
         obj.init();
 
         int rank = obj.getRank();
@@ -1072,16 +1008,16 @@ public class ResultWriterHDF5 implements ResultWriter {
         int[][] pop = ArrayUtil.reshape(data, (int) dims[1], (int) dims[2]);
         // log.debug("{}", (Object) pop);
         return pop;
+*/
+
+        return null;
     }
 
     protected static LoadModelResult _loadModel(File filename, int trial, Double pop_from_time)
         throws Exception
     {
-        FileFormat fileFormat = FileFormat.getFileFormat(FileFormat.FILE_TYPE_HDF5);
-        if (fileFormat == null)
-            throw new UnsatisfiedLinkError("hdf5");
-
         log.debug("Opening input file {}", filename);
+/*
         final H5File h5;
         try {
             h5 = (H5File) fileFormat.createInstance(filename.toString(), FileFormat.READ);
@@ -1112,10 +1048,13 @@ public class ResultWriterHDF5 implements ResultWriter {
         if (!Double.isNaN(pop_from_time))
             pop = loadPopulationFromTime(h5, trial, "__main__", pop_from_time);
 
-        /* Make sure file is closed so that we can overwrite it. */
+        Make sure file is closed so that we can overwrite it.
         h5.close();
 
         return new LoadModelResult(xml, seed, species, pop);
+*/
+
+        return null;
     }
 
     public static LoadModelResult loadModel(File filename, int trial, double pop_from_time) {
@@ -1145,133 +1084,8 @@ public class ResultWriterHDF5 implements ResultWriter {
      ***************           Utility functions          ******************
      ***********************************************************************/
 
-    protected static void setAttribute(HObject obj, String name, String value)
-        throws Exception
-    {
-        Attribute attr = new Attribute(name, short_str_t,
-                                       new long[] {}, new String[] {value});
-        obj.writeMetadata(attr);
-        log.debug("Wrote metadata on {} {}={}", obj, name, value);
-    }
-
-    protected static void setAttribute(HObject obj, String name, long value)
-        throws Exception
-    {
-        Attribute attr = new Attribute(name, long_t,
-                                       new long[] {}, new long[] {value});
-        obj.writeMetadata(attr);
-        log.debug("Wrote metadata on {} {}={}", obj, name, value);
-    }
-
-    protected static <T> T getAttribute(H5File h5, String path, String name)
-        throws Exception
-    {
-        HObject obj = h5.get(path);
-        if (obj == null) {
-            log.error("Failed to retrieve \"{}\"", path);
-            throw new Exception("Path \"" + path + "\" not found");
-        }
-        List<Attribute> list = obj.getMetadata();
-        for (Attribute attr: list)
-            if (name.equals(attr.getName()))
-                return (T) attr.getValue();
-
-        throw new Exception("Atribute \"" + name + "\" not found on \"" + path + "\"");
-    }
-
-    protected Dataset _writeArray(String name, Group parent, H5Datatype type,
-                                  long[] dims,
-                                  Object data)
-        throws Exception
-    {
-        boolean chunked = ArrayUtil.product(dims) > 0;
-        /* chunking and/or compression are broken for empty arrays */
-        log.debug("Creating {} with dims=[{}] size=[{}] chunks=[{}]...",
-                  name, xJoined(dims), "", chunked ? xJoined(dims) : "");
-
-        Dataset ds = this.output.createScalarDS(name, parent, type,
-                                                dims,
-                                                chunked ? dims.clone() : null,
-                                                chunked ? dims.clone() : null,
-                                                chunked ? compression_level : 0,
-                                                data);
-        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                 name, xJoined(dims), "", chunked ? xJoined(dims) : "");
-        return ds;
-    }
-
-    protected Dataset writeArray(String name, Group parent, double[][] items)
-        throws Exception
-    {
-        int maxlength = ArrayUtil.maxLength(items);
-        long[] dims = {items.length, maxlength};
-
-        double[] flat = ArrayUtil.flatten(items, maxlength);
-
-        return _writeArray(name, parent, double_t, dims, flat);
-    }
-
-    protected Dataset writeArray(String name, Group parent, int[][] items, int fill)
-        throws Exception
-    {
-        int maxlength = ArrayUtil.maxLength(items);
-        long[] dims = {items.length, maxlength};
-
-        int[] flat = ArrayUtil.flatten(items, maxlength, fill);
-
-        return _writeArray(name, parent, int_t, dims, flat);
-    }
-
-    protected Dataset writeVector(String name, Group parent, String... items)
-        throws Exception
-    {
-        int maxlength = Math.max(ArrayUtil.maxLength(items) * 4, 1);
-        long[] dims = {items.length};
-
-        H5Datatype string_t = new H5Datatype(Datatype.CLASS_STRING, maxlength,
-                                             Datatype.NATIVE, Datatype.NATIVE);
-
-        return _writeArray(name, parent, string_t, dims, items);
-    }
-
-    protected void writeMap(Group element, Set<Map.Entry<Object,Object>> set)
-        throws Exception
-    {
-        for (Map.Entry<Object,Object> entry: set) {
-            /* Manifest keys allow ascii characters, numbers, dashes and underscores. */
-            String key = entry.getKey().toString();
-            String value = (String) entry.getValue();
-
-            setAttribute(element, key, value);
-        }
-    }
-
-    protected Dataset writeVector(String name, Group parent, double... items)
-        throws Exception
-    {
-        long[] dims = {items.length};
-
-        return _writeArray(name, parent, double_t, dims, items);
-    }
-
-    protected Dataset writeVector(String name, Group parent, int... items)
-        throws Exception
-    {
-        long[] dims = {items.length};
-
-        return _writeArray(name, parent, int_t, dims, items);
-    }
-
-    protected Dataset writeVector(String name, Group parent, long... items)
-        throws Exception
-    {
-        long[] dims = {items.length};
-
-        return _writeArray(name, parent, long_t, dims, items);
-    }
-
     protected void writeSpeciesVector(String name, String title,
-                                      Group parent, String[] species, int[] which)
+                                      H5File.Group parent, String[] species, int[] which)
         throws Exception
     {
         final String[] specout;
@@ -1283,95 +1097,10 @@ public class ResultWriterHDF5 implements ResultWriter {
                 specout[i] = species[which[i]];
         }
 
-        Dataset ds = writeVector(name, parent, specout);
-        setAttribute(ds, "TITLE", title);
-        setAttribute(ds, "LAYOUT", "[nspecies]");
-        setAttribute(ds, "UNITS", "text");
-    }
-
-    protected H5ScalarDS createExtensibleArray(String name, Group parent, Datatype type,
-                                               String TITLE, String LAYOUT, String UNITS,
-                                               long... dims)
-        throws Exception
-    {
-        long[] maxdims = dims.clone();
-        maxdims[0] = H5F_UNLIMITED;
-        long[] chunks = dims.clone();
-
-        /* avoid too small chunks */
-        chunks[0] = 1;
-        if (ArrayUtil.product(chunks) == 0)
-            throw new RuntimeException("Empty chunks: " + xJoined(chunks));
-
-        while (ArrayUtil.product(chunks) < 1024)
-            chunks[0] *= 2;
-
-        /* do not write any data in the beginning */
-        dims[0] = 0;
-
-        /* Create dataspace */
-         /*HDFView3.0: long filespace_id = H5.H5Screate_simple(dims.length, dims, maxdims);*/
-        int filespace_id = H5.H5Screate_simple(dims.length, dims, maxdims);
-        /* Create the dataset creation property list, add the shuffle filter
-         * and the gzip compression filter. The order in which the filters
-         * are added here is significant — we will see much greater results
-         * when the shuffle is applied first. The order in which the filters
-         * are added to the property list is the order in which they will be
-         * invoked when writing data. */
-        /*HDFView3.0: long dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);*/
-        int dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
-        H5.H5Pset_shuffle(dcpl_id);
-        H5.H5Pset_deflate(dcpl_id, compression_level);
-        H5.H5Pset_chunk(dcpl_id, dims.length, chunks);
-
-        /* Create the dataset */
-        final String path = parent.getFullName() + "/" + name;
-        H5.H5Dcreate(this.output.getFID(), path,
-                     type.toNative(), filespace_id,
-                     HDF5Constants.H5P_DEFAULT, dcpl_id, HDF5Constants.H5P_DEFAULT);
-        Dataset ds = new H5ScalarDS(this.output, path, "/");
-        ds.init();
-
-        log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                 name, xJoined(dims), xJoined(maxdims), xJoined(chunks));
-
-        setAttribute(ds, "TITLE", TITLE);
-        setAttribute(ds, "LAYOUT", LAYOUT);
-        setAttribute(ds, "UNITS", UNITS);
-
-        return (H5ScalarDS) ds;
-    }
-
-    protected static void extendExtensibleArray(H5ScalarDS ds, long howmuch)
-        throws Exception
-    {
-        final long[] start = ds.getStartDims();
-        final long[] dims = ds.getDims();
-        final long[] selected = ds.getSelectedDims();
-        start[0] = dims[0];
-        dims[0] = dims[0] + howmuch;
-        ds.extend(dims);
-
-        selected[0] = howmuch;
-        System.arraycopy(dims, 1, selected, 1, dims.length - 1);
-
-        Object data = ds.getData();
-        int length = 0;
-        if (data instanceof int[])
-            length = ((int[])data).length;
-        else if (data instanceof double[])
-            length = ((double[])data).length;
-        else
-            assert false;
-        if (length < ArrayUtil.product(selected))
-            log.error("howmuch={} start={} dims={} selected={}" +
-                      " getSelected→{} getStride={} getDims={} getStartDims={} getMaxDims={} getChunkSize={} {}↔{}" +
-                      "\ndata={}",
-                      howmuch, start, dims, selected,
-                      ds.getSelectedDims(), ds.getStride(), ds.getDims(), ds.getStartDims(),
-                      ds.getMaxDims(), ds.getChunkSize(),
-                      length, ArrayUtil.product(selected),
-                      data);
+        H5File.Dataset ds = parent.writeVector(name, specout);
+        ds.setAttribute("TITLE", title);
+        ds.setAttribute("LAYOUT", "[nspecies]");
+        ds.setAttribute("UNITS", "text");
     }
 
     protected static void getGridNumbers(int[][] dst,
