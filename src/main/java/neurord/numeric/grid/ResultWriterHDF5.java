@@ -321,13 +321,17 @@ public class ResultWriterHDF5 implements ResultWriter {
             log.debug("Writing {} pop entries at time {}", this.concs_times_count, time);
 
             {
-                int[][][] cache;
+                final int[][][] cache;
                 if (this.concs_times_count == this.times_cache.length)
                     cache = this.concs_cache;
                 else
                     cache = Arrays.copyOfRange(this.concs_cache, 0, this.concs_times_count);
 
-                this.concs.extend(this.concs_times_count, cache);
+
+                final int[] flat = new int[this.concs_times_count];
+                ArrayUtil._flatten(flat, cache, cache[0][0].length, 0);
+
+                this.concs.extend(this.concs_times_count, flat);
             }
 
             this.times.extend(this.concs_times_count, this.times_cache);
