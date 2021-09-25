@@ -119,9 +119,9 @@ public class TestH5File {
             g.createExtensibleArray("extensible2", int.class,
                                     "EXTENSIBLE2", "[INT]", "[(NONE)]",
                                     new long[]{3});
-        ext2.extend(1, new int[] {0, 1, 2});
-        ext2.extend(1, new int[] {3, 4, 5});
-        ext2.extend(3, new int[] {6, 7, 8, 9, 10, 11, 12, 13, 14});
+        ext2.extend(3, new int[] {0, 1, 2});
+        ext2.extend(3, new int[] {3, 4, 5});
+        ext2.extend(9, new int[] {6, 7, 8, 9, 10, 11, 12, 13, 14});
         ext2.close();
 
         g.close();

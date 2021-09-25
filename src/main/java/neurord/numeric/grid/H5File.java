@@ -360,13 +360,13 @@ public class H5File {
 
         protected Dataset createExtensibleArray(String name, long type,
                                                 String TITLE, String LAYOUT, String UNITS,
-                                                long... slice_dims)
+                                                long... dims)
             throws Exception
         {
-            long[] full_dims = new long[slice_dims.length + 1]; /* {0, slice_dims[0], slice_dims[1], …} */
-            System.arraycopy(slice_dims, 0, full_dims, 1, slice_dims.length);
+            long[] dims0 = dims.clone();
+            dims0[0] = 0;
 
-            Dataset ds = this._createArray(name, type, full_dims, null, false, true);
+            Dataset ds = this._createArray(name, type, dims0, null, false, true);
 
             ds.setAttribute("TITLE", TITLE);
             ds.setAttribute("LAYOUT", LAYOUT);
@@ -377,7 +377,7 @@ public class H5File {
 
         protected Dataset createExtensibleArray(String name, Class type,
                                                 String TITLE, String LAYOUT, String UNITS,
-                                                long... slice_dims)
+                                                long... dims)
             throws Exception
         {
             final long type_id;
@@ -392,7 +392,7 @@ public class H5File {
 
             return createExtensibleArray(name, type_id,
                                          TITLE, LAYOUT, UNITS,
-                                         slice_dims);
+                                         dims);
         }
     }
 
