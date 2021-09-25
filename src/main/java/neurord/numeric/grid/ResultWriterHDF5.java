@@ -136,7 +136,9 @@ public class ResultWriterHDF5 implements ResultWriter {
         throws Exception
     {
         Manifest manifest = Settings.getManifest();
-        this.output.createGroup("/manifest").writeMap(manifest.getMainAttributes().entrySet());
+        H5File.Group g = this.output.createGroup("/manifest");
+        g.writeMap(manifest.getMainAttributes().entrySet());
+        g.close();
     }
 
     protected H5File.Group model() throws Exception {
@@ -223,6 +225,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             H5File.Group output_info = model.createSubGroup("output");
             output_info.setAttribute("TITLE", "output species");
             t.writeOutputInfo(output_info);
+            output_info.close();
         }
 
         {
@@ -230,6 +233,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             H5File.Dataset ds = model.writeVector("serialized_config", s);
             ds.setAttribute("TITLE", "serialized config");
             ds.setAttribute("LAYOUT", "XML");
+            ds.close();
         }
     }
 
@@ -442,6 +446,8 @@ public class ResultWriterHDF5 implements ResultWriter {
             grid.setAttribute("TITLE", "voxels");
             grid.setAttribute("LAYOUT",
                               "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
+
+            grid.close();
             */
 
             {
@@ -450,6 +456,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 ds.setAttribute("TITLE", "adjacency mapping between voxels");
                 ds.setAttribute("LAYOUT", "[nel × neighbors*]");
                 ds.setAttribute("UNITS", "indices");
+                ds.close();
             }
             {
                 H5File.Dataset ds =
@@ -457,6 +464,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                 ds.setAttribute("TITLE", "coupling rate between voxels");
                 ds.setAttribute("LAYOUT", "[nel × neighbors*]");
                 ds.setAttribute("UNITS", "nm^2 / nm ?");
+                ds.close();
             }
         }
 
@@ -506,6 +514,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                 ds.setAttribute("LAYOUT", "[??? × ???]");
                 ds.setAttribute("UNITS", "indices");
             }
+
+            group.close();
         }
 
         protected void writeReactionData(H5File.Group parent, IGridCalc source)
@@ -566,6 +576,8 @@ public class ResultWriterHDF5 implements ResultWriter {
                 ds.setAttribute("LAYOUT", "[nreact]");
                 ds.setAttribute("UNITS", "indices");
             }
+
+            group.close();
         }
 
         protected void writeEventData(H5File.Group parent, IGridCalc source)
@@ -582,79 +594,79 @@ public class ResultWriterHDF5 implements ResultWriter {
             H5File.Group group = parent.createSubGroup("events");
             group.setAttribute("TITLE", "description of all event types");
 
-            {
-                String[] descriptions = new String[events.size()];
-                int[] types = new int[events.size()];
-                int[][] elements = new int[events.size()][2];
-                int[][] substrates = new int[events.size()][];
-                int[][] stoichiometries = new int[events.size()][];
-                int[][] dependent = null;
+            String[] descriptions = new String[events.size()];
+            int[] types = new int[events.size()];
+            int[][] elements = new int[events.size()][2];
+            int[][] substrates = new int[events.size()][];
+            int[][] stoichiometries = new int[events.size()][];
+            int[][] dependent = null;
 
-                if (source.getSource().writeDependencies()) {
-                    log.debug("Dependency scheme writing enabled");
-                    dependent = new int[events.size()][];
-                }
+            if (source.getSource().writeDependencies()) {
+                log.debug("Dependency scheme writing enabled");
+                dependent = new int[events.size()][];
+            }
 
-                for (IGridCalc.Event event: events) {
-                    int i = event.event_number();
-                    descriptions[i] = event.description();
-                    types[i] = event.event_type().ordinal();
-                    elements[i][0] = event.element();
-                    elements[i][1] = event.element2();
-                    substrates[i] = event.substrates();
-                    stoichiometries[i] = event.substrate_stoichiometry();
-
-                    if (dependent != null) {
-                        Collection<IGridCalc.Event> dep = event.dependent();
-                        dependent[i] = new int[dep.size()];
-                        int j = 0;
-                        for (IGridCalc.Event child: dep)
-                            dependent[i][j++] = child.event_number();
-                    }
-                }
-
-                {
-                    H5File.Dataset ds = group.writeVector("descriptions", descriptions);
-                    ds.setAttribute("TITLE", "signatures of reaction channels");
-                    ds.setAttribute("LAYOUT", "[nchannel]");
-                    ds.setAttribute("UNITS", "text");
-                }
-
-                {
-                    H5File.Dataset ds = group.writeArray("elements", elements, -1);
-                    ds.setAttribute("TITLE", "voxel numbers of reaction channels");
-                    ds.setAttribute("LAYOUT", "[nchannel x {source,target}]");
-                    ds.setAttribute("UNITS", "index");
-                }
-
-                {
-                    H5File.Dataset ds = group.writeVector("types", types);
-                    ds.setAttribute("TITLE", "types of reaction channels");
-                    ds.setAttribute("LAYOUT", "[nchannel]");
-                    ds.setAttribute("UNITS", "enumeration");
-                }
-
-                {
-                    H5File.Dataset ds = group.writeArray("substrates", substrates, -1);
-                    ds.setAttribute("TITLE", "event substrates");
-                    ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
-                    ds.setAttribute("UNITS", "indices");
-                }
-
-                {
-                    H5File.Dataset ds = group.writeArray("stoichiometries", stoichiometries, 0);
-                    ds.setAttribute("TITLE", "substrate stoichiometries");
-                    ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
-                    ds.setAttribute("UNITS", "indices");
-                }
+            for (IGridCalc.Event event: events) {
+                int i = event.event_number();
+                descriptions[i] = event.description();
+                types[i] = event.event_type().ordinal();
+                elements[i][0] = event.element();
+                elements[i][1] = event.element2();
+                substrates[i] = event.substrates();
+                stoichiometries[i] = event.substrate_stoichiometry();
 
                 if (dependent != null) {
-                    H5File.Dataset ds = group.writeArray("dependent", dependent, -1);
-                    ds.setAttribute("TITLE", "dependent reaction channels");
-                    ds.setAttribute("LAYOUT", "[nchannel x ndependent*]");
-                    ds.setAttribute("UNITS", "indices");
+                    Collection<IGridCalc.Event> dep = event.dependent();
+                    dependent[i] = new int[dep.size()];
+                    int j = 0;
+                    for (IGridCalc.Event child: dep)
+                        dependent[i][j++] = child.event_number();
                 }
             }
+
+            {
+                H5File.Dataset ds = group.writeVector("descriptions", descriptions);
+                ds.setAttribute("TITLE", "signatures of reaction channels");
+                ds.setAttribute("LAYOUT", "[nchannel]");
+                ds.setAttribute("UNITS", "text");
+            }
+
+            {
+                H5File.Dataset ds = group.writeArray("elements", elements, -1);
+                ds.setAttribute("TITLE", "voxel numbers of reaction channels");
+                ds.setAttribute("LAYOUT", "[nchannel x {source,target}]");
+                ds.setAttribute("UNITS", "index");
+            }
+
+            {
+                H5File.Dataset ds = group.writeVector("types", types);
+                ds.setAttribute("TITLE", "types of reaction channels");
+                ds.setAttribute("LAYOUT", "[nchannel]");
+                ds.setAttribute("UNITS", "enumeration");
+            }
+
+            {
+                H5File.Dataset ds = group.writeArray("substrates", substrates, -1);
+                ds.setAttribute("TITLE", "event substrates");
+                ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
+                ds.setAttribute("UNITS", "indices");
+            }
+
+            {
+                H5File.Dataset ds = group.writeArray("stoichiometries", stoichiometries, 0);
+                ds.setAttribute("TITLE", "substrate stoichiometries");
+                ds.setAttribute("LAYOUT", "[nchannel x nspecies*]");
+                ds.setAttribute("UNITS", "indices");
+            }
+
+            if (dependent != null) {
+                H5File.Dataset ds = group.writeArray("dependent", dependent, -1);
+                ds.setAttribute("TITLE", "dependent reaction channels");
+                ds.setAttribute("LAYOUT", "[nchannel x ndependent*]");
+                ds.setAttribute("UNITS", "indices");
+            }
+
+            group.close();
         }
 
         protected void writeOutputInfo(H5File.Group parent, String identifier,
@@ -1101,6 +1113,7 @@ public class ResultWriterHDF5 implements ResultWriter {
         ds.setAttribute("TITLE", title);
         ds.setAttribute("LAYOUT", "[nspecies]");
         ds.setAttribute("UNITS", "text");
+        ds.close();
     }
 
     protected static void getGridNumbers(int[][] dst,

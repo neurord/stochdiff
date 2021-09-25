@@ -3,6 +3,7 @@ package neurord.numeric.grid;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 
 import hdf.hdf5lib.H5;
 import hdf.hdf5lib.HDF5Constants;
@@ -22,6 +23,7 @@ public class H5File {
                                                               "Compression level in HDF5 output",
                                                               1);
     long fd;
+    Set<Group> groups;
 
     public H5File(File path)
         throws Exception
@@ -38,6 +40,8 @@ public class H5File {
             throw e;
         }
 
+        this.groups = new HashSet<>();
+
         assert(this.fd >= 0);
     }
 
@@ -50,6 +54,11 @@ public class H5File {
     public void close()
         throws Exception
     {
+        while (!this.groups.isEmpty())
+            this.groups.iterator().next().close();
+
+        log.debug("Closing H5File (fd={})", this.fd);
+
         if (this.fd >= 0) {
             H5.H5Fclose(this.fd);
             this.fd = HDF5Constants.H5I_INVALID_HID;
@@ -60,29 +69,21 @@ public class H5File {
         throws Exception
     {
         log.debug("Creating group {}", path);
-
         long id = H5.H5Gcreate(fd, path,
                                HDF5Constants.H5P_DEFAULT,
                                HDF5Constants.H5P_DEFAULT,
                                HDF5Constants.H5P_DEFAULT);
-
-        return new Group(path, id);
+        return new Group(this, path, id);
     }
 
-    public class HObject {
+    public static class HObject {
         final String path;
-        long id;
+        final long id;
 
         HObject(String path, long id) {
             assert path.charAt(0) == '/';
             this.path = path;
             this.id = id;
-        }
-
-        public Group createSubGroup(String name)
-            throws Exception
-        {
-            return createGroup(this.path + "/" + name);
         }
 
         protected void setAttribute(String name, long type, Object value) {
@@ -146,14 +147,31 @@ public class H5File {
         }
     }
 
-    public class Group extends HObject {
-        public Group(String path, long id)
+    public static class Group extends HObject {
+        final H5File file;
+        Set<Dataset> children;
+
+        protected Group(H5File file, String path, long id)
             throws Exception
         {
             super(path, id);
+            this.file = file;
+            file.groups.add(this);
+            this.children = new HashSet<>();
+        }
+
+        public Group createSubGroup(String name)
+            throws Exception
+        {
+            return this.file.createGroup(this.path + "/" + name);
         }
 
         public void close() {
+            while (!this.children.isEmpty())
+                this.children.iterator().next().close();
+
+            log.debug("Closing Group {} (id={})", this.path, this.id);
+            this.file.groups.remove(this);
             H5.H5Gclose(this.id);
         }
 
@@ -220,7 +238,7 @@ public class H5File {
                     if (chunks != null)
                         H5.H5Pset_chunk(dcpl_id, dims.length, chunks);
 
-                    id = H5.H5Dcreate(fd, path,
+                    id = H5.H5Dcreate(this.file.fd, path,
                                       type,
                                       dataspace_id,
                                       HDF5Constants.H5P_DEFAULT,
@@ -246,7 +264,7 @@ public class H5File {
                      size != null ? xJoined(size) : "",
                      chunks != null ? xJoined(chunks) : "");
 
-            return new Dataset(path, id, type, dims, chunks);
+            return new Dataset(this, path, id, type, dims, chunks);
         }
 
         protected Dataset _createArray(String name,
@@ -378,20 +396,27 @@ public class H5File {
         }
     }
 
-    public class Dataset extends HObject {
+    public static class Dataset extends HObject {
+        final Group group;
         final long[] dimensions, chunks;
         final long type;
 
-        public Dataset(String path, long id, long type, long[] dimensions, long[] chunks)
+        public Dataset(Group group, String path, long id, long type, long[] dimensions, long[] chunks)
             throws Exception
         {
             super(path, id);
+            this.group = group;
+            group.children.add(this);
+
             this.dimensions = dimensions;
             this.chunks = chunks;
             this.type = type;
         }
 
         public void close() {
+            log.debug("Closing Dataset {} (id={})", this.path, this.id);
+            this.group.children.remove(this);
+
             H5.H5Dclose(this.id);
         }
 
