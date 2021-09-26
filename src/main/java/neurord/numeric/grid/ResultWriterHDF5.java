@@ -815,7 +815,7 @@ public class ResultWriterHDF5 implements ResultWriter {
             }
 
             log.debug("Writing event statistics at time {}", time);
-            this.event_statistics.extend(stats.length, this.event_statistics);
+            this.event_statistics.extend(stats.length, stats);
 
             if (this.statistics_times != null)
                 this.statistics_times.extend(1, new double[]{ time });
