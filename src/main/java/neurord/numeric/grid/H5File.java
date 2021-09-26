@@ -377,7 +377,7 @@ public class H5File {
             long[] dims0 = dims.clone();
             dims0[0] = 0;
 
-            Dataset ds = this._createArray(name, type, dims0, null, false, true);
+            Dataset ds = this._createArray(name, type, dims0, null, true, true);
 
             ds.setAttribute("TITLE", TITLE);
             ds.setAttribute("LAYOUT", LAYOUT);
