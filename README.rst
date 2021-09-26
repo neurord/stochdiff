@@ -588,7 +588,7 @@ Full list of options can be displayed using ``--help``:
         --version            print version string and exit
     
     Recognized properties (use as -D<property>=<value>):
-    neurord.mmap_appender (default: true)       User MemoryMappedFileAppender
+    neurord.mmap_appender (default: false)      Use MemoryMappedFileAppender
     neurord.writers (default: [h5])             Write output in those formats
     neurord.trials (default: 1)                 How many trials to run
     neurord.threads (default: 0)                How many threads to use (0 == #CPUs)
