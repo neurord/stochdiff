@@ -190,7 +190,9 @@ public class H5File {
             long[] chunks = dims.clone();
 
             if (!extensible)
-                return null; // FIXME: should we consider chunking here too?
+                return null; /* We don't do compression for non-extensible arrays.
+                              * It turns out to be inefficient because we have a bunch of
+                              * very small items. */
 
             /* Avoid too small chunks */
             for (chunks[0] = 1;; chunks[0] *= 2) {
