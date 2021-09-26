@@ -328,7 +328,7 @@ public class ResultWriterHDF5 implements ResultWriter {
                     cache = Arrays.copyOfRange(this.concs_cache, 0, this.concs_times_count);
 
 
-                final int[] flat = new int[this.concs_times_count];
+                final int[] flat = new int[this.concs_times_count * cache[0].length * cache[0][0].length];
                 ArrayUtil._flatten(flat, cache, cache[0][0].length, 0);
 
                 this.concs.extend(this.concs_times_count, flat);
