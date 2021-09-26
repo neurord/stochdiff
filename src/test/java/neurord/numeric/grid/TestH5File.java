@@ -116,15 +116,20 @@ public class TestH5File {
         ext1.close();
 
         H5File.Dataset ext2 =
-            g.createExtensibleArray("extensible2", int.class,
+            g.createExtensibleArray("extensible2", long.class,
                                     "EXTENSIBLE2", "[INT]", "[(NONE)]",
                                     new long[]{3});
-        ext2.extend(3, new int[] {0, 1, 2});
-        ext2.extend(3, new int[] {3, 4, 5});
-        ext2.extend(9, new int[] {6, 7, 8, 9, 10, 11, 12, 13, 14});
+        ext2.extend(3, new long[] {0, 1, 2});
+        ext2.extend(3, new long[] {3, 4, 5});
+        ext2.extend(9, new long[] {6, 7, 8, 9, 10, 11, 12, 13, 14});
         ext2.close();
 
         g.close();
+
+        int[] ext1re = f.read("/group1/extensible1");
+
+        long[] ext2re = f.read("/group1/extensible2");
+
         f.close();
     }
 

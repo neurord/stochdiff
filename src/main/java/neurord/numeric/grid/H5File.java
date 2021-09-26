@@ -80,11 +80,70 @@ public class H5File {
         throws Exception
     {
         log.debug("Creating group {}", path);
-        long id = H5.H5Gcreate(fd, path,
+        long id = H5.H5Gcreate(this.fd, path,
                                HDF5Constants.H5P_DEFAULT,
                                HDF5Constants.H5P_DEFAULT,
                                HDF5Constants.H5P_DEFAULT);
         return new Group(this, path, id);
+    }
+
+    protected Object _read(String path)
+        throws Exception
+    {
+        long dset = H5.H5Dopen(this.fd, path, HDF5Constants.H5P_DEFAULT);
+
+        try {
+            final long dtype = H5.H5Dget_type(dset);
+            final long dspace = H5.H5Dget_space(dset);
+
+            try {
+                final int ndims = H5.H5Sget_simple_extent_ndims(dspace);
+                final long[] dims = new long[ndims];
+                final long[] size = new long[ndims];
+
+                H5.H5Sget_simple_extent_dims(dspace, dims, size);
+                log.debug("{}: extents [{}], [{}]", path, xJoined(dims), xJoined(size));
+
+                final int n = (int) ArrayUtil.product(dims);
+
+                final Object data;
+                if (H5.H5Tequal(dtype, HDF5Constants.H5T_STD_I32LE)) {
+                    data = new int[n];
+                    H5.H5Dread(dset,
+                               HDF5Constants.H5T_NATIVE_INT,
+                               HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
+                               data);
+                } else if (H5.H5Tequal(dtype, HDF5Constants.H5T_STD_I64LE)) {
+                    data = new long[n];
+                    H5.H5Dread(dset,
+                               HDF5Constants.H5T_NATIVE_LONG,
+                               HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
+                               data);
+                } else if (H5.H5Tequal(dtype, HDF5Constants.H5T_IEEE_F64LE)) {
+                    data = new double[n];
+                    H5.H5Dread(dset,
+                               HDF5Constants.H5T_NATIVE_DOUBLE,
+                               HDF5Constants.H5S_ALL, HDF5Constants.H5S_ALL, HDF5Constants.H5P_DEFAULT,
+                               data);
+                } else
+                    throw new Exception("Uknown datatype " + dtype);
+
+                return data;
+
+            } finally {
+                H5.H5Sclose(dspace);
+                H5.H5Tclose(dtype);
+            }
+        } finally {
+            H5.H5Dclose(dset);
+        }
+    }
+
+    public <T> T read(String path)
+        throws Exception
+    {
+        Object data = this._read(path);
+        return (T) data;
     }
 
     public static class HObject {
