@@ -430,7 +430,6 @@ public class H5File {
 
             long dataspace_id = H5.H5Screate_simple(dims.length, dims, null);
             final long id;
-            final boolean deflate = true;
 
             final int type_size = compound_type_size(memberTypes);
             final long type;
@@ -439,9 +438,10 @@ public class H5File {
                 long dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
 
                 try {
-                    if (deflate) {
+                    if (compression_level > 0) {
                         H5.H5Pset_shuffle(dcpl_id);
                         H5.H5Pset_deflate(dcpl_id, compression_level);
+                        H5.H5Pset_chunk(dcpl_id, dims.length, dims);
                     }
 
                     long strtype = H5.H5Tcopy(HDF5Constants.H5T_C_S1);
@@ -461,7 +461,7 @@ public class H5File {
                                       type,
                                       dataspace_id,
                                       HDF5Constants.H5P_DEFAULT,
-                                      HDF5Constants.H5P_DEFAULT, // dcpl_id,
+                                      dcpl_id,
                                       HDF5Constants.H5P_DEFAULT);
 
                     H5.H5Tclose(strtype);
@@ -478,10 +478,7 @@ public class H5File {
             bytes_buf.order(ByteOrder.nativeOrder());
 
             for (int i = 0; i < dims[0]; i++)
-                for (int k = 0; k < memberTypes.length; k++) {
-                    System.out.println(String.format("i=%d k=%d position=%d capacity=%d",
-                                                     i, k, bytes_buf.position(), bytes_buf.capacity()));
-
+                for (int k = 0; k < memberTypes.length; k++)
                     if (memberTypes[k] == double.class)
                         bytes_buf.putDouble(((double[]) data[k])[i]);
                     else if (memberTypes[k] == int.class)
@@ -492,7 +489,6 @@ public class H5File {
                         bytes_buf.position(bytes_buf.position() + 100 - t.length);
                     } else
                         throw new RuntimeException("unknown type");
-                }
 
             H5.H5Dwrite(id, type,
                         HDF5Constants.H5S_ALL,
