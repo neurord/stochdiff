@@ -128,6 +128,32 @@ public class TestH5File {
         f.close();
     }
 
+    @Test
+    public void testCompoundDS()
+        throws Exception
+    {
+        H5File f = new H5File("test3.h5");
+
+        H5File.Group g = f.createGroup("/group1");
+
+        final String[] memberNames = new String[] { "double", "double2", "int", "string" };
+        final Class[] memberTypes = new Class[] { double.class, double.class, int.class, String.class };
+        final Object[] data = new Object[] {
+            new double[] { 1.1, 2.2, 3.3, 4.4 },
+            new double[] { 11.1, 12.1, 13.1, 14.1 },
+            new int[] { 111, 222, 333, 444 },
+            new String[] { "hello", "brave", "new", "world ąęółśćńźż" },
+        };
+
+        H5File.Dataset ds =
+            g.writeCompoundDS("compound",
+                              memberNames, memberTypes,
+                              4, data);
+        ds.close();
+        g.close();
+        f.close();
+    }
+
     public static void main(String... args)
         throws Exception
     {
@@ -136,5 +162,6 @@ public class TestH5File {
         TestH5File test = new TestH5File();
         test.testBasics();
         test.testExtensibleArray();
+        test.testCompoundDS();
     }
 }

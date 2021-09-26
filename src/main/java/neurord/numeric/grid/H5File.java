@@ -1,6 +1,8 @@
 package neurord.numeric.grid;
 
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
@@ -375,24 +377,130 @@ public class H5File {
             return ds;
         }
 
+        protected long typeId(Class type, Long string_type)
+            throws Exception
+        {
+            if (type == int.class)
+                return HDF5Constants.H5T_STD_I32LE;
+            else if (type == long.class)
+                return HDF5Constants.H5T_STD_I64LE;
+            else if (type == double.class)
+                return HDF5Constants.H5T_IEEE_F64LE;
+            else if (type == String.class && string_type != null)
+                return string_type;
+            else
+                throw new Exception("Uknown type " + type);
+        }
+
         protected Dataset createExtensibleArray(String name, Class type,
                                                 String TITLE, String LAYOUT, String UNITS,
                                                 long... dims)
             throws Exception
         {
-            final long type_id;
-            if (type == int.class)
-                type_id = HDF5Constants.H5T_STD_I32LE;
-            else if (type == long.class)
-                type_id = HDF5Constants.H5T_STD_I64LE;
-            else if (type == double.class)
-                type_id = HDF5Constants.H5T_IEEE_F64LE;
-            else
-                throw new Exception("Uknown type " + type);
+            final long type_id = typeId(type, null);
 
             return createExtensibleArray(name, type_id,
                                          TITLE, LAYOUT, UNITS,
                                          dims);
+        }
+
+        protected int compound_type_size(Class... memberTypes) {
+            int size = 0;
+
+            for (Class type: memberTypes)
+                if (type == double.class)
+                    size += 8;
+                else if (type == int.class)
+                    size += 4;
+                else if (type == String.class)
+                    size += 100;
+                else
+                    throw new RuntimeException("unknown type");
+
+            return size;
+        }
+
+        protected Dataset writeCompoundDS(String name,
+                                          String[] memberNames, Class[] memberTypes,
+                                          int count, Object[] data)
+            throws Exception
+        {
+            final String path = this.path + "/" + name;
+            final long[] dims = new long[]{ count };
+
+            long dataspace_id = H5.H5Screate_simple(dims.length, dims, null);
+            final long id;
+            final boolean deflate = true;
+
+            final int type_size = compound_type_size(memberTypes);
+            final long type;
+
+            try {
+                long dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
+
+                try {
+                    if (deflate) {
+                        H5.H5Pset_shuffle(dcpl_id);
+                        H5.H5Pset_deflate(dcpl_id, compression_level);
+                    }
+
+                    long strtype = H5.H5Tcopy(HDF5Constants.H5T_C_S1);
+                    H5.H5Tset_size(strtype, 100);
+
+                    type = H5.H5Tcreate(HDF5Constants.H5T_COMPOUND, type_size);
+
+                    long offset = 0;
+                    for (int k = 0; k < memberNames.length; k++) {
+                        long member_type = typeId(memberTypes[k], strtype);
+                        H5.H5Tinsert(type, memberNames[k], offset, member_type);
+                        offset += compound_type_size(memberTypes[k]);
+                    }
+                    assert offset == type_size;
+
+                    id = H5.H5Dcreate(this.file.fd, path,
+                                      type,
+                                      dataspace_id,
+                                      HDF5Constants.H5P_DEFAULT,
+                                      HDF5Constants.H5P_DEFAULT, // dcpl_id,
+                                      HDF5Constants.H5P_DEFAULT);
+
+                    H5.H5Tclose(strtype);
+
+                } finally {
+                    H5.H5Pclose(dcpl_id);
+                }
+            } finally {
+                H5.H5Sclose(dataspace_id);
+            }
+
+            byte[] bytes = new byte[count * type_size];
+            ByteBuffer bytes_buf = ByteBuffer.wrap(bytes);
+            bytes_buf.order(ByteOrder.nativeOrder());
+
+            for (int i = 0; i < dims[0]; i++)
+                for (int k = 0; k < memberTypes.length; k++) {
+                    System.out.println(String.format("i=%d k=%d position=%d capacity=%d",
+                                                     i, k, bytes_buf.position(), bytes_buf.capacity()));
+
+                    if (memberTypes[k] == double.class)
+                        bytes_buf.putDouble(((double[]) data[k])[i]);
+                    else if (memberTypes[k] == int.class)
+                        bytes_buf.putInt(((int[]) data[k])[i]);
+                    else if (memberTypes[k] == String.class) {
+                        byte[] t = ((String[]) data[k])[i].getBytes();
+                        bytes_buf.put(t);
+                        bytes_buf.position(bytes_buf.position() + 100 - t.length);
+                    } else
+                        throw new RuntimeException("unknown type");
+                }
+
+            H5.H5Dwrite(id, type,
+                        HDF5Constants.H5S_ALL,
+                        HDF5Constants.H5S_ALL,
+                        HDF5Constants.H5P_DEFAULT,
+                        bytes);
+
+            return new Dataset(this, path, id, type, dims, null);
         }
     }
 

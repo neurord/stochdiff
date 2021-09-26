@@ -440,19 +440,17 @@ public class ResultWriterHDF5 implements ResultWriter {
                 data.add(labels);
             }
 
-            H5File.Dataset grid = null;
-            /*
-                output.createCompoundDS("grid", model(), dims, null, chunks, compression_level,
-                                        memberNames, memberTypes, null, data);
+            {
+                H5File.Dataset grid = model().writeCompoundDS("grid",
+                                                              memberNames, memberTypes,
+                                                              nel, data.toArray());
 
-            log.info("Created {} with dims=[{}] size=[{}] chunks=[{}]",
-                     "grid", xJoined(dims), "", xJoined(chunks));
-            grid.setAttribute("TITLE", "voxels");
-            grid.setAttribute("LAYOUT",
-                              "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
-
-            grid.close();
-            */
+                log.info("Created {} with size=[{}]", "grid", data.size());
+                grid.setAttribute("TITLE", "voxels");
+                grid.setAttribute("LAYOUT",
+                                  "[nel × {x,y,z, x,y,z, x,y,z, x,y,z, volume, deltaZ, label, region#, type, group}]");
+                grid.close();
+            }
 
             {
                 H5File.Dataset ds =
