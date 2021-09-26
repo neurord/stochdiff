@@ -24,6 +24,15 @@ public class H5File {
     final static int compression_level = Settings.getProperty("neurord.compression",
                                                               "Compression level in HDF5 output",
                                                               1);
+
+    static {
+        if (System.getProperty("hdf.hdf5lib.H5.hdf5lib") == null) {
+            if (new File("/usr/lib64/hdf5/libhdf5_java.so").exists()) {
+                System.setProperty("hdf.hdf5lib.H5.hdf5lib", "/usr/lib64/hdf5/libhdf5_java.so");
+            }
+        }
+    }
+
     long fd;
     Set<Group> groups;
 
