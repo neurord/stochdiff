@@ -478,7 +478,7 @@ use the following syntax:
      
 .. code-block:: shell
 
-UBUNTU (and possiby other UNIX) USERS: if you see the the following error:
+UBUNTU ( and possiby other UNIX) USERS: if you see the the following error:
 
 .. code-block:: shell
 
@@ -488,11 +488,13 @@ UBUNTU (and possiby other UNIX) USERS: if you see the the following error:
  
          at java.lang.Runtime.loadLibrary0(Runtime.java:870)
 
-That means that you do not have the java hdf5 libraries installed (or java doesn't know how to find them). Install the java hdf5 library, libjhdf5.so or jarhdf*-3.3.2.jar.  On UBUNTU the following command works:
+That means that you do not have the java hdf5 libraries installed (or java doesn't know how to find them). Install the java hdf5 library, libjhdf5.so or jarhdf*-3.3.2.jar.  On UBUNTU version 22.04 and using neurord-v3.3.0, the following commands works:
 
 .. code-block:: shell
 
-	sudo apt install libjhdf5-jni
+	sudo apt-get install openjdk-17-jdk
+
+	sudo apt-get install libhdf5-java
 	
 in Fedora, use the following command:
 
@@ -508,7 +510,7 @@ MAC AND WINDOWS USERS: if you see either of the the following errors:
      
      Exception in thread "main" java.lang.RuntimeException: java.lang.UnsatisfiedLinkError: hdf5
 
-That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  To fix the problem,
+That means that either you do not have the java hdf5 libraries installed, or java doesn't know how to find them.  To fix the problem (using neurord-v3.2.4 ),
 install the java hdf5 libraries by installing HDFView+Object 2.14 (do not install version 3), which includes jarhdf.jar, jarhdf5.jar and hdfobject.jar (and slf4j*.jar) as well as .dll files.  In windows, if you are running neurord from the command line, install the windows 32bit version, obtained from 
 https://support.hdfgroup.org/products/java/release/download.html
 Extract the zip archive, run the installer.
@@ -524,7 +526,7 @@ If you still cannot fix the problem, you can run neurord using
 
 .. code-block:: shell
 
-     java -jar path/to/neurord-3.2.3-all-deps.jar -Dneurord.writers=text path/to/model/model.xml
+     java -jar path/to/neurord-3.2.4-all-deps.jar -Dneurord.writers=text path/to/model/model.xml
 
 and get text output.
 
