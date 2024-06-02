@@ -231,7 +231,7 @@
     <dependency>
       <groupId>org.hdfgroup</groupId>
       <artifactId>hdf5</artifactId>
-      <version>1.10.6</version>
+      <version>1.12.1</version>
     </dependency>
 
     <!-- https://stackoverflow.com/a/43574427/405505 -->
