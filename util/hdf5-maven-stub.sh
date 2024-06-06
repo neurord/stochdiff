@@ -8,7 +8,7 @@ dir="$HOME/.m2/repository/org/hdfgroup/hdf5/$version"
 mkdir -p "$dir"
 
 [ -e "/usr/share/java/jarhdf5.jar" ] && ln -sv "/usr/share/java/jarhdf5.jar" "$dir/hdf5-$version.jar"
-[ -e "/usr/lib/java/hdf5.jar" ] && ln -sv "/usr/lib/java/hdf5.jar"
+[ -e "/usr/lib/java/hdf5.jar" ] && ln -sv "/usr/lib/java/hdf5.jar" "$dir/hdf5-$version.jar"
 [ -e "$dir/hdf5-$version.jar" ] || exit 1
 
 cat >"$dir/hdf5-$version.pom" <<EOF
