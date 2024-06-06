@@ -71,13 +71,14 @@ public class ModelReader<T> {
 
             boolean first = true;
             for (HashMap<String,String> map: overrides)
-                if (map != null) {
-                    if (first) {
-                        log.debug("Overrides (higher priority first):");
-                        first = false;
+                if (map != null)
+                    for (Map.Entry<String,String> entry: map.entrySet()) {
+                        if (first) {
+                            log.debug("Overrides (higher priority first):");
+                            first = false;
+                        }
+                        log.debug("{} = {}", entry.getKey(), entry.getValue());
                     }
-                    log.debug("{}", map);
-                }
             if (first)
                 log.debug("No overrides");
         }
