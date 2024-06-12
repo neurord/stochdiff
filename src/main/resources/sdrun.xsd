@@ -340,7 +340,7 @@
   <xs:simpleType name="calculation">
     <xs:restriction base="xs:string">
       <xs:enumeration value="GRID_STEPPED_STOCHASTIC" />
-      <xs:enumeration value="GRID_STEPPED_DETERMINISTIC" />
+      <xs:enumeration value="GRID_STEPPED_CONTINUOUS" />
       <xs:enumeration value="GRID_EXACT" />
       <xs:enumeration value="GRID_ADAPTIVE" />
       <xs:whiteSpace value="collapse" />
