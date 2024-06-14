@@ -1,5 +1,7 @@
 package neurord.numeric.math;
 
+import java.util.Arrays;
+
 public final class Column {
 
     int n;
@@ -11,10 +13,9 @@ public final class Column {
     }
 
     public Column(double[] d) {
-        dat = d;
-        n = d.length;
+    	  n = d.length;
+    	  dat = Arrays.copyOf(d, n);
     }
-
 
     public Column plus(double d) {
         double[] ret = new double[n];
@@ -122,14 +123,18 @@ public final class Column {
 
     }
 
-
     public void writeTo(double[] dout) {
-        if (dat == dout) {
-            // warn?
-        } else {
+//        if (dat == dout) {
+//            // warn?
+//        } else {
+//            for (int i = 0; i < n; i++) {
+//                dout[i] = dat[i];
+//            }
+//        }
+    	if (dat != dout) {
             for (int i = 0; i < n; i++) {
                 dout[i] = dat[i];
-            }
+    	    }  
         }
     }
 
