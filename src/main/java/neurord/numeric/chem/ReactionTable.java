@@ -224,26 +224,39 @@ public class ReactionTable {
         double[] c = mconc.getData();
         double[][] d = new double[this.species.length][this.species.length];
 
-        for (int ireac = 0; ireac < nreaction; ireac++)
-            for (int index: reactantIndices[ireac]) {
-                double r = rates[ireac];
-
-                for (int index2: reactantIndices[ireac])
-                    if (index2 != index)
-                        r *= c[index2];
-
-                for (int index2: reactantIndices[ireac])
-                    d[index2][index] -= r;
-
-                // TODO - identify A+A reactions etc and multiply by combinatorial
-                // factor!!!!!!!!;
-                for (int index2: productIndices[ireac])
-                    d[index2][index] += r;
+        for (int ireac = 0; ireac < nreaction; ireac++) {
+                // Guards against cases with one [reactant] == 0
+                boolean reactantsPresent = true;
+                // Check if any reactant concentration is zero
+                // or holds a negative residue from a prev call.
+            for (int index : reactantIndices[ireac]) {
+                if (c[index] <= 0) {
+                    reactantsPresent = false;
+                    break;
+                }
             }
+
+            if (reactantsPresent) {
+                for (int index: reactantIndices[ireac]) {
+                        double r = rates[ireac];
+
+                        for (int index2: reactantIndices[ireac])
+                                if (index2 != index)
+                                        r *= c[index2];
+
+                        for (int index2: reactantIndices[ireac])
+                                d[index2][index] -= r;
+
+                        // TODO - identify A+A reactions etc and multiply by combinatorial
+                        // factor!!!!!!!!;
+                        for (int index2: productIndices[ireac])
+                                d[index2][index] += r;
+                }
+            }
+        }
 
         return new Matrix(d);
     }
-
 
 
     public final Column stepResiduals(Column vc, Column vdc, double dt) {
