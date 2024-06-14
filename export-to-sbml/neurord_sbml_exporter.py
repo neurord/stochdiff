@@ -365,7 +365,7 @@ def get_parser():
 
     neurord_group = parser.add_argument_group('neuroRD files')
     neurord_group.add_argument('-r', '--reactions-file', help='NeuroRD file with reactions.', default='')
-    neurord_group.add_argument('-ic','--initial-conditions-file', help='NeuroRD file with initial conditions for the model', default='')
+    neurord_group.add_argument('-ic','--initial-conditions-file', help='NeuroRD file with initial conditions for the model. Remember to initialize concentrations of every molecular specie.', default='')
     #neurord_group.add_argument('-vol', help='volume for SBML model', default=1)
     #neurord_group.add_argument('-SD_to_conc', help='conversion factor for surface density spec', default=1)
 
@@ -380,7 +380,7 @@ def get_parser():
 if __name__ == "__main__":
     
     parser = get_parser() 
-    args = parser.parse_args(["-r", "Reac_1xdiff_simplified.xml", "-ic", "IC_dendonly_simplified_noSD.xml", "-o", "neurord_export_to_sbml.xml"])
+    args = parser.parse_args()
 
     # if args.signature_file:
     #    with open (args.signature_file, 'r') as f:
