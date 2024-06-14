@@ -380,7 +380,7 @@ def get_parser():
 if __name__ == "__main__":
     
     parser = get_parser() 
-    args = parser.parse_args(["-r", "Reac_1xdiff_simplified.xml", "-ic", "IC_dendonly_simplified_noSD.xml", "-o", "neurord_export_to_sbml.xml"])
+    args = parser.parse_args()
 
     # if args.signature_file:
     #    with open (args.signature_file, 'r') as f:
