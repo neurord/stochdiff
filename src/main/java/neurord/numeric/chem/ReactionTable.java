@@ -51,7 +51,7 @@ public class ReactionTable {
 
         this.rates = new double[nreaction];
     }
-
+    
 
     public void print() {
         StringBuffer sb = new StringBuffer();
@@ -177,13 +177,18 @@ public class ReactionTable {
         if (productionMatrix == null) {
             double[][] a = new double[this.species.length][nreaction];
             for (int ireac = 0; ireac < nreaction; ireac++) {
-                for (int index: reactantIndices[ireac])
-                    a[index][ireac] -= 1;
+            	int[] si = reactantIndices[ireac];
+                int[] pi = productIndices[ireac];
+            	int[] rstoich = reactantStoichiometry[ireac];
+            	int[] pstoich = productStoichiometry[ireac];
+            	
+            	for (int j = 0; j < si.length; j++)
+            		a[si[j]][ireac] -= rstoich[j];
 
-                for (int index: productIndices[ireac])
-                    a[index][ireac] += 1;
+            	for (int j = 0; j < pi.length; j++)
+            		a[pi[j]][ireac] += pstoich[j];
 
-                // FIXME: what about stoichiometry?!!!
+             // TODO: A.S.: ADD SUPPORT FOR HIGHER REACTION ORDERS!!!
             }
             productionMatrix = new Matrix(a);
         }
@@ -199,18 +204,20 @@ public class ReactionTable {
         for (int ireac = 0; ireac < nreaction; ireac++) {
             int[] si = reactantIndices[ireac];
             int[] pi = productIndices[ireac];
+        	int[] rstoich = reactantStoichiometry[ireac];
+        	int[] pstoich = productStoichiometry[ireac];
 
             double r = rates[ireac];
             for (int index: reactantIndices[ireac])
                 r *= c[index];
+            
+            for (int j = 0; j < si.length; j++)
+            	vr[si[j]] -= r * rstoich[j];
+            
+            for (int j = 0; j < pi.length; j++)
+            	vr[pi[j]] += r * pstoich[j];
 
-            for (int index: reactantIndices[ireac])
-                vr[index] -= r;
-
-            for (int index: productIndices[ireac])
-                vr[index] += r;
-
-            // FIXME: what about stoichiometry?!!!
+            // TODO: A.S.: ADD SUPPORT FOR HIGHER REACTION ORDERS!!!
         }
         return new Column(vr);
     }
@@ -225,10 +232,10 @@ public class ReactionTable {
         double[][] d = new double[this.species.length][this.species.length];
 
         for (int ireac = 0; ireac < nreaction; ireac++) {
-                // Guards against cases with one [reactant] == 0
+                // Guards against cases with a [reactant] == 0
                 boolean reactantsPresent = true;
                 // Check if any reactant concentration is zero
-                // or holds a negative residue from a prev call.
+                // or holds a negative residue from a previous call.
             for (int index : reactantIndices[ireac]) {
                 if (c[index] <= 0) {
                     reactantsPresent = false;
