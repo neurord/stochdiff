@@ -46,44 +46,23 @@ public class SemiBNGLParser {
 		}
 	}
 
-/*
-	private void parseParameters(BufferedReader reader) throws ParseException {
-		String line;
-		while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end parameters")) {
-			String[] param =  line.split("\\s+");
-			if (param.length == 2)
-				parameters.put(param[0], param[1]);
-			else if (param.length > 2) {
-				// TODO: Add support for special math operators and chars ^()*,/+-e
-				// Handle multi-word parameter values separated by white space
-				String key = param[0];
-				StringBuilder value = new StringBuilder(param[1]);
-				for (int i = 2; i < param.length; i++)
-					value.append(param[i]);
-				
-				parameters.put(key, value.toString());
-			}
-		}
-	}
-*/
-
     private void parseParameters(BufferedReader reader) throws IOException {
     	String line;
     	try {
     		while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end parameters")) {
     			String[] param =  line.split("\\s+");
+    			ParameterResolver pr = new ParameterResolver();
     			if (param.length == 2) {
-    				Integer value = constructPValueFromLine(param[1]);
-    				parameters.put(param[0], value.intValue());
+    				Integer value = pr.constructPValue(param[1], parameters);
+    				parameters.put(param[0], value);
     			} else if (param.length > 2) {
-    				// Handle multi-word parameter values separated by white space
+    				// Concatenate multi-word parameter values separated by white space
     				StringBuilder sb = new StringBuilder(param[1]);
     				for (int i = 2; i < param.length; i++)
-    					sb.append(" ").append(param[i]);
-    				
-    				// TODO: Add support for special math operators and chars ^()*,/+-e
-    				Integer value = constructPValueFromLine(sb.toString());
-    				parameters.put(param[0], value.intValue());
+    					sb.append(param[i]);
+
+    				Integer value = pr.constructPValue(sb.toString(), parameters);
+    				parameters.put(param[0], value);
     			}
     		}
     	} catch (IOException e) {
