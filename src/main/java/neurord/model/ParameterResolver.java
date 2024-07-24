@@ -2,6 +2,7 @@ package neurord.model;
 
 import java.util.Map;
 import java.util.Stack;
+import java.util.Vector;
 
 /**
  * This class represents methods that resolve the parameter values taken from
@@ -85,6 +86,10 @@ public class ParameterResolver {
                 ops.push(part.charAt(0));
             }
         }
+        
+        if (!ops.isEmpty() && ((Vector<Double>) values).size() == 1) {
+        	return signedValues(values, ops);
+        }
 
         while (!ops.isEmpty()) {
             values.push(operation(ops.pop(), values.pop(), values.pop()));
@@ -128,8 +133,15 @@ public class ParameterResolver {
             case '/':
                 if (b == 0) throw new ArithmeticException("Cannot divide by zero");
                 return a / b;
-            case '^': return (int) Math.pow(a, b);
+            case '^': return Math.pow(a, b);
         }
         return 0;
+    }
+    
+    private double signedValues(Stack<Double> values, Stack<Character> ops) {
+        String valString = Double.toString(values.pop());
+        double signedVal = Double.parseDouble(ops.pop() + valString);
+        values.push(signedVal);
+        return values.pop();
     }
 }
