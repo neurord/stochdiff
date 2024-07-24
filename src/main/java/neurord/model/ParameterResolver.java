@@ -8,19 +8,19 @@ import java.util.Stack;
  * the input file. The values can be a combination of numerical values, other variables,
  * as well as the basic math operators and chars: ^()*+/-
  * 
- * @version 1.0
+ * @version 1.1
  */
 
 public class ParameterResolver {
 
-    public Integer constructPValue(String pValue, Map<String, Integer> parameters) throws Exception {
+    public Double constructPValue(String pValue, Map<String, Double> parameters) throws Exception {
         // Split the pValue into elements
         String[] parts = pValue.split("(?=[-+*/^()])|(?<=[^-+*/^][-+*/^])|(?<=[()])");
         
         return evaluateExpression(parts, parameters);
     }
 
-    private Integer evaluateExpression(String[] parts, Map<String, Integer> parameters) throws Exception {
+    private Double evaluateExpression(String[] parts, Map<String, Double> parameters) throws Exception {
         // If there is only one element
         if (parts.length == 1) {
             String part = parts[0];
@@ -28,7 +28,7 @@ public class ParameterResolver {
                 return parameters.get(part);
             } else {
                 try {
-                    return Integer.parseInt(part);
+                    return Double.parseDouble(part);
                 } catch (NumberFormatException e) {
                     throw new Exception("Invalid number format: " + part);
                 }
@@ -47,7 +47,7 @@ public class ParameterResolver {
                     for (int j = left + 1; j < right; j++) {
                         stack.push(parts[j]);
                     }
-                    int value = evaluateStack(stack, parameters);
+                    double value = evaluateStack(stack, parameters);
                     parts[left] = String.valueOf(value);
 
                     // Shift elements to the left to remove the evaluated expression
@@ -68,18 +68,18 @@ public class ParameterResolver {
         return evaluateStack(stack, parameters);
     }
 
-    private int evaluateStack(Stack<String> stack, Map<String, Integer> parameters) throws Exception {
-        Stack<Integer> values = new Stack<>();
+    private double evaluateStack(Stack<String> stack, Map<String, Double> parameters) throws Exception {
+        Stack<Double> values = new Stack<>();
         Stack<Character> ops = new Stack<>();
 
         while (!stack.isEmpty()) {
             String part = stack.remove(0);
             if (isNumber(part)) {
-                values.push(Integer.parseInt(part));
+                values.push(Double.parseDouble(part));
             } else if (parameters.containsKey(part)) {
                 values.push(parameters.get(part));
             } else if (isOperator(part.charAt(0))) {
-                while (!ops.isEmpty() && hasPriority(part.charAt(0), ops.peek())) {
+            	while (!ops.isEmpty() && hasPriority(ops.peek(), part.charAt(0))) {
                     values.push(operation(ops.pop(), values.pop(), values.pop()));
                 }
                 ops.push(part.charAt(0));
@@ -95,7 +95,7 @@ public class ParameterResolver {
 
     private boolean isNumber(String part) {
         try {
-            Integer.parseInt(part);
+        	Double.parseDouble(part);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -120,7 +120,7 @@ public class ParameterResolver {
         return true;
     }
 
-    private int operation(char op, int b, int a) throws Exception {
+    private double operation(char op, double b, double a) throws Exception {
         switch (op) {
             case '+': return a + b;
             case '-': return a - b;
