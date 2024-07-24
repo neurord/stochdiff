@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class SemiBNGLParser {
-	private Map<String, Integer> parameters;
+	private Map<String, Double> parameters;
 	private Map<Species, Integer> seedSpecies;
 	private List<Molecule> moleculeTypes;
 	private List<Pattern> observables; // Using a generic type instead?
@@ -53,7 +53,7 @@ public class SemiBNGLParser {
     			String[] param =  line.split("\\s+");
     			ParameterResolver pr = new ParameterResolver();
     			if (param.length == 2) {
-    				Integer value = pr.constructPValue(param[1], parameters);
+    				Double value = pr.constructPValue(param[1], parameters);
     				parameters.put(param[0], value);
     			} else if (param.length > 2) {
     				// Concatenate multi-word parameter values separated by white space
@@ -61,12 +61,14 @@ public class SemiBNGLParser {
     				for (int i = 2; i < param.length; i++)
     					sb.append(param[i]);
 
-    				Integer value = pr.constructPValue(sb.toString(), parameters);
+    				Double value = pr.constructPValue(sb.toString(), parameters);
     				parameters.put(param[0], value);
     			}
     		}
     	} catch (IOException e) {
     		throw new IOException("Error reading parameters", e);
+    	} catch (Exception e) {
+    		throw new RuntimeException("Error parsing parameters", e);
     	}
     }
 	
