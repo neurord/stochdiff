@@ -1,11 +1,15 @@
 package neurord.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Specie: Represents a specific instance of a Molecule with all state variables
- * in a defined state. It is suppose to contain all the states and site variables
+ * in a defined state. It is supposed to contain all the state and site variables
  * introduced in the corresponding Molecule object.
  */
 
@@ -19,9 +23,18 @@ public class StructuredSpecie {
 			this.siteName = siteName;
 			this.bondIndex = bondIndex;
 		}
+		
+		public String getSiteName() {
+            return siteName;
+        }
+        
+        public String getBondIndex() {
+            return bondIndex;
+        }
 	}
 	
 	private List<StructuredMolecule> molecules;
+	private Map<String, StructuredMolecule> moleculeTypesMap;
 	private List<Bond> bonds;
 	
 	public StructuredSpecie(String specie) {
@@ -30,11 +43,56 @@ public class StructuredSpecie {
 		parseSpecie(specie);
 	}
 	
+	public StructuredSpecie(String specie, List<StructuredMolecule> moleculeTypes) {
+		this.molecules = new ArrayList<>();
+		this.bonds = new ArrayList<>();
+		this.moleculeTypesMap = new HashMap<>();
+		for (StructuredMolecule smt : moleculeTypes)
+		    moleculeTypesMap.put(smt.getName(), smt);
+		parseSpecie(specie);
+		validateSpecie();
+	}
+	
 	public void parseSpecie(String specie) {
 		String[] components = specie.split("\\.");
 		for (String component : components)
 			molecules.add(parseMolecule(component));
 //			molecules.add(new StructuredMolecule(component));
+	}
+	
+	// Checks the compatibility of a Specie with the Molecules defined
+	// in  a molecule block of the user's input.
+	public void validateSpecie() {
+		for (StructuredMolecule sms : molecules) {
+	        String sName = sms.getName();
+	        StructuredMolecule smt = moleculeTypesMap.get(sName);
+
+	        if (smt == null) {
+	            throw new IllegalArgumentException("No molecule type found for species molecule: " + sName);
+	        }
+
+	        Map<String, Site> sSites = sms.getSites();
+	        Map<String, Site> mSites = smt.getSites();
+
+	        for (String sSiteName : sSites.keySet()) {
+	            Site sSite = sSites.get(sSiteName);
+	            Site mSite = mSites.get(sSiteName);
+
+	            if (mSite == null) {
+	                throw new IllegalArgumentException("No site found in molecule " + sName + " for site " + sSiteName);
+	            }
+
+	            String sState = sSite.getState();
+	            String[] mStates = mSite.getState().split("~");
+
+	            // Check if mStates contains sState? If not throw an error.
+	            if (!Arrays.asList(mStates).contains(sState)) {
+	                throw new IllegalArgumentException(
+	                    "Validation failed for site " + sSiteName + " in molecule " + sName +
+	                    " Valid states: " + Arrays.toString(mStates));
+	            }
+	        }
+	    }
 	}
 	
 	private StructuredMolecule parseMolecule(String component) {
@@ -66,8 +124,12 @@ public class StructuredSpecie {
 		if (bound) {
 			String bondIndex = name.substring(name.indexOf("!") + 1 , name.length());
 			name = name.substring(0, name.indexOf("!"));
+			
+			// In case bond index == '+', add it as a site state too
+			if (bondIndex.equals("+")) {
+				state = bondIndex;
+			}
 			bonds.add(new Bond(name, bondIndex));
-//			TODO: Maybe handling special cases of unspecified bonds with '+' char?
 		}
 		
 		return new Site(name, state);
@@ -84,6 +146,14 @@ public class StructuredSpecie {
 	        }
 	    }
 	    return matchingSites;
+	}
+	
+	public List<StructuredMolecule> getMoleculeComponents() {
+		return Collections.unmodifiableList(molecules);
+	}
+	
+	public List<Bond> getBonds() {
+	    return Collections.unmodifiableList(bonds);
 	}
 	
 	@Override
