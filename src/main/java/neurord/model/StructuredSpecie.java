@@ -10,18 +10,24 @@ import java.util.Map;
 /**
  * Specie: Represents a specific instance of a Molecule with all state variables
  * in a defined state. It is supposed to contain all the state and site variables
- * introduced in the corresponding Molecule object.
+ * introduced in the corresponding Molecule type.
  */
 
 public class StructuredSpecie {
 	
-	private static class Bond {
+	public static class Bond {
+		private String moleculeName;
 		private String bondIndex;
 		private String siteName;
 		
-		Bond(String siteName, String bondIndex) {
+		Bond(String moleculeName, String siteName, String bondIndex) {
+			this.moleculeName = moleculeName;
 			this.siteName = siteName;
 			this.bondIndex = bondIndex;
+		}
+		
+		public String getMoleculeName() {
+			return moleculeName;
 		}
 		
 		public String getSiteName() {
@@ -41,6 +47,7 @@ public class StructuredSpecie {
 		this.molecules = new ArrayList<>();
 		this.bonds = new ArrayList<>();
 		parseSpecie(specie);
+		validateBonds();
 	}
 	
 	public StructuredSpecie(String specie, List<StructuredMolecule> moleculeTypes) {
@@ -51,6 +58,7 @@ public class StructuredSpecie {
 		    moleculeTypesMap.put(smt.getName(), smt);
 		parseSpecie(specie);
 		validateSpecie();
+		validateBonds();
 	}
 	
 	public void parseSpecie(String specie) {
@@ -60,9 +68,48 @@ public class StructuredSpecie {
 //			molecules.add(new StructuredMolecule(component));
 	}
 	
+	private StructuredMolecule parseMolecule(String component) {
+		int openParenIndex = component.indexOf('(');
+		StringBuilder name = new StringBuilder(component.substring(0, openParenIndex));
+		String sitesStr = component.substring(openParenIndex + 1, component.indexOf(')'));
+		
+		StructuredMolecule molecule = new StructuredMolecule(name);
+		String[] sites = sitesStr.split(",");
+		for (String siteStr : sites) {
+			Site site = parseSite(name, siteStr);
+			molecule.addSite(site);
+		}
+		
+		return molecule;
+	}
+	
+	private Site parseSite(StringBuilder moleculeName, String siteStr) {
+		String[] components = siteStr.split("~");
+		if (components.length > 2) {
+			throw new IllegalArgumentException("Site " + components[0]
+					+ " has multiple states specified: " + siteStr);
+		}
+		
+		String siteName = components[0];
+		String state = components.length > 1 ? components[1] : "";
+		
+		boolean bound = siteName.contains("!");
+		if (bound) {
+			String bondIndex = siteName.substring(siteName.indexOf("!") + 1 , siteName.length());
+			siteName = siteName.substring(0, siteName.indexOf("!"));
+			
+			// In case bond index == '+', add it as a site state too
+			if (bondIndex.equals("+")) {
+				state = bondIndex;
+			}
+			bonds.add(new Bond(moleculeName.toString(), siteName, bondIndex));
+		}
+		
+		return new Site(siteName, state);
+	}
+	
 	// Checks the compatibility of a Specie with the Molecules defined
-	// in  a molecule block of the user's input.
-	public void validateSpecie() {
+	private void validateSpecie() {
 		for (StructuredMolecule sms : molecules) {
 	        String sName = sms.getName();
 	        StructuredMolecule smt = moleculeTypesMap.get(sName);
@@ -95,44 +142,34 @@ public class StructuredSpecie {
 	    }
 	}
 	
-	private StructuredMolecule parseMolecule(String component) {
-		int openParenIndex = component.indexOf('(');
-		StringBuilder name = new StringBuilder(component.substring(0, openParenIndex));
-		String sitesStr = component.substring(openParenIndex + 1, component.indexOf(')'));
-		
-		StructuredMolecule molecule = new StructuredMolecule(name);
-		String[] sites = sitesStr.split(",");
-		for (String siteStr : sites) {
-			Site site = parseSite(siteStr);
-			molecule.addSite(site);
-		}
-		
-		return molecule;
-	}
-	
-	private Site parseSite(String siteStr) {
-		String[] components = siteStr.split("~");
-		if (components.length > 2) {
-			throw new IllegalArgumentException("Site " + components[0]
-					+ " has multiple states specified: " + siteStr);
-		}
-		
-		String name = components[0];
-		String state = components.length > 1 ? components[1] : "";
-		
-		boolean bound = name.contains("!");
-		if (bound) {
-			String bondIndex = name.substring(name.indexOf("!") + 1 , name.length());
-			name = name.substring(0, name.indexOf("!"));
-			
-			// In case bond index == '+', add it as a site state too
-			if (bondIndex.equals("+")) {
-				state = bondIndex;
-			}
-			bonds.add(new Bond(name, bondIndex));
-		}
-		
-		return new Site(name, state);
+	// Make sure that we have no lone bond indices
+	private void validateBonds() {
+	    HashMap<String, Integer> indexMap = new HashMap<>();
+	    
+	    for (Bond bond : bonds) {
+	        String key = bond.bondIndex;
+	        if (!key.equals("+")) {
+	            int value = indexMap.getOrDefault(key, 0) + 1;
+	            indexMap.put(key, value);
+	        }
+	    }
+
+	    for (Map.Entry<String, Integer> entry : indexMap.entrySet()) {
+	        String bondIndex = entry.getKey();
+	        int count = entry.getValue();
+	        
+	        if (count < 2) {
+	        	Bond unpairedBond = bonds.stream()
+	                    .filter(b -> b.bondIndex.equals(bondIndex))
+	                    .findFirst()
+	                    .orElseThrow(() -> new IllegalArgumentException("Unexpected error during bond validation"));
+
+	            throw new IllegalArgumentException(
+	                "Validation failed: Unpaired bond index " + bondIndex + " at site " + unpairedBond.siteName
+	            );
+	        }
+	    }
+	    // TODO: Add checks for available bonding sites in a multi-component specie
 	}
 
 	public List<Site> getSite(String moleculeName, String siteName) {
@@ -161,12 +198,10 @@ public class StructuredSpecie {
 		StringBuilder sb = new StringBuilder();
 		for (StructuredMolecule molecule : molecules) {
 			sb.append(molecule.toString()).append(".");
-		}
-		
+		}	
 		if (sb.length() > 0)
 			sb.setLength(sb.length() - 1);	// Drop the last dot
 		
 		return "Specie{" + sb.toString() + "}";
 	}
-
 }
