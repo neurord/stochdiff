@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 public class SemiBNGLParser {
 	private Map<String, Double> parameters;
-	private Map<Species, Integer> seedSpecies;
-	private List<Molecule> moleculeTypes;
+	private Map<StructuredSpecie, Integer> seedSpecies;
+	private List<StructuredMolecule> moleculeTypes;
 	private List<Pattern> observables; // Using a generic type instead?
 	private List<String> reactionRules; // Using a list of objects instead?
 	
@@ -76,7 +76,8 @@ public class SemiBNGLParser {
 		String line;
 		try {
 			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end molecule types")) {
-				Molecule molecule = new  constructMoleculeFromLine(line);
+				String allCharMolecule = line.replaceAll("\\s+", "");
+				StructuredMolecule molecule = new StructuredMolecule(allCharMolecule);
 				moleculeTypes.add(molecule);
 			}
 		} catch (IOException e) {
@@ -85,16 +86,43 @@ public class SemiBNGLParser {
 	}
 	
 	private void parseSeedSpecies(BufferedReader reader) throws IOException {
-		String line;
-		try {
-			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end seed species")) {
-				Species species = new constructSpeciesFromLine(line);
-				Integer seed = new constructSeedFromLine(line);
-				seedSpecies.put(species, seed.intValue());
-			}
-		} catch (IOException e) {
-			throw new IOException("Error reading seed species", e);
-		}
+	    String line;
+	    try {
+	        while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end seed species")) {
+	            Integer seed;
+	            String[] parts = line.split("\\s+");
+
+	            // Concatenate multi-word specie chars separated by white spaces
+	            StringBuilder sb = new StringBuilder(parts[0]);
+	            for (int i = 1; i < parts.length - 1; i++) {
+	                sb.append(parts[i]);
+	            }
+
+	            StructuredSpecie specie;
+	            String allCharSpecie = sb.toString().replaceAll("\\s+", "");
+	            if (moleculeTypes.isEmpty()) {
+	                specie = new StructuredSpecie(allCharSpecie);
+	            } else {
+	                specie = new StructuredSpecie(allCharSpecie, moleculeTypes);
+	            }
+
+	            // Handle the last part as either a predefined parameter or an integer
+	            String lastPart = parts[parts.length - 1];
+	            if (parameters.containsKey(lastPart)) {
+	                seed = parameters.get(lastPart).intValue();
+	            } else {
+	                try {
+	                    seed = Integer.parseInt(lastPart);
+	                } catch (NumberFormatException e) {
+	                    throw new IOException("Invalid seed value: " + lastPart, e);
+	                }
+	            }
+
+	            seedSpecies.put(specie, seed);
+	        }
+	    } catch (IOException e) {
+	        throw new IOException("Error reading seed species", e);
+	    }
 	}
 	
 	private void parseObservables(BufferedReader reader) throws IOException {
@@ -164,15 +192,15 @@ public class SemiBNGLParser {
 	
 	
 	// Getters for the parsed data
-	public HashMap<String, Integer> getParameters() {
+	public Map<String, Double> getParameters() {
 		return parameters;
 	}
 	
-	public HashMap<Species, Integer> getSeedSpecies() {
+	public Map<StructuredSpecie, Integer> getSeedSpecies() {
 		return seedSpecies;
 	}
 	
-	public List<Molecule> getMoleculeTypes() {
+	public List<StructuredMolecule> getMoleculeTypes() {
 		return moleculeTypes;
 	}
 	
