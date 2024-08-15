@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Specie: Represents a specific instance of a Molecule with all state variables
@@ -65,7 +67,6 @@ public class StructuredSpecie {
 		String[] components = specie.split("\\.");
 		for (String component : components)
 			molecules.add(parseMolecule(component));
-//			molecules.add(new StructuredMolecule(component));
 	}
 	
 	private StructuredMolecule parseMolecule(String component) {
@@ -117,6 +118,11 @@ public class StructuredSpecie {
 	        if (smt == null) {
 	            throw new IllegalArgumentException("No molecule type found for species molecule: " + sName);
 	        }
+	        
+	        if (sms.getSites().size() != smt.getSites().size()) {
+	        	throw new IllegalArgumentException("Sites not specified in species molecule '" 
+	        			+ sName + "' in accordance with molecule types");
+	        }
 
 	        Map<String, Site> sSites = sms.getSites();
 	        Map<String, Site> mSites = smt.getSites();
@@ -130,13 +136,14 @@ public class StructuredSpecie {
 	            }
 
 	            String sState = sSite.getState();
-	            String[] mStates = mSite.getState().split("~");
+//	            String[] mStates = mSite.getState().split("~");
+	            Set<String> mStateSet = new HashSet<>(Arrays.asList(mSite.getState().split("~")));
 
 	            // Check if mStates contains sState? If not throw an error.
-	            if (!Arrays.asList(mStates).contains(sState)) {
+	            if (!mStateSet.contains(sState)) {
 	                throw new IllegalArgumentException(
 	                    "Validation failed for site " + sSiteName + " in molecule " + sName +
-	                    " Valid states: " + Arrays.toString(mStates));
+	                    " Valid states: " + mStateSet);
 	            }
 	        }
 	    }
@@ -169,7 +176,7 @@ public class StructuredSpecie {
 	            );
 	        }
 	    }
-	    // TODO: Add checks for available bonding sites in a multi-component specie
+	    // TODO: Add checks for the existence of bonding sites in a multi-component specie
 	}
 
 	public List<Site> getSite(String moleculeName, String siteName) {
