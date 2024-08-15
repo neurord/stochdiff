@@ -1,10 +1,11 @@
 package neurord.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Molecule: Represents the full set of possible states and sites.
+ * Molecule: Represents the full set of possible sites and states.
  */
 public class StructuredMolecule implements Particle {
 	private String name;
@@ -54,7 +55,7 @@ public class StructuredMolecule implements Particle {
 		if (bound) {
 			String bondIndex = name.substring(name.indexOf("!") + 1);
 			name = name.substring(0, name.indexOf("!"));
-			// A bond in a "molecule" can only be specified with "+"
+			// A bond index in a "molecule" can only be specified with "+"
 			if (!bondIndex.equals("+"))
 				throw new IllegalArgumentException("Invalid bond index: " + bondIndex);
 			
@@ -69,6 +70,10 @@ public class StructuredMolecule implements Particle {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	public Map<String, Site> getSites() {
+		return Collections.unmodifiableMap(sites);
 	}
 	
 	@Override
