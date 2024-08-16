@@ -13,14 +13,14 @@ public class SemiBNGLParser {
 	private Map<String, Double> parameters;
 	private Map<StructuredSpecie, Integer> seedSpecies;
 	private List<StructuredMolecule> moleculeTypes;
-	private List<Pattern> observables; // Using a generic type instead?
+	private Map<String, Map<String, List<Pattern>>> observables;
 	private List<String> reactionRules; // Using a list of objects instead?
 	
 	public SemiBNGLParser() {
 		parameters = new HashMap<>();
 		seedSpecies = new HashMap<>();
 		moleculeTypes = new ArrayList<>();
-		observables = new ArrayList<>();
+		observables = new HashMap<>();
 		reactionRules = new ArrayList<>();
 	}
 	
@@ -124,25 +124,48 @@ public class SemiBNGLParser {
 	        throw new IOException("Error reading seed species", e);
 	    }
 	}
-	
+
 	private void parseObservables(BufferedReader reader) throws IOException {
-		String line;
-		try {
-			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end observables")) {
-				// Some logic here depending on the types declared
-			}
-		} catch (IOException e) {
-			throw new IOException("Error reading observables", e);
-		}
+	    String line;
+	    try {
+	        while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end observables")) {
+	            String[] parts = line.split("\\s+");
+
+	            // Make sure the input has at least 3 parts: Type, PatternName and at least one Pattern
+	            if (parts.length < 3) {
+	                throw new IllegalArgumentException("Invalid input format. Expected: Type PatternName Pattern1 ... PatternN");
+	            }
+
+	            String type = parts[0];
+	            String patternName = parts[1];
+
+	            if (!type.equals("Molecules") && !type.equals("Species")) {
+	                throw new IllegalArgumentException("Invalid observable type. Expected 'Molecules' or 'Species', received " + type);
+	            }
+
+	            Map<String, List<Pattern>> innerMap = observables.getOrDefault(patternName, new HashMap<>());
+	            List<Pattern> patterns = innerMap.getOrDefault(type, new ArrayList<>());
+
+	            for (int i = 2; i < parts.length; i++) {
+	                Pattern pattern;
+	                if (moleculeTypes.isEmpty()) {
+	                    pattern = new Pattern(parts[i]);
+	                } else {
+	                    pattern = new Pattern(parts[i], moleculeTypes);
+	                }
+	                patterns.add(pattern);
+	            }
+
+	            innerMap.put(type, patterns);
+	            observables.put(patternName, innerMap);
+	        }
+	    } catch (IOException e) {
+	        throw new IOException("Error reading observables", e);
+	    }
 	}
-	
+
 	private void parseReactionRules(BufferedReader reader) throws IOException {
 		// Some logic here depending on the types declared
-	}
-	
-	private Integer constructPValueFromLine(String pValue) {
-		// parameter evaluator 
-		// parameterExpr
 	}
 	
 	
@@ -204,29 +227,11 @@ public class SemiBNGLParser {
 		return moleculeTypes;
 	}
 	
-	public List<Pattern> getObservables () {
+	public Map<String, Map<String, List<Pattern>>> getObservables () {
 		return observables;
 	}
 	
 	public List<String> getReactionRules () {
 		return reactionRules;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
