@@ -61,6 +61,17 @@ public class Pattern extends StructuredSpecie {
 		}
 	}
 	
+	// Add a site to a component specified by its index (not just name)
+	public void addSite(String moleculeName, int index, Site site, String state) {
+	    StructuredMolecule component = getMoleculeComponents().get(index);
+	    if (!component.getName().equals(moleculeName)) {
+	        throw new IllegalArgumentException("Component name does not match the specified index.");
+	    }
+	    
+	    Site s = new Site(site.getName(), state);
+	    component.addSite(s);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
