@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class SemiBNGLParser {
 	private Map<StructuredSpecie, Integer> seedSpecies;
 	private List<StructuredMolecule> moleculeTypes;
 	private Map<String, Map<String, List<Pattern>>> observables;
-	private List<String> reactionRules; // Using a list of objects instead?
+	private List<ReactionRule> reactionRules;
 	
 	public SemiBNGLParser() {
 		parameters = new HashMap<>();
@@ -94,9 +95,8 @@ public class SemiBNGLParser {
 
 	            // Concatenate multi-word specie chars separated by white spaces
 	            StringBuilder sb = new StringBuilder(parts[0]);
-	            for (int i = 1; i < parts.length - 1; i++) {
+	            for (int i = 1; i < parts.length - 1; i++)
 	                sb.append(parts[i]);
-	            }
 
 	            StructuredSpecie specie;
 	            String allCharSpecie = sb.toString().replaceAll("\\s+", "");
@@ -106,18 +106,8 @@ public class SemiBNGLParser {
 	                specie = new StructuredSpecie(allCharSpecie, moleculeTypes);
 	            }
 
-	            // Handle the last part as either a predefined parameter or an integer
 	            String lastPart = parts[parts.length - 1];
-	            if (parameters.containsKey(lastPart)) {
-	                seed = parameters.get(lastPart).intValue();
-	            } else {
-	                try {
-	                    seed = Integer.parseInt(lastPart);
-	                } catch (NumberFormatException e) {
-	                    throw new IOException("Invalid seed value: " + lastPart, e);
-	                }
-	            }
-
+	            seed = getOrResolve(lastPart);
 	            seedSpecies.put(specie, seed);
 	        }
 	    } catch (IOException e) {
@@ -165,54 +155,65 @@ public class SemiBNGLParser {
 	}
 
 	private void parseReactionRules(BufferedReader reader) throws IOException {
-		// Some logic here depending on the types declared
+		String line;
+		boolean reversible;
+		String[] reaction;
+		String[] arrowsRight;
+//		int[] rateConsts = new int[2];
+		List<Integer> rateConsts = new ArrayList<>();
+		try {
+			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end reaction rules")) {
+				if (line.contains("->")) {
+	                reversible = false;
+	                reaction = line.split("->");
+	            } else if (line.contains("<->")) {
+	                reversible = true;
+	                reaction = line.split("<->");
+	            } else {
+	                throw new IllegalArgumentException("Invalid reaction rule format");
+	            }
+				
+				reaction[0] = reaction[0].trim(); // Reactants
+				reaction[1] = reaction[1].trim(); // Products plus rate constants
+				arrowsRight = reaction[1].split("\\s+");
+				reaction[1] = arrowsRight[0]; // Products
+				arrowsRight[1] = String.join("", Arrays.copyOfRange(arrowsRight, 1, arrowsRight.length));
+				String[] consts = arrowsRight[1].split(",");
+				
+				if (reversible) {
+					assert consts.length == 2;
+					for (int i = 0; i < 2; i++)
+						rateConsts.add(getOrResolve(consts[i]));
+				} else {
+					assert consts.length == 1;
+					rateConsts.add(getOrResolve(consts[0]));
+				}
+				
+				ReactionRule rr;
+				if (moleculeTypes.isEmpty())
+					rr = new ReactionRule(reaction, rateConsts,reversible);
+				else
+					rr = new ReactionRule(reaction, rateConsts, reversible, moleculeTypes);
+				
+				reactionRules.add(rr);
+			}
+		} catch (IOException e) {
+			throw new IOException("Error reading reaction rules", e);
+		}
+	}	
+	
+	// Resolves constant parameters
+	private int getOrResolve(String s) {
+		if (parameters.containsKey(s))
+			return parameters.get(s).intValue();
+		else {
+			try {
+				return Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Invalid constatnt value: " + s);
+            }
+		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// Getters for the parsed data
 	public Map<String, Double> getParameters() {
@@ -231,7 +232,7 @@ public class SemiBNGLParser {
 		return observables;
 	}
 	
-	public List<String> getReactionRules () {
+	public List<ReactionRule> getReactionRules () {
 		return reactionRules;
 	}
 }
