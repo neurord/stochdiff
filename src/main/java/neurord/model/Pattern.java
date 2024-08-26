@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import neurord.model.StructuredSpecie.Bond;
+
 /**
  * Pattern: Similar to a Specie but with only a subset of state variables specified.
  */
@@ -70,6 +72,49 @@ public class Pattern extends StructuredSpecie {
 	    
 	    Site s = new Site(site.getName(), state);
 	    component.addSite(s);
+	}
+	
+	// Returns the pattern in its exact string expression
+	public String toFormalString() {
+	    StringBuilder formalString = new StringBuilder();
+	    List<StructuredMolecule> components = getMoleculeComponents();
+
+	    for (int i = 0; i < components.size(); i++) {
+	        StructuredMolecule component = components.get(i);
+	        formalString.append(component.getName()).append("(");
+
+	        Map<String, Site> sites = component.getSites();
+	        List<Bond> bonds = getComponentBonds(i);
+
+	        for (Map.Entry<String, Site> entry : sites.entrySet()) {
+	            String siteName = entry.getKey();
+	            Site site = entry.getValue();
+
+	            formalString.append(siteName);
+
+	            if (site.getState() != null && !site.getState().equals("+")) {
+	                formalString.append("~").append(site.getState());
+	            }
+
+	            // Check if the site has a bond associated with it
+	            for (Bond bond : bonds) {
+	                if (bond.getSiteName().equals(siteName)) {
+	                    formalString.append("!").append(bond.getBondIndex());
+	                }
+	            }
+	            formalString.append(",");
+	        }
+	        
+	        if (formalString.charAt(formalString.length() - 1) == ',') {
+	            formalString.deleteCharAt(formalString.length() - 1);
+	        }
+	        formalString.append(").");
+	    }
+
+	    if (formalString.charAt(formalString.length() - 1) == '.') {
+	        formalString.deleteCharAt(formalString.length() - 1);
+	    }
+	    return formalString.toString();
 	}
 	
 	@Override
