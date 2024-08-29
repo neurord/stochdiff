@@ -9,7 +9,7 @@ public class ReactionRule {
 	private List<Pattern> reactants;
 	private List<Pattern> products;
 	private List<Integer> rateConsts;
-	private List<StructuredMolecule> moleculeTypes;
+	protected static List<StructuredMolecule> moleculeTypes;
 	private boolean reversible;
 	
 	public ReactionRule(String[] reaction, List<Integer> rateConsts, boolean reversible) {
@@ -26,7 +26,7 @@ public class ReactionRule {
 		this.reaction = reaction;
 		this.rateConsts = rateConsts;
 		this.reversible = reversible;
-		this.moleculeTypes = moleculeTypes;
+		ReactionRule.moleculeTypes = moleculeTypes;
 		this.reactants = new ArrayList<>();
 		this.products = new ArrayList<>();
 		parseReaction();
