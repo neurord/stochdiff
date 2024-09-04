@@ -2,12 +2,14 @@ package neurord.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A representation of a reaction rule expanded to its full set of possible reactants and products.
@@ -33,14 +35,14 @@ public class RuleExpansion {
 		
 		for (Pattern reactant : reactionRule.getReactants()) {
 			List<Pattern> matchingPatterns = new ArrayList<>();
-			matchingPatterns = constructSpeciesFromPattern(reactant, matchingPatterns);
+			matchingPatterns = constructSpeciesFromPattern(reactant, new HashSet<>());
 			if (matchingPatterns != null && !matchingPatterns.isEmpty())
 				reactantLists.add(matchingPatterns);
 		}
 		
 		for (Pattern product : reactionRule.getProducts()) {
 			List<Pattern> matchingPatterns = new ArrayList<>();
-			matchingPatterns = constructSpeciesFromPattern(product, matchingPatterns);
+			matchingPatterns = constructSpeciesFromPattern(product, new HashSet<>());
 			if (matchingPatterns != null && !matchingPatterns.isEmpty())
 				productLists.add(matchingPatterns);
 		}
@@ -70,11 +72,11 @@ public class RuleExpansion {
         }
     }
 	
-	private List<Pattern> constructSpeciesFromPattern(Pattern pattern, List<Pattern> matchingPatterns) {
+	private List<Pattern> constructSpeciesFromPattern(Pattern pattern, Set<Pattern> matchingPatterns) {
 		if (moleculeTypesMap == null || moleculeTypesMap.isEmpty()) {
 		    log.warn("Molecule types list is empty. The reaction rule cannot be expanded any further.");
 		    matchingPatterns.add(pattern);
-		    return matchingPatterns;
+		    return new ArrayList<>(matchingPatterns);
 		}
 
 	    List<StructuredMolecule> components = pattern.getMoleculeComponents();
@@ -100,7 +102,7 @@ public class RuleExpansion {
 	    // Base case:
 	    if (hasAllSites) {
 	        matchingPatterns.add(pattern);
-	        return matchingPatterns;
+	        return new ArrayList<>(matchingPatterns);
 	    }
 	    
 	    for (int i = 0; i < components.size(); i++) {
@@ -127,18 +129,10 @@ public class RuleExpansion {
 	                    newPattern.addSite(name, i, site, state);  // Specify the component index
 	                    constructSpeciesFromPattern(newPattern, matchingPatterns);
 	                }
-	            } else {
-	                for (String state : states) {
-	                    if (!state.equals(component.getSite(siteName).getState())) {
-	                        Pattern newPattern = new Pattern(pattern.toFormalString());
-	                        newPattern.addSite(name, i, site, state);  // Specify the component index
-	                        constructSpeciesFromPattern(newPattern, matchingPatterns);
-	                    }
-	                }
 	            }
 	        }
 	    }	    
-	    return matchingPatterns;
+	    return new ArrayList<>(matchingPatterns);
 	}
 	
 	public List<String> getReactantCombinations() {
