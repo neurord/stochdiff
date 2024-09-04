@@ -1,6 +1,8 @@
 package neurord.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +66,7 @@ public class Pattern extends StructuredSpecie {
 	}
 	
 	// Add a site to a component specified by its index (not just name)
+	// Sites are passed to this method from a Molecule type hence '+' is the only possible bond index
 	public void addSite(String moleculeName, int index, Site site, String state) {
 	    StructuredMolecule component = getMoleculeComponents().get(index);
 	    if (!component.getName().equals(moleculeName)) {
@@ -71,10 +74,13 @@ public class Pattern extends StructuredSpecie {
 	    }
 	    
 	    Site s = new Site(site.getName(), state);
+	    if (state.equals("+")) {
+	    	this.addBond(index, new Bond(moleculeName, site.getName(), state));
+	    }
 	    component.addSite(s);
 	}
 	
-	// Returns the pattern in its exact string expression
+	// Returns the pattern in its exact string form
 	public String toFormalString() {
 	    StringBuilder formalString = new StringBuilder();
 	    List<StructuredMolecule> components = getMoleculeComponents();
@@ -92,7 +98,8 @@ public class Pattern extends StructuredSpecie {
 
 	            formalString.append(siteName);
 
-	            if (site.getState() != null && !site.getState().equals("+")) {
+	            if (site.getState() != null && !site.getState().equals("")
+	            		&& !site.getState().equals("+")) {
 	                formalString.append("~").append(site.getState());
 	            }
 
@@ -128,4 +135,84 @@ public class Pattern extends StructuredSpecie {
 		
 		return "Pattern{" + sb.toString() + "}";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+	    Pattern other = (Pattern) obj;
+	    
+	    // If number of components (molecules) is different, the patterns are not equal
+	    if (this.getMoleculeComponents().size() != other.getMoleculeComponents().size()) {
+	        return false;
+	    }
+	    
+	    // Use a set to track unmatched molecules in the "other" pattern and keep "other" intact
+	    Set<StructuredMolecule> unmatchedMolecules = new HashSet<>(other.getMoleculeComponents());
+	    
+	    return patternsAreEqual(this.getMoleculeComponents(), unmatchedMolecules, 0);
+	}
+
+	// Compares patterns regardless od ordering of their components
+	private boolean patternsAreEqual(List<StructuredMolecule> thisMolecules, Set<StructuredMolecule> unmatchedMolecules, int index) {
+	    
+	    // Base case: if all molecules are matched
+	    if (index == thisMolecules.size()) {
+	        return unmatchedMolecules.isEmpty();
+	    }
+	    
+	    StructuredMolecule thisComponent = thisMolecules.get(index);
+	    
+	    for (StructuredMolecule otherComponent : new HashSet<>(unmatchedMolecules)) {
+	        if (thisComponent.getName().equals(otherComponent.getName()) &&
+	            thisComponent.getSites().size() == otherComponent.getSites().size()) {
+	            
+	            boolean allSitesMatch = true;
+	            for (String siteName : thisComponent.getSites().keySet()) {
+	                Site thisSite = thisComponent.getSite(siteName);
+	                Site otherSite = otherComponent.getSite(siteName);
+	                
+	                if (otherSite == null || !thisSite.getState().equals(otherSite.getState())) {
+	                    allSitesMatch = false;
+	                    break;
+	                }
+	            }
+	            
+	            if (allSitesMatch) {
+	                unmatchedMolecules.remove(otherComponent);
+	                return patternsAreEqual(thisMolecules, unmatchedMolecules, index + 1);
+	            }
+	        }
+	    }
+	    return false;
+	}
+
+	@Override
+	public int hashCode() {
+	    int code = 17;
+	    
+	    // Sort components by name to make hashing insensitive to the order of components
+	    List<StructuredMolecule> sortedMolecules = new ArrayList<>(this.getMoleculeComponents());
+	    sortedMolecules.sort(Comparator.comparing(StructuredMolecule::getName));
+	    
+	    for (StructuredMolecule molecule : sortedMolecules) {
+	        code *= 31 + molecule.getName().hashCode();
+	        
+	        List<String> sortedSiteNames = new ArrayList<>(molecule.getSites().keySet());
+	        sortedSiteNames.sort(String::compareTo);
+	        
+	        for (String siteName : sortedSiteNames) {
+	            Site site = molecule.getSite(siteName);
+	            code *= 31 + siteName.hashCode();
+	            code *= 31 + site.getState().hashCode();
+	        }
+	    }    
+	    return code;
+	}
+
+
 }
