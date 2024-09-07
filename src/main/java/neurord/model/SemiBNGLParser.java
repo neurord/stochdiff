@@ -163,12 +163,12 @@ public class SemiBNGLParser {
 		List<Integer> rateConsts = new ArrayList<>();
 		try {
 			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end reaction rules")) {
-				if (line.contains("->")) {
-	                reversible = false;
-	                reaction = line.split("->");
-	            } else if (line.contains("<->")) {
+				if (line.contains("<->")) {
 	                reversible = true;
 	                reaction = line.split("<->");
+	            } else if (line.contains("->")) {
+	                reversible = false;
+	                reaction = line.split("->");
 	            } else {
 	                throw new IllegalArgumentException("Invalid reaction rule format");
 	            }
