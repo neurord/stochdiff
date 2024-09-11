@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import neurord.model.StructuredSpecie.Bond;
-
 /**
  * Pattern: Similar to a Specie but with only a subset of state variables specified.
  */
