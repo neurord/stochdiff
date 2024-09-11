@@ -20,18 +20,24 @@ public class RuleExpansion {
 	private List<String> reactantCombinations;
 	private List<String> productCombinations;
 	private Map<String, StructuredMolecule> moleculeTypesMap;
+	private Set<Pattern> patternSet;
 	private static final Logger log = LogManager.getLogger(RuleExpansion.class.getName());
 	
 	public RuleExpansion (ReactionRule reactionRule) {
 		this.reactionRule = reactionRule;
 		this.moleculeTypesMap = new HashMap<>();
-		for (StructuredMolecule molecule : ReactionRule.moleculeTypes)
-		    moleculeTypesMap.put(molecule.getName(), molecule);
+		this.patternSet = new HashSet<>();
+		if (ReactionRule.moleculeTypes != null)
+			for (StructuredMolecule molecule : ReactionRule.moleculeTypes)
+				moleculeTypesMap.put(molecule.getName(), molecule);
 	}
 	
 	public void generateReactionSets() {
 		List<List<Pattern>> reactantLists = new ArrayList<>();
 		List<List<Pattern>> productLists = new ArrayList<>();
+		
+		if (moleculeTypesMap == null || moleculeTypesMap.isEmpty())
+			log.warn("Molecule types list is empty. The reaction rule cannot be expanded any further.");
 		
 		for (Pattern reactant : reactionRule.getReactants()) {
 			List<Pattern> matchingPatterns = new ArrayList<>();
@@ -49,6 +55,7 @@ public class RuleExpansion {
 		
 		this.reactantCombinations = generateCombinations(reactantLists);
 		this.productCombinations = generateCombinations(productLists);
+		populatePatternSet(reactantLists, productLists);
 	}
 	
 	private List<String> generateCombinations(List<List<Pattern>> patternLists) {
@@ -74,7 +81,6 @@ public class RuleExpansion {
 	
 	private List<Pattern> constructSpeciesFromPattern(Pattern pattern, Set<Pattern> matchingPatterns) {
 		if (moleculeTypesMap == null || moleculeTypesMap.isEmpty()) {
-		    log.warn("Molecule types list is empty. The reaction rule cannot be expanded any further.");
 		    matchingPatterns.add(pattern);
 		    return new ArrayList<>(matchingPatterns);
 		}
@@ -135,12 +141,26 @@ public class RuleExpansion {
 	    return new ArrayList<>(matchingPatterns);
 	}
 	
+	private void populatePatternSet(List<List<Pattern>> rLists, List<List<Pattern>> pLists) {
+		for (int i = 0; i < rLists.size(); i++)
+			for (int j = 0; j < rLists.get(i).size(); j++)
+				this.patternSet.add(rLists.get(i).get(j));
+
+		for (int i = 0; i < pLists.size(); i++)
+			for (int j = 0; j < pLists.get(i).size(); j++)
+				this.patternSet.add(pLists.get(i).get(j));
+	}
+	
 	public List<String> getReactantCombinations() {
 		return reactantCombinations;
 	}
 	
 	public List<String> getProductCombinations() {
 		return productCombinations;
+	}
+	
+	public Set<Pattern> getPatternSet() {
+		return patternSet;
 	}
 
 }
