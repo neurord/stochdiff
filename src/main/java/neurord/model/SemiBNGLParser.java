@@ -50,7 +50,7 @@ public class SemiBNGLParser {
     private void parseParameters(BufferedReader reader) throws IOException {
     	String line;
     	try {
-    		while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end parameters")) {
+    		while (!(line = reader.readLine().replaceAll("#.*$", "").trim()).equals("end parameters")) {
     			String[] param =  line.split("\\s+");
     			ParameterResolver pr = new ParameterResolver();
     			if (param.length == 2) {
@@ -76,7 +76,9 @@ public class SemiBNGLParser {
 	private void parseMoleculeTypes(BufferedReader reader) throws IOException {
 		String line;
 		try {
-			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end molecule types")) {
+			while (!(line = reader.readLine().replaceAll("#.*$", "").trim()).equals("end molecule types")) {
+				if (line.isEmpty())
+					continue;
 				String allCharMolecule = line.replaceAll("\\s+", "");
 				StructuredMolecule molecule = new StructuredMolecule(allCharMolecule);
 				moleculeTypes.add(molecule);
@@ -89,7 +91,10 @@ public class SemiBNGLParser {
 	private void parseSeedSpecies(BufferedReader reader) throws IOException {
 	    String line;
 	    try {
-	        while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end seed species")) {
+	        while (!(line = reader.readLine().replaceAll("#.*$", "").trim()).equals("end seed species")) {
+	        	if (line.isEmpty())
+	        		continue;
+	        	
 	            Integer seed;
 	            String[] parts = line.split("\\s+");
 
@@ -118,9 +123,11 @@ public class SemiBNGLParser {
 	private void parseObservables(BufferedReader reader) throws IOException {
 	    String line;
 	    try {
-	        while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end observables")) {
+	        while (!(line = reader.readLine().replaceAll("#.*$", "").trim()).equals("end observables")) {
+	        	if (line.isEmpty())
+	        		continue;
+	        	
 	            String[] parts = line.split("\\s+");
-
 	            // Make sure the input has at least 3 parts: Type, PatternName and at least one Pattern
 	            if (parts.length < 3) {
 	                throw new IllegalArgumentException("Invalid input format. Expected: Type PatternName Pattern1 ... PatternN");
@@ -159,10 +166,11 @@ public class SemiBNGLParser {
 		boolean reversible;
 		String[] reaction;
 		String[] arrowsRight;
-//		int[] rateConsts = new int[2];
 		List<Integer> rateConsts = new ArrayList<>();
 		try {
-			while (!(line = reader.readLine().replaceAll("^\\s*#.*$", "").trim()).equals("end reaction rules")) {
+			while (!(line = reader.readLine().replaceAll("#.*$", "").trim()).equals("end reaction rules")) {
+				if (line.isEmpty())
+					continue;
 				if (line.contains("<->")) {
 	                reversible = true;
 	                reaction = line.split("<->");
