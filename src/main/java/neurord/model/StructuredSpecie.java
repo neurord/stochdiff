@@ -43,13 +43,11 @@ public class StructuredSpecie {
 	
 	private List<StructuredMolecule> molecules;
 	private Map<String, StructuredMolecule> moleculeTypesMap;
-//	private List<Bond> bonds;
 	private Map<Integer, List<Bond>> componentBonds; // A component's bonds are a subset of its sites
 	
 	public StructuredSpecie(String specie) {
 		this.molecules = new ArrayList<>();
 		this.componentBonds = new HashMap<>();
-//		this.bonds = new ArrayList<>();
 		parseSpecie(specie);
 		validateBonds();
 	}
@@ -65,12 +63,7 @@ public class StructuredSpecie {
 		validateSpecie();
 		validateBonds();
 	}
-	
-//	public void parseSpecie(String specie) {
-//		String[] components = specie.split("\\.");
-//		for (String component : components)
-//			molecules.add(parseMolecule(component));
-//	}
+
 	public void parseSpecie(String specie) {
 		String[] components = specie.split("\\.");
 		for (int i = 0; i < components.length; i++)
@@ -112,7 +105,7 @@ public class StructuredSpecie {
 			if (bondIndex.equals("+")) {
 				state = bondIndex;
 			}
-//			bonds.add(new Bond(moleculeName.toString(), siteName, bondIndex));
+
 			Bond bond = new Bond(moleculeName.toString(), siteName, bondIndex);
 			componentBonds.computeIfAbsent(componentIndex, k -> new ArrayList<>()).add(bond);
 		}
@@ -160,36 +153,6 @@ public class StructuredSpecie {
 	    }
 	}
 	
-//	// Make sure that we have no lone bond indices
-//	private void validateBonds() {
-//	    HashMap<String, Integer> indexMap = new HashMap<>();
-//	    
-//	    for (Bond bond : bonds) {
-//	        String key = bond.bondIndex;
-//	        if (!key.equals("+")) {
-//	            int value = indexMap.getOrDefault(key, 0) + 1;
-//	            indexMap.put(key, value);
-//	        }
-//	    }
-//
-//	    for (Map.Entry<String, Integer> entry : indexMap.entrySet()) {
-//	        String bondIndex = entry.getKey();
-//	        int count = entry.getValue();
-//	        
-//	        if (count < 2) {
-//	        	Bond unpairedBond = bonds.stream()
-//	                    .filter(b -> b.bondIndex.equals(bondIndex))
-//	                    .findFirst()
-//	                    .orElseThrow(() -> new IllegalArgumentException("Unexpected error during bond validation"));
-//
-//	            throw new IllegalArgumentException(
-//	                "Validation failed: Unpaired bond index " + bondIndex + " at site " + unpairedBond.siteName
-//	            );
-//	        }
-//	    }
-//	    // TODO: Add checks for the existence of bonding sites in a multi-component specie
-//	}
-	
 	// Make sure that we have no lone bond indices
 	private void validateBonds() {
 	    HashMap<String, Integer> indexMap = new HashMap<>();
@@ -224,7 +187,10 @@ public class StructuredSpecie {
 	    }
 	    // TODO: Add checks for the existence of bonding sites in a multi-component specie
 	}
-
+	
+	public void addBond(int componentIndex, Bond bond) {
+		this.componentBonds.computeIfAbsent(componentIndex, k -> new ArrayList<>()).add(bond);
+	}
 
 	public List<Site> getSite(String moleculeName, String siteName) {
 		List<Site> matchingSites = new ArrayList<>();
@@ -242,10 +208,6 @@ public class StructuredSpecie {
 	public List<StructuredMolecule> getMoleculeComponents() {
 		return Collections.unmodifiableList(molecules);
 	}
-	
-//	public List<Bond> getBonds() {
-//	    return Collections.unmodifiableList(bonds);
-//	}
 	
 	// Returns bonds associated with a specific molecule component
 	public List<Bond> getComponentBonds(int componentIndex) {
