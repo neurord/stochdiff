@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
+import neurord.model.RBSRun;
 import neurord.model.SDRun;
 import neurord.xml.ModelReader.XMLUnmarshallingFailure;
 
@@ -82,6 +83,8 @@ public class StochDiff {
         options.addOption("v", "verbose", false, "increase log level");
         options.addOption("s", "statistics", true, "override statistics gathering " +
                           "({none|injections|by-channel|by-event}[:interval])");
+        
+        options.addOption(null, "rbs", false, "run rule-based model file");
 
         Option property = OptionBuilder.withArgName("property=value")
             .hasArgs(2)
@@ -141,6 +144,7 @@ public class StochDiff {
         if (argv.length > 1) {
             if (argv[1].endsWith(".h5") ||
                 argv[1].endsWith(".txt") ||
+                argv[1].endsWith(".xml") ||	// check added for RBS output files
                 argv[1].endsWith(".log"))
                 outputFile = new File(argv[1].substring(0, argv[1].lastIndexOf(".")));
             else
@@ -158,6 +162,17 @@ public class StochDiff {
 
         if (!logfile.equals("no"))
             log.info("Writing logs to {}", logfile);
+        
+        // If specified with the -rbs flag, process rule-based models and exit
+        if (cmd.hasOption("rbs")) {
+            log.info("Processing rule-based model file.");
+            RBSRun rbsRun = new RBSRun();
+            rbsRun.loadFromFile(modelFile);
+            if (rbsRun != null) {
+                rbsRun.toXML(outputFile);
+            }
+            System.exit(0);
+        }
 
         final File ic_file = Settings.getOption(cmd, "ic", null);
         final int ic_trial = Settings.getOption(cmd, "ic-trial", 0);
