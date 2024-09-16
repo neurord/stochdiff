@@ -15,7 +15,7 @@
   </appenders>
 
   <loggers>
-    <root level="notice">
+    <root level="WARN">
       <appender-ref ref="model-logfile"/>
     </root>
     <logger name="neurord.StochDiff" />
@@ -31,6 +31,10 @@
     <logger name="neurord.model.SDRun" />
     <logger name="neurord.model.SurfaceDensitySet" />
     <logger name="neurord.model.InitialConditions" />
+    <logger name="neurord.model.RBSRun" />
+    <logger name="neurord.model.RuleExpansion" />
+    <logger name="neurord.model.ReactionWriterXML" />
+    <logger name="neurord.model.ReactionWriterText" />
     <logger name="neurord.util.TimeUtil" />
     <logger name="neurord.util.Settings" />
   </loggers>
