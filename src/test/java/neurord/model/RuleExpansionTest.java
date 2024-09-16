@@ -28,12 +28,12 @@ public class RuleExpansionTest {
         StructuredMolecule molecule1 = new StructuredMolecule("R(DD!+,Y~U~P)");
         StructuredMolecule molecule2 = new StructuredMolecule("S(Y~U~P,SH2,Kin~inact~act,W~U~P)");
         
-//        molecule1.addSite(new Site("Inja", "bala~paein"));
-//        molecule2.addSite(new Site("Anja", "chap~raast"));
+        molecule1.addSite(new Site("Inja", "bala~paein"));
+        molecule2.addSite(new Site("Anja", "chap~raast"));
         
         this.moleculeTypes = new ArrayList<>();
-//        moleculeTypes.add(molecule1);
-//        moleculeTypes.add(molecule2);
+        moleculeTypes.add(molecule1);
+        moleculeTypes.add(molecule2);
         
         rule = new ReactionRule(reaction, rateConsts, false, moleculeTypes);
         ruleExpansion = new RuleExpansion(rule);
