@@ -5,16 +5,16 @@ public class MaxEntropySolver {
 	private static final double ALPHA = 0.1;       // Decay profile parameter
     private static final double EPSILON = 1e-6;   // Small value for higher-order lambdas
     private static final int M_CRITICAL = 6;      // Threshold for lambda decay
-    private static final int MAX_ITERATIONS = 100;
+    private static final int MAX_ITERATIONS = 20;
     private static final double TOLERANCE = 1e-4;
 	
-	private double[] population;
+	private int[] population;
 	private double[] multipliers;
 //	private double[][] moments;
 	private int closureOrder;
 	private int numSpecies;
 	
-	public MaxEntropySolver(double[] population, int closureOrder) {
+	public MaxEntropySolver(int[] population, int closureOrder) {
 		this.population = population;
 		this.closureOrder = closureOrder;
 		this.numSpecies = population.length;
@@ -82,8 +82,8 @@ public class MaxEntropySolver {
 	        double stateEnumeration = 0.0; // Marginalized sum for species n
 
 	        // Precompute and store marginalized p_H(x) per iteration
-	        double[] probability = new double[MAX_ITERATIONS + 1];
-	        for (int x = 0; x <= MAX_ITERATIONS; x++) {
+	        double[] probability = new double[MAX_ITERATIONS];
+	        for (int x = 0; x < MAX_ITERATIONS; x++) {
 	            double exponent = -1.0;
 	            for (int m = 0; m <= closureOrder; m++) {
 	                int index = n * (closureOrder + 1) + m;
@@ -93,11 +93,11 @@ public class MaxEntropySolver {
 	        }
 
 	        // Calculate the summation term for <x^order>
-	        for (int x = 0; x <= MAX_ITERATIONS; x++) {
+	        for (int x = 0; x < MAX_ITERATIONS; x++) {
 	            double diff = (order > 0 ? Math.pow(x, order) : 1.0) * probability[x];
 	            stateEnumeration += diff;
 
-	            if (diff < TOLERANCE) {
+	            if (diff < TOLERANCE && x > 0) {
 	                break;
 	            }
 	        }
