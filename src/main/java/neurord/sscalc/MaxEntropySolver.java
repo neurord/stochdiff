@@ -40,39 +40,35 @@ public class MaxEntropySolver {
 		}
 	};
 
-	// This method calculates the first two moments only (0th and 1st moments),
-	// assuming that only the 1st moment is known.
-//	private double[] calculateEntropyMoments() {
-//		// Calculate entropy moments using p_H(x)
-//		double normalizationConst = calcNormalizationConst();
-//		double zerothMoment, firstMoment = 1.0;
-//		
-//		for (int n = 0; n < numSpecies; n++) {
-//			zerothMoment *= calcSingleComponenetMoment(0); 
-//			firstMoment *= calcSingleComponenetMoment(componentMomentOrder[n]);
-//		}
-//	}
-	
-	/*
-	private double[] calculateEntropyMoments() {
-		// Calculate entropy moments using p_H(x)
-		// Can postpone the calculation of normalization constants to when 
-		// the needed moments are combined.
-		for (int n = 0; n < numSpecies; n++) {
-			for (int m = 0; m < orderSet[n].length; m++) {
-				int order = orderSet[m];
-//				double normalizationConst = calculateNormalizationConst(n, order);
-				moments[n][m] = calculateComponentMoment(n,order);
-			}
-		}
-		
+	// This method calculates the moment differences for the first two
+	// moments only (0th and 1st moments), assuming that only the 1st moment is known.
+	private double[] calculateMomentDifferences() {
+	    double[] momentDifferences = new double[numSpecies * 2];
+	    
+	    for (int n = 0; n < numSpecies; n++) {
+	        double[] knownMoments = {1.0, population[n]};
+	        
+	        int[] zerothOrder = new int[numSpecies];
+	        double zerothEntropyMoment = calculateEntropyMoment(zerothOrder);
+	        
+	        int[] firstOrder = new int[numSpecies];
+	        firstOrder[n] = 1;
+	        double firstEntropyMoment = calculateEntropyMoment(firstOrder);
+	        
+	        momentDifferences[n * 2] = knownMoments[0] - zerothEntropyMoment; // 0th-order difference
+	        momentDifferences[n * 2 + 1] = knownMoments[1] - firstEntropyMoment; // 1st-order difference
+	    }
+	    
+	    return momentDifferences;
 	}
 	
-	private double calculateComponentMoment(int specie, int order) {
-		for ()
+	private double calculateNormError(double[] momentDifferences) {
+	    double normError = 0.0;
+	    for (double diff : momentDifferences) {
+	        normError += diff * diff;
+	    }
+	    return normError;
 	}
-	*/
-	
 	
 	public double calculateEntropyMoment(int[] orders) {
 	    double moment = 1.0;
