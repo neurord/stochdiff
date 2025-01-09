@@ -25,16 +25,36 @@ public class MaxEntropySolver {
 		this.em = new EntropyMoment(numSpecies, truncationLimit);
 		this.jacobian = new Jacobian(numSpecies, truncationLimit);
 	}
-	
-//	private double[] solve() {
-		// Returns an array of the multipliers, basically the answer array that we are looking for.
-		// Initialize the multipliers matrix (step 1)
-		// Calculate the lower-order maximum entropy moments, μ_H , using p_H(x) (step 3)
-		// Calculate the difference between the known moments and maximum entropy moments (step 4)
-		// Calculate the 2-norm error: $\DELTA = \Delta\mu^T * \Delta\mu$ (step 5)
-		
-//	}
 
+	// Returns an array of multipliers, basically the answer array 
+	// to construct the MEP density distribution
+	public double[] solve() {
+	    double normError;
+	    int maxIterations = 1000;
+	    int iterations = 0;
+	    
+	    initializeMultipliers();
+	    double[] momentDifferences = calculateMomentDifferences();
+	    normError = calculateNormError(momentDifferences);
+
+	    while (normError > EPSILON && iterations < maxIterations) {
+	        iterations++;
+	        DMatrixRMaj inverseJ = jacobian.invertJacobian(jacobian.calculateBlockDiagonalJacobian(multipliers));
+	        double[] deltaLambda = calculateMultipliersStep(inverseJ, momentDifferences);
+	        updateMultipliers(deltaLambda);
+
+	        momentDifferences = calculateMomentDifferences();
+	        normError = calculateNormError(momentDifferences);
+
+	        System.out.printf("Iteration %d: normError = %.6f%n", iterations, normError);
+	    }
+
+	    if (iterations >= maxIterations) {
+	        throw new RuntimeException("Solver failed to converge within maximum iterations.");
+	    }
+
+	    return this.multipliers;
+	}
 	
 	private void initializeMultipliers() {
 		for (int n = 0; n < numSpecies; n++) {
