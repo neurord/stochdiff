@@ -1,9 +1,6 @@
 package neurord.sscalc;
 
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.data.DMatrixSparseCSC;
-import org.ejml.sparse.csc.factory.LinearSolverFactory_DSCC;
-import org.ejml.interfaces.linsol.LinearSolverSparse;
+import org.apache.commons.math3.linear.*;
 
 public class Jacobian {
 	private final int numSpecies;
@@ -13,46 +10,20 @@ public class Jacobian {
     public Jacobian(int numSpecies, int truncationLimit) {
         this.numSpecies = numSpecies;
         this.truncationLimit = truncationLimit;
-        this.em = new EntropyMoment(truncationLimit, numSpecies);
+        this.em = new EntropyMoment(numSpecies, truncationLimit);
     }
 
     /**
      * Calculate the block diagonal Jacobian matrix for the system.
      * @param multipliers Array of Lagrange multipliers.
-     * @return Jacobian matrix as a 2D array.
+     * @return sparse Jacobian matrix.
      */
-//    public double[][] calculateBlockDiagonalJacobian(double[] multipliers) {
-//    	int numKnownMoments = truncationLimit + 1;
-//    	int totalSize = numSpecies * numKnownMoments;
-//        double[][] jacobian = new double[totalSize][totalSize];
-//
-//        for (int n = 0; n < numSpecies; n++) {
-//            // Jacobian block for species n
-//            double[][] block = new double[numKnownMoments][numKnownMoments];
-//            for (int i = 0; i < numKnownMoments; i++) {
-//                for (int j = 0; j < numKnownMoments; j++) {
-//                    int[] orders = new int[numSpecies];
-//                    orders[n] = i + j;
-//                    block[i][j] = -em.calculateEntropyMoment(orders, multipliers);
-//                }
-//            }
-//
-//            for (int i = 0; i < numKnownMoments; i++) {
-//                for (int j = 0; j < numKnownMoments; j++) {
-//                    jacobian[n * numKnownMoments + i][n * numKnownMoments + j] = block[i][j];
-//                }
-//            }
-//        }
-//
-//        return jacobian;
-//    }
-    
-    public DMatrixSparseCSC calculateBlockDiagonalJacobian(double[] multipliers) {
+    public OpenMapRealMatrix calculateBlockDiagonalJacobian(double[] multipliers) {
         int numKnownMoments = truncationLimit + 1;
         int totalSize = numSpecies * numKnownMoments;
 
         // Sparse matrix for Jacobian
-        DMatrixSparseCSC jacobian = new DMatrixSparseCSC(totalSize, totalSize, totalSize);
+        OpenMapRealMatrix jacobian = new OpenMapRealMatrix(totalSize, totalSize);
 
         for (int n = 0; n < numSpecies; n++) {
             for (int i = 0; i < numKnownMoments; i++) {
@@ -64,7 +35,7 @@ public class Jacobian {
 
                     int globalRow = n * numKnownMoments + i;
                     int globalCol = n * numKnownMoments + j;
-                    jacobian.set(globalRow, globalCol, value);
+                    jacobian.setEntry(globalRow, globalCol, value);
                 }
             }
         }
@@ -72,25 +43,34 @@ public class Jacobian {
         return jacobian;
     }
     
-    public DMatrixRMaj invertJacobian(DMatrixSparseCSC jacobian) {
-        LinearSolverSparse<DMatrixSparseCSC, DMatrixRMaj> solver = LinearSolverFactory_DSCC.lu(null);
+    public OpenMapRealMatrix invertJacobian(OpenMapRealMatrix jacobian) {
+        if (jacobian.getRowDimension() != jacobian.getColumnDimension()) {
+            throw new IllegalArgumentException("Jacobian has to be square.");
+        }
 
-        if (!solver.setA(jacobian)) {
+        LUDecomposition luDecomposition = new LUDecomposition(jacobian);
+
+        if (!luDecomposition.getSolver().isNonSingular()) {
             throw new RuntimeException("Jacobian matrix is singular and cannot be inverted.");
         }
+        
+        RealMatrix denseInverse = luDecomposition.getSolver().getInverse();
 
-        // Create an identity matrix (rhs),
-        // to solve for it. I.e. obtaining the inverse
-        DMatrixRMaj identity = new DMatrixRMaj(jacobian.numCols, jacobian.numCols);
-        for (int i = 0; i < jacobian.numCols; i++) {
-            identity.set(i, i, 1.0);
+        // Convert the inverted matrix to an OpenMapRealMatrix
+        int nRows = denseInverse.getRowDimension();
+        int nColumns = denseInverse.getColumnDimension();
+        OpenMapRealMatrix sparseInverse = new OpenMapRealMatrix(nRows, nColumns);
+        for (int i = 0; i < nRows; i++) {
+            for (int j = 0; j < nColumns; j++) {
+                double value = denseInverse.getEntry(i, j);
+                if (value != 0.0) {
+                    sparseInverse.setEntry(i, j, value);
+                }
+            }
         }
 
-        // Create the dense inverted matrix
-        DMatrixRMaj inverse = new DMatrixRMaj(jacobian.numCols, jacobian.numRows);
-        solver.solve(identity, inverse);
-        
-        return inverse;
+        return sparseInverse;
     }
+    
 
 }
