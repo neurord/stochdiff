@@ -1,7 +1,7 @@
 package neurord.sscalc;
 
-import org.ejml.data.DMatrixRMaj;
-import org.ejml.dense.row.CommonOps_DDRM;
+import org.apache.commons.math3.linear.OpenMapRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 
 public class MaxEntropySolver {
 	
@@ -39,7 +39,9 @@ public class MaxEntropySolver {
 
 	    while (normError > EPSILON && iterations < maxIterations) {
 	        iterations++;
-	        DMatrixRMaj inverseJ = jacobian.invertJacobian(jacobian.calculateBlockDiagonalJacobian(multipliers));
+	        
+	        OpenMapRealMatrix inverseJ = 
+	        		jacobian.invertJacobian(jacobian.calculateBlockDiagonalJacobian(multipliers));
 	        double[] deltaLambda = calculateMultipliersStep(inverseJ, momentDifferences);
 	        updateMultipliers(deltaLambda);
 
@@ -101,21 +103,39 @@ public class MaxEntropySolver {
 	 * @param momentDifferences: \Delta\mu vector with dimensions (w * 1)
 	 * @return deltaLambda: with dimensions (w * 1)
 	 */
-	private double[] calculateMultipliersStep(DMatrixRMaj inverseJ, double[] momentDifferences) {
-		int w = momentDifferences.length;
+//	private double[] calculateMultipliersStep(DMatrixRMaj inverseJ, double[] momentDifferences) {
+//		int w = momentDifferences.length;
+//
+//        DMatrixRMaj deltaMu = new DMatrixRMaj(w, 1);
+//        for (int i = 0; i < w; i++)
+//            deltaMu.set(i, 0, momentDifferences[i]);
+//
+//        DMatrixRMaj deltaLambda = new DMatrixRMaj(w, 1);
+//        CommonOps_DDRM.mult(inverseJ, deltaMu, deltaLambda);
+//        
+//        double[] deltaLambdaArray = new double[w];
+//        for (int i = 0; i < w; i++)
+//            deltaLambdaArray[i] = deltaLambda.get(i, 0);
+//
+//        return deltaLambdaArray;
+//	}
+	
+	private double[] calculateMultipliersStep(OpenMapRealMatrix inverseJ, double[] momentDifferences) {
+	    int w = momentDifferences.length;
 
-        DMatrixRMaj deltaMu = new DMatrixRMaj(w, 1);
-        for (int i = 0; i < w; i++)
-            deltaMu.set(i, 0, momentDifferences[i]);
+	    RealMatrix deltaMu = new OpenMapRealMatrix(w, 1);
+	    for (int i = 0; i < w; i++) {
+	        deltaMu.setEntry(i, 0, momentDifferences[i]);
+	    }
 
-        DMatrixRMaj deltaLambda = new DMatrixRMaj(w, 1);
-        CommonOps_DDRM.mult(inverseJ, deltaMu, deltaLambda);
-        
-        double[] deltaLambdaArray = new double[w];
-        for (int i = 0; i < w; i++)
-            deltaLambdaArray[i] = deltaLambda.get(i, 0);
+	    RealMatrix deltaLambda = inverseJ.multiply(deltaMu);
 
-        return deltaLambdaArray;
+	    double[] deltaLambdaArray = new double[w];
+	    for (int i = 0; i < w; i++) {
+	        deltaLambdaArray[i] = deltaLambda.getEntry(i, 0);
+	    }
+
+	    return deltaLambdaArray;
 	}
 	
 	private void updateMultipliers(double[] deltaLambda) {
