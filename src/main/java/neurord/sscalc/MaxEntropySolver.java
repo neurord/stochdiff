@@ -33,7 +33,7 @@ public class MaxEntropySolver {
 	    int maxIterations = 1000;
 	    int iterations = 0;
 	    
-	    initializeMultipliers();
+//	    initializeMultipliers();
 	    double[] momentDifferences = calculateMomentDifferences();
 	    normError = calculateNormError(momentDifferences);
 
@@ -103,23 +103,6 @@ public class MaxEntropySolver {
 	 * @param momentDifferences: \Delta\mu vector with dimensions (w * 1)
 	 * @return deltaLambda: with dimensions (w * 1)
 	 */
-//	private double[] calculateMultipliersStep(DMatrixRMaj inverseJ, double[] momentDifferences) {
-//		int w = momentDifferences.length;
-//
-//        DMatrixRMaj deltaMu = new DMatrixRMaj(w, 1);
-//        for (int i = 0; i < w; i++)
-//            deltaMu.set(i, 0, momentDifferences[i]);
-//
-//        DMatrixRMaj deltaLambda = new DMatrixRMaj(w, 1);
-//        CommonOps_DDRM.mult(inverseJ, deltaMu, deltaLambda);
-//        
-//        double[] deltaLambdaArray = new double[w];
-//        for (int i = 0; i < w; i++)
-//            deltaLambdaArray[i] = deltaLambda.get(i, 0);
-//
-//        return deltaLambdaArray;
-//	}
-	
 	private double[] calculateMultipliersStep(OpenMapRealMatrix inverseJ, double[] momentDifferences) {
 	    int w = momentDifferences.length;
 
